@@ -53,11 +53,39 @@ targets:
         CODE_SIGN_ENTITLEMENTS: PulseWatch/App/PulseWatch.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TARGETED_DEVICE_FAMILY: "1"
+    dependencies:
+      - target: PulseWatchWidget
     entitlements:
       path: PulseWatch/App/PulseWatch.entitlements
       properties:
         com.apple.developer.healthkit: true
         com.apple.developer.healthkit.access: []
+        com.apple.security.application-groups:
+          - group.com.abundra.pulse.shared
+
+  PulseWatchWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: PulseWatchWidget
+    info:
+      path: PulseWatchWidget/Info.plist
+      properties:
+        CFBundleDisplayName: "Pulse Widget"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse.widget
+        INFOPLIST_FILE: PulseWatchWidget/Info.plist
+        CODE_SIGN_ENTITLEMENTS: PulseWatchWidget/PulseWatchWidget.entitlements
+        TARGETED_DEVICE_FAMILY: "1"
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: 1
+        GENERATE_INFOPLIST_FILE: false
+    entitlements:
+      path: PulseWatchWidget/PulseWatchWidget.entitlements
+      properties:
         com.apple.security.application-groups:
           - group.com.abundra.pulse.shared
 

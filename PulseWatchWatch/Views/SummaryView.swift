@@ -178,6 +178,14 @@ struct SummaryView: View {
                 hrv = healthManager.latestHRV ?? 0
                 sleepMinutes = healthManager.lastNightSleepMinutes
                 steps = healthManager.todaySteps
+
+                // 触觉反馈：评分刷新完成
+                HapticManager.scoreRefreshed()
+
+                // 异常告警：评分过低
+                if (connectivity.receivedScore ?? localScore) < 30 {
+                    HapticManager.alertTriggered()
+                }
             } catch {
                 print("SummaryView HealthKit error: \(error)")
             }

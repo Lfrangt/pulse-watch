@@ -83,6 +83,7 @@ struct WatchHomeView: View {
                 GymArrivalView(
                     trainingPlan: buildPendingPlan(),
                     onStartWorkout: {
+                        HapticManager.workoutStarted()
                         connectivity.sendWorkoutStarted(
                             category: connectivity.pendingTrainingGroup ?? "general"
                         )
@@ -90,6 +91,7 @@ struct WatchHomeView: View {
                         showGymArrival = false
                     },
                     onDismiss: {
+                        HapticManager.tap()
                         connectivity.dismissGymArrival()
                         showGymArrival = false
                     }
@@ -111,6 +113,12 @@ struct WatchHomeView: View {
             if let newScore {
                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                     ringProgress = CGFloat(newScore) / 100.0
+                }
+                // 触觉反馈：同步完成
+                HapticManager.scoreRefreshed()
+                // 异常告警
+                if newScore < 30 {
+                    HapticManager.alertTriggered()
                 }
             }
         }
@@ -189,6 +197,14 @@ struct WatchHomeView: View {
                     withAnimation(.spring(response: 0.8, dampingFraction: 0.75)) {
                         ringProgress = CGFloat(score) / 100.0
                     }
+                }
+
+                // 触觉反馈：数据刷新完成
+                HapticManager.scoreRefreshed()
+
+                // 异常告警：评分过低
+                if score < 30 {
+                    HapticManager.alertTriggered()
                 }
             } catch {
                 print("Watch HealthKit error: \(error)")

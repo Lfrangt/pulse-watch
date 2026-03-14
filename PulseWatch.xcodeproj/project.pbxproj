@@ -17,12 +17,9 @@
 		3BE750BEC5F4DA16CB6C6BB0 /* PulseWatchWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDBD8ABD5C19A640CEBBC99D /* PulseWatchWatchApp.swift */; };
 		4A6365C02853DEA90A19D208 /* ScoreEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C689D7ED34748CC72C57C9D /* ScoreEngine.swift */; };
 		4A88CB8CC9ADE27277ED8A92 /* ScoreEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C689D7ED34748CC72C57C9D /* ScoreEngine.swift */; };
-		4EFFB84D3C38272FA8C034D5 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C93FB5DBBD7437C3C0479A6 /* LocationManager.swift */; };
-		567297AD60FF0DE90654C3EB /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24D4B80B8A0AE76ECAF39C6 /* HealthKitManager.swift */; };
 		5AF2668F1996BFA0EA981730 /* GymArrivalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA6C27A8ED0F06D7371F978 /* GymArrivalView.swift */; };
 		60BACF24F4F514EF36D9C6AB /* StatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB91463719D9CE6B82F0FEBB /* StatusCard.swift */; };
 		68CEAF6FBC0C50146F8C0121 /* PulseComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D9CB0C64149D715BAF6C9E1 /* PulseComplication.swift */; };
-		6CE49CAA1BC60AE2B0059235 /* GymCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 624D05567DAEB29F5F5F6D38 /* GymCoordinator.swift */; };
 		6D78E19149EBA723FFBE2C66 /* GymCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 624D05567DAEB29F5F5F6D38 /* GymCoordinator.swift */; };
 		6DAFBD2E3282EF5798FA9AC6 /* HealthSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B43CF30861598DBA2C32FFCB /* HealthSnapshot.swift */; };
 		83F37F4DCF2C79966B016C4C /* GymCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 624D05567DAEB29F5F5F6D38 /* GymCoordinator.swift */; };
@@ -31,10 +28,8 @@
 		A6699509D400627420C6D418 /* HealthSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B43CF30861598DBA2C32FFCB /* HealthSnapshot.swift */; };
 		B12CC726298E718F0B1E05E6 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C93FB5DBBD7437C3C0479A6 /* LocationManager.swift */; };
 		BBD408C0FE46E86A1634B244 /* WatchHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69357AC37E6D0E47B4931BFD /* WatchHomeView.swift */; };
-		CE7FBDA97DB932DB54082C0E /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9EF7F9A71B5B0CB3D007D8 /* WatchConnectivityManager.swift */; };
 		D9BE37B0190918BC2AF48D2A /* PulseTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8334C65FC6CA06682ADE69B9 /* PulseTheme.swift */; };
 		D9C69F3E427376A757BB498D /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24D4B80B8A0AE76ECAF39C6 /* HealthKitManager.swift */; };
-		F61C4F3BBC7835AFA963EA26 /* ScoreEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C689D7ED34748CC72C57C9D /* ScoreEngine.swift */; };
 		F8177CBBA3F13228F6789DC2 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24D4B80B8A0AE76ECAF39C6 /* HealthKitManager.swift */; };
 /* End PBXBuildFile section */
 
@@ -64,6 +59,7 @@
 
 /* Begin PBXFileReference section */
 		1C93FB5DBBD7437C3C0479A6 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		4F5CFB6551FD356A50B2063A /* PulseWatchWatchWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PulseWatchWatchWidgetExtension.entitlements; sourceTree = "<group>"; };
 		580338BE678C02AF8FB4EB37 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5D9CB0C64149D715BAF6C9E1 /* PulseComplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseComplication.swift; sourceTree = "<group>"; };
 		624D05567DAEB29F5F5F6D38 /* GymCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymCoordinator.swift; sourceTree = "<group>"; };
@@ -105,6 +101,7 @@
 			children = (
 				A60A489C55FC834EA5A89444 /* Info.plist */,
 				5D9CB0C64149D715BAF6C9E1 /* PulseComplication.swift */,
+				4F5CFB6551FD356A50B2063A /* PulseWatchWatchWidgetExtension.entitlements */,
 			);
 			path = Complications;
 			sourceTree = "<group>";
@@ -321,14 +318,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6CE49CAA1BC60AE2B0059235 /* GymCoordinator.swift in Sources */,
-				567297AD60FF0DE90654C3EB /* HealthKitManager.swift in Sources */,
 				A6699509D400627420C6D418 /* HealthSnapshot.swift in Sources */,
-				4EFFB84D3C38272FA8C034D5 /* LocationManager.swift in Sources */,
 				68CEAF6FBC0C50146F8C0121 /* PulseComplication.swift in Sources */,
 				1A362FF701FC28DED6BAAD03 /* PulseTheme.swift in Sources */,
-				F61C4F3BBC7835AFA963EA26 /* ScoreEngine.swift in Sources */,
-				CE7FBDA97DB932DB54082C0E /* WatchConnectivityManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,12 +403,15 @@
 		9DDC7FE625360FB5E5BEBA3D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PulseWatchWatch/Complications/PulseWatchWatchWidgetExtension.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = PulseWatchWatch/Complications/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.abundra.pulse.watchkitapp.widget;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -582,12 +577,15 @@
 		FE75222A5DF296F2AE5277FF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PulseWatchWatch/Complications/PulseWatchWatchWidgetExtension.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = PulseWatchWatch/Complications/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.abundra.pulse.watchkitapp.widget;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;

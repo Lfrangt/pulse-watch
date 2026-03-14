@@ -70,7 +70,10 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse.watchkitapp.widget
         INFOPLIST_FILE: PulseWatchWatch/Complications/Info.plist
         WATCHOS_DEPLOYMENT_TARGET: "10.0"
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: 1
     entitlements:
+      path: PulseWatchWatch/Complications/PulseWatchWatchWidgetExtension.entitlements
       properties:
         com.apple.security.application-groups:
           - group.com.abundra.pulse

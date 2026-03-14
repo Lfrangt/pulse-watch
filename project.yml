@@ -13,6 +13,8 @@ settings:
     SWIFT_VERSION: "5.9"
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: 1
+    DEVELOPMENT_TEAM: WRH82M8L9U
+    CODE_SIGN_STYLE: Automatic
 
 targets:
   PulseWatch:
@@ -21,19 +23,24 @@ targets:
     sources:
       - path: PulseWatch
       - path: Shared
+    info:
+      path: PulseWatch/App/Info.plist
+      properties:
+        NSHealthShareUsageDescription: "Pulse 需要读取你的健康数据来生成每日状态评分和训练建议。所有数据仅存储在你的设备上。"
+        NSHealthUpdateUsageDescription: "Pulse 需要记录你的运动数据。"
+        NSLocationAlwaysAndWhenInUseUsageDescription: "Pulse 使用位置来检测你是否到达健身房，自动建议训练计划。位置数据不会上传到任何服务器。"
+        NSLocationWhenInUseUsageDescription: "Pulse 使用位置来保存你的常去地点。"
+        UIBackgroundModes:
+          - location
+          - processing
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse
-        INFOPLIST_FILE: PulseWatch/App/Info.plist
         CODE_SIGN_ENTITLEMENTS: PulseWatch/App/PulseWatch.entitlements
     entitlements:
       path: PulseWatch/App/PulseWatch.entitlements
       properties:
         com.apple.developer.healthkit: true
-        com.apple.developer.healthkit.access:
-          - health-records
-        com.apple.security.application-groups:
-          - group.com.abundra.pulse
 
   PulseWatchWatch:
     type: application
@@ -55,8 +62,6 @@ targets:
       path: PulseWatchWatch/App/PulseWatchWatch.entitlements
       properties:
         com.apple.developer.healthkit: true
-        com.apple.security.application-groups:
-          - group.com.abundra.pulse
 
   PulseWatchWatchWidgetExtension:
     type: app-extension
@@ -74,9 +79,7 @@ targets:
         CURRENT_PROJECT_VERSION: 1
     entitlements:
       path: PulseWatchWatch/Complications/PulseWatchWatchWidgetExtension.entitlements
-      properties:
-        com.apple.security.application-groups:
-          - group.com.abundra.pulse
+      properties: {}
 
 schemes:
   PulseWatch:

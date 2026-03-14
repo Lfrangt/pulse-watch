@@ -49,6 +49,12 @@ struct PulseWatchApp: App {
         WindowGroup {
             RootView()
                 .preferredColorScheme(.dark)
+                .onOpenURL { url in
+                    // 处理 OpenClaw URL Scheme 请求
+                    Task { @MainActor in
+                        _ = OpenClawBridge.shared.handleURL(url)
+                    }
+                }
         }
         .modelContainer(sharedModelContainer)
     }

@@ -80,6 +80,7 @@ final class MorningBriefService: NSObject {
         registerCategories()
         requestAuthorization()
         rescheduleMorningBrief()
+        scheduleWeeklyReportReminder()
     }
 
     /// 请求通知权限
@@ -314,6 +315,44 @@ final class MorningBriefService: NSObject {
             return "建议轻松恢复日，散步或拉伸"
         } else {
             return "身体在喊停，今天好好休息吧 😴"
+        }
+    }
+
+    // MARK: - 周报提醒
+
+    /// 每周日晚 20:00 推送周报提醒
+    func scheduleWeeklyReportReminder() {
+        let center = UNUserNotificationCenter.current()
+        let identifier = "com.abundra.pulse.weekly-report"
+
+        center.removePendingNotificationRequests(withIdentifiers: [identifier])
+
+        var dateComponents = DateComponents()
+        dateComponents.weekday = 1  // 周日
+        dateComponents.hour = 20
+        dateComponents.minute = 0
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+
+        let content = UNMutableNotificationContent()
+        content.title = "📊 本周健康周报已生成"
+        content.body = "查看你这一周的健康表现、趋势分析和下周建议"
+        content.sound = .default
+        content.categoryIdentifier = CategoryID.morningBrief
+        content.interruptionLevel = .active
+
+        let request = UNNotificationRequest(
+            identifier: identifier,
+            content: content,
+            trigger: trigger
+        )
+
+        center.add(request) { error in
+            if let error {
+                self.logger.error("周报提醒调度失败: \(error.localizedDescription)")
+            } else {
+                self.logger.info("周报提醒已调度 → 每周日 20:00")
+            }
         }
     }
 

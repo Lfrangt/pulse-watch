@@ -6,6 +6,7 @@ import Charts
 struct HistoryView: View {
 
     @State private var selectedRange: TimeRange = .week
+    @State private var showWeeklyReport = false
     @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
 
     var body: some View {
@@ -36,6 +37,10 @@ struct HistoryView: View {
                     weeklyReportCard
                         .staggered(index: 5)
 
+                    // 查看完整周报按钮
+                    weeklyReportButton
+                        .staggered(index: 6)
+
                     Spacer(minLength: 60)
                 }
                 .padding(.horizontal, PulseTheme.spacingM)
@@ -45,6 +50,10 @@ struct HistoryView: View {
             .navigationTitle("历史趋势")
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .sheet(isPresented: $showWeeklyReport) {
+                WeeklyReportView()
+                    .preferredColorScheme(.dark)
+            }
         }
     }
 
@@ -438,6 +447,36 @@ struct HistoryView: View {
         } else {
             return "\(Int(value))\(suffix)"
         }
+    }
+
+    // MARK: - 完整周报入口
+
+    private var weeklyReportButton: some View {
+        Button {
+            showWeeklyReport = true
+        } label: {
+            HStack(spacing: PulseTheme.spacingS) {
+                Image(systemName: "doc.richtext")
+                    .font(.system(size: 15, weight: .medium))
+                Text("查看完整周报")
+                    .font(PulseTheme.bodyFont.weight(.medium))
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+            .foregroundStyle(PulseTheme.accent)
+            .padding(PulseTheme.spacingM)
+            .background(
+                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                    .fill(PulseTheme.accent.opacity(0.08))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                            .stroke(PulseTheme.accent.opacity(0.2), lineWidth: 0.5)
+                    )
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - 通用图表卡片容器

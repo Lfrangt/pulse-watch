@@ -370,40 +370,96 @@ struct SettingsView: View {
         .pulseCard()
     }
 
-    // MARK: - OpenClaw 集成（预留）
+    // MARK: - OpenClaw 集成
 
     private var openClawSection: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+        let bridge = OpenClawBridge.shared
+
+        return VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             sectionHeader(icon: "cpu", title: "OpenClaw 集成")
 
+            // 数据共享开关
             settingRow {
                 Toggle(isOn: $openClawEnabled) {
                     VStack(alignment: .leading, spacing: 2) {
-                        HStack(spacing: PulseTheme.spacingXS) {
-                            Text("OpenClaw AI 分析")
-                                .font(PulseTheme.bodyFont)
-                                .foregroundStyle(PulseTheme.textPrimary)
-                            Text("即将推出")
-                                .font(.system(size: 10, weight: .medium, design: .rounded))
-                                .foregroundStyle(PulseTheme.accent)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(
-                                    Capsule()
-                                        .fill(PulseTheme.accent.opacity(0.15))
-                                )
-                        }
-                        Text("使用本地 AI 模型进行深度健康分析")
+                        Text("共享健康数据给 Agent")
+                            .font(PulseTheme.bodyFont)
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text("允许 OpenClaw 读取你的健康状态，提供 body-aware 建议")
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
                 }
                 .tint(PulseTheme.accent)
-                .disabled(true)
+                .onChange(of: openClawEnabled) {
+                    bridge.isEnabled = openClawEnabled
+                }
+            }
+
+            if openClawEnabled {
+                // 连接状态
+                settingRow {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("连接状态")
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(bridge.connectionStatus.rawValue)
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(Color(hex: bridge.connectionStatus.color))
+                        }
+                        Spacer()
+                        Image(systemName: bridge.connectionStatus.icon)
+                            .font(.system(size: 18))
+                            .foregroundStyle(Color(hex: bridge.connectionStatus.color))
+                    }
+                }
+
+                // 最后同步时间
+                settingRow {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("最后同步")
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(bridge.lastSyncDisplay)
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        // 手动同步按钮
+                        Button {
+                            Task { @MainActor in
+                                bridge.pushHealthStatus()
+                            }
+                        } label: {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(PulseTheme.accent)
+                                .padding(8)
+                                .background(
+                                    Circle()
+                                        .fill(PulseTheme.accent.opacity(0.1))
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+
+                // 数据说明
+                HStack(spacing: PulseTheme.spacingS) {
+                    Image(systemName: "lock.shield.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(PulseTheme.statusGood)
+                    Text("数据仅通过 App Group 本地共享，不经过网络传输")
+                        .font(.system(size: 11, weight: .regular, design: .rounded))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                        .lineSpacing(2)
+                }
+                .padding(.horizontal, PulseTheme.spacingXS)
             }
         }
         .pulseCard()
-        .opacity(0.6)
     }
 
     // MARK: - 关于

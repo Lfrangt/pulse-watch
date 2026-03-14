@@ -30,6 +30,10 @@ targets:
         NSHealthUpdateUsageDescription: "Pulse 需要记录你的运动数据。"
         NSLocationAlwaysAndWhenInUseUsageDescription: "Pulse 使用位置来检测你是否到达健身房，自动建议训练计划。位置数据不会上传到任何服务器。"
         NSLocationWhenInUseUsageDescription: "Pulse 使用位置来保存你的常去地点。"
+        CFBundleURLTypes:
+          - CFBundleURLSchemes:
+              - pulse-health
+            CFBundleURLName: com.abundra.pulse.openclaw
         UIBackgroundModes:
           - location
           - processing

@@ -33,6 +33,7 @@ targets:
         UIBackgroundModes:
           - location
           - processing
+          - health-update
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse

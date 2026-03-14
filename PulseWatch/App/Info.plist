@@ -30,6 +30,7 @@
 	<array>
 		<string>location</string>
 		<string>processing</string>
+		<string>health-update</string>
 	</array>
 </dict>
 </plist>

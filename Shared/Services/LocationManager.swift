@@ -1,75 +1,118 @@
 import Foundation
 import CoreLocation
-import SwiftData
 
 /// Manages geofencing and location-based triggers
 @Observable
 final class LocationManager: NSObject, CLLocationManagerDelegate {
-    
+
     static let shared = LocationManager()
-    
+
     private let manager = CLLocationManager()
-    
+
+    #if os(iOS)
+    private var monitor: CLMonitor?
+    private var monitorTask: Task<Void, any Error>?
+    #endif
+
     var currentLocation: CLLocation?
     var isAuthorized = false
-    var currentRegionEvent: RegionEvent?
-    
-    struct RegionEvent {
-        let locationName: String
-        let locationType: String
-        let isEntering: Bool
-        let timestamp: Date
-    }
-    
+
     override init() {
         super.init()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        manager.allowsBackgroundLocationUpdates = true
-        manager.pausesLocationUpdatesAutomatically = true
     }
-    
+
     // MARK: - Authorization
-    
+
     func requestAuthorization() {
+        manager.requestWhenInUseAuthorization()
+    }
+
+    func requestAlwaysAuthorization() {
         manager.requestAlwaysAuthorization()
     }
-    
-    // MARK: - Geofencing
-    
+
+    // MARK: - Geofencing (iOS only — Watch receives events via WatchConnectivity)
+
+    #if os(iOS)
     func registerGeofence(for location: SavedLocation) {
-        guard CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) else { return }
-        
-        let region = CLCircularRegion(
-            center: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude),
-            radius: min(location.radiusMeters, manager.maximumRegionMonitoringDistance),
-            identifier: location.id.uuidString
-        )
-        region.notifyOnEntry = true
-        region.notifyOnExit = true
-        
-        manager.startMonitoring(for: region)
+        Task {
+            if monitor == nil {
+                monitor = await CLMonitor("pulseGeofences")
+                startMonitoringEvents()
+            }
+
+            let center = CLLocationCoordinate2D(
+                latitude: location.latitude,
+                longitude: location.longitude
+            )
+            let condition = CLMonitor.CircularGeographicCondition(
+                center: center,
+                radius: location.radiusMeters
+            )
+
+            await monitor?.add(condition, identifier: location.id.uuidString)
+        }
     }
-    
+
     func removeGeofence(for locationId: UUID) {
-        for region in manager.monitoredRegions {
-            if region.identifier == locationId.uuidString {
-                manager.stopMonitoring(for: region)
+        Task {
+            await monitor?.remove(locationId.uuidString)
+        }
+    }
+
+    func removeAllGeofences() {
+        monitorTask?.cancel()
+        monitorTask = nil
+        monitor = nil
+    }
+
+    private func startMonitoringEvents() {
+        guard let monitor else { return }
+
+        monitorTask = Task {
+            for try await event in await monitor.events {
+                await handleMonitorEvent(event)
             }
         }
     }
-    
-    func removeAllGeofences() {
-        for region in manager.monitoredRegions {
-            manager.stopMonitoring(for: region)
+
+    @MainActor
+    private func handleMonitorEvent(_ event: CLMonitor.Event) {
+        let isEntering: Bool
+        switch event.state {
+        case .satisfied:
+            isEntering = true
+        case .unsatisfied:
+            isEntering = false
+        default:
+            return
+        }
+
+        let identifier = event.identifier
+
+        if isEntering {
+            NotificationCenter.default.post(
+                name: .didEnterSavedRegion,
+                object: nil,
+                userInfo: ["regionId": identifier]
+            )
+        } else {
+            NotificationCenter.default.post(
+                name: .didExitSavedRegion,
+                object: nil,
+                userInfo: ["regionId": identifier]
+            )
         }
     }
-    
+    #endif
+
     // MARK: - Save Current Location
-    
+
     func saveCurrentAsLocation(name: String, type: String, radius: Double = 100) -> SavedLocation? {
         guard let location = currentLocation else { return nil }
-        
+
         return SavedLocation(
             name: name,
             latitude: location.coordinate.latitude,
@@ -78,56 +121,25 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
             locationType: type
         )
     }
-    
+
     // MARK: - CLLocationManagerDelegate
-    
+
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
-        case .authorizedAlways:
-            isAuthorized = true
-            manager.startUpdatingLocation()
-        case .authorizedWhenInUse:
+        case .authorizedAlways, .authorizedWhenInUse:
             isAuthorized = true
             manager.startUpdatingLocation()
         default:
             isAuthorized = false
         }
     }
-    
+
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         currentLocation = locations.last
     }
-    
-    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        handleRegionEvent(region: region, isEntering: true)
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
-        handleRegionEvent(region: region, isEntering: false)
-    }
-    
-    private func handleRegionEvent(region: CLRegion, isEntering: Bool) {
-        // This will be connected to notification/workout triggers
-        currentRegionEvent = RegionEvent(
-            locationName: region.identifier, // Will be resolved to actual name
-            locationType: "unknown",
-            isEntering: isEntering,
-            timestamp: .now
-        )
-        
-        if isEntering {
-            NotificationCenter.default.post(
-                name: .didEnterSavedRegion,
-                object: nil,
-                userInfo: ["regionId": region.identifier]
-            )
-        } else {
-            NotificationCenter.default.post(
-                name: .didExitSavedRegion,
-                object: nil,
-                userInfo: ["regionId": region.identifier]
-            )
-        }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("Location error: \(error.localizedDescription)")
     }
 }
 

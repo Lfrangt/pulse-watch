@@ -10,5 +10,10 @@
     <string>Pulse 使用位置来检测你是否到达健身房，自动建议训练计划。位置数据不会上传到任何服务器。</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Pulse 使用位置来保存你的常去地点。</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>processing</string>
+    </array>
 </dict>
 </plist>

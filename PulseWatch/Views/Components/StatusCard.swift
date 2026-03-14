@@ -1,86 +1,94 @@
 import SwiftUI
 
-/// The hero card — shows daily score with organic, textured feel
+// MARK: - Hero Status Card
+
+/// The hero card — daily score with warm, organic feel and glow
 struct StatusCard: View {
     let score: Int
     let headline: String
     let insight: String
-    
+
     @State private var animatedScore: Int = 0
+    @State private var ringProgress: CGFloat = 0
     @State private var appeared = false
-    
+
+    private var statusColor: Color { PulseTheme.statusColor(for: score) }
+
     var body: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            // Score ring + number
             HStack(alignment: .center, spacing: PulseTheme.spacingL) {
-                // Circular score indicator
+                // Score ring with glow
                 ZStack {
+                    // Ambient glow behind ring
+                    Circle()
+                        .fill(statusColor.opacity(0.12))
+                        .frame(width: 100, height: 100)
+                        .blur(radius: 20)
+
                     // Track
                     Circle()
-                        .stroke(PulseTheme.border, lineWidth: 6)
+                        .stroke(PulseTheme.border, lineWidth: 5)
                         .frame(width: 88, height: 88)
-                    
-                    // Progress
+
+                    // Progress arc
                     Circle()
-                        .trim(from: 0, to: appeared ? CGFloat(score) / 100 : 0)
+                        .trim(from: 0, to: ringProgress)
                         .stroke(
-                            PulseTheme.statusColor(for: score),
-                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                            statusColor,
+                            style: StrokeStyle(lineWidth: 5, lineCap: .round)
                         )
                         .frame(width: 88, height: 88)
                         .rotationEffect(.degrees(-90))
-                        .animation(.easeOut(duration: 1.2), value: appeared)
-                    
+
                     // Score number
                     Text("\(animatedScore)")
                         .font(PulseTheme.scoreFont)
                         .foregroundStyle(PulseTheme.textPrimary)
                         .contentTransition(.numericText())
                 }
-                
+
                 VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
                     Text(headline)
                         .font(PulseTheme.headlineFont)
-                        .foregroundStyle(PulseTheme.statusColor(for: score))
-                    
+                        .foregroundStyle(statusColor)
+
                     Text(insight)
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textSecondary)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                
-                Spacer()
+
+                Spacer(minLength: 0)
             }
         }
         .padding(PulseTheme.spacingL)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL)
+            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
                 .fill(PulseTheme.cardBackground)
                 .overlay(
-                    // Subtle gradient overlay for depth
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusL)
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
                         .fill(PulseTheme.statusGradient(for: score))
                 )
-                .overlay(
-                    // Thin border for definition
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusL)
-                        .stroke(PulseTheme.border, lineWidth: 0.5)
-                )
+                .shadow(color: PulseTheme.cardShadow, radius: 20, y: 8)
+                .shadow(color: statusColor.opacity(0.08), radius: 30, y: 0)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
+                .stroke(statusColor.opacity(0.1), lineWidth: 0.5)
         )
         .onAppear {
-            withAnimation(.easeOut(duration: 1.2)) {
+            withAnimation(.spring(response: 1.0, dampingFraction: 0.8)) {
+                ringProgress = CGFloat(score) / 100.0
                 appeared = true
             }
-            // Animate score counting up
-            animateScore(to: score)
+            animateScoreCount(to: score)
         }
     }
-    
-    private func animateScore(to target: Int) {
-        let steps = 30
-        let interval = 1.0 / Double(steps)
-        
+
+    private func animateScoreCount(to target: Int) {
+        let steps = 35
+        let interval = 0.9 / Double(steps)
         for i in 0...steps {
             DispatchQueue.main.asyncAfter(deadline: .now() + interval * Double(i)) {
                 withAnimation(.none) {
@@ -88,52 +96,6 @@ struct StatusCard: View {
                 }
             }
         }
-    }
-}
-
-// MARK: - Metric Row
-
-struct MetricRow: View {
-    let icon: String
-    let label: String
-    let value: String
-    let sublabel: String?
-    
-    init(icon: String, label: String, value: String, sublabel: String? = nil) {
-        self.icon = icon
-        self.label = label
-        self.value = value
-        self.sublabel = sublabel
-    }
-    
-    var body: some View {
-        HStack(spacing: PulseTheme.spacingM) {
-            // Icon
-            Image(systemName: icon)
-                .font(.system(size: 18))
-                .foregroundStyle(PulseTheme.accent)
-                .frame(width: 28)
-            
-            // Label
-            VStack(alignment: .leading, spacing: 2) {
-                Text(label)
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
-                if let sublabel {
-                    Text(sublabel)
-                        .font(.system(size: 11))
-                        .foregroundStyle(PulseTheme.textTertiary)
-                }
-            }
-            
-            Spacer()
-            
-            // Value
-            Text(value)
-                .font(PulseTheme.metricFont)
-                .foregroundStyle(PulseTheme.textPrimary)
-        }
-        .padding(.vertical, PulseTheme.spacingS)
     }
 }
 
@@ -146,43 +108,98 @@ struct MetricsCard: View {
     let steps: Int
     let calories: Double
     let sleepSummary: String?
-    
+
     var body: some View {
         VStack(spacing: 0) {
             if let hr = heartRate {
-                MetricRow(icon: "heart.fill", label: "心率", value: "\(Int(hr))", sublabel: "bpm")
-                Divider().background(PulseTheme.border)
+                MetricRow(icon: "heart.fill", label: "心率", value: "\(Int(hr))", unit: "bpm", color: PulseTheme.statusPoor)
+                metricDivider
             }
-            
+
             if let hrv {
-                MetricRow(icon: "waveform.path.ecg", label: "HRV", value: "\(Int(hrv))", sublabel: "ms")
-                Divider().background(PulseTheme.border)
+                MetricRow(icon: "waveform.path.ecg", label: "HRV", value: "\(Int(hrv))", unit: "ms", color: PulseTheme.accent)
+                metricDivider
             }
-            
+
             if let spo2 = bloodOxygen {
-                MetricRow(icon: "lungs.fill", label: "血氧", value: "\(Int(spo2))%")
-                Divider().background(PulseTheme.border)
+                MetricRow(icon: "lungs.fill", label: "血氧", value: "\(Int(spo2))%", color: PulseTheme.statusGood)
+                metricDivider
             }
-            
-            MetricRow(icon: "figure.walk", label: "步数", value: "\(steps)")
-            Divider().background(PulseTheme.border)
-            
-            MetricRow(icon: "flame.fill", label: "活动消耗", value: "\(Int(calories))", sublabel: "kcal")
-            
+
+            MetricRow(icon: "figure.walk", label: "步数", value: formatSteps(steps), color: PulseTheme.statusGood)
+            metricDivider
+
+            MetricRow(icon: "flame.fill", label: "活动消耗", value: "\(Int(calories))", unit: "kcal", color: PulseTheme.statusModerate)
+
             if let sleep = sleepSummary {
-                Divider().background(PulseTheme.border)
-                MetricRow(icon: "moon.fill", label: "睡眠", value: sleep)
+                metricDivider
+                MetricRow(icon: "moon.fill", label: "睡眠", value: sleep, color: Color(hex: "8B7EC8"))
             }
         }
-        .padding(PulseTheme.spacingM)
-        .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL)
-                .fill(PulseTheme.cardBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusL)
-                        .stroke(PulseTheme.border, lineWidth: 0.5)
-                )
-        )
+        .pulseCard(padding: PulseTheme.spacingM)
+    }
+
+    private var metricDivider: some View {
+        Rectangle()
+            .fill(PulseTheme.border.opacity(0.5))
+            .frame(height: 0.5)
+            .padding(.horizontal, PulseTheme.spacingS)
+    }
+
+    private func formatSteps(_ steps: Int) -> String {
+        if steps >= 10000 {
+            return String(format: "%.1fk", Double(steps) / 1000)
+        } else if steps >= 1000 {
+            return String(format: "%.1fk", Double(steps) / 1000)
+        }
+        return "\(steps)"
+    }
+}
+
+// MARK: - Metric Row
+
+struct MetricRow: View {
+    let icon: String
+    let label: String
+    let value: String
+    var unit: String? = nil
+    var color: Color = PulseTheme.accent
+
+    var body: some View {
+        HStack(spacing: PulseTheme.spacingM) {
+            // Icon with colored badge
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(color.opacity(0.12))
+                    .frame(width: 32, height: 32)
+
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(color)
+            }
+
+            // Label
+            Text(label)
+                .font(PulseTheme.captionFont)
+                .foregroundStyle(PulseTheme.textSecondary)
+
+            Spacer()
+
+            // Value + unit
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text(value)
+                    .font(PulseTheme.metricFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+
+                if let unit {
+                    Text(unit)
+                        .font(PulseTheme.metricLabelFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+            }
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, PulseTheme.spacingS)
     }
 }
 
@@ -190,58 +207,90 @@ struct MetricsCard: View {
 
 struct TrainingCard: View {
     let plan: TrainingPlan
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            // Header
             HStack {
-                Image(systemName: "dumbbell.fill")
-                    .foregroundStyle(PulseTheme.accent)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(PulseTheme.accent.opacity(0.12))
+                        .frame(width: 32, height: 32)
+
+                    Image(systemName: "dumbbell.fill")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(PulseTheme.accent)
+                }
+
                 Text("今日训练")
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
+
                 Spacer()
+
+                // Intensity badge
                 Text(plan.intensity.rawValue)
-                    .font(PulseTheme.captionFont)
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
                     .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
+                    .padding(.vertical, 5)
                     .background(
                         Capsule()
-                            .fill(intensityColor.opacity(0.2))
+                            .fill(intensityColor.opacity(0.15))
                     )
                     .foregroundStyle(intensityColor)
             }
-            
+
+            // Reason
             Text(plan.reason)
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textSecondary)
-            
+
+            // Exercise list
             if !plan.suggestedExercises.isEmpty {
-                VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                    ForEach(plan.suggestedExercises, id: \.name) { exercise in
+                VStack(spacing: 0) {
+                    ForEach(Array(plan.suggestedExercises.enumerated()), id: \.element.name) { index, exercise in
                         HStack {
                             Text(exercise.name)
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
+
                             Spacer()
-                            Text("\(exercise.sets)×\(exercise.reps)")
-                                .font(PulseTheme.captionFont)
-                                .foregroundStyle(PulseTheme.textSecondary)
+
+                            HStack(spacing: PulseTheme.spacingXS) {
+                                Text("\(exercise.sets)×\(exercise.reps)")
+                                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                                    .foregroundStyle(PulseTheme.textSecondary)
+
+                                if let weight = exercise.suggestedWeight {
+                                    Text("\(Int(weight))kg")
+                                        .font(.system(size: 12, design: .rounded))
+                                        .foregroundStyle(PulseTheme.textTertiary)
+                                }
+                            }
+                        }
+                        .padding(.vertical, 8)
+
+                        if index < plan.suggestedExercises.count - 1 {
+                            Rectangle()
+                                .fill(PulseTheme.border.opacity(0.3))
+                                .frame(height: 0.5)
                         }
                     }
                 }
             }
         }
-        .padding(PulseTheme.spacingL)
-        .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL)
-                .fill(PulseTheme.cardBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusL)
-                        .stroke(PulseTheme.border, lineWidth: 0.5)
-                )
-        )
+        .pulseCard()
+        // Subtle left accent bar
+        .overlay(alignment: .leading) {
+            UnevenRoundedRectangle(
+                topLeadingRadius: PulseTheme.radiusL,
+                bottomLeadingRadius: PulseTheme.radiusL
+            )
+            .fill(intensityColor.opacity(0.3))
+            .frame(width: 3)
+        }
     }
-    
+
     private var intensityColor: Color {
         switch plan.intensity {
         case .light: return PulseTheme.statusGood
@@ -251,11 +300,49 @@ struct TrainingCard: View {
     }
 }
 
+// MARK: - Recovery Card
+
+struct RecoveryCard: View {
+    let note: String
+
+    var body: some View {
+        HStack(spacing: PulseTheme.spacingM) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(PulseTheme.statusModerate.opacity(0.12))
+                    .frame(width: 32, height: 32)
+
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(PulseTheme.statusModerate)
+            }
+
+            Text(note)
+                .font(PulseTheme.bodyFont)
+                .foregroundStyle(PulseTheme.textSecondary)
+
+            Spacer()
+        }
+        .padding(PulseTheme.spacingM)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                .fill(PulseTheme.statusModerate.opacity(0.06))
+                .shadow(color: PulseTheme.cardShadow.opacity(0.3), radius: 8, y: 4)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                .stroke(PulseTheme.statusModerate.opacity(0.12), lineWidth: 0.5)
+        )
+    }
+}
+
+// MARK: - Previews
+
 #Preview {
     ScrollView {
         VStack(spacing: 16) {
             StatusCard(score: 78, headline: "状态良好", insight: "身体恢复很好，适合高强度训练")
-            
+
             MetricsCard(
                 heartRate: 72,
                 hrv: 55,
@@ -264,7 +351,7 @@ struct TrainingCard: View {
                 calories: 280,
                 sleepSummary: "7h12m"
             )
-            
+
             TrainingCard(plan: TrainingPlan(
                 targetMuscleGroup: "chest",
                 daysSinceLastTrained: 3,
@@ -276,8 +363,11 @@ struct TrainingCard: View {
                 intensity: .heavy,
                 reason: "上次练胸是3天前"
             ))
+
+            RecoveryCard(note: "HRV 偏低(28ms)，静息心率偏高(78bpm)")
         }
         .padding()
     }
     .background(PulseTheme.background)
+    .preferredColorScheme(.dark)
 }

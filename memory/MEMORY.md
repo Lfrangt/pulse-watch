@@ -1,0 +1,3 @@
+- [user_profile.md](user_profile.md) — Developer building an AI health agent for Apple Watch
+- [project_architecture.md](project_architecture.md) — Pulse Watch project structure and tech decisions
+- [feedback_design.md](feedback_design.md) — UI design preferences: warm, organic, no AI feel

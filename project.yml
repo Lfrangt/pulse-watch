@@ -32,12 +32,16 @@ targets:
         com.apple.developer.healthkit: true
         com.apple.developer.healthkit.access:
           - health-records
-          
+        com.apple.security.application-groups:
+          - group.com.abundra.pulse
+
   PulseWatchWatch:
     type: application
     platform: watchOS
     sources:
       - path: PulseWatchWatch
+        excludes:
+          - "Complications/**"
       - path: Shared
     dependencies:
       - target: PulseWatchWatchWidgetExtension
@@ -51,18 +55,25 @@ targets:
       path: PulseWatchWatch/App/PulseWatchWatch.entitlements
       properties:
         com.apple.developer.healthkit: true
+        com.apple.security.application-groups:
+          - group.com.abundra.pulse
 
   PulseWatchWatchWidgetExtension:
     type: app-extension
     platform: watchOS
     sources:
       - path: PulseWatchWatch/Complications
-      - path: Shared
+      - path: Shared/Theme
+      - path: Shared/Models
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse.watchkitapp.widget
         INFOPLIST_FILE: PulseWatchWatch/Complications/Info.plist
         WATCHOS_DEPLOYMENT_TARGET: "10.0"
+    entitlements:
+      properties:
+        com.apple.security.application-groups:
+          - group.com.abundra.pulse
 
 schemes:
   PulseWatch:
@@ -72,7 +83,7 @@ schemes:
         PulseWatchWatch: all
     run:
       config: Debug
-  
+
   PulseWatchWatch:
     build:
       targets:

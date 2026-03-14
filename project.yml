@@ -1,0 +1,81 @@
+name: PulseWatch
+options:
+  bundleIdPrefix: com.abundra.pulse
+  deploymentTarget:
+    iOS: "17.0"
+    watchOS: "10.0"
+  xcodeVersion: "16.0"
+  groupSortPosition: top
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: 1
+
+targets:
+  PulseWatch:
+    type: application
+    platform: iOS
+    sources:
+      - path: PulseWatch
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse
+        INFOPLIST_FILE: PulseWatch/App/Info.plist
+        CODE_SIGN_ENTITLEMENTS: PulseWatch/App/PulseWatch.entitlements
+    entitlements:
+      path: PulseWatch/App/PulseWatch.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access:
+          - health-records
+          
+  PulseWatchWatch:
+    type: application
+    platform: watchOS
+    sources:
+      - path: PulseWatchWatch
+      - path: Shared
+    dependencies:
+      - target: PulseWatchWatchWidgetExtension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse.watchkitapp
+        INFOPLIST_FILE: PulseWatchWatch/App/Info.plist
+        CODE_SIGN_ENTITLEMENTS: PulseWatchWatch/App/PulseWatchWatch.entitlements
+        WATCHOS_DEPLOYMENT_TARGET: "10.0"
+    entitlements:
+      path: PulseWatchWatch/App/PulseWatchWatch.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+
+  PulseWatchWatchWidgetExtension:
+    type: app-extension
+    platform: watchOS
+    sources:
+      - path: PulseWatchWatch/Complications
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse.watchkitapp.widget
+        INFOPLIST_FILE: PulseWatchWatch/Complications/Info.plist
+        WATCHOS_DEPLOYMENT_TARGET: "10.0"
+
+schemes:
+  PulseWatch:
+    build:
+      targets:
+        PulseWatch: all
+        PulseWatchWatch: all
+    run:
+      config: Debug
+  
+  PulseWatchWatch:
+    build:
+      targets:
+        PulseWatchWatch: all
+    run:
+      config: Debug

@@ -36,6 +36,9 @@ struct PulseWatchApp: App {
         HealthKitService.shared.enableBackgroundDelivery()
         HealthKitService.shared.startObserving()
 
+        // Morning Brief 通知系统
+        MorningBriefService.shared.setup()
+
         Task {
             try? await HealthKitService.shared.requestAuthorization()
             await HealthKitService.shared.performInitialFetch()

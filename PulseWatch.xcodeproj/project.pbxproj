@@ -14,6 +14,8 @@
 		23BD6B2C92134B184081934C /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6181030B012FB16DCC5EEF7 /* HealthKitService.swift */; };
 		25B1A93A2171BA3FB0923D51 /* HealthSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B43CF30861598DBA2C32FFCB /* HealthSnapshot.swift */; };
 		2C424EF36C7A4E94C959B5D6 /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9EF7F9A71B5B0CB3D007D8 /* WatchConnectivityManager.swift */; };
+		31A491D76C596E6E0B4B6E30 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8E10979DD142ECAABA4B87 /* SummaryView.swift */; };
+		36478F738E60554AC42348D9 /* MorningBriefService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04762B973BF706C0FCA20C34 /* MorningBriefService.swift */; };
 		3AEFD5E19F28DE9AF225F34C /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9EF7F9A71B5B0CB3D007D8 /* WatchConnectivityManager.swift */; };
 		3BE750BEC5F4DA16CB6C6BB0 /* PulseWatchWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDBD8ABD5C19A640CEBBC99D /* PulseWatchWatchApp.swift */; };
 		4A6365C02853DEA90A19D208 /* ScoreEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C689D7ED34748CC72C57C9D /* ScoreEngine.swift */; };
@@ -68,6 +70,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04762B973BF706C0FCA20C34 /* MorningBriefService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorningBriefService.swift; sourceTree = "<group>"; };
 		1C93FB5DBBD7437C3C0479A6 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		423E402954856FBC1F53AFD4 /* HealthRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthRecord.swift; sourceTree = "<group>"; };
 		4F5CFB6551FD356A50B2063A /* PulseWatchWatchWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PulseWatchWatchWidgetExtension.entitlements; sourceTree = "<group>"; };
@@ -87,6 +90,7 @@
 		9CE9A1CF188E7C75BDEB5EE1 /* PulseWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PulseWatch.entitlements; sourceTree = "<group>"; };
 		A60A489C55FC834EA5A89444 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A8C2F4BB3B5BDF9120AD5EB0 /* PulseWatchWatchWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PulseWatchWatchWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC8E10979DD142ECAABA4B87 /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
 		B24D4B80B8A0AE76ECAF39C6 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		B43CF30861598DBA2C32FFCB /* HealthSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthSnapshot.swift; sourceTree = "<group>"; };
 		B474F2A2028207A9CFDBEE34 /* PulseWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseWatchApp.swift; sourceTree = "<group>"; };
@@ -98,6 +102,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		041CCDE03DE697130B91048B /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				04762B973BF706C0FCA20C34 /* MorningBriefService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		3B5FB9B30DAAC2255BA13DE1 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -136,6 +148,7 @@
 			isa = PBXGroup;
 			children = (
 				D11A29C3BC90988F007799A5 /* App */,
+				041CCDE03DE697130B91048B /* Services */,
 				72A0E4DF5C4D646CB62568EC /* Views */,
 			);
 			path = PulseWatch;
@@ -145,6 +158,7 @@
 			isa = PBXGroup;
 			children = (
 				9CA6C27A8ED0F06D7371F978 /* GymArrivalView.swift */,
+				AC8E10979DD142ECAABA4B87 /* SummaryView.swift */,
 				69357AC37E6D0E47B4931BFD /* WatchHomeView.swift */,
 			);
 			path = Views;
@@ -372,6 +386,7 @@
 				D9BE37B0190918BC2AF48D2A /* PulseTheme.swift in Sources */,
 				3BE750BEC5F4DA16CB6C6BB0 /* PulseWatchWatchApp.swift in Sources */,
 				4A88CB8CC9ADE27277ED8A92 /* ScoreEngine.swift in Sources */,
+				31A491D76C596E6E0B4B6E30 /* SummaryView.swift in Sources */,
 				3AEFD5E19F28DE9AF225F34C /* WatchConnectivityManager.swift in Sources */,
 				BBD408C0FE46E86A1634B244 /* WatchHomeView.swift in Sources */,
 			);
@@ -390,6 +405,7 @@
 				25B1A93A2171BA3FB0923D51 /* HealthSnapshot.swift in Sources */,
 				A1FDE0A560C4AF84E9451881 /* HomeView.swift in Sources */,
 				B12CC726298E718F0B1E05E6 /* LocationManager.swift in Sources */,
+				36478F738E60554AC42348D9 /* MorningBriefService.swift in Sources */,
 				12558EC881A90A97E59B9616 /* PulseTheme.swift in Sources */,
 				0A32C25CCAE11724202F6D11 /* PulseWatchApp.swift in Sources */,
 				4A6365C02853DEA90A19D208 /* ScoreEngine.swift in Sources */,

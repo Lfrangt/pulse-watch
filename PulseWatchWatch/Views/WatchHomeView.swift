@@ -30,7 +30,6 @@ struct WatchHomeView: View {
     }
 
     var body: some View {
-        NavigationStack {
             ScrollView {
                 VStack(spacing: 10) {
                     // Score ring — the hero
@@ -96,7 +95,6 @@ struct WatchHomeView: View {
                     }
                 )
             }
-        }
         .onAppear {
             withAnimation(.spring(response: 0.8, dampingFraction: 0.75)) {
                 appeared = true

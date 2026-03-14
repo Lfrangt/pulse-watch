@@ -39,9 +39,22 @@ struct PulseWatchWatchApp: App {
         }
     }
 
+    @State private var showSummary = false
+
     var body: some Scene {
         WindowGroup {
-            WatchHomeView()
+            NavigationStack {
+                WatchHomeView()
+                    .navigationDestination(isPresented: $showSummary) {
+                        SummaryView()
+                    }
+            }
+            .onOpenURL { url in
+                // Complication 点击跳转到摘要视图
+                if url.absoluteString == "pulse://summary" {
+                    showSummary = true
+                }
+            }
         }
         .modelContainer(sharedModelContainer)
     }

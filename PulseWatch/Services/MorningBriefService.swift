@@ -181,7 +181,7 @@ final class MorningBriefService: NSObject {
 
     // MARK: - 生成 Morning Brief 内容
 
-    /// 从 HealthDataService 读取数据，生成通知内容
+    /// 从 HealthAnalyzer 生成通知内容（使用 AI 分析引擎）
     @MainActor
     func generateBriefContent() -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
@@ -189,21 +189,11 @@ final class MorningBriefService: NSObject {
         content.sound = .default
         content.interruptionLevel = .timeSensitive
 
+        // 使用 HealthAnalyzer 引擎生成洞察
+        let insight = HealthAnalyzer.shared.generateInsight()
+
         let summary = HealthDataService.shared.fetchTodaySummary()
-        let vitals = HealthDataService.shared.getLatestVitals()
-
-        // 睡眠质量评分
         let sleepMinutes = summary?.sleepDurationMinutes ?? 0
-        let sleepScore = calculateSleepScore(minutes: sleepMinutes, deep: summary?.deepSleepMinutes ?? 0)
-
-        // 恢复评分（基于 HRV + 静息心率）
-        let recoveryScore = calculateRecoveryScore(hrv: vitals.hrv, restingHR: vitals.restingHeartRate)
-
-        // 综合评分
-        let dailyScore = summary?.dailyScore ?? ((sleepScore + recoveryScore) / 2)
-
-        // 一句话建议
-        let advice = generateAdvice(score: dailyScore, sleepMinutes: sleepMinutes, hrv: vitals.hrv)
 
         // 睡眠显示
         let sleepDisplay: String
@@ -213,9 +203,9 @@ final class MorningBriefService: NSObject {
             sleepDisplay = "无数据"
         }
 
-        content.title = "☀️ 早安 · 状态 \(dailyScore)分"
-        content.subtitle = "睡眠 \(sleepDisplay) · 恢复 \(recoveryScore)分"
-        content.body = advice
+        content.title = "☀️ 早安 · 状态 \(insight.dailyScore)分"
+        content.subtitle = "睡眠 \(sleepDisplay) · 恢复 \(insight.recoveryScore)分"
+        content.body = insight.insights.first ?? insight.trainingAdvice.label
 
         return content
     }
@@ -224,36 +214,25 @@ final class MorningBriefService: NSObject {
 
     /// 检查异常并主动推送告警
     /// 由 HealthKitService 在数据更新后调用
+    /// 使用 HealthAnalyzer 的标准差方法进行个性化异常检测
     @MainActor
     func checkAndNotifyAnomalies() {
         guard !skippedToday else { return }
 
-        let anomalies = HealthDataService.shared.checkAnomalies()
+        // 使用 HealthAnalyzer 引擎的异常检测（基于个人基线标准差）
+        let insight = HealthAnalyzer.shared.generateInsight()
+        let detectedAnomalies = insight.anomalies
 
-        for (index, anomaly) in anomalies.enumerated() {
-            // 只推送 warning 及以上级别
-            guard anomaly.severity != .info else { continue }
+        for (index, anomaly) in detectedAnomalies.enumerated() {
+            // 只推送 medium 及以上级别
+            guard anomaly.severity >= .medium else { continue }
 
             let content = UNMutableNotificationContent()
             content.categoryIdentifier = CategoryID.anomalyAlert
-            content.interruptionLevel = anomaly.severity == .alert ? .critical : .timeSensitive
-
-            switch anomaly {
-            case .hrvDrop(let current, let baseline):
-                content.title = "⚠️ HRV 骤降"
-                content.body = "当前 \(Int(current))ms，较近日均值 \(Int(baseline))ms 明显下降。注意休息。"
-                content.sound = .default
-
-            case .elevatedRestingHR(let current, let baseline):
-                content.title = "⚠️ 静息心率偏高"
-                content.body = "当前 \(Int(current))bpm，高于近日均值 \(Int(baseline))bpm。可能需要多休息。"
-                content.sound = .default
-
-            case .poorSleepStreak(let nights):
-                content.title = "🔴 连续睡眠不足"
-                content.body = "已连续 \(nights) 晚睡眠不足 6 小时，这会严重影响恢复。今晚早点休息吧。"
-                content.sound = .defaultCritical
-            }
+            content.interruptionLevel = anomaly.severity == .high ? .critical : .timeSensitive
+            content.title = anomaly.severity == .high ? "🔴 \(anomaly.message)" : "⚠️ \(anomaly.message)"
+            content.body = anomaly.detail
+            content.sound = anomaly.severity == .high ? .defaultCritical : .default
 
             let identifier = "\(NotificationID.anomalyPrefix).\(index).\(Date().timeIntervalSince1970)"
             let request = UNNotificationRequest(

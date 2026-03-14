@@ -47,9 +47,43 @@ struct PulseWatchApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            MainTabView()
                 .preferredColorScheme(.dark)
         }
         .modelContainer(sharedModelContainer)
+    }
+}
+
+// MARK: - 主 Tab 导航
+
+struct MainTabView: View {
+
+    @State private var selectedTab = 0
+
+    init() {
+        // 自定义 TabBar 外观
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(PulseTheme.surface)
+        appearance.shadowColor = .clear
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+    }
+
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            HomeView()
+                .tabItem {
+                    Label("首页", systemImage: "heart.text.clipboard")
+                }
+                .tag(0)
+
+            SettingsView()
+                .tabItem {
+                    Label("设置", systemImage: "gearshape.fill")
+                }
+                .tag(1)
+        }
+        .tint(PulseTheme.accent)
     }
 }

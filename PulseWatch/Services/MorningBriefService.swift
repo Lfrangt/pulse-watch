@@ -36,7 +36,12 @@ final class MorningBriefService: NSObject {
 
     /// 通知时间（默认 7:30）
     var scheduledHour: Int {
-        get { UserDefaults.standard.integer(forKey: "pulse.brief.hour").nonZero ?? 7 }
+        get {
+            let key = "pulse.brief.hour"
+            return UserDefaults.standard.object(forKey: key) != nil
+                ? UserDefaults.standard.integer(forKey: key)
+                : 7
+        }
         set {
             UserDefaults.standard.set(newValue, forKey: "pulse.brief.hour")
             rescheduleMorningBrief()
@@ -44,7 +49,12 @@ final class MorningBriefService: NSObject {
     }
 
     var scheduledMinute: Int {
-        get { UserDefaults.standard.integer(forKey: "pulse.brief.minute").nonZero ?? 30 }
+        get {
+            let key = "pulse.brief.minute"
+            return UserDefaults.standard.object(forKey: key) != nil
+                ? UserDefaults.standard.integer(forKey: key)
+                : 30
+        }
         set {
             UserDefaults.standard.set(newValue, forKey: "pulse.brief.minute")
             rescheduleMorningBrief()
@@ -427,9 +437,3 @@ extension Notification.Name {
     static let morningBriefTapped = Notification.Name("pulse.morningBriefTapped")
 }
 
-// MARK: - Helper
-
-private extension Int {
-    /// 返回非零值，零值返回 nil（用于 UserDefaults 默认值处理）
-    var nonZero: Int? { self != 0 ? self : nil }
-}

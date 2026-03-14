@@ -429,8 +429,8 @@ struct OnboardingView: View {
             // 通知
             let _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
 
-            // 位置
-            LocationManager.shared.requestAuthorization()
+            // 位置（先请求 whenInUse，再升级到 always 用于地理围栏）
+            LocationManager.shared.requestAlwaysAuthorization()
 
             await MainActor.run {
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {

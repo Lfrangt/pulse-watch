@@ -150,6 +150,7 @@ final class HealthKitService {
     // MARK: - Anchored Object Query（增量采集）
 
     /// 对量化类型执行增量查询，将新数据写入 SwiftData
+    @MainActor
     private func performAnchoredQuery(for type: HKQuantityType) async {
         let anchor = anchors[type.identifier]
 
@@ -170,18 +171,16 @@ final class HealthKitService {
             logger.info("增量采集 \(type.identifier): \(results.addedSamples.count) 条新数据")
 
             // 转换并写入 SwiftData
-            let records = results.addedSamples.compactMap { sample -> HealthRecord? in
-                guard let quantitySample = sample as? HKQuantitySample else { return nil }
+            let records = results.addedSamples.map { sample in
                 let metricType = self.metricType(for: type)
-                let value = self.extractValue(from: quantitySample, type: type)
-                let source = quantitySample.sourceRevision.source.name
-                let record = HealthRecord(
+                let value = self.extractValue(from: sample, type: type)
+                let source = sample.sourceRevision.source.name
+                return HealthRecord(
                     metricType: metricType,
                     value: value,
-                    timestamp: quantitySample.startDate,
+                    timestamp: sample.startDate,
                     source: source
                 )
-                return record
             }
 
             await saveRecords(records)
@@ -193,6 +192,7 @@ final class HealthKitService {
     }
 
     /// 睡眠数据的增量查询
+    @MainActor
     private func performSleepAnchoredQuery(for type: HKCategoryType) async {
         let anchor = anchors[type.identifier]
 
@@ -212,8 +212,7 @@ final class HealthKitService {
             logger.info("增量采集 sleep: \(results.addedSamples.count) 条新数据")
 
             let records = results.addedSamples.compactMap { sample -> HealthRecord? in
-                guard let categorySample = sample as? HKCategorySample else { return nil }
-                let sleepValue = HKCategoryValueSleepAnalysis(rawValue: categorySample.value)
+                let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value)
 
                 // 只记录实际睡眠阶段，忽略 inBed/awake
                 guard sleepValue == .asleepCore || sleepValue == .asleepDeep ||
@@ -221,12 +220,12 @@ final class HealthKitService {
                     return nil
                 }
 
-                let durationMinutes = categorySample.endDate.timeIntervalSince(categorySample.startDate) / 60
-                let source = categorySample.sourceRevision.source.name
+                let durationMinutes = sample.endDate.timeIntervalSince(sample.startDate) / 60
+                let source = sample.sourceRevision.source.name
                 return HealthRecord(
                     metricType: .sleepAnalysis,
                     value: durationMinutes,
-                    timestamp: categorySample.startDate,
+                    timestamp: sample.startDate,
                     source: source
                 )
             }
@@ -357,6 +356,7 @@ final class HealthKitService {
 
     // MARK: - 手动触发全量采集（首次启动或需要补数据时）
 
+    @MainActor
     func performInitialFetch() async {
         for type in backgroundQuantityTypes {
             await performAnchoredQuery(for: type)

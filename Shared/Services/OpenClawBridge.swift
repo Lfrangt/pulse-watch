@@ -305,11 +305,13 @@ final class OpenClawBridge {
     }
 
     /// 处理来自 OpenClaw 的指令
+    @MainActor
     private func handleCommand(params: [URLQueryItem]) {
         guard let action = params.first(where: { $0.name == "action" })?.value else { return }
 
         switch action {
         case "setNotificationTime":
+            #if os(iOS)
             if let hourStr = params.first(where: { $0.name == "hour" })?.value,
                let minuteStr = params.first(where: { $0.name == "minute" })?.value,
                let hour = Int(hourStr), let minute = Int(minuteStr),
@@ -318,16 +320,13 @@ final class OpenClawBridge {
                 MorningBriefService.shared.scheduledMinute = minute
                 logger.info("OpenClaw 设置通知时间: \(hour):\(String(format: "%02d", minute))")
             }
+            #endif
 
         case "requestReport":
-            Task { @MainActor in
-                pushHealthStatus()
-            }
+            pushHealthStatus()
 
         case "refreshData":
-            Task { @MainActor in
-                pushHealthStatus()
-            }
+            pushHealthStatus()
 
         default:
             logger.info("未知指令: \(action)")

@@ -47,14 +47,30 @@ struct PulseWatchApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            RootView()
                 .preferredColorScheme(.dark)
         }
         .modelContainer(sharedModelContainer)
     }
 }
 
-// MARK: - 主 Tab 导航
+// MARK: - 根视图（Onboarding 判断）
+
+struct RootView: View {
+    @AppStorage("pulse.onboarding.completed") private var onboardingCompleted = false
+
+    var body: some View {
+        if onboardingCompleted {
+            MainTabView()
+                .transition(.opacity)
+        } else {
+            OnboardingView()
+                .transition(.opacity)
+        }
+    }
+}
+
+// MARK: - 主 Tab 导航（3 tabs）
 
 struct MainTabView: View {
 
@@ -72,17 +88,23 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeView()
+            DashboardView()
                 .tabItem {
-                    Label("首页", systemImage: "heart.text.clipboard")
+                    Label("今日", systemImage: "heart.text.clipboard")
                 }
                 .tag(0)
+
+            HistoryView()
+                .tabItem {
+                    Label("趋势", systemImage: "chart.xyaxis.line")
+                }
+                .tag(1)
 
             SettingsView()
                 .tabItem {
                     Label("设置", systemImage: "gearshape.fill")
                 }
-                .tag(1)
+                .tag(2)
         }
         .tint(PulseTheme.accent)
     }

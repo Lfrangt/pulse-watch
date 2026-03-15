@@ -35,6 +35,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Pulse 需要相机来扫描 OpenClaw 配对二维码。</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Pulse 需要读取你的健康数据来生成每日状态评分和训练建议。所有数据仅存储在你的设备上。</string>
 	<key>NSHealthUpdateUsageDescription</key>

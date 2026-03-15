@@ -11,27 +11,28 @@ struct PulseOpenClawConfig: Codable, Equatable {
     var agentID: String
 
     static let defaultAgentID = "openclaw:main"
+    private static let tokenKeychainKey = "pulse.openclaw.token"
 
-    /// 从 UserDefaults 加载
+    /// 从 UserDefaults + Keychain 加载
     static func load() -> PulseOpenClawConfig? {
         guard let url = UserDefaults.standard.string(forKey: "pulse.openclaw.gatewayURL"),
-              let token = UserDefaults.standard.string(forKey: "pulse.openclaw.token"),
+              let token = KeychainHelper.load(forKey: tokenKeychainKey),
               !url.isEmpty, !token.isEmpty else { return nil }
         let agent = UserDefaults.standard.string(forKey: "pulse.openclaw.agentID") ?? defaultAgentID
         return PulseOpenClawConfig(gatewayURL: url, token: token, agentID: agent)
     }
 
-    /// 保存到 UserDefaults
+    /// 保存 — URL/agentID 存 UserDefaults，Token 存 Keychain
     func save() {
         UserDefaults.standard.set(gatewayURL, forKey: "pulse.openclaw.gatewayURL")
-        UserDefaults.standard.set(token, forKey: "pulse.openclaw.token")
+        KeychainHelper.save(token, forKey: Self.tokenKeychainKey)
         UserDefaults.standard.set(agentID, forKey: "pulse.openclaw.agentID")
     }
 
     /// 清除配置
     static func clear() {
         UserDefaults.standard.removeObject(forKey: "pulse.openclaw.gatewayURL")
-        UserDefaults.standard.removeObject(forKey: "pulse.openclaw.token")
+        KeychainHelper.delete(forKey: tokenKeychainKey)
         UserDefaults.standard.removeObject(forKey: "pulse.openclaw.agentID")
     }
 
@@ -39,6 +40,12 @@ struct PulseOpenClawConfig: Codable, Equatable {
     var completionsURL: URL? {
         let base = gatewayURL.hasSuffix("/") ? String(gatewayURL.dropLast()) : gatewayURL
         return URL(string: "\(base)/v1/chat/completions")
+    }
+
+    /// 构建健康检查 URL
+    var healthURL: URL? {
+        let base = gatewayURL.hasSuffix("/") ? String(gatewayURL.dropLast()) : gatewayURL
+        return URL(string: "\(base)/health")
     }
 }
 
@@ -186,9 +193,25 @@ final class OpenClawBridge {
 
     // MARK: - 配对验证
 
-    /// 验证 Gateway 连通性
+    /// 验证 Gateway 连通性 — 先尝试 GET /health，回退到 POST /v1/chat/completions
     func verifyConnection(url: String, token: String) async -> Bool {
         let base = url.hasSuffix("/") ? String(url.dropLast()) : url
+
+        // 1) 尝试 GET /health
+        if let healthEndpoint = URL(string: "\(base)/health") {
+            var healthReq = URLRequest(url: healthEndpoint)
+            healthReq.httpMethod = "GET"
+            healthReq.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            healthReq.timeoutInterval = 10
+
+            if let (_, resp) = try? await session.data(for: healthReq),
+               let http = resp as? HTTPURLResponse,
+               (200..<300).contains(http.statusCode) {
+                return true
+            }
+        }
+
+        // 2) 回退：POST /v1/chat/completions 发送 ping
         guard let endpoint = URL(string: "\(base)/v1/chat/completions") else { return false }
 
         var request = URLRequest(url: endpoint)
@@ -198,12 +221,9 @@ final class OpenClawBridge {
 
         let body: [String: Any] = [
             "model": PulseOpenClawConfig.defaultAgentID,
-            "messages": [
-                ["role": "user", "content": "ping"]
-            ],
+            "messages": [["role": "user", "content": "ping"]],
             "max_tokens": 10
         ]
-
         guard let bodyData = try? JSONSerialization.data(withJSONObject: body) else { return false }
         request.httpBody = bodyData
 

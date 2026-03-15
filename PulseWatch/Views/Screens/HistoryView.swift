@@ -13,6 +13,10 @@ struct HistoryView: View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: PulseTheme.spacingM) {
+                    // 训练日历入口
+                    trainingCalendarEntry
+                        .staggered(index: 0)
+
                     // 时间范围切换
                     rangePicker
                         .staggered(index: 0)
@@ -520,6 +524,48 @@ struct HistoryView: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: 140)
+    }
+
+    // MARK: - 训练日历入口
+
+    private var trainingCalendarEntry: some View {
+        NavigationLink {
+            TrainingCalendarView()
+                .preferredColorScheme(.dark)
+        } label: {
+            HStack(spacing: PulseTheme.spacingS) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(PulseTheme.accent.opacity(0.12))
+                        .frame(width: 32, height: 32)
+
+                    Image(systemName: "calendar")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(PulseTheme.accent)
+                }
+
+                Text("训练日历")
+                    .font(PulseTheme.bodyFont.weight(.medium))
+                    .foregroundStyle(PulseTheme.textPrimary)
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+            .padding(PulseTheme.spacingM)
+            .background(
+                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                    .fill(PulseTheme.cardBackground)
+                    .shadow(color: PulseTheme.cardShadow.opacity(0.3), radius: 8, y: 4)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                    .stroke(PulseTheme.accent.opacity(0.15), lineWidth: 0.5)
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - 数据计算

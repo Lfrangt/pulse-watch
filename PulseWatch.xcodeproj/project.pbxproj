@@ -65,6 +65,9 @@
 		F4B3BFD8FCB29275EBFC3C6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 691CF6519E17F0083CE8A11B /* Assets.xcassets */; };
 		F8177CBBA3F13228F6789DC2 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24D4B80B8A0AE76ECAF39C6 /* HealthKitManager.swift */; };
 		FA5FEC930F0EF865D6BF4BE7 /* HealthRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423E402954856FBC1F53AFD4 /* HealthRecord.swift */; };
+		784AFE23D2CF43F8DD93F7C0 /* CoachChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D93629CFC3CD04FB317930F /* CoachChatView.swift */; };
+		7E52EFA709199FAA42C05F7A /* RecoveryTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FEE8433C00A2532C89E4910 /* RecoveryTimelineView.swift */; };
+		27D32FF760B64DFBEB4C76BB /* TrainingCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16BFDF12379E29222D1863E4 /* TrainingCalendarView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -161,6 +164,9 @@
 		E6181030B012FB16DCC5EEF7 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		FD42A291856B9B4DCE954001 /* WorkoutTrackingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTrackingView.swift; sourceTree = "<group>"; };
 		FDBD8ABD5C19A640CEBBC99D /* PulseWatchWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseWatchWatchApp.swift; sourceTree = "<group>"; };
+		3D93629CFC3CD04FB317930F /* CoachChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachChatView.swift; sourceTree = "<group>"; };
+		0FEE8433C00A2532C89E4910 /* RecoveryTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryTimelineView.swift; sourceTree = "<group>"; };
+		16BFDF12379E29222D1863E4 /* TrainingCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingCalendarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -307,11 +313,13 @@
 		9B74290BD76A83B42A188400 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				3D93629CFC3CD04FB317930F /* CoachChatView.swift */,
 				914F3CFFE74D89F5CAED7075 /* DashboardView.swift */,
 				2F2AEDCA575EB20BD7D18E40 /* HistoryView.swift */,
 				7C1C0D07C1855FDE1FE7E6D5 /* HomeView.swift */,
 				2D7EAB8DD243A4A5F0B782B0 /* OnboardingView.swift */,
 				D01195020D34743F50D83026 /* SettingsView.swift */,
+				16BFDF12379E29222D1863E4 /* TrainingCalendarView.swift */,
 				5E74FC5907036F49B32AC895 /* WeeklyReportView.swift */,
 				36ED27B3D9E0F37CE264F67B /* WorkoutView.swift */,
 			);
@@ -323,6 +331,7 @@
 			children = (
 				4DB44D514AD89CA6515F60D4 /* AppIconView.swift */,
 				9B8AF5335F8330E76B283777 /* LaunchScreenView.swift */,
+				0FEE8433C00A2532C89E4910 /* RecoveryTimelineView.swift */,
 				CB91463719D9CE6B82F0FEBB /* StatusCard.swift */,
 			);
 			path = Components;
@@ -577,6 +586,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37C0AE89CC67FAE5F629520F /* AppIconView.swift in Sources */,
+				784AFE23D2CF43F8DD93F7C0 /* CoachChatView.swift in Sources */,
 				8D5549A30D2F578A86560129 /* DailySummary.swift in Sources */,
 				5DFB4A4238D5002DE2C96573 /* DashboardView.swift in Sources */,
 				6D78E19149EBA723FFBE2C66 /* GymCoordinator.swift in Sources */,
@@ -595,9 +605,11 @@
 				214BA964157D8EAE4C312067 /* OpenClawBridge.swift in Sources */,
 				12558EC881A90A97E59B9616 /* PulseTheme.swift in Sources */,
 				0A32C25CCAE11724202F6D11 /* PulseWatchApp.swift in Sources */,
+				7E52EFA709199FAA42C05F7A /* RecoveryTimelineView.swift in Sources */,
 				4A6365C02853DEA90A19D208 /* ScoreEngine.swift in Sources */,
 				023DD41747CDC71643CFDB8F /* SettingsView.swift in Sources */,
 				60BACF24F4F514EF36D9C6AB /* StatusCard.swift in Sources */,
+				27D32FF760B64DFBEB4C76BB /* TrainingCalendarView.swift in Sources */,
 				2C424EF36C7A4E94C959B5D6 /* WatchConnectivityManager.swift in Sources */,
 				3AF9CB80C91C1EFBF44BB697 /* WeeklyReportView.swift in Sources */,
 				E2AE16CA3B2D05EE03747012 /* WorkoutView.swift in Sources */,

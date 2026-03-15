@@ -81,6 +81,7 @@ struct RootView: View {
 struct MainTabView: View {
 
     @State private var selectedTab = 0
+    @State private var showCoachFromURL = false
 
     init() {
         // 自定义 TabBar 外观
@@ -113,5 +114,16 @@ struct MainTabView: View {
                 .tag(2)
         }
         .tint(PulseTheme.accent)
+        .onOpenURL { url in
+            // 处理 pulse://coach — 打开 AI 教练对话
+            if url.scheme == "pulse" && url.host == "coach" {
+                selectedTab = 0
+                showCoachFromURL = true
+            }
+        }
+        .sheet(isPresented: $showCoachFromURL) {
+            CoachChatView()
+                .preferredColorScheme(.dark)
+        }
     }
 }

@@ -13,16 +13,16 @@ enum PulseTheme {
     static let background = Color(hex: "0D0C0B")
 
     /// Slightly elevated warm surface
-    static let surface = Color(hex: "161412")
+    static let surface = Color(hex: "1A1715")
 
-    /// Card background with earthy warmth
-    static let cardBackground = Color(hex: "1A1816")
+    /// Card background with earthy warmth — 提高与背景区分度
+    static let cardBackground = Color(hex: "1E1B18")
 
     /// Elevated card (active/pressed)
-    static let cardElevated = Color(hex: "211E1B")
+    static let cardElevated = Color(hex: "252220")
 
-    /// Subtle warm border
-    static let border = Color(hex: "2A2623")
+    /// Subtle warm border — 加强可见性
+    static let border = Color(hex: "332E29")
 
     /// Primary text — warm parchment white
     static let textPrimary = Color(hex: "F5F0EB")
@@ -30,8 +30,8 @@ enum PulseTheme {
     /// Secondary text — warm stone gray
     static let textSecondary = Color(hex: "9A938C")
 
-    /// Tertiary text — muted earth
-    static let textTertiary = Color(hex: "5C564F")
+    /// Tertiary text — muted earth（提高对比度，确保可读）
+    static let textTertiary = Color(hex: "6E675F")
 
     // MARK: - Status Colors
 
@@ -44,8 +44,8 @@ enum PulseTheme {
     /// Poor / needs rest — muted terracotta
     static let statusPoor = Color(hex: "C75C5C")
 
-    /// Primary accent — warm antique gold
-    static let accent = Color(hex: "C9A96E")
+    /// Primary accent — warm antique gold（更明亮，CTA 更突出）
+    static let accent = Color(hex: "D4B478")
 
     /// Subtle warm highlight for active states
     static let warmHighlight = Color(hex: "2D2520")

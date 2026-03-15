@@ -20,6 +20,8 @@
     <string>Pulse 需要读取你的健康数据来显示状态评分。</string>
     <key>NSHealthUpdateUsageDescription</key>
     <string>Pulse 需要记录你的运动数据。</string>
+    <key>WKCompanionAppBundleIdentifier</key>
+    <string>com.abundra.pulse</string>
     <key>WKApplication</key>
     <true/>
     <key>WKBackgroundModes</key>

@@ -100,23 +100,17 @@ struct MainTabView: View {
                 }
                 .tag(0)
 
-            WorkoutView()
-                .tabItem {
-                    Label("运动", systemImage: "figure.run")
-                }
-                .tag(1)
-
             HistoryView()
                 .tabItem {
                     Label("趋势", systemImage: "chart.xyaxis.line")
                 }
-                .tag(2)
+                .tag(1)
 
             SettingsView()
                 .tabItem {
                     Label("设置", systemImage: "gearshape.fill")
                 }
-                .tag(3)
+                .tag(2)
         }
         .tint(PulseTheme.accent)
     }

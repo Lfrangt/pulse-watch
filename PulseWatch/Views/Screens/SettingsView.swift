@@ -19,10 +19,6 @@ struct SettingsView: View {
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
     @State private var showLocationSetup = false
     @State private var showAbout = false
-    @State private var gymAddress = ""
-    @State private var gymLatitude = ""
-    @State private var gymLongitude = ""
-    @State private var showManualCoordEntry = false
     @State private var isSavingGym = false
     @State private var gymSaveSuccess = false
 
@@ -155,24 +151,23 @@ struct SettingsView: View {
         .pulseCard()
     }
 
+    @State private var showGymSearch = false
+
     // MARK: - 健身房位置设置
 
     private var gymSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             sectionHeader(icon: "dumbbell.fill", title: "健身房位置")
 
-            // 当前已保存的健身房
             if let gym = gymLocations.first {
+                // 已保存 — 显示地点信息
                 settingRow {
                     HStack {
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: 4) {
                             Text(gym.name)
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text(String(format: "%.4f, %.4f", gym.latitude, gym.longitude))
-                                .font(PulseTheme.captionFont)
-                                .foregroundStyle(PulseTheme.textTertiary)
-                            Text("半径 \(Int(gym.radiusMeters))m")
+                            Text("到达时自动提醒开始训练")
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -180,40 +175,40 @@ struct SettingsView: View {
                         Spacer()
 
                         Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 18))
                             .foregroundStyle(PulseTheme.statusGood)
                     }
                 }
 
-                // 删除按钮
-                Button {
-                    removeGymLocation(gym)
-                } label: {
-                    HStack {
-                        Image(systemName: "trash")
-                            .font(.system(size: 13))
-                        Text("移除健身房")
+                // 更换 / 移除
+                HStack(spacing: PulseTheme.spacingM) {
+                    Button {
+                        showGymSearch = true
+                    } label: {
+                        Text("更换")
                             .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.accent)
                     }
-                    .foregroundStyle(PulseTheme.statusPoor)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, PulseTheme.spacingS)
+
+                    Button {
+                        removeGymLocation(gym)
+                    } label: {
+                        Text("移除")
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.statusPoor)
+                    }
                 }
+                .frame(maxWidth: .infinity)
             } else {
-                // 使用当前位置
+                // 未设置 — 搜索按钮
                 Button {
-                    saveCurrentLocationAsGym()
+                    showGymSearch = true
                 } label: {
                     HStack(spacing: PulseTheme.spacingS) {
-                        if isSavingGym {
-                            ProgressView()
-                                .tint(PulseTheme.accent)
-                                .scaleEffect(0.8)
-                        } else {
-                            Image(systemName: "location.fill")
-                                .font(.system(size: 14))
-                        }
-                        Text("使用当前位置")
-                            .font(PulseTheme.bodyFont)
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 14, weight: .medium))
+                        Text("搜索健身房")
+                            .font(PulseTheme.bodyFont.weight(.medium))
                     }
                     .foregroundStyle(PulseTheme.accent)
                     .frame(maxWidth: .infinity)
@@ -224,29 +219,29 @@ struct SettingsView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .disabled(isSavingGym)
 
-                // 手动输入坐标
+                // 或使用当前位置
                 Button {
-                    withAnimation(.spring(response: 0.3)) {
-                        showManualCoordEntry.toggle()
-                    }
+                    saveCurrentLocationAsGym()
                 } label: {
                     HStack(spacing: PulseTheme.spacingS) {
-                        Image(systemName: "pencil.line")
-                            .font(.system(size: 14))
-                        Text("手动输入坐标")
-                            .font(PulseTheme.bodyFont)
+                        if isSavingGym {
+                            ProgressView()
+                                .tint(PulseTheme.accent)
+                                .scaleEffect(0.7)
+                        } else {
+                            Image(systemName: "location.fill")
+                                .font(.system(size: 13))
+                        }
+                        Text("使用当前位置")
+                            .font(PulseTheme.captionFont)
                     }
                     .foregroundStyle(PulseTheme.textSecondary)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, PulseTheme.spacingS)
                 }
                 .buttonStyle(.plain)
-
-                if showManualCoordEntry {
-                    manualCoordInputView
-                }
+                .disabled(isSavingGym)
 
                 if gymSaveSuccess {
                     HStack(spacing: PulseTheme.spacingXS) {
@@ -260,52 +255,35 @@ struct SettingsView: View {
             }
         }
         .pulseCard()
-    }
-
-    /// 手动坐标输入
-    private var manualCoordInputView: some View {
-        VStack(spacing: PulseTheme.spacingS) {
-            HStack(spacing: PulseTheme.spacingS) {
-                coordField(title: "纬度", text: $gymLatitude, placeholder: "31.2304")
-                coordField(title: "经度", text: $gymLongitude, placeholder: "121.4737")
-            }
-
-            Button {
-                saveManualGymLocation()
-            } label: {
-                Text("保存")
-                    .font(PulseTheme.bodyFont.weight(.medium))
-                    .foregroundStyle(PulseTheme.background)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background(
-                        RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                            .fill(PulseTheme.accent)
-                    )
-            }
-            .buttonStyle(.plain)
-            .disabled(gymLatitude.isEmpty || gymLongitude.isEmpty)
-            .opacity(gymLatitude.isEmpty || gymLongitude.isEmpty ? 0.5 : 1)
-        }
-        .transition(.opacity.combined(with: .move(edge: .top)))
-    }
-
-    private func coordField(title: String, text: Binding<String>, placeholder: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textTertiary)
-            TextField(placeholder, text: text)
-                .font(PulseTheme.bodyFont)
-                .foregroundStyle(PulseTheme.textPrimary)
-                .keyboardType(.decimalPad)
-                .padding(PulseTheme.spacingS)
-                .background(
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                        .fill(PulseTheme.surface)
+        .sheet(isPresented: $showGymSearch) {
+            GymSearchView { name, lat, lon in
+                // 先移除旧的
+                for old in gymLocations {
+                    removeGymLocation(old)
+                }
+                // 保存新的
+                let location = SavedLocation(
+                    name: name,
+                    latitude: lat,
+                    longitude: lon,
+                    radiusMeters: 100,
+                    locationType: "gym"
                 )
+                modelContext.insert(location)
+                #if os(iOS)
+                LocationManager.shared.registerGeofence(for: location)
+                #endif
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                    gymSaveSuccess = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    gymSaveSuccess = false
+                }
+            }
         }
     }
+
+    // 手动坐标输入已移除 — 使用 GymSearchView 地址搜索代替
 
     // MARK: - 通知权限
 
@@ -906,36 +884,7 @@ struct SettingsView: View {
         }
     }
 
-    private func saveManualGymLocation() {
-        guard let lat = Double(gymLatitude),
-              let lon = Double(gymLongitude),
-              (-90...90).contains(lat),
-              (-180...180).contains(lon) else { return }
-
-        let location = SavedLocation(
-            name: "健身房",
-            latitude: lat,
-            longitude: lon,
-            radiusMeters: 100,
-            locationType: "gym"
-        )
-        modelContext.insert(location)
-
-        #if os(iOS)
-        LocationManager.shared.registerGeofence(for: location)
-        #endif
-
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
-            gymSaveSuccess = true
-            showManualCoordEntry = false
-            gymLatitude = ""
-            gymLongitude = ""
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            gymSaveSuccess = false
-        }
-    }
+    // saveManualGymLocation 已移除 — 使用 GymSearchView
 
     private func removeGymLocation(_ location: SavedLocation) {
         #if os(iOS)

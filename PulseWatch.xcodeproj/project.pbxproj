@@ -65,6 +65,7 @@
 		D9BE37B0190918BC2AF48D2A /* PulseTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8334C65FC6CA06682ADE69B9 /* PulseTheme.swift */; };
 		D9C69F3E427376A757BB498D /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24D4B80B8A0AE76ECAF39C6 /* HealthKitManager.swift */; };
 		DE88A3060BF319B28E9B836E /* LaunchScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8AF5335F8330E76B283777 /* LaunchScreenView.swift */; };
+		DF3945F898AB21F858475D0D /* GymSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0BDF3A5D302AEE99BC17EF /* GymSearchView.swift */; };
 		E2AE16CA3B2D05EE03747012 /* WorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36ED27B3D9E0F37CE264F67B /* WorkoutView.swift */; };
 		F080EB92336B15BFD06A027C /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7EAB8DD243A4A5F0B782B0 /* OnboardingView.swift */; };
 		F4B3BFD8FCB29275EBFC3C6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 691CF6519E17F0083CE8A11B /* Assets.xcassets */; };
@@ -117,6 +118,7 @@
 
 /* Begin PBXFileReference section */
 		04762B973BF706C0FCA20C34 /* MorningBriefService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorningBriefService.swift; sourceTree = "<group>"; };
+		0B0BDF3A5D302AEE99BC17EF /* GymSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymSearchView.swift; sourceTree = "<group>"; };
 		1C93FB5DBBD7437C3C0479A6 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		2BD1EDEE975D246E28C222AE /* OpenClawBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawBridge.swift; sourceTree = "<group>"; };
 		2D7EAB8DD243A4A5F0B782B0 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -336,6 +338,7 @@
 			isa = PBXGroup;
 			children = (
 				4DB44D514AD89CA6515F60D4 /* AppIconView.swift */,
+				0B0BDF3A5D302AEE99BC17EF /* GymSearchView.swift */,
 				9B8AF5335F8330E76B283777 /* LaunchScreenView.swift */,
 				BCB4D5F51FF5C4DC019D609B /* QRScannerView.swift */,
 				363204A6CBD545ECC1DD5485 /* RecoveryTimelineView.swift */,
@@ -598,6 +601,7 @@
 				5DFB4A4238D5002DE2C96573 /* DashboardView.swift in Sources */,
 				0769AFDD1513AF8D8357A85F /* DemoDataProvider.swift in Sources */,
 				6D78E19149EBA723FFBE2C66 /* GymCoordinator.swift in Sources */,
+				DF3945F898AB21F858475D0D /* GymSearchView.swift in Sources */,
 				A7E8BDCD7A72838576AEAC31 /* HealthAnalyzer.swift in Sources */,
 				C82377FA21A98E19F24317E7 /* HealthDataService.swift in Sources */,
 				D9C69F3E427376A757BB498D /* HealthKitManager.swift in Sources */,

@@ -4,6 +4,8 @@ import SwiftData
 /// Tab 1: 今日状态总览 — 评分大圆环 + 洞察卡片 + 指标网格 + 训练建议
 struct DashboardView: View {
 
+    @AppStorage("pulse.demo.enabled") private var demoMode = false
+
     @State private var healthManager = HealthKitManager.shared
     @State private var connectivityManager = WatchConnectivityManager.shared
     @State private var isLoading = true
@@ -17,6 +19,9 @@ struct DashboardView: View {
     @State private var animatedScore: Int = 0
     @State private var ringProgress: CGFloat = 0
     @State private var ringAnimated = false
+
+    // 演示模式时间线事件
+    @State private var demoTimelineEvents: [TimelineEvent] = []
 
     @Query(sort: \WorkoutRecord.date, order: .reverse) private var recentWorkouts: [WorkoutRecord]
     @Query private var savedLocations: [SavedLocation]
@@ -326,12 +331,35 @@ struct DashboardView: View {
 
     /// 是否有任何有效指标数据
     private var hasAnyMetric: Bool {
+        demoMode ||
         healthManager.latestHeartRate != nil ||
         healthManager.latestHRV != nil ||
         brief?.sleepSummary != nil ||
         healthManager.todaySteps > 0 ||
         healthManager.todayActiveCalories > 0 ||
         healthManager.latestBloodOxygen != nil
+    }
+
+    // MARK: - 演示模式指标值
+
+    /// 当前心率（演示或真实）
+    private var currentHeartRate: Double? {
+        demoMode ? DemoDataProvider.heartRate : healthManager.latestHeartRate
+    }
+    private var currentHRV: Double? {
+        demoMode ? DemoDataProvider.hrv : healthManager.latestHRV
+    }
+    private var currentSleep: String? {
+        demoMode ? "7h12m" : brief?.sleepSummary
+    }
+    private var currentSteps: Int {
+        demoMode ? DemoDataProvider.steps : healthManager.todaySteps
+    }
+    private var currentCalories: Double {
+        demoMode ? DemoDataProvider.activeCalories : healthManager.todayActiveCalories
+    }
+    private var currentBloodOxygen: Double? {
+        demoMode ? DemoDataProvider.bloodOxygen : healthManager.latestBloodOxygen
     }
 
     private var metricsGrid: some View {
@@ -341,75 +369,116 @@ struct DashboardView: View {
         ]
 
         return LazyVGrid(columns: columns, spacing: PulseTheme.spacingS) {
-            // 心率：仅在有数据时显示
-            if let hr = healthManager.latestHeartRate {
+            // 心率
+            if let hr = currentHeartRate {
                 metricTile(
                     icon: "heart.fill",
                     label: "心率",
                     value: "\(Int(hr))",
                     unit: "bpm",
-                    color: PulseTheme.statusPoor
+                    color: PulseTheme.statusPoor,
+                    trend: metricStatus(hr, good: 55...70, ok: 50...80),
+                    animated: true
                 )
             }
 
-            // HRV：仅在有数据时显示
-            if let hrv = healthManager.latestHRV {
+            // HRV
+            if let hrv = currentHRV {
                 metricTile(
                     icon: "waveform.path.ecg",
                     label: "HRV",
                     value: "\(Int(hrv))",
                     unit: "ms",
-                    color: PulseTheme.accent
+                    color: PulseTheme.accent,
+                    trend: metricStatus(hrv, good: 45...200, ok: 30...45),
+                    animated: false
                 )
             }
 
-            // 睡眠：仅在有数据时显示
-            if let sleep = brief?.sleepSummary {
+            // 睡眠
+            if let sleep = currentSleep {
                 metricTile(
                     icon: "moon.fill",
                     label: "睡眠",
                     value: sleep,
                     unit: "",
-                    color: Color(hex: "8B7EC8")
+                    color: Color(hex: "8B7EC8"),
+                    trend: .good,
+                    animated: false
                 )
             }
 
-            // 步数：仅在大于0时显示
-            if healthManager.todaySteps > 0 {
+            // 步数
+            if currentSteps > 0 {
                 metricTile(
-                    icon: "figure.walk",
+                    icon: "figure.run",
                     label: "步数",
-                    value: formatSteps(healthManager.todaySteps),
+                    value: formatSteps(currentSteps),
                     unit: "",
-                    color: PulseTheme.statusGood
+                    color: PulseTheme.statusGood,
+                    trend: currentSteps >= 8000 ? .good : (currentSteps >= 5000 ? .ok : .poor),
+                    animated: true
                 )
             }
 
-            // 卡路里：仅在大于0时显示
-            if healthManager.todayActiveCalories > 0 {
+            // 卡路里
+            if currentCalories > 0 {
                 metricTile(
                     icon: "flame.fill",
                     label: "卡路里",
-                    value: "\(Int(healthManager.todayActiveCalories))",
+                    value: "\(Int(currentCalories))",
                     unit: "kcal",
-                    color: PulseTheme.statusModerate
+                    color: PulseTheme.statusModerate,
+                    trend: currentCalories >= 300 ? .good : .ok,
+                    animated: false
                 )
             }
 
-            // 血氧：仅在有数据时显示
-            if let spo2 = healthManager.latestBloodOxygen {
+            // 血氧
+            if let spo2 = currentBloodOxygen {
                 metricTile(
                     icon: "lungs.fill",
                     label: "血氧",
                     value: "\(Int(spo2))%",
                     unit: "",
-                    color: PulseTheme.statusGood
+                    color: PulseTheme.statusGood,
+                    trend: spo2 >= 96 ? .good : (spo2 >= 93 ? .ok : .poor),
+                    animated: false
                 )
             }
         }
     }
 
-    private func metricTile(icon: String, label: String, value: String, unit: String, color: Color) -> some View {
+    // MARK: - 指标状态
+
+    enum MetricStatus {
+        case good, ok, poor
+
+        var arrow: String {
+            switch self {
+            case .good: return "arrow.up.right"
+            case .ok:   return "arrow.right"
+            case .poor: return "arrow.down.right"
+            }
+        }
+
+        var color: Color {
+            switch self {
+            case .good: return PulseTheme.statusGood
+            case .ok:   return PulseTheme.statusModerate
+            case .poor: return PulseTheme.statusPoor
+            }
+        }
+    }
+
+    /// 根据值域判断指标状态
+    private func metricStatus(_ value: Double, good: ClosedRange<Double>, ok: ClosedRange<Double>) -> MetricStatus {
+        if good.contains(value) { return .good }
+        if ok.contains(value) { return .ok }
+        return .poor
+    }
+
+    private func metricTile(icon: String, label: String, value: String, unit: String, color: Color, trend: MetricStatus, animated: Bool) -> some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
             HStack(spacing: PulseTheme.spacingS) {
                 ZStack {
@@ -420,11 +489,19 @@ struct DashboardView: View {
                     Image(systemName: icon)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(color)
+                        .symbolEffect(.pulse, options: .repeating, isActive: animated)
                 }
 
                 Text(label)
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
+
+                Spacer()
+
+                // 趋势箭头
+                Image(systemName: trend.arrow)
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(trend.color)
             }
 
             HStack(alignment: .firstTextBaseline, spacing: 3) {
@@ -666,14 +743,11 @@ struct DashboardView: View {
 
     @ViewBuilder
     private var recoveryTimelineSection: some View {
-        let timeline = RecoveryTimelineView()
-        // 仅在有事件时显示
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-            Text("身体时间线")
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
-
-            timeline
+        if demoMode {
+            // 演示模式 — 使用模拟时间线
+            RecoveryTimelineView(events: demoTimelineEvents)
+        } else {
+            RecoveryTimelineSection()
         }
     }
 
@@ -716,6 +790,16 @@ struct DashboardView: View {
 
     private func loadData() async {
         isLoading = true
+
+        if demoMode {
+            // 演示模式 — 使用模拟数据
+            brief = DemoDataProvider.makeBrief()
+            insight = DemoDataProvider.makeInsight()
+            demoTimelineEvents = DemoDataProvider.makeTimelineEvents()
+            ringAnimated = false
+            isLoading = false
+            return
+        }
 
         do {
             try await healthManager.requestAuthorization()

@@ -13,8 +13,8 @@ struct HistoryView: View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: PulseTheme.spacingM) {
-                    // 训练日历入口
-                    trainingCalendarEntry
+                    // 快捷入口
+                    shortcutButtons
                         .staggered(index: 0)
 
                     // 时间范围切换
@@ -526,46 +526,62 @@ struct HistoryView: View {
         .frame(height: 140)
     }
 
-    // MARK: - 训练日历入口
+    // MARK: - 快捷入口
 
-    private var trainingCalendarEntry: some View {
-        NavigationLink {
-            TrainingCalendarView()
-                .preferredColorScheme(.dark)
-        } label: {
-            HStack(spacing: PulseTheme.spacingS) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(PulseTheme.accent.opacity(0.12))
-                        .frame(width: 32, height: 32)
-
-                    Image(systemName: "calendar")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(PulseTheme.accent)
-                }
-
-                Text("训练日历")
-                    .font(PulseTheme.bodyFont.weight(.medium))
-                    .foregroundStyle(PulseTheme.textPrimary)
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(PulseTheme.textTertiary)
+    private var shortcutButtons: some View {
+        HStack(spacing: PulseTheme.spacingS) {
+            // 训练日历
+            NavigationLink {
+                TrainingCalendarView()
+                    .preferredColorScheme(.dark)
+            } label: {
+                shortcutButton(icon: "calendar", title: "训练日历")
             }
-            .padding(PulseTheme.spacingM)
-            .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .fill(PulseTheme.cardBackground)
-                    .shadow(color: PulseTheme.cardShadow.opacity(0.3), radius: 8, y: 4)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .stroke(PulseTheme.accent.opacity(0.15), lineWidth: 0.5)
-            )
+            .buttonStyle(.plain)
+
+            // 周报
+            Button {
+                showWeeklyReport = true
+            } label: {
+                shortcutButton(icon: "doc.richtext", title: "周报")
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
+    }
+
+    private func shortcutButton(icon: String, title: String) -> some View {
+        HStack(spacing: PulseTheme.spacingS) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(PulseTheme.accent.opacity(0.12))
+                    .frame(width: 32, height: 32)
+
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(PulseTheme.accent)
+            }
+
+            Text(title)
+                .font(PulseTheme.bodyFont.weight(.medium))
+                .foregroundStyle(PulseTheme.textPrimary)
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(PulseTheme.textTertiary)
+        }
+        .padding(PulseTheme.spacingM)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                .fill(PulseTheme.cardBackground)
+                .shadow(color: PulseTheme.cardShadow.opacity(0.3), radius: 8, y: 4)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                .stroke(PulseTheme.accent.opacity(0.15), lineWidth: 0.5)
+        )
     }
 
     // MARK: - 数据计算

@@ -12,6 +12,7 @@ struct SettingsView: View {
     @AppStorage("pulse.brief.minute") private var briefMinute = 30
     @AppStorage("pulse.collection.frequency") private var collectionFrequency = "normal"
     @AppStorage("pulse.openclaw.enabled") private var openClawEnabled = false
+    @AppStorage("pulse.demo.enabled") private var demoModeEnabled = false
 
     // MARK: - 状态
 
@@ -55,9 +56,13 @@ struct SettingsView: View {
                     openClawSection
                         .staggered(index: 4)
 
+                    // 开发者选项
+                    developerSection
+                        .staggered(index: 5)
+
                     // 关于
                     aboutSection
-                        .staggered(index: 5)
+                        .staggered(index: 6)
 
                     Spacer(minLength: 40)
                 }
@@ -373,9 +378,16 @@ struct SettingsView: View {
     // MARK: - OpenClaw 集成
 
     @State private var installCommandCopied = false
+    @State private var gatewayURL = ""
+    @State private var gatewayToken = ""
+    @State private var gatewayAgentID = ""
+    @State private var isPairing = false
+    @State private var pairResult: Bool?
+    @State private var showGatewayConfig = false
 
     private var openClawSection: some View {
         let bridge = OpenClawBridge.shared
+        let isPaired = bridge.config != nil
 
         return VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             sectionHeader(icon: "cpu", title: "连接 OpenClaw")
@@ -383,11 +395,11 @@ struct SettingsView: View {
             // 说明
             settingRow {
                 VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                    Text("安装 Pulse Coach 教练 skill 到你的 OpenClaw")
+                    Text("连接你的 OpenClaw Gateway")
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
-                    Text("在 OpenClaw 中对你的 agent 说「今天练什么」，它会读取你的健康数据给出训练建议")
+                    Text("健康数据通过 API 推送给你的 AI Agent，获取个性化训练建议和健康分析")
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                         .lineSpacing(3)
@@ -420,25 +432,78 @@ struct SettingsView: View {
             }
             .buttonStyle(.plain)
 
-            // 数据共享开关
-            settingRow {
-                Toggle(isOn: $openClawEnabled) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("共享健康数据给 Agent")
-                            .font(PulseTheme.bodyFont)
-                            .foregroundStyle(PulseTheme.textPrimary)
-                        Text("允许 OpenClaw 读取你的健康状态")
-                            .font(PulseTheme.captionFont)
-                            .foregroundStyle(PulseTheme.textTertiary)
+            // Gateway 配置
+            if isPaired {
+                // 已配对 — 显示状态
+                settingRow {
+                    VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                        HStack {
+                            Image(systemName: "checkmark.seal.fill")
+                                .font(.system(size: 14))
+                                .foregroundStyle(PulseTheme.statusGood)
+                            Text("Gateway 已配对")
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                        }
+                        if let cfg = bridge.config {
+                            Text(cfg.gatewayURL)
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                                .lineLimit(1)
+                        }
                     }
                 }
-                .tint(PulseTheme.accent)
-                .onChange(of: openClawEnabled) {
-                    bridge.isEnabled = openClawEnabled
+
+                // 重新配置按钮
+                Button {
+                    if let cfg = bridge.config {
+                        gatewayURL = cfg.gatewayURL
+                        gatewayAgentID = cfg.agentID
+                        gatewayToken = ""
+                    }
+                    withAnimation(.spring(response: 0.3)) {
+                        showGatewayConfig.toggle()
+                    }
+                } label: {
+                    Text(showGatewayConfig ? "取消" : "重新配置")
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.textSecondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, PulseTheme.spacingS)
+                }
+                .buttonStyle(.plain)
+            } else {
+                // 未配对 — 展开配置
+                let _ = {
+                    // 始终显示配置区域
+                }()
+            }
+
+            if showGatewayConfig || !isPaired {
+                gatewayConfigView
+            }
+
+            // 数据共享开关（需要先配对）
+            if isPaired {
+                settingRow {
+                    Toggle(isOn: $openClawEnabled) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("自动推送健康数据")
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text("每 30 分钟或数据有重大变化时自动推送")
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                    }
+                    .tint(PulseTheme.accent)
+                    .onChange(of: openClawEnabled) {
+                        bridge.isEnabled = openClawEnabled
+                    }
                 }
             }
 
-            if openClawEnabled {
+            if openClawEnabled && isPaired {
                 // 连接状态 + 最后同步
                 settingRow {
                     HStack {
@@ -454,7 +519,7 @@ struct SettingsView: View {
                         // 手动同步按钮
                         Button {
                             Task { @MainActor in
-                                bridge.pushHealthStatus()
+                                await bridge.pushHealthStatus()
                             }
                         } label: {
                             Image(systemName: "arrow.triangle.2.circlepath")
@@ -475,12 +540,149 @@ struct SettingsView: View {
                     Image(systemName: "lock.shield.fill")
                         .font(.system(size: 12))
                         .foregroundStyle(PulseTheme.statusGood)
-                    Text("数据仅通过 App Group 本地共享，不经过网络传输")
+                    Text("数据直接发送到你的 OpenClaw Gateway，不经过第三方服务器")
                         .font(.system(size: 11, weight: .regular, design: .rounded))
                         .foregroundStyle(PulseTheme.textTertiary)
                         .lineSpacing(2)
                 }
                 .padding(.horizontal, PulseTheme.spacingXS)
+            }
+        }
+        .pulseCard()
+    }
+
+    /// Gateway 配置输入区域
+    private var gatewayConfigView: some View {
+        VStack(spacing: PulseTheme.spacingS) {
+            // Gateway URL
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Gateway URL")
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+                TextField("https://your-gateway.example.com", text: $gatewayURL)
+                    .font(PulseTheme.bodyFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .keyboardType(.URL)
+                    .padding(PulseTheme.spacingS)
+                    .background(
+                        RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                            .fill(PulseTheme.surface)
+                    )
+            }
+
+            // Token
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Token")
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+                SecureField("Bearer token", text: $gatewayToken)
+                    .font(PulseTheme.bodyFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                    .padding(PulseTheme.spacingS)
+                    .background(
+                        RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                            .fill(PulseTheme.surface)
+                    )
+            }
+
+            // Agent ID (可选)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Agent ID（可选）")
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+                TextField(PulseOpenClawConfig.defaultAgentID, text: $gatewayAgentID)
+                    .font(PulseTheme.bodyFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .padding(PulseTheme.spacingS)
+                    .background(
+                        RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                            .fill(PulseTheme.surface)
+                    )
+            }
+
+            // 配对按钮
+            Button {
+                Task {
+                    isPairing = true
+                    pairResult = nil
+                    let agent = gatewayAgentID.isEmpty ? nil : gatewayAgentID
+                    let ok = await OpenClawBridge.shared.pair(
+                        gatewayURL: gatewayURL,
+                        token: gatewayToken,
+                        agentID: agent
+                    )
+                    isPairing = false
+                    pairResult = ok
+                    if ok {
+                        withAnimation(.spring(response: 0.3)) {
+                            showGatewayConfig = false
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            pairResult = nil
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: PulseTheme.spacingS) {
+                    if isPairing {
+                        ProgressView()
+                            .tint(PulseTheme.accent)
+                            .scaleEffect(0.8)
+                    } else {
+                        Image(systemName: "link")
+                            .font(.system(size: 14, weight: .medium))
+                    }
+                    Text(isPairing ? "验证中..." : "验证并连接")
+                        .font(PulseTheme.bodyFont.weight(.medium))
+                }
+                .foregroundStyle(PulseTheme.accent)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                        .fill(PulseTheme.accent.opacity(0.1))
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(gatewayURL.isEmpty || gatewayToken.isEmpty || isPairing)
+            .opacity(gatewayURL.isEmpty || gatewayToken.isEmpty ? 0.5 : 1)
+
+            // 配对结果
+            if let result = pairResult {
+                HStack(spacing: PulseTheme.spacingXS) {
+                    Image(systemName: result ? "checkmark.circle.fill" : "xmark.circle.fill")
+                    Text(result ? "连接成功" : "连接失败，请检查 URL 和 Token")
+                }
+                .font(PulseTheme.captionFont)
+                .foregroundStyle(result ? PulseTheme.statusGood : PulseTheme.statusPoor)
+                .transition(.scale.combined(with: .opacity))
+            }
+        }
+        .transition(.opacity.combined(with: .move(edge: .top)))
+    }
+
+    // MARK: - 开发者选项
+
+    private var developerSection: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            sectionHeader(icon: "hammer.fill", title: "开发者选项")
+
+            settingRow {
+                Toggle(isOn: $demoModeEnabled) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("演示模式")
+                            .font(PulseTheme.bodyFont)
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text("使用模拟数据展示完整界面效果")
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .tint(PulseTheme.accent)
             }
         }
         .pulseCard()

@@ -2,9 +2,59 @@ import Foundation
 import SwiftData
 import os
 
+// MARK: - 配置
+
+/// OpenClaw Gateway 连接配置
+struct PulseOpenClawConfig: Codable, Equatable {
+    var gatewayURL: String
+    var token: String
+    var agentID: String
+
+    static let defaultAgentID = "openclaw:main"
+
+    /// 从 UserDefaults 加载
+    static func load() -> PulseOpenClawConfig? {
+        guard let url = UserDefaults.standard.string(forKey: "pulse.openclaw.gatewayURL"),
+              let token = UserDefaults.standard.string(forKey: "pulse.openclaw.token"),
+              !url.isEmpty, !token.isEmpty else { return nil }
+        let agent = UserDefaults.standard.string(forKey: "pulse.openclaw.agentID") ?? defaultAgentID
+        return PulseOpenClawConfig(gatewayURL: url, token: token, agentID: agent)
+    }
+
+    /// 保存到 UserDefaults
+    func save() {
+        UserDefaults.standard.set(gatewayURL, forKey: "pulse.openclaw.gatewayURL")
+        UserDefaults.standard.set(token, forKey: "pulse.openclaw.token")
+        UserDefaults.standard.set(agentID, forKey: "pulse.openclaw.agentID")
+    }
+
+    /// 清除配置
+    static func clear() {
+        UserDefaults.standard.removeObject(forKey: "pulse.openclaw.gatewayURL")
+        UserDefaults.standard.removeObject(forKey: "pulse.openclaw.token")
+        UserDefaults.standard.removeObject(forKey: "pulse.openclaw.agentID")
+    }
+
+    /// 构建 API endpoint URL
+    var completionsURL: URL? {
+        let base = gatewayURL.hasSuffix("/") ? String(gatewayURL.dropLast()) : gatewayURL
+        return URL(string: "\(base)/v1/chat/completions")
+    }
+}
+
+// MARK: - Agent 回复模型
+
+/// Agent 返回的健康建议结构
+struct AgentHealthAdvice: Codable {
+    let morningBrief: String?
+    let trainingAdvice: String?
+    let alerts: [String]?
+    let recoveryScore: Int?
+    let summary: String?
+}
+
 /// OpenClaw 集成桥接层
-/// 通过 App Group UserDefaults + URL Scheme 向 OpenClaw agent 暴露健康状态
-/// 支持定时推送和按需查询
+/// 通过 HTTP API 向用户的 OpenClaw Gateway 推送健康数据并接收 AI 分析
 @Observable
 final class OpenClawBridge {
 
@@ -12,28 +62,17 @@ final class OpenClawBridge {
 
     private let logger = Logger(subsystem: "com.abundra.pulse", category: "OpenClawBridge")
 
-    /// App Group 标识（与 OpenClaw 共享）
-    static let appGroupID = "group.com.abundra.pulse.shared"
-
-    /// 共享 UserDefaults
-    private let sharedDefaults = UserDefaults(suiteName: OpenClawBridge.appGroupID)
-
-    /// URL Scheme 标识
-    static let urlScheme = "pulse-health"
-
     // MARK: - 状态
 
-    /// 是否启用数据共享
+    /// 是否启用 OpenClaw 连接
     var isEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: "pulse.openclaw.enabled") }
         set {
             UserDefaults.standard.set(newValue, forKey: "pulse.openclaw.enabled")
             if newValue {
                 Task { @MainActor in
-                    pushHealthStatus()
+                    await pushHealthStatus()
                 }
-            } else {
-                clearSharedData()
             }
         }
     }
@@ -47,17 +86,36 @@ final class OpenClawBridge {
         set { UserDefaults.standard.set(newValue, forKey: "pulse.openclaw.lastSync") }
     }
 
+    /// 最新的 agent 分析结果
+    var latestAdvice: AgentHealthAdvice?
+
+    /// 配置
+    var config: PulseOpenClawConfig? {
+        PulseOpenClawConfig.load()
+    }
+
     /// 上次推送的评分（用于检测重大变化）
     private var lastPushedScore: Int?
 
+    /// 推送间隔（秒）
+    private let pushInterval: TimeInterval = 1800 // 30 分钟
+
+    /// 重大变化阈值
+    private let significantChangeThreshold = 15
+
+    private let session: URLSession
+
     private init() {
-        // 检查连接状态
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 30
+        config.timeoutIntervalForResource = 60
+        self.session = URLSession(configuration: config)
+
         checkConnection()
     }
 
     // MARK: - 健康状态数据格式
 
-    /// 完整健康状态 JSON 结构
     struct HealthStatus: Codable {
         let timestamp: Date
         let lastSyncTime: Date
@@ -88,7 +146,7 @@ final class OpenClawBridge {
 
     struct WeekTrendPayload: Codable {
         let averageScore: Int?
-        let scoreTrend: String      // "improving" / "stable" / "declining"
+        let scoreTrend: String
         let hrvTrend: String
         let sleepTrend: String
         let dailyScores: [DayScore]
@@ -126,62 +184,176 @@ final class OpenClawBridge {
         }
     }
 
-    // MARK: - 推送健康状态
+    // MARK: - 配对验证
 
-    /// 生成并推送当前健康状态到 OpenClaw
-    /// 通过 App Group UserDefaults 共享数据
+    /// 验证 Gateway 连通性
+    func verifyConnection(url: String, token: String) async -> Bool {
+        let base = url.hasSuffix("/") ? String(url.dropLast()) : url
+        guard let endpoint = URL(string: "\(base)/v1/chat/completions") else { return false }
+
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+            "model": PulseOpenClawConfig.defaultAgentID,
+            "messages": [
+                ["role": "user", "content": "ping"]
+            ],
+            "max_tokens": 10
+        ]
+
+        guard let bodyData = try? JSONSerialization.data(withJSONObject: body) else { return false }
+        request.httpBody = bodyData
+
+        do {
+            let (_, response) = try await session.data(for: request)
+            if let http = response as? HTTPURLResponse {
+                return (200..<300).contains(http.statusCode)
+            }
+            return false
+        } catch {
+            logger.error("Gateway 连通性验证失败: \(error.localizedDescription)")
+            return false
+        }
+    }
+
+    /// 保存配置并验证
+    func pair(gatewayURL: String, token: String, agentID: String? = nil) async -> Bool {
+        let ok = await verifyConnection(url: gatewayURL, token: token)
+        if ok {
+            let cfg = PulseOpenClawConfig(
+                gatewayURL: gatewayURL,
+                token: token,
+                agentID: agentID ?? PulseOpenClawConfig.defaultAgentID
+            )
+            cfg.save()
+            await MainActor.run {
+                connectionStatus = .connected
+            }
+            logger.info("OpenClaw Gateway 配对成功")
+        }
+        return ok
+    }
+
+    // MARK: - 推送健康数据
+
+    /// 将健康数据打包发送给 OpenClaw Agent，接收分析结果
     @MainActor
-    func pushHealthStatus() {
+    func pushHealthStatus() async {
         guard isEnabled else { return }
+        guard let cfg = config else {
+            connectionStatus = .disconnected
+            logger.info("未配置 OpenClaw Gateway")
+            return
+        }
+        guard let endpoint = cfg.completionsURL else {
+            connectionStatus = .error
+            return
+        }
 
         connectionStatus = .syncing
 
         let status = buildHealthStatus()
 
-        // 写入 App Group UserDefaults
-        if let data = try? JSONEncoder().encode(status) {
-            sharedDefaults?.set(data, forKey: "pulse.healthStatus")
-            sharedDefaults?.set(Date(), forKey: "pulse.healthStatus.timestamp")
-            sharedDefaults?.synchronize()
+        // 将健康数据编码为 JSON 字符串作为 user message
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        guard let statusData = try? encoder.encode(status),
+              let statusJSON = String(data: statusData, encoding: .utf8) else {
+            connectionStatus = .error
+            return
         }
 
-        // 同时写入标准 UserDefaults 作为备份
-        if let jsonData = try? JSONEncoder().encode(status),
-           let jsonString = String(data: jsonData, encoding: .utf8) {
-            UserDefaults.standard.set(jsonString, forKey: "pulse.openclaw.latestStatus")
+        let messageContent = """
+        [HEALTH_DATA]
+        \(statusJSON)
+        [/HEALTH_DATA]
+
+        请根据以上健康数据，给出今日健康摘要和训练建议。用 JSON 格式回复，包含 morningBrief、trainingAdvice、alerts、recoveryScore、summary 字段。
+        """
+
+        let body: [String: Any] = [
+            "model": cfg.agentID,
+            "messages": [
+                ["role": "system", "content": "你是 Pulse Coach，用户的私人健身教练 AI。根据 HealthKit 数据给出精准的健康分析和训练建议。回复 JSON 格式。"],
+                ["role": "user", "content": messageContent]
+            ],
+            "max_tokens": 1024
+        ]
+
+        guard let bodyData = try? JSONSerialization.data(withJSONObject: body) else {
+            connectionStatus = .error
+            return
         }
 
-        lastSyncTime = Date()
-        lastPushedScore = status.recoveryScore
-        connectionStatus = .connected
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(cfg.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = bodyData
 
-        logger.info("健康状态已推送到 OpenClaw — 恢复评分: \(status.recoveryScore)")
+        do {
+            let (data, response) = try await session.data(for: request)
+
+            guard let http = response as? HTTPURLResponse,
+                  (200..<300).contains(http.statusCode) else {
+                let code = (response as? HTTPURLResponse)?.statusCode ?? -1
+                logger.error("OpenClaw API 错误: HTTP \(code)")
+                connectionStatus = .error
+                return
+            }
+
+            // 解析 OpenAI-compatible 回复
+            if let advice = parseAgentResponse(data) {
+                latestAdvice = advice
+            }
+
+            lastSyncTime = Date()
+            lastPushedScore = status.recoveryScore
+            connectionStatus = .connected
+
+            // 同时写入 App Group 供 Widget 读取
+            writeToAppGroup(status)
+
+            logger.info("健康数据已推送到 OpenClaw — 恢复评分: \(status.recoveryScore)")
+
+        } catch {
+            logger.error("推送健康数据失败: \(error.localizedDescription)")
+            connectionStatus = .error
+        }
     }
 
     /// 检查是否有重大变化需要立即推送
     @MainActor
     func checkAndPushIfNeeded() {
-        guard isEnabled else { return }
+        guard isEnabled, config != nil else { return }
 
         let insight = HealthAnalyzer.shared.generateInsight()
         let currentScore = insight.recoveryScore
 
-        // 评分变化超过 15 分视为重大变化
-        if let lastScore = lastPushedScore, abs(currentScore - lastScore) >= 15 {
+        var shouldPush = false
+
+        // 评分变化超过阈值
+        if let lastScore = lastPushedScore, abs(currentScore - lastScore) >= significantChangeThreshold {
             logger.info("检测到评分重大变化: \(lastScore) → \(currentScore)，立即推送")
-            pushHealthStatus()
-            return
+            shouldPush = true
         }
 
-        // 检查上次推送时间，超过 1 小时自动推送
+        // 超过推送间隔
         if let lastSync = lastSyncTime {
-            let interval = Date().timeIntervalSince(lastSync)
-            if interval >= 3600 { // 1 小时
-                pushHealthStatus()
+            if Date().timeIntervalSince(lastSync) >= pushInterval {
+                shouldPush = true
             }
         } else {
-            // 从未推送过
-            pushHealthStatus()
+            shouldPush = true // 从未推送过
+        }
+
+        if shouldPush {
+            Task { @MainActor in
+                await pushHealthStatus()
+            }
         }
     }
 
@@ -195,7 +367,6 @@ final class OpenClawBridge {
         let vitals = dataService.getLatestVitals()
         let insight = HealthAnalyzer.shared.generateInsight()
 
-        // 今日摘要
         let todaySummary = TodaySummaryPayload(
             date: DailySummary.dateFormatter.string(from: Date()),
             dailyScore: today?.dailyScore,
@@ -206,7 +377,6 @@ final class OpenClawBridge {
             activeCalories: today?.activeCalories
         )
 
-        // 最新生命体征
         let vitalsPayload = VitalsPayload(
             heartRate: vitals.heartRate,
             hrv: vitals.hrv,
@@ -215,7 +385,6 @@ final class OpenClawBridge {
             lastUpdated: vitals.lastUpdated
         )
 
-        // 周趋势
         let scores = week.compactMap(\.dailyScore)
         let avgScore = scores.isEmpty ? nil : scores.reduce(0, +) / scores.count
         let dailyScores = week.compactMap { s -> DayScore? in
@@ -242,16 +411,80 @@ final class OpenClawBridge {
         )
     }
 
-    // MARK: - URL Scheme 处理
+    // MARK: - 解析 Agent 回复
+
+    /// 解析 OpenAI-compatible chat completion 响应
+    private func parseAgentResponse(_ data: Data) -> AgentHealthAdvice? {
+        // 标准 OpenAI 格式: { choices: [{ message: { content: "..." } }] }
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let choices = json["choices"] as? [[String: Any]],
+              let first = choices.first,
+              let message = first["message"] as? [String: Any],
+              let content = message["content"] as? String else {
+            logger.warning("无法解析 Agent 回复结构")
+            return nil
+        }
+
+        // 尝试从 content 中提取 JSON
+        let jsonContent = extractJSON(from: content)
+        if let jsonData = jsonContent.data(using: .utf8),
+           let advice = try? JSONDecoder().decode(AgentHealthAdvice.self, from: jsonData) {
+            return advice
+        }
+
+        // 如果不是 JSON，包装为 summary
+        return AgentHealthAdvice(
+            morningBrief: nil,
+            trainingAdvice: nil,
+            alerts: nil,
+            recoveryScore: nil,
+            summary: content
+        )
+    }
+
+    /// 从可能包含 markdown code block 的文本中提取 JSON
+    private func extractJSON(from text: String) -> String {
+        // 匹配 ```json ... ``` 或 ``` ... ```
+        if let range = text.range(of: "```(?:json)?\\s*\\n([\\s\\S]*?)\\n```",
+                                   options: .regularExpression) {
+            let match = text[range]
+            // 去掉 ``` 标记
+            let lines = match.split(separator: "\n", omittingEmptySubsequences: false)
+            if lines.count > 2 {
+                return lines.dropFirst().dropLast().joined(separator: "\n")
+            }
+        }
+
+        // 尝试找第一个 { 到最后一个 }
+        if let start = text.firstIndex(of: "{"),
+           let end = text.lastIndex(of: "}") {
+            return String(text[start...end])
+        }
+
+        return text
+    }
+
+    // MARK: - App Group (Widget 兼容)
+
+    private static let appGroupID = "group.com.abundra.pulse.shared"
+
+    /// 写入 App Group 供 Widget 读取
+    private func writeToAppGroup(_ status: HealthStatus) {
+        guard let sharedDefaults = UserDefaults(suiteName: Self.appGroupID) else { return }
+        if let data = try? JSONEncoder().encode(status) {
+            sharedDefaults.set(data, forKey: "pulse.healthStatus")
+            sharedDefaults.set(Date(), forKey: "pulse.healthStatus.timestamp")
+        }
+    }
+
+    // MARK: - URL Scheme 处理（保持兼容）
 
     /// 处理来自 OpenClaw 的 URL Scheme 请求
-    /// 格式: pulse-health://query?type=status
-    /// 格式: pulse-health://command?action=setNotificationTime&hour=7&minute=30
     @MainActor
     func handleURL(_ url: URL) -> Bool {
-        guard url.scheme == Self.urlScheme else { return false }
+        guard url.scheme == "pulse-health" else { return false }
         guard isEnabled else {
-            logger.info("OpenClaw 请求被忽略：数据共享未启用")
+            logger.info("OpenClaw 请求被忽略：未启用")
             return false
         }
 
@@ -262,51 +495,28 @@ final class OpenClawBridge {
         case "query":
             handleQuery(params: params)
             return true
-
         case "command":
             handleCommand(params: params)
             return true
-
         default:
             logger.warning("未知的 OpenClaw 请求: \(url.absoluteString)")
             return false
         }
     }
 
-    /// 处理查询请求
     @MainActor
     private func handleQuery(params: [URLQueryItem]) {
         let type = params.first { $0.name == "type" }?.value ?? "status"
-
         switch type {
-        case "status":
-            pushHealthStatus()
-
-        case "vitals":
-            let vitals = HealthDataService.shared.getLatestVitals()
-            if let data = try? JSONEncoder().encode(
-                VitalsPayload(
-                    heartRate: vitals.heartRate,
-                    hrv: vitals.hrv,
-                    restingHeartRate: vitals.restingHeartRate,
-                    bloodOxygen: vitals.bloodOxygen,
-                    lastUpdated: vitals.lastUpdated
-                )
-            ) {
-                sharedDefaults?.set(data, forKey: "pulse.queryResponse")
-                sharedDefaults?.synchronize()
+        case "status", "vitals", "report":
+            Task { @MainActor in
+                await pushHealthStatus()
             }
-
-        case "report":
-            // 触发完整报告生成
-            pushHealthStatus()
-
         default:
             logger.info("未知查询类型: \(type)")
         }
     }
 
-    /// 处理来自 OpenClaw 的指令
     @MainActor
     private func handleCommand(params: [URLQueryItem]) {
         guard let action = params.first(where: { $0.name == "action" })?.value else { return }
@@ -323,13 +533,10 @@ final class OpenClawBridge {
                 logger.info("OpenClaw 设置通知时间: \(hour):\(String(format: "%02d", minute))")
             }
             #endif
-
-        case "requestReport":
-            pushHealthStatus()
-
-        case "refreshData":
-            pushHealthStatus()
-
+        case "requestReport", "refreshData":
+            Task { @MainActor in
+                await pushHealthStatus()
+            }
         default:
             logger.info("未知指令: \(action)")
         }
@@ -337,40 +544,21 @@ final class OpenClawBridge {
 
     // MARK: - 连接管理
 
-    /// 检查 OpenClaw 连接状态
     private func checkConnection() {
-        if isEnabled {
-            // 检查 App Group 是否可用
-            if sharedDefaults != nil {
-                // 检查最后同步时间
-                if let lastSync = lastSyncTime,
-                   Date().timeIntervalSince(lastSync) < 7200 { // 2 小时内
-                    connectionStatus = .connected
-                } else {
-                    connectionStatus = .disconnected
-                }
+        if isEnabled, config != nil {
+            if let lastSync = lastSyncTime,
+               Date().timeIntervalSince(lastSync) < 7200 {
+                connectionStatus = .connected
             } else {
-                connectionStatus = .error
-                logger.error("App Group UserDefaults 不可用")
+                connectionStatus = .disconnected
             }
         } else {
             connectionStatus = .disconnected
         }
     }
 
-    /// 清除共享数据
-    private func clearSharedData() {
-        sharedDefaults?.removeObject(forKey: "pulse.healthStatus")
-        sharedDefaults?.removeObject(forKey: "pulse.healthStatus.timestamp")
-        sharedDefaults?.removeObject(forKey: "pulse.queryResponse")
-        sharedDefaults?.synchronize()
-        connectionStatus = .disconnected
-        logger.info("已清除 OpenClaw 共享数据")
-    }
-
     // MARK: - 格式化
 
-    /// 最后同步时间的显示文本
     var lastSyncDisplay: String {
         guard let time = lastSyncTime else { return "从未同步" }
 

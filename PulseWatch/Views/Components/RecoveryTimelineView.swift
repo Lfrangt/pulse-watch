@@ -1,0 +1,553 @@
+import SwiftUI
+
+// MARK: - 身体恢复时间线组件
+// 展示过去 24 小时的身体变化事件，垂直时间线设计
+
+// MARK: - 时间线事件数据模型
+
+struct TimelineEvent: Identifiable {
+    let id = UUID()
+    let time: Date
+    let icon: String          // SF Symbol 名称
+    let title: String         // 事件标题
+    let detail: String        // 事件详情
+    let impact: String        // 影响描述（显示为标签）
+    let impactPositive: Bool  // 影响是正面还是负面
+    let color: Color          // 节点颜色
+    let isCurrent: Bool       // 是否为"当前"节点（底部脉冲动画）
+
+    init(
+        time: Date,
+        icon: String,
+        title: String,
+        detail: String,
+        impact: String,
+        impactPositive: Bool,
+        color: Color,
+        isCurrent: Bool = false
+    ) {
+        self.time = time
+        self.icon = icon
+        self.title = title
+        self.detail = detail
+        self.impact = impact
+        self.impactPositive = impactPositive
+        self.color = color
+        self.isCurrent = isCurrent
+    }
+}
+
+// MARK: - 时间线事件生成器
+
+/// 从 HealthKit 真实数据构建时间线事件，数据不足时用占位结构
+enum TimelineEventBuilder {
+
+    /// 睡眠事件专用颜色 — 柔和紫
+    static let sleepColor = Color(hex: "8B7EC8")
+
+    /// 从 HealthKitManager 和 HealthAnalyzer 数据构建事件列表
+    @MainActor
+    static func buildEvents() -> [TimelineEvent] {
+        let hk = HealthKitManager.shared
+        let insight = HealthAnalyzer.shared.generateInsight()
+        let calendar = Calendar.current
+        let now = Date()
+
+        var events: [TimelineEvent] = []
+
+        // ── 1. 睡眠事件 ──
+        let sleepMinutes = hk.lastNightSleepMinutes
+        if sleepMinutes > 0 {
+            let sleepHours = sleepMinutes / 60
+            let sleepMins = sleepMinutes % 60
+            let deepHours = Double(sleepMinutes) * 0.2 // 估算深睡（约 20%）
+
+            // 入睡时间（倒推）
+            let bedtime = calendar.date(byAdding: .minute, value: -sleepMinutes, to:
+                calendar.date(bySettingHour: 7, minute: 0, second: 0, of: now) ?? now
+            ) ?? now
+
+            events.append(TimelineEvent(
+                time: bedtime,
+                icon: "moon.fill",
+                title: "入睡",
+                detail: "总计 \(sleepHours)h\(sleepMins)m · 深睡约 \(String(format: "%.1f", deepHours / 60))h",
+                impact: insight.sleepScore >= 70 ? "恢复 +\(min(20, insight.sleepScore / 5))" : "恢复一般",
+                impactPositive: insight.sleepScore >= 50,
+                color: sleepColor
+            ))
+
+            // 醒来时间
+            let wakeTime = calendar.date(bySettingHour: 7, minute: 0, second: 0, of: now) ?? now
+
+            // 醒来事件 — 结合静息心率
+            let rhrText: String
+            let rhrGood: Bool
+            if let rhr = hk.latestRestingHR {
+                rhrText = "静息心率 \(Int(rhr))bpm"
+                rhrGood = rhr < 70
+            } else {
+                rhrText = "静息心率 --"
+                rhrGood = true
+            }
+
+            events.append(TimelineEvent(
+                time: wakeTime,
+                icon: "sunrise.fill",
+                title: "醒来",
+                detail: rhrText,
+                impact: rhrGood ? "恢复良好" : "恢复偏弱",
+                impactPositive: rhrGood,
+                color: rhrGood ? PulseTheme.statusGood : PulseTheme.statusModerate
+            ))
+        } else {
+            // 无睡眠数据 — 占位
+            let placeholderBedtime = calendar.date(bySettingHour: 23, minute: 30, second: 0, of:
+                calendar.date(byAdding: .day, value: -1, to: now) ?? now
+            ) ?? now
+
+            events.append(TimelineEvent(
+                time: placeholderBedtime,
+                icon: "moon.fill",
+                title: "睡眠",
+                detail: "暂无睡眠数据",
+                impact: "等待同步",
+                impactPositive: true,
+                color: sleepColor
+            ))
+
+            let placeholderWake = calendar.date(bySettingHour: 7, minute: 0, second: 0, of: now) ?? now
+            events.append(TimelineEvent(
+                time: placeholderWake,
+                icon: "sunrise.fill",
+                title: "醒来",
+                detail: "静息心率 --",
+                impact: "--",
+                impactPositive: true,
+                color: PulseTheme.textTertiary
+            ))
+        }
+
+        // ── 2. 日间活动事件 ──
+        let steps = hk.todaySteps
+        let calories = hk.todayActiveCalories
+
+        if steps > 0 || calories > 0 {
+            // 根据当前时间估算活动发生的大致时段
+            let activityHour = min(calendar.component(.hour, from: now), 14)
+            let activityTime = calendar.date(bySettingHour: max(activityHour, 9), minute: 0, second: 0, of: now) ?? now
+
+            let stepsText: String
+            if steps >= 10000 {
+                stepsText = String(format: "%.1fk 步", Double(steps) / 1000)
+            } else if steps >= 1000 {
+                stepsText = String(format: "%.1fk 步", Double(steps) / 1000)
+            } else {
+                stepsText = "\(steps) 步"
+            }
+
+            events.append(TimelineEvent(
+                time: activityTime,
+                icon: "figure.walk",
+                title: "日间活动",
+                detail: "\(stepsText) · 活跃卡路里 +\(Int(calories))kcal",
+                impact: steps >= 8000 ? "活跃 +" : "继续加油",
+                impactPositive: steps >= 5000,
+                color: PulseTheme.accent
+            ))
+        }
+
+        // ── 3. 当前状态事件（始终显示，底部脉冲） ──
+        let hrvText: String
+        let currentGood: Bool
+        if let hrv = hk.latestHRV {
+            let arrow = insight.recoveryScore >= 60 ? "↑" : "↓"
+            hrvText = "HRV \(Int(hrv))ms \(arrow)"
+            currentGood = insight.recoveryScore >= 60
+        } else {
+            hrvText = "HRV --"
+            currentGood = true
+        }
+
+        let adviceText = insight.trainingAdvice.label
+
+        events.append(TimelineEvent(
+            time: now,
+            icon: "heart.text.clipboard",
+            title: "当前状态",
+            detail: "\(hrvText) · \(adviceText)",
+            impact: currentGood ? "可以训练" : "建议休息",
+            impactPositive: currentGood,
+            color: PulseTheme.accent,
+            isCurrent: true
+        ))
+
+        // 按时间排序
+        return events.sorted { $0.time < $1.time }
+    }
+}
+
+// MARK: - 时间线主视图
+
+struct RecoveryTimelineView: View {
+    /// 时间线事件列表
+    let events: [TimelineEvent]
+
+    /// 外部传入或自动构建
+    init(events: [TimelineEvent]? = nil) {
+        self.events = events ?? []
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            // ── 标题区 ──
+            sectionHeader
+
+            // ── 时间线内容 ──
+            if events.isEmpty {
+                emptyState
+            } else {
+                timelineContent
+            }
+        }
+        .pulseCard()
+    }
+
+    // MARK: - 标题
+
+    private var sectionHeader: some View {
+        HStack(spacing: PulseTheme.spacingS) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(PulseTheme.accent.opacity(0.12))
+                    .frame(width: 32, height: 32)
+
+                Image(systemName: "clock.arrow.circlepath")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(PulseTheme.accent)
+            }
+
+            Text("身体时间线")
+                .font(PulseTheme.headlineFont)
+                .foregroundStyle(PulseTheme.textPrimary)
+
+            Spacer()
+
+            // 时间范围标签
+            Text("过去 24h")
+                .font(PulseTheme.captionFont)
+                .foregroundStyle(PulseTheme.textTertiary)
+        }
+    }
+
+    // MARK: - 空状态
+
+    private var emptyState: some View {
+        HStack {
+            Spacer()
+            VStack(spacing: PulseTheme.spacingS) {
+                Image(systemName: "clock.badge.questionmark")
+                    .font(.system(size: 28, weight: .light))
+                    .foregroundStyle(PulseTheme.textTertiary)
+
+                Text("暂无时间线数据")
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+            .padding(.vertical, PulseTheme.spacingXL)
+            Spacer()
+        }
+    }
+
+    // MARK: - 时间线主体
+
+    private var timelineContent: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(events.enumerated()), id: \.element.id) { index, event in
+                TimelineNodeView(
+                    event: event,
+                    isFirst: index == 0,
+                    isLast: index == events.count - 1
+                )
+                .staggered(index: index + 1) // +1 因为标题占了 index 0
+            }
+        }
+    }
+}
+
+// MARK: - 单个时间线节点
+
+struct TimelineNodeView: View {
+    let event: TimelineEvent
+    let isFirst: Bool
+    let isLast: Bool
+
+    /// "当前"节点的脉冲动画状态
+    @State private var isPulsing = false
+
+    /// 节点圆的大小
+    private let nodeSize: CGFloat = 11
+    /// 时间线宽度
+    private let lineWidth: CGFloat = 2
+    /// 节点区域总宽度（左侧留给线 + 圆 + 间距）
+    private let leadingWidth: CGFloat = 40
+
+    var body: some View {
+        HStack(alignment: .top, spacing: PulseTheme.spacingM) {
+            // ── 左侧：垂直线 + 节点圆 ──
+            timelineTrack
+                .frame(width: leadingWidth)
+
+            // ── 右侧：事件内容 ──
+            eventContent
+        }
+        .padding(.vertical, PulseTheme.spacingXS)
+        .onAppear {
+            // 当前节点启动脉冲动画
+            if event.isCurrent {
+                withAnimation(
+                    .easeInOut(duration: 1.6)
+                    .repeatForever(autoreverses: true)
+                ) {
+                    isPulsing = true
+                }
+            }
+        }
+    }
+
+    // MARK: - 左侧轨道（垂直线 + 圆点）
+
+    private var timelineTrack: some View {
+        GeometryReader { geo in
+            let centerX = geo.size.width / 2
+
+            ZStack(alignment: .top) {
+                // 垂直连接线 — 上半段（非第一个节点时显示）
+                if !isFirst {
+                    Rectangle()
+                        .fill(PulseTheme.border)
+                        .frame(width: lineWidth)
+                        .frame(height: geo.size.height / 2)
+                        .position(x: centerX, y: geo.size.height / 4)
+                }
+
+                // 垂直连接线 — 下半段（非最后一个节点时显示）
+                if !isLast {
+                    Rectangle()
+                        .fill(PulseTheme.border)
+                        .frame(width: lineWidth)
+                        .frame(height: geo.size.height / 2)
+                        .position(x: centerX, y: geo.size.height * 3 / 4)
+                }
+
+                // 节点圆
+                ZStack {
+                    // 脉冲光晕 — 仅"当前"节点
+                    if event.isCurrent {
+                        Circle()
+                            .fill(event.color.opacity(0.25))
+                            .frame(width: nodeSize + 12, height: nodeSize + 12)
+                            .scaleEffect(isPulsing ? 1.6 : 1.0)
+                            .opacity(isPulsing ? 0.0 : 0.5)
+
+                        Circle()
+                            .fill(event.color.opacity(0.15))
+                            .frame(width: nodeSize + 6, height: nodeSize + 6)
+                            .scaleEffect(isPulsing ? 1.3 : 1.0)
+                            .opacity(isPulsing ? 0.2 : 0.4)
+                    }
+
+                    // 主圆点
+                    Circle()
+                        .fill(event.color)
+                        .frame(width: nodeSize, height: nodeSize)
+
+                    // 内部高光 — 增加质感
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [.white.opacity(0.3), .clear],
+                                center: .topLeading,
+                                startRadius: 0,
+                                endRadius: nodeSize / 2
+                            )
+                        )
+                        .frame(width: nodeSize, height: nodeSize)
+                }
+                .position(x: centerX, y: geo.size.height / 2)
+            }
+        }
+        .frame(minHeight: 60)
+    }
+
+    // MARK: - 右侧事件内容
+
+    private var eventContent: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
+            // 时间标签
+            Text(formattedTime)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(PulseTheme.textTertiary)
+
+            // 事件标题 + 图标
+            HStack(spacing: PulseTheme.spacingXS + 2) {
+                Image(systemName: event.icon)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(event.color)
+
+                Text(event.title)
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .foregroundStyle(PulseTheme.textPrimary)
+            }
+
+            // 详情描述
+            Text(event.detail)
+                .font(PulseTheme.captionFont)
+                .foregroundStyle(PulseTheme.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            // 影响标签（彩色胶囊）
+            impactCapsule
+        }
+        .padding(.vertical, PulseTheme.spacingXS)
+    }
+
+    // MARK: - 影响胶囊标签
+
+    private var impactCapsule: some View {
+        let capsuleColor = event.impactPositive ? PulseTheme.statusGood : PulseTheme.statusModerate
+
+        return Text(event.impact)
+            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .foregroundStyle(capsuleColor)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(
+                Capsule()
+                    .fill(capsuleColor.opacity(0.12))
+            )
+    }
+
+    // MARK: - 时间格式化
+
+    private var formattedTime: String {
+        if event.isCurrent {
+            return "当前"
+        }
+
+        let calendar = Calendar.current
+        let now = Date()
+        let components = calendar.dateComponents([.hour, .minute], from: event.time)
+        let hour = components.hour ?? 0
+        let minute = components.minute ?? 0
+        let timeStr = String(format: "%02d:%02d", hour, minute)
+
+        // 判断是否是昨天
+        if !calendar.isDate(event.time, inSameDayAs: now) {
+            return "昨晚 \(timeStr)"
+        }
+
+        // 根据时段添加前缀
+        switch hour {
+        case 0..<6:
+            return "凌晨 \(timeStr)"
+        case 6..<9:
+            return "早上 \(timeStr)"
+        case 9..<12:
+            return "上午 \(timeStr)"
+        case 12..<14:
+            return "中午 \(timeStr)"
+        case 14..<18:
+            return "下午 \(timeStr)"
+        case 18..<21:
+            return "傍晚 \(timeStr)"
+        default:
+            return "晚上 \(timeStr)"
+        }
+    }
+}
+
+// MARK: - 便捷初始化（自动从 HealthKit 构建）
+
+struct RecoveryTimelineSection: View {
+    @State private var events: [TimelineEvent] = []
+
+    var body: some View {
+        RecoveryTimelineView(events: events)
+            .task {
+                await buildTimeline()
+            }
+    }
+
+    @MainActor
+    private func buildTimeline() async {
+        events = TimelineEventBuilder.buildEvents()
+    }
+}
+
+// MARK: - 预览
+
+#Preview {
+    ScrollView {
+        VStack(spacing: PulseTheme.spacingM) {
+            // 使用模拟数据预览
+            RecoveryTimelineView(events: previewEvents)
+        }
+        .padding()
+    }
+    .background(PulseTheme.background)
+    .preferredColorScheme(.dark)
+}
+
+/// 预览用模拟事件
+private var previewEvents: [TimelineEvent] {
+    let calendar = Calendar.current
+    let now = Date()
+
+    let bedtime = calendar.date(bySettingHour: 23, minute: 30, second: 0, of:
+        calendar.date(byAdding: .day, value: -1, to: now)!
+    )!
+
+    let wakeTime = calendar.date(bySettingHour: 7, minute: 5, second: 0, of: now)!
+    let activityTime = calendar.date(bySettingHour: 14, minute: 0, second: 0, of: now)!
+
+    return [
+        TimelineEvent(
+            time: bedtime,
+            icon: "moon.fill",
+            title: "入睡",
+            detail: "总计 7h35m · 深睡约 2.1h",
+            impact: "恢复 +15",
+            impactPositive: true,
+            color: Color(hex: "8B7EC8")
+        ),
+        TimelineEvent(
+            time: wakeTime,
+            icon: "sunrise.fill",
+            title: "醒来",
+            detail: "静息心率 62bpm",
+            impact: "恢复良好",
+            impactPositive: true,
+            color: PulseTheme.statusGood
+        ),
+        TimelineEvent(
+            time: activityTime,
+            icon: "figure.walk",
+            title: "日间活动",
+            detail: "3.0k 步 · 活跃卡路里 +120kcal",
+            impact: "继续加油",
+            impactPositive: true,
+            color: PulseTheme.accent
+        ),
+        TimelineEvent(
+            time: now,
+            icon: "heart.text.clipboard",
+            title: "当前状态",
+            detail: "HRV 48ms ↑ · 中等强度",
+            impact: "可以训练",
+            impactPositive: true,
+            color: PulseTheme.accent,
+            isCurrent: true
+        ),
+    ]
+}

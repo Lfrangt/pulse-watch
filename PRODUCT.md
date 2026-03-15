@@ -8,77 +8,61 @@ Turn Apple Watch into an AI-powered health agent. Not a dashboard — an agent t
 - **Data stays on device** (local-first)
 - **Action over information** — don't show charts, give advice
 - **Minimal UI** — glance and go
-
-## Target Device
-- Apple Watch Series 7 (primary dev device)
-- Support Series 6+ (blood oxygen), SE 2+ (basic)
+- **小而美** — App does data collection + display, OpenClaw does AI
 
 ## Architecture
 
 ```
-Apple Watch (Sensors + Complications + Minimal UI)
+Apple Watch (Sensors + Complications + Training)
     ↓ WatchConnectivity
-iPhone App (Core Brain)
+iPhone App (Data Hub)
     ├── HealthKit data collection
-    ├── CoreLocation (geofence)
-    ├── Local data store (SwiftData)
-    ├── AI analysis engine (local + optional OpenClaw)
-    └── Notification system
+    ├── HealthAnalyzer (local scoring, no AI)
+    ├── SwiftData local storage
+    ├── Beautiful data visualization
+    └── OpenClaw Bridge (App Group → Agent)
+         ↕
+OpenClaw (User's own)
+    └── Pulse Coach Agent Skill
+         ├── Reads health data from App Group
+         ├── AI-powered training advice
+         ├── Conversational coaching
+         └── Memory (tracks progress)
 ```
 
-## MVP Features (Phase 1)
+## Current State (v1.0.0)
 
-### 1. Silent Sensing (Background)
-- Continuous HealthKit data: HR, HRV, sleep, steps, calories, blood oxygen
-- Low-power geofencing for known locations
-- Local SwiftData storage
+### iPhone App
+- 3-Tab: 今日 | 趋势 | 设置
+- Dashboard: 评分圆环(弹性动画) + 洞察 + 指标(趋势箭头) + 恢复时间线
+- History: Swift Charts + 训练日历 + 周报
+- Settings: OpenClaw连接引导 + Morning Brief配置 + 演示模式
+- Home Screen Widget (small/medium/large)
+- Onboarding Flow
 
-### 2. Daily Intelligence
-- **Morning Brief** (configurable time): sleep quality + recovery score + one-line advice
-- **Anomaly alerts**: HRV drop, elevated resting HR, poor sleep streak
-- **Weekly report**: trend card
+### Apple Watch
+- Complication (圆形+矩形)
+- SummaryView (评分+指标)
+- WorkoutTracking (HKWorkoutSession + 实时心率)
+- TrainingPlanView (PPL轮换)
+- Haptic Feedback
 
-### 3. Location-Aware Automation
-- Arrive at gym → haptic + "Working out?" → auto-start Workout Session
-- Today's training plan from AI (push/pull/legs rotation)
-- Track workout history, suggest progressive overload (+2.5kg)
-- Recovery-aware: bad sleep/low HRV → suggest lighter session
-- Extensible: school → study mode, home → daily summary
-
-### 4. Watch Complication
-- Circular gauge: daily status score (0-100)
-- Color-coded (green/yellow/red)
-- Tap → 3-line summary + action button
-
-### 5. OpenClaw Integration (Optional)
-- User opts in to share health context with their agent
-- Agent becomes body-aware: adjusts behavior based on health state
-- API endpoint for agent to query health status
+### Agent Skill (Pulse Coach)
+- 读取 App Group 健康数据
+- PPL 训练推荐
+- 渐进超载追踪
+- 营养建议
+- 异常预警
 
 ## Tech Stack
-- SwiftUI (iOS 17+ / watchOS 10+)
-- SwiftData for local persistence
-- HealthKit
-- CoreLocation (geofencing)
+- SwiftUI + SwiftData (iOS 17+ / watchOS 10+)
+- HealthKit + CoreLocation
+- WidgetKit
 - WatchConnectivity
-- WidgetKit (complications)
+- Swift Charts
 
-## File Structure
-```
-PulseWatch/
-├── Shared/              # Shared models, utilities
-│   ├── Models/
-│   ├── Services/
-│   └── Extensions/
-├── PulseWatch/          # iPhone app
-│   ├── App/
-│   ├── Views/
-│   ├── ViewModels/
-│   └── Services/
-├── PulseWatchWatch/     # watchOS app  
-│   ├── App/
-│   ├── Views/
-│   ├── Complications/
-│   └── Services/
-└── PulseWatchTests/
-```
+## Stats
+- 39 Swift files, ~13K lines
+- 19 commits
+- 5 hours from zero to real device
+- iPhone real device tested ✅

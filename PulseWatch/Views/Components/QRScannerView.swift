@@ -8,12 +8,35 @@ struct QRScannerView: View {
 
     @State private var error: String?
     @State private var scanned = false
+    @State private var cameraAuthorized = false
+    @State private var permissionDenied = false
 
     var body: some View {
         ZStack {
-            // 相机预览
-            QRCameraPreview(onCodeFound: handleCode)
-                .ignoresSafeArea()
+            if cameraAuthorized {
+                // 相机预览
+                QRCameraPreview(onCodeFound: handleCode)
+                    .ignoresSafeArea()
+            } else if permissionDenied {
+                VStack(spacing: 16) {
+                    Image(systemName: "camera.fill")
+                        .font(.system(size: 40))
+                        .foregroundStyle(.gray)
+                    Text("需要相机权限来扫描二维码")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(.white)
+                    Button("前往设置") {
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                    .foregroundStyle(.blue)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(.black)
+            } else {
+                Color.black.ignoresSafeArea()
+            }
 
             // 覆盖层
             VStack {
@@ -68,6 +91,18 @@ struct QRScannerView: View {
         }
         .animation(.spring(response: 0.3), value: scanned)
         .animation(.spring(response: 0.3), value: error)
+        .task {
+            switch AVCaptureDevice.authorizationStatus(for: .video) {
+            case .authorized:
+                cameraAuthorized = true
+            case .notDetermined:
+                let granted = await AVCaptureDevice.requestAccess(for: .video)
+                cameraAuthorized = granted
+                permissionDenied = !granted
+            default:
+                permissionDenied = true
+            }
+        }
     }
 
     private func handleCode(_ code: String) {

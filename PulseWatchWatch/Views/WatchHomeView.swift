@@ -1,4 +1,5 @@
 import SwiftUI
+import HealthKit
 
 /// Watch face — glance and go. Minimal, warm, alive.
 struct WatchHomeView: View {
@@ -16,6 +17,8 @@ struct WatchHomeView: View {
     @State private var appeared = false
     @State private var ringProgress: CGFloat = 0
     @State private var showGymArrival = false
+    @State private var showWorkout = false
+    @State private var workoutInitialType: WorkoutSessionManager.WorkoutType = .strength
 
     private var score: Int { connectivity.receivedScore ?? localScore }
     private var headline: String { connectivity.receivedHeadline ?? localHeadline }
@@ -62,6 +65,50 @@ struct WatchHomeView: View {
                     .padding(.top, 4)
                     .opacity(appeared ? 1 : 0)
 
+                    // 训练入口
+                    HStack(spacing: 10) {
+                        NavigationLink {
+                            TrainingPlanView()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "calendar.badge.clock")
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(PulseTheme.accent)
+                                Text("计划")
+                                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                                    .foregroundStyle(PulseTheme.textSecondary)
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule().fill(PulseTheme.cardBackground)
+                            )
+                        }
+                        .buttonStyle(.plain)
+
+                        Button {
+                            workoutInitialType = .strength
+                            showWorkout = true
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "dumbbell.fill")
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(PulseTheme.accent)
+                                Text("训练")
+                                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                                    .foregroundStyle(PulseTheme.textSecondary)
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule().fill(PulseTheme.cardBackground)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.top, 2)
+                    .opacity(appeared ? 1 : 0)
+
                     // Last sync indicator
                     if let syncDate = connectivity.lastSyncDate {
                         Text(syncLabel(syncDate))
@@ -89,12 +136,21 @@ struct WatchHomeView: View {
                         )
                         connectivity.dismissGymArrival()
                         showGymArrival = false
+                        // 到达健身房 → 自动打开训练界面
+                        workoutInitialType = .strength
+                        showWorkout = true
                     },
                     onDismiss: {
                         HapticManager.tap()
                         connectivity.dismissGymArrival()
                         showGymArrival = false
                     }
+                )
+            }
+            .fullScreenCover(isPresented: $showWorkout) {
+                WorkoutTrackingView(
+                    initialType: workoutInitialType,
+                    onClose: { showWorkout = false }
                 )
             }
         .onAppear {

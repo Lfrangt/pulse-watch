@@ -372,11 +372,53 @@ struct SettingsView: View {
 
     // MARK: - OpenClaw 集成
 
+    @State private var installCommandCopied = false
+
     private var openClawSection: some View {
         let bridge = OpenClawBridge.shared
 
         return VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "cpu", title: "OpenClaw 集成")
+            sectionHeader(icon: "cpu", title: "连接 OpenClaw")
+
+            // 说明
+            settingRow {
+                VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                    Text("安装 Pulse Coach 教练 skill 到你的 OpenClaw")
+                        .font(PulseTheme.bodyFont)
+                        .foregroundStyle(PulseTheme.textPrimary)
+
+                    Text("在 OpenClaw 中对你的 agent 说「今天练什么」，它会读取你的健康数据给出训练建议")
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
+                        .lineSpacing(3)
+                }
+            }
+
+            // 复制安装命令
+            Button {
+                UIPasteboard.general.string = "openclaw install pulse-coach"
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    installCommandCopied = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    withAnimation { installCommandCopied = false }
+                }
+            } label: {
+                HStack(spacing: PulseTheme.spacingS) {
+                    Image(systemName: installCommandCopied ? "checkmark" : "doc.on.doc")
+                        .font(.system(size: 14, weight: .medium))
+                    Text(installCommandCopied ? "已复制" : "复制安装命令")
+                        .font(PulseTheme.bodyFont.weight(.medium))
+                }
+                .foregroundStyle(installCommandCopied ? PulseTheme.statusGood : PulseTheme.accent)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                        .fill((installCommandCopied ? PulseTheme.statusGood : PulseTheme.accent).opacity(0.1))
+                )
+            }
+            .buttonStyle(.plain)
 
             // 数据共享开关
             settingRow {
@@ -385,7 +427,7 @@ struct SettingsView: View {
                         Text("共享健康数据给 Agent")
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("允许 OpenClaw 读取你的健康状态，提供 body-aware 建议")
+                        Text("允许 OpenClaw 读取你的健康状态")
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -397,34 +439,16 @@ struct SettingsView: View {
             }
 
             if openClawEnabled {
-                // 连接状态
+                // 连接状态 + 最后同步
                 settingRow {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("连接状态")
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text(bridge.connectionStatus.rawValue)
+                            Text("\(bridge.connectionStatus.rawValue) · \(bridge.lastSyncDisplay)")
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(Color(hex: bridge.connectionStatus.color))
-                        }
-                        Spacer()
-                        Image(systemName: bridge.connectionStatus.icon)
-                            .font(.system(size: 18))
-                            .foregroundStyle(Color(hex: bridge.connectionStatus.color))
-                    }
-                }
-
-                // 最后同步时间
-                settingRow {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("最后同步")
-                                .font(PulseTheme.bodyFont)
-                                .foregroundStyle(PulseTheme.textPrimary)
-                            Text(bridge.lastSyncDisplay)
-                                .font(PulseTheme.captionFont)
-                                .foregroundStyle(PulseTheme.textTertiary)
                         }
                         Spacer()
                         // 手动同步按钮

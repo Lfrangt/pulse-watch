@@ -60,6 +60,7 @@ final class OpenClawBridge {
     /// 完整健康状态 JSON 结构
     struct HealthStatus: Codable {
         let timestamp: Date
+        let lastSyncTime: Date
         let todaySummary: TodaySummaryPayload
         let latestVitals: VitalsPayload
         let weekTrend: WeekTrendPayload
@@ -232,6 +233,7 @@ final class OpenClawBridge {
 
         return HealthStatus(
             timestamp: Date(),
+            lastSyncTime: Date(),
             todaySummary: todaySummary,
             latestVitals: vitalsPayload,
             weekTrend: weekTrend,

@@ -11,7 +11,6 @@ struct DashboardView: View {
     @State private var insight: HealthInsight?
     @State private var showLocationSetup = false
     @State private var showGymPrompt = false
-    @State private var showCoachChat = false
     @State private var breathe = false
 
     // 圆环动画状态
@@ -29,10 +28,6 @@ struct DashboardView: View {
                 VStack(spacing: PulseTheme.spacingM) {
                     // 问候语
                     greetingSection
-                        .staggered(index: 0)
-
-                    // "问教练" AI 入口卡片
-                    coachEntryCard
                         .staggered(index: 0)
 
                     // 状态评分大圆环
@@ -118,10 +113,6 @@ struct DashboardView: View {
             }
             .sheet(isPresented: $showLocationSetup) {
                 LocationSetupView()
-            }
-            .sheet(isPresented: $showCoachChat) {
-                CoachChatView()
-                    .preferredColorScheme(.dark)
             }
             .alert("到达健身房", isPresented: $showGymPrompt) {
                 Button("好的") {}
@@ -666,71 +657,6 @@ struct DashboardView: View {
             .overlay(
                 RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
                     .stroke(PulseTheme.accent.opacity(0.15), lineWidth: 0.5)
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    // MARK: - "问教练" AI 入口卡片
-
-    private var coachEntryCard: some View {
-        Button {
-            showCoachChat = true
-        } label: {
-            HStack(spacing: PulseTheme.spacingM) {
-                // AI 图标
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: [Color(hex: "FF8A65"), Color(hex: "FF6E40")],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 40, height: 40)
-
-                    Image(systemName: "brain.head.profile.fill")
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(.white)
-                }
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("问教练")
-                        .font(PulseTheme.headlineFont)
-                        .foregroundStyle(PulseTheme.textPrimary)
-
-                    Text("AI 分析你的身体数据，给出个性化建议")
-                        .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
-                        .lineLimit(1)
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(PulseTheme.textTertiary)
-            }
-            .padding(PulseTheme.spacingM)
-            .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .fill(PulseTheme.cardBackground)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: "FF8A65").opacity(0.08), Color(hex: "FF6E40").opacity(0.03)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                    )
-                    .shadow(color: Color(hex: "FF8A65").opacity(0.1), radius: 12, y: 4)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .stroke(Color(hex: "FF8A65").opacity(0.2), lineWidth: 0.5)
             )
         }
         .buttonStyle(.plain)

@@ -186,6 +186,9 @@ final class HealthKitService {
             await saveRecords(records)
             await updateDailySummary(for: Date())
 
+            // 数据更新后推送到 OpenClaw
+            OpenClawBridge.shared.checkAndPushIfNeeded()
+
         } catch {
             logger.error("Anchored Query 失败 [\(type.identifier)]: \(error.localizedDescription)")
         }
@@ -232,6 +235,9 @@ final class HealthKitService {
 
             await saveRecords(records)
             await updateDailySummary(for: Date())
+
+            // 数据更新后推送到 OpenClaw
+            OpenClawBridge.shared.checkAndPushIfNeeded()
 
         } catch {
             logger.error("Sleep Anchored Query 失败: \(error.localizedDescription)")

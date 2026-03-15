@@ -70,6 +70,7 @@
 		F4B3BFD8FCB29275EBFC3C6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 691CF6519E17F0083CE8A11B /* Assets.xcassets */; };
 		F8177CBBA3F13228F6789DC2 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24D4B80B8A0AE76ECAF39C6 /* HealthKitManager.swift */; };
 		FA5FEC930F0EF865D6BF4BE7 /* HealthRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423E402954856FBC1F53AFD4 /* HealthRecord.swift */; };
+		FD2CAFAC652D279BEA76F3EF /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB4D5F51FF5C4DC019D609B /* QRScannerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -158,6 +159,7 @@
 		B24D4B80B8A0AE76ECAF39C6 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		B43CF30861598DBA2C32FFCB /* HealthSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthSnapshot.swift; sourceTree = "<group>"; };
 		B474F2A2028207A9CFDBEE34 /* PulseWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseWatchApp.swift; sourceTree = "<group>"; };
+		BCB4D5F51FF5C4DC019D609B /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
 		C79EAA80DBA326B8681C5688 /* TrainingCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingCalendarView.swift; sourceTree = "<group>"; };
 		C8221E5917BA08F7EF820B5A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C97109479A7A9833D9887F50 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
@@ -335,6 +337,7 @@
 			children = (
 				4DB44D514AD89CA6515F60D4 /* AppIconView.swift */,
 				9B8AF5335F8330E76B283777 /* LaunchScreenView.swift */,
+				BCB4D5F51FF5C4DC019D609B /* QRScannerView.swift */,
 				363204A6CBD545ECC1DD5485 /* RecoveryTimelineView.swift */,
 				CB91463719D9CE6B82F0FEBB /* StatusCard.swift */,
 			);
@@ -611,6 +614,7 @@
 				214BA964157D8EAE4C312067 /* OpenClawBridge.swift in Sources */,
 				12558EC881A90A97E59B9616 /* PulseTheme.swift in Sources */,
 				0A32C25CCAE11724202F6D11 /* PulseWatchApp.swift in Sources */,
+				FD2CAFAC652D279BEA76F3EF /* QRScannerView.swift in Sources */,
 				BD2DF800197AAA403C5EE3DA /* RecoveryTimelineView.swift in Sources */,
 				4A6365C02853DEA90A19D208 /* ScoreEngine.swift in Sources */,
 				023DD41747CDC71643CFDB8F /* SettingsView.swift in Sources */,

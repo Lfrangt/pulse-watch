@@ -381,14 +381,13 @@ struct SettingsView: View {
     @AppStorage("pulse.openclaw.agentID") private var savedAgentID = "openclaw:main"
     @AppStorage("pulse.openclaw.connected") private var isConnected = false
 
-    @State private var installCommandCopied = false
     @State private var gatewayURL = ""
     @State private var gatewayToken = ""
     @State private var gatewayAgentID = ""
     @State private var isPairing = false
     @State private var pairResult: Bool?
     @State private var showGatewayConfig = false
-    @State private var showInstallGuide = false
+    @State private var showQRScanner = false
 
     private var openClawSection: some View {
         let bridge = OpenClawBridge.shared
@@ -410,9 +409,6 @@ struct SettingsView: View {
                         .lineSpacing(3)
                 }
             }
-
-            // 安装 Pulse Coach Skill
-            pulseCoachInstallSection
 
             // Gateway 配置
             if isPaired {
@@ -456,7 +452,53 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
             }
 
-            if showGatewayConfig || !isPaired {
+            if !isPaired && !showGatewayConfig {
+                // 扫码配对（主入口）
+                Button {
+                    showQRScanner = true
+                } label: {
+                    HStack(spacing: PulseTheme.spacingS) {
+                        Image(systemName: "qrcode.viewfinder")
+                            .font(.system(size: 16, weight: .medium))
+                        Text("扫码连接")
+                            .font(PulseTheme.bodyFont.weight(.medium))
+                    }
+                    .foregroundStyle(PulseTheme.accent)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(
+                        RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                            .fill(PulseTheme.accent.opacity(0.1))
+                    )
+                }
+                .buttonStyle(.plain)
+
+                // CLI 提示
+                HStack(spacing: PulseTheme.spacingXS) {
+                    Image(systemName: "terminal")
+                        .font(.system(size: 11))
+                    Text("终端运行 openclaw pair --qr 获取二维码")
+                        .font(.system(size: 11, weight: .regular, design: .monospaced))
+                }
+                .foregroundStyle(PulseTheme.textTertiary)
+                .padding(.horizontal, PulseTheme.spacingXS)
+
+                // 手动输入 fallback
+                Button {
+                    withAnimation(.spring(response: 0.3)) {
+                        showGatewayConfig = true
+                    }
+                } label: {
+                    Text("手动输入")
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, PulseTheme.spacingS)
+                }
+                .buttonStyle(.plain)
+            }
+
+            if showGatewayConfig {
                 gatewayConfigView
             }
 
@@ -531,107 +573,36 @@ struct SettingsView: View {
             gatewayURL = savedGatewayURL
             gatewayAgentID = savedAgentID
         }
-    }
-
-    // MARK: - Pulse Coach Skill 安装引导
-
-    private let installCommand = "curl -fsSL https://raw.githubusercontent.com/anthropics/openclaw-skills/main/pulse-coach/install.sh | bash"
-
-    private var pulseCoachInstallSection: some View {
-        VStack(spacing: PulseTheme.spacingS) {
-            // 安装按钮
-            Button {
-                withAnimation(.spring(response: 0.3)) {
-                    showInstallGuide.toggle()
-                }
-            } label: {
-                HStack(spacing: PulseTheme.spacingS) {
-                    Image(systemName: showInstallGuide ? "chevron.up" : "shippingbox.fill")
-                        .font(.system(size: 14, weight: .medium))
-                    Text("安装 Pulse Coach Skill")
-                        .font(PulseTheme.bodyFont.weight(.medium))
-                }
-                .foregroundStyle(PulseTheme.accent)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                        .fill(PulseTheme.accent.opacity(0.1))
-                )
-            }
-            .buttonStyle(.plain)
-
-            if showInstallGuide {
-                VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-                    // 安装步骤
-                    installStep(number: 1, text: "复制下方安装命令")
-                    installStep(number: 2, text: "在终端运行")
-                    installStep(number: 3, text: "重启 OpenClaw")
-                    installStep(number: 4, text: "对 Agent 说「今天练什么」")
-
-                    // 可复制的命令文本框
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("安装命令")
-                            .font(PulseTheme.captionFont)
-                            .foregroundStyle(PulseTheme.textTertiary)
-
-                        HStack {
-                            Text(installCommand)
-                                .font(.system(size: 11, weight: .regular, design: .monospaced))
-                                .foregroundStyle(PulseTheme.textSecondary)
-                                .lineLimit(2)
-
-                            Spacer(minLength: 8)
-
-                            Button {
-                                UIPasteboard.general.string = installCommand
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    installCommandCopied = true
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                    withAnimation { installCommandCopied = false }
-                                }
-                            } label: {
-                                Image(systemName: installCommandCopied ? "checkmark" : "doc.on.doc")
-                                    .font(.system(size: 13, weight: .medium))
-                                    .foregroundStyle(installCommandCopied ? PulseTheme.statusGood : PulseTheme.accent)
-                            }
-                            .buttonStyle(.plain)
+        .sheet(isPresented: $showQRScanner) {
+            QRScannerView { url, token, agent in
+                // QR 扫码成功 — 自动配对
+                Task {
+                    isPairing = true
+                    pairResult = nil
+                    let ok = await OpenClawBridge.shared.pair(
+                        gatewayURL: url,
+                        token: token,
+                        agentID: agent
+                    )
+                    isPairing = false
+                    pairResult = ok
+                    if ok {
+                        savedGatewayURL = url
+                        savedAgentID = agent
+                        isConnected = true
+                        #if os(iOS)
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        #endif
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            pairResult = nil
                         }
-                        .padding(PulseTheme.spacingS)
-                        .background(
-                            RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                                .fill(PulseTheme.surface)
-                        )
                     }
                 }
-                .padding(PulseTheme.spacingM)
-                .background(
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .fill(PulseTheme.surface)
-                )
-                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
     }
 
-    private func installStep(number: Int, text: String) -> some View {
-        HStack(spacing: PulseTheme.spacingS) {
-            Text("\(number)")
-                .font(.system(size: 12, weight: .bold, design: .rounded))
-                .foregroundStyle(PulseTheme.accent)
-                .frame(width: 22, height: 22)
-                .background(
-                    Circle()
-                        .fill(PulseTheme.accent.opacity(0.15))
-                )
-            Text(text)
-                .font(PulseTheme.bodyFont)
-                .foregroundStyle(PulseTheme.textPrimary)
-        }
-    }
-
-    /// Gateway 配置输入区域
+    /// Gateway 配置输入区域（手动 fallback）
     private var gatewayConfigView: some View {
         VStack(spacing: PulseTheme.spacingS) {
             // Gateway URL

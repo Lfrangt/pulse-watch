@@ -26,6 +26,7 @@ targets:
     resources:
       - path: PulseWatch/Assets.xcassets
       - path: PulseWatch/App/PrivacyInfo.xcprivacy
+      - path: Localizable.xcstrings
     info:
       path: PulseWatch/App/Info.plist
       properties:

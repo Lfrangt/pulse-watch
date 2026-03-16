@@ -1,0 +1,5222 @@
+{
+  "sourceLanguage": "zh-Hans",
+  "version": "1.0",
+  "strings": {
+    "%.1fk 步": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%.1fk 步"
+          }
+        }
+      }
+    },
+    ", avg)) 小时，建议增加睡眠时间": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ", avg)) 小时，建议增加睡眠时间"
+          }
+        }
+      }
+    },
+    "3.0k 步 · 活跃卡路里 +120kcal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3.0k 步 · 活跃卡路里 +120kcal"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3.0k steps · Active calories +120kcal"
+          }
+        }
+      }
+    },
+    "30天": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30天"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 Days"
+          }
+        }
+      }
+    },
+    "7天": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "7天"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "7 Days"
+          }
+        }
+      }
+    },
+    "8.4k 步 · 活跃卡路里 +320kcal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "8.4k 步 · 活跃卡路里 +320kcal"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "8.4k steps · Active calories +320kcal"
+          }
+        }
+      }
+    },
+    "AI 健康洞察": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 健康洞察"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Health Insights"
+          }
+        }
+      }
+    },
+    "AI 洞察": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 洞察"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Insights"
+          }
+        }
+      }
+    },
+    "Gateway 已连接": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gateway 已连接"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gateway Connected"
+          }
+        }
+      }
+    },
+    "HRV 48ms ↑ · 中等强度": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 48ms ↑ · 中等强度"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 48ms ↑ · Moderate"
+          }
+        }
+      }
+    },
+    "HRV 偏低": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 偏低"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV below baseline"
+          }
+        }
+      }
+    },
+    "HRV 偏低(28ms)，静息心率偏高(78bpm)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 偏低(28ms)，静息心率偏高(78bpm)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV low (28ms), resting HR elevated (78bpm)"
+          }
+        }
+      }
+    },
+    "HRV 偏低(\\(Int(hrv))ms)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 偏低(\\(Int(hrv))ms)"
+          }
+        }
+      }
+    },
+    "HRV 偏低，建议轻松恢复日 🧘": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 偏低，建议轻松恢复日 🧘"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV low — consider a light recovery day 🧘"
+          }
+        }
+      }
+    },
+    "HRV 呈下降趋势，关注压力管理和恢复质量": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 呈下降趋势，关注压力管理和恢复质量"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV trending down — manage stress and recovery"
+          }
+        }
+      }
+    },
+    "HRV 显著偏低": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 显著偏低"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV significantly low"
+          }
+        }
+      }
+    },
+    "HRV 趋势上升 12%": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 趋势上升 12%"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV trending up 12%"
+          }
+        }
+      }
+    },
+    "HRV 近期呈上升趋势，身体适应能力在增强": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 近期呈上升趋势，身体适应能力在增强"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV trending up — your body is adapting well"
+          }
+        }
+      }
+    },
+    "HRV 近期有下降趋势，注意控制训练量和压力": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 近期有下降趋势，注意控制训练量和压力"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV declining — watch training load and stress"
+          }
+        }
+      }
+    },
+    "HRV 骤降：当前 \\(Int(current))ms，基线 \\(Int(baseline))ms": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 骤降：当前 \\(Int(current))ms，基线 \\(Int(baseline))ms"
+          }
+        }
+      }
+    },
+    "HRV偏低，建议轻量活动或休息": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV偏低，建议轻量活动或休息"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV low — try light activity or rest"
+          }
+        }
+      }
+    },
+    "M月d日": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "M月d日"
+          }
+        }
+      }
+    },
+    "M月d日 EEEE": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "M月d日 EEEE"
+          }
+        }
+      }
+    },
+    "M月d日 HH:mm": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "M月d日 HH:mm"
+          }
+        }
+      }
+    },
+    "Pulse Watch 所有数据均存储在你的设备上，不会上传到任何服务器。健康数据仅从 Apple HealthKit 读取，用于生成本地分析和训练建议。我们不收集任何个人信息。": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pulse Watch 所有数据均存储在你的设备上，不会上传到任何服务器。健康数据仅从 Apple HealthKit 读取，用于生成本地分析和训练建议。我们不收集任何个人信息。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All Pulse Watch data is stored on your device and never uploaded to any server. Health data is read only from Apple HealthKit for local analysis and training suggestions. We do not collect any personal information."
+          }
+        }
+      }
+    },
+    "Pulse Watch 正在后台收集你的健康数据\\n几小时后就能看到你的第一份状态评分": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pulse Watch 正在后台收集你的健康数据\\n几小时后就能看到你的第一份状态评分"
+          }
+        }
+      }
+    },
+    "Pulse 周报": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pulse 周报"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pulse Weekly"
+          }
+        }
+      }
+    },
+    "\\u{2600}\\u{FE0F} 戴上手表，开始记录你的一天": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\\u{2600}\\u{FE0F} 戴上手表，开始记录你的一天"
+          }
+        }
+      }
+    },
+    "yyyy年M月": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yyyy年M月"
+          }
+        }
+      }
+    },
+    "☀️ 早安 Pulse": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "☀️ 早安 Pulse"
+          }
+        }
+      }
+    },
+    "☀️ 早安 · 状态 \\(insight.dailyScore)分": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "☀️ 早安 · 状态 \\(insight.dailyScore)分"
+          }
+        }
+      }
+    },
+    "一": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mon"
+          }
+        }
+      }
+    },
+    "一切就绪": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一切就绪"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All Set"
+          }
+        }
+      }
+    },
+    "一键授权": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一键授权"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One-tap Authorize"
+          }
+        }
+      }
+    },
+    "三": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "三"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wed"
+          }
+        }
+      }
+    },
+    "三头下压": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "三头下压"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tricep Pushdown"
+          }
+        }
+      }
+    },
+    "上升趋势": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上升趋势"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Improving"
+          }
+        }
+      }
+    },
+    "上午 \\(timeStr)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上午 \\(timeStr)"
+          }
+        }
+      }
+    },
+    "上周": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上周"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last Week"
+          }
+        }
+      }
+    },
+    "上斜哑铃卧推": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上斜哑铃卧推"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incline Dumbbell Press"
+          }
+        }
+      }
+    },
+    "上次练\\(localizedGroup(bestGroup))是\\(maxDays)天前": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上次练\\(localizedGroup(bestGroup))是\\(maxDays)天前"
+          }
+        }
+      }
+    },
+    "上次练胸是3天前": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上次练胸是3天前"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last chest day was 3 days ago"
+          }
+        }
+      }
+    },
+    "下午 \\(timeStr)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下午 \\(timeStr)"
+          }
+        }
+      }
+    },
+    "下午好": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下午好"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good Afternoon"
+          }
+        }
+      }
+    },
+    "下周建议": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下周建议"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next Week's Advice"
+          }
+        }
+      }
+    },
+    "下降趋势": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下降趋势"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Declining"
+          }
+        }
+      }
+    },
+    "不了": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不了"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        }
+      }
+    },
+    "中午 \\(timeStr)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "中午 \\(timeStr)"
+          }
+        }
+      }
+    },
+    "中午好": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "中午好"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good Afternoon"
+          }
+        }
+      }
+    },
+    "中等": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "中等"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate"
+          }
+        }
+      }
+    },
+    "中等强度": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "中等强度"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate"
+          }
+        }
+      }
+    },
+    "临时授权": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "临时授权"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Provisional"
+          }
+        }
+      }
+    },
+    "乒乓球": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "乒乓球"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Table Tennis"
+          }
+        }
+      }
+    },
+    "二": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "二"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tue"
+          }
+        }
+      }
+    },
+    "二头弯举": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "二头弯举"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bicep Curl"
+          }
+        }
+      }
+    },
+    "五": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "五"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fri"
+          }
+        }
+      }
+    },
+    "今天": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
+          }
+        }
+      }
+    },
+    "今天 ": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天 "
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today "
+          }
+        }
+      }
+    },
+    "今天适合高强度训练 💪": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天适合高强度训练 💪"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ready for high intensity today 💪"
+          }
+        }
+      }
+    },
+    "今日": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
+          }
+        }
+      }
+    },
+    "今日健康摘要已准备好，点击查看": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日健康摘要已准备好，点击查看"
+          }
+        }
+      }
+    },
+    "今日推荐": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日推荐"
+          }
+        }
+      }
+    },
+    "今日洞察": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日洞察"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's Insights"
+          }
+        }
+      }
+    },
+    "今日状态评分 · 点击查看摘要": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日状态评分 · 点击查看摘要"
+          }
+        }
+      }
+    },
+    "今日训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日训练"
+          }
+        }
+      }
+    },
+    "从未同步": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从未同步"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Never synced"
+          }
+        }
+      }
+    },
+    "位置": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "位置"
+          }
+        }
+      }
+    },
+    "位置权限未授权": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "位置权限未授权"
+          }
+        }
+      }
+    },
+    "你是 Pulse Coach，用户的私人健身教练 AI。根据 HealthKit 数据给出精准的健康分析和训练建议。回复 JSON 格式。": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你是 Pulse Coach，用户的私人健身教练 AI。根据 HealthKit 数据给出精准的健康分析和训练建议。回复 JSON 格式。"
+          }
+        }
+      }
+    },
+    "你的数据仅存储在设备上\\n我们不会上传任何信息": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的数据仅存储在设备上\\n我们不会上传任何信息"
+          }
+        }
+      }
+    },
+    "你的智能健康伙伴": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的智能健康伙伴"
+          }
+        }
+      }
+    },
+    "使用当前位置": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用当前位置"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use Current Location"
+          }
+        }
+      }
+    },
+    "使用当前位置添加健身房": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用当前位置添加健身房"
+          }
+        }
+      }
+    },
+    "使用模拟数据展示完整界面效果": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用模拟数据展示完整界面效果"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show UI with simulated data"
+          }
+        }
+      }
+    },
+    "侧平举": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "侧平举"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lateral Raise"
+          }
+        }
+      }
+    },
+    "保持平稳": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保持平稳"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stable"
+          }
+        }
+      }
+    },
+    "保持当前训练节奏，注意恢复和营养补充": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保持当前训练节奏，注意恢复和营养补充"
+          }
+        }
+      }
+    },
+    "健康数据不可用": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "健康数据不可用"
+          }
+        }
+      }
+    },
+    "健康数据通过 API 推送给你的 AI Agent，获取个性化训练建议和健康分析": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "健康数据通过 API 推送给你的 AI Agent，获取个性化训练建议和健康分析"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push health data to your AI Agent for personalized training advice"
+          }
+        }
+      }
+    },
+    "健身房": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "健身房"
+          }
+        }
+      }
+    },
+    "健身房位置": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "健身房位置"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gym Location"
+          }
+        }
+      }
+    },
+    "傍晚 \\(timeStr)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "傍晚 \\(timeStr)"
+          }
+        }
+      }
+    },
+    "入睡": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入睡"
+          }
+        }
+      }
+    },
+    "六": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "六"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sat"
+          }
+        }
+      }
+    },
+    "关于": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关于"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About"
+          }
+        }
+      }
+    },
+    "关键指标 vs 上周": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关键指标 vs 上周"
+          }
+        }
+      }
+    },
+    "关闭": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
+      }
+    },
+    "凌晨 \\(timeStr)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "凌晨 \\(timeStr)"
+          }
+        }
+      }
+    },
+    "分": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pts"
+          }
+        }
+      }
+    },
+    "分享周报": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享周报"
+          }
+        }
+      }
+    },
+    "分类图例": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分类图例"
+          }
+        }
+      }
+    },
+    "分钟": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分钟"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "min"
+          }
+        }
+      }
+    },
+    "划船": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "划船"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Row"
+          }
+        }
+      }
+    },
+    "刚刚": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刚刚"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Just now"
+          }
+        }
+      }
+    },
+    "刚刚同步": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刚刚同步"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Just synced"
+          }
+        }
+      }
+    },
+    "到达\\(location.name)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "到达\\(location.name)"
+          }
+        }
+      }
+    },
+    "到达健身房": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "到达健身房"
+          }
+        }
+      }
+    },
+    "到达健身房时智能提醒训练计划": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "到达健身房时智能提醒训练计划"
+          }
+        }
+      }
+    },
+    "到达时自动提醒开始训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "到达时自动提醒开始训练"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-remind when you arrive"
+          }
+        }
+      }
+    },
+    "到达时自动提醒训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "到达时自动提醒训练"
+          }
+        }
+      }
+    },
+    "前往系统设置开启": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前往系统设置开启"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open System Settings"
+          }
+        }
+      }
+    },
+    "前往设置": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前往设置"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        }
+      }
+    },
+    "力量训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "力量训练"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strength"
+          }
+        }
+      }
+    },
+    "功能性力量": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "功能性力量"
+          }
+        }
+      }
+    },
+    "加载中…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加载中…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading..."
+          }
+        }
+      }
+    },
+    "千卡": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "千卡"
+          }
+        }
+      }
+    },
+    "卡路里": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "卡路里"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calories"
+          }
+        }
+      }
+    },
+    "卧推": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "卧推"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bench Press"
+          }
+        }
+      }
+    },
+    "历史趋势": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "历史趋势"
+          }
+        }
+      }
+    },
+    "发送每日健康摘要和异常提醒": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送每日健康摘要和异常提醒"
+          }
+        }
+      }
+    },
+    "取消": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "变化": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "变化"
+          }
+        }
+      }
+    },
+    "可以训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可以训练"
+          }
+        }
+      }
+    },
+    "同步中": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同步中"
+          }
+        }
+      }
+    },
+    "周报": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周报"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekly Report"
+          }
+        }
+      }
+    },
+    "周报对比": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周报对比"
+          }
+        }
+      }
+    },
+    "哑铃推举": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "哑铃推举"
+          }
+        }
+      }
+    },
+    "四": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "四"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thu"
+          }
+        }
+      }
+    },
+    "在健身房？": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在健身房？"
+          }
+        }
+      }
+    },
+    "在终端运行 openclaw pair --qr": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在终端运行 openclaw pair --qr"
+          }
+        }
+      }
+    },
+    "坐姿划船": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "坐姿划船"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seated Row"
+          }
+        }
+      }
+    },
+    "基于 Apple Watch 数据，用 AI 分析你的身体状态\\n每天给出个性化的恢复评分和训练建议": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "基于 Apple Watch 数据，用 AI 分析你的身体状态\\n每天给出个性化的恢复评分和训练建议"
+          }
+        }
+      }
+    },
+    "夜深了": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "夜深了"
+          }
+        }
+      }
+    },
+    "天": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "天"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "days"
+          }
+        }
+      }
+    },
+    "好的": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "好的"
+          }
+        }
+      }
+    },
+    "完全休息": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完全休息"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rest Day"
+          }
+        }
+      }
+    },
+    "完成": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
+    "小时": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "小时"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "hour"
+          }
+        }
+      }
+    },
+    "小腿提踵": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "小腿提踵"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calf Raise"
+          }
+        }
+      }
+    },
+    "巅峰状态": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "巅峰状态"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peak"
+          }
+        }
+      }
+    },
+    "已保存": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已保存"
+          }
+        }
+      }
+    },
+    "已关闭": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已关闭"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disabled"
+          }
+        }
+      }
+    },
+    "已开启": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已开启"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enabled"
+          }
+        }
+      }
+    },
+    "已授权": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已授权"
+          }
+        }
+      }
+    },
+    "已连接": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已连接"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected"
+          }
+        }
+      }
+    },
+    "已通知手表": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已通知手表"
+          }
+        }
+      }
+    },
+    "平均": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "平均"
+          }
+        }
+      }
+    },
+    "平均心率": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "平均心率"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avg Heart Rate"
+          }
+        }
+      }
+    },
+    "平均评分": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "平均评分"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avg Score"
+          }
+        }
+      }
+    },
+    "平板卧推": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "平板卧推"
+          }
+        }
+      }
+    },
+    "建议今天练\\(localizedGroup(plan.targetMuscleGroup))，已通知手表": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建议今天练\\(localizedGroup(plan.targetMuscleGroup))，已通知手表"
+          }
+        }
+      }
+    },
+    "建议休息": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建议休息"
+          }
+        }
+      }
+    },
+    "建议减少高强度训练，优先保证睡眠质量": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建议减少高强度训练，优先保证睡眠质量"
+          }
+        }
+      }
+    },
+    "建议练\\(localizedGroup(plan.targetMuscleGroup))": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建议练\\(localizedGroup(plan.targetMuscleGroup))"
+          }
+        }
+      }
+    },
+    "建议轻松恢复": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建议轻松恢复"
+          }
+        }
+      }
+    },
+    "建议轻松恢复日，散步或拉伸": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建议轻松恢复日，散步或拉伸"
+          }
+        }
+      }
+    },
+    "开发者选项": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开发者选项"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Developer"
+          }
+        }
+      }
+    },
+    "开始一次运动后，你的记录会显示在这里。\\n支持跑步、骑行、游泳、力量训练等。": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始一次运动后，你的记录会显示在这里。\\n支持跑步、骑行、游泳、力量训练等。"
+          }
+        }
+      }
+    },
+    "开始使用": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始使用"
+          }
+        }
+      }
+    },
+    "开始训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始训练"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Workout"
+          }
+        }
+      }
+    },
+    "引体向上": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "引体向上"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull-up"
+          }
+        }
+      }
+    },
+    "当前": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前"
+          }
+        }
+      }
+    },
+    "当前 \\(Int(currentHRV))ms，低于个人均值 \\(Int(mean))ms": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前 \\(Int(currentHRV))ms，低于个人均值 \\(Int(mean))ms"
+          }
+        }
+      }
+    },
+    "当前 \\(Int(currentHRV))ms，低于个人基线 \\(Int(mean))ms 超过 2 个标准差": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前 \\(Int(currentHRV))ms，低于个人基线 \\(Int(mean))ms 超过 2 个标准差"
+          }
+        }
+      }
+    },
+    "当前 \\(Int(currentRHR))bpm，高于个人均值 \\(Int(mean))bpm": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前 \\(Int(currentRHR))bpm，高于个人均值 \\(Int(mean))bpm"
+          }
+        }
+      }
+    },
+    "当前 \\(Int(currentRHR))bpm，高于个人基线 \\(Int(mean))bpm 超过 2 个标准差": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前 \\(Int(currentRHR))bpm，高于个人基线 \\(Int(mean))bpm 超过 2 个标准差"
+          }
+        }
+      }
+    },
+    "当前状态": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前状态"
+          }
+        }
+      }
+    },
+    "徒步": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "徒步"
+          }
+        }
+      }
+    },
+    "心率": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "心率"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heart Rate"
+          }
+        }
+      }
+    },
+    "心率区间": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "心率区间"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heart Rate Zone"
+          }
+        }
+      }
+    },
+    "心率变异性": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "心率变异性"
+          }
+        }
+      }
+    },
+    "总时长": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总时长"
+          }
+        }
+      }
+    },
+    "总消耗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总消耗"
+          }
+        }
+      }
+    },
+    "总计 7h12m · 深睡约 1.8h": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总计 7h12m · 深睡约 1.8h"
+          }
+        }
+      }
+    },
+    "总计 7h35m · 深睡约 2.1h": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总计 7h35m · 深睡约 2.1h"
+          }
+        }
+      }
+    },
+    "总计 \\(sleepHours)h\\(sleepMins)m · 深睡约 \\(String(format: ": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总计 \\(sleepHours)h\\(sleepMins)m · 深睡约 \\(String(format: "
+          }
+        }
+      }
+    },
+    "总训练时长": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总训练时长"
+          }
+        }
+      }
+    },
+    "恢复 +15": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复 +15"
+          }
+        }
+      }
+    },
+    "恢复 +\\(min(20, insight.sleepScore / 5))": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复 +\\(min(20, insight.sleepScore / 5))"
+          }
+        }
+      }
+    },
+    "恢复 \\(score)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复 \\(score)"
+          }
+        }
+      }
+    },
+    "恢复一般": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复一般"
+          }
+        }
+      }
+    },
+    "恢复中等，建议适度训练，注意倾听身体": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复中等，建议适度训练，注意倾听身体"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate recovery, listen to your body"
+          }
+        }
+      }
+    },
+    "恢复偏弱": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复偏弱"
+          }
+        }
+      }
+    },
+    "恢复状态良好，可以正常安排训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复状态良好，可以正常安排训练"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good recovery, train normally"
+          }
+        }
+      }
+    },
+    "恢复良好": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复良好"
+          }
+        }
+      }
+    },
+    "恢复评分": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复评分"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recovery Score"
+          }
+        }
+      }
+    },
+    "手动输入": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手动输入"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual Input"
+          }
+        }
+      }
+    },
+    "手臂": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手臂"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arms"
+          }
+        }
+      }
+    },
+    "手表联动": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手表联动"
+          }
+        }
+      }
+    },
+    "扫描 OpenClaw 配对二维码": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扫描 OpenClaw 配对二维码"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan OpenClaw pairing QR code"
+          }
+        }
+      }
+    },
+    "扫码连接": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扫码连接"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan to Connect"
+          }
+        }
+      }
+    },
+    "拉 (背)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拉 (背)"
+          }
+        }
+      }
+    },
+    "拉 Pull": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拉 Pull"
+          }
+        }
+      }
+    },
+    "持续佩戴设备，积累健康数据基线": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "持续佩戴设备，积累健康数据基线"
+          }
+        }
+      }
+    },
+    "指标": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "指标"
+          }
+        }
+      }
+    },
+    "推 (胸/肩)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "推 (胸/肩)"
+          }
+        }
+      }
+    },
+    "推 Push": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "推 Push"
+          }
+        }
+      }
+    },
+    "推荐": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "推荐"
+          }
+        }
+      }
+    },
+    "推送时间": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "推送时间"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notification Time"
+          }
+        }
+      }
+    },
+    "搜索你常去的健身房": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索你常去的健身房"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search for your gym"
+          }
+        }
+      }
+    },
+    "搜索健身房": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索健身房"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Gym"
+          }
+        }
+      }
+    },
+    "摘要": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "摘要"
+          }
+        }
+      }
+    },
+    "放松恢复": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "放松恢复"
+          }
+        }
+      }
+    },
+    "数据不足": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数据不足"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insufficient Data"
+          }
+        }
+      }
+    },
+    "数据直接发送到你的 OpenClaw Gateway，不经过第三方服务器": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数据直接发送到你的 OpenClaw Gateway，不经过第三方服务器"
+          }
+        }
+      }
+    },
+    "数据积累中，下周将有更详细的分析": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数据积累中，下周将有更详细的分析"
+          }
+        }
+      }
+    },
+    "数据采集": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数据采集"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Data Collection"
+          }
+        }
+      }
+    },
+    "整体状态较上周提升，保持当前的生活节奏": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "整体状态较上周提升，保持当前的生活节奏"
+          }
+        }
+      }
+    },
+    "无效的配对二维码": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无效的配对二维码"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid pairing QR code"
+          }
+        }
+      }
+    },
+    "无数据": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无数据"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Data"
+          }
+        }
+      }
+    },
+    "无氧": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无氧"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anaerobic"
+          }
+        }
+      }
+    },
+    "日": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sun"
+          }
+        }
+      }
+    },
+    "日期": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日期"
+          }
+        }
+      }
+    },
+    "日间活动": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日间活动"
+          }
+        }
+      }
+    },
+    "早上 \\(timeStr)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "早上 \\(timeStr)"
+          }
+        }
+      }
+    },
+    "早上好": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "早上好"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good Morning"
+          }
+        }
+      }
+    },
+    "时": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时"
+          }
+        }
+      }
+    },
+    "时长": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时长"
+          }
+        }
+      }
+    },
+    "时间范围": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时间范围"
+          }
+        }
+      }
+    },
+    "昨天": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "昨天"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yesterday"
+          }
+        }
+      }
+    },
+    "昨天 ": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "昨天 "
+          }
+        }
+      }
+    },
+    "昨晚 \\(hoursNow)h\\(minsNow)m，远低于你的平均 \\(hoursAvg)h\\(minsAvg)m": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "昨晚 \\(hoursNow)h\\(minsNow)m，远低于你的平均 \\(hoursAvg)h\\(minsAvg)m"
+          }
+        }
+      }
+    },
+    "昨晚 \\(timeStr)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "昨晚 \\(timeStr)"
+          }
+        }
+      }
+    },
+    "昨晚睡眠质量很好，为今天打下了好基础": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "昨晚睡眠质量很好，为今天打下了好基础"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Great sleep last night — solid foundation for today"
+          }
+        }
+      }
+    },
+    "晚上 \\(timeStr)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "晚上 \\(timeStr)"
+          }
+        }
+      }
+    },
+    "晚上好": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "晚上好"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good Evening"
+          }
+        }
+      }
+    },
+    "智能分析趋势和异常\\n所有计算在设备本地完成": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "智能分析趋势和异常\\n所有计算在设备本地完成"
+          }
+        }
+      }
+    },
+    "暂无时间线数据": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无时间线数据"
+          }
+        }
+      }
+    },
+    "暂无本周数据": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无本周数据"
+          }
+        }
+      }
+    },
+    "暂无睡眠数据": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无睡眠数据"
+          }
+        }
+      }
+    },
+    "暂无足够数据": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无足够数据"
+          }
+        }
+      }
+    },
+    "更换": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更换"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change"
+          }
+        }
+      }
+    },
+    "最大心率": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最大心率"
+          }
+        }
+      }
+    },
+    "最常练的部位": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最常练的部位"
+          }
+        }
+      }
+    },
+    "最近训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近训练"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recent Workouts"
+          }
+        }
+      }
+    },
+    "有氧": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有氧"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cardio"
+          }
+        }
+      }
+    },
+    "未知": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未知"
+          }
+        }
+      }
+    },
+    "未设置": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未设置"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not Set"
+          }
+        }
+      }
+    },
+    "未连接": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未连接"
+          }
+        }
+      }
+    },
+    "本周": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Week"
+          }
+        }
+      }
+    },
+    "本周可尝试 +2.5kg": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周可尝试 +2.5kg"
+          }
+        }
+      }
+    },
+    "本周平均睡眠 \\(String(format: ": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周平均睡眠 \\(String(format: "
+          }
+        }
+      }
+    },
+    "本周数据不足，请佩戴设备积累更多数据": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周数据不足，请佩戴设备积累更多数据"
+          }
+        }
+      }
+    },
+    "本周最低日：\\(worstLabel) \\(worstDay.dailyScore ?? 0)分\\(worstReason)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周最低日：\\(worstLabel) \\(worstDay.dailyScore ?? 0)分\\(worstReason)"
+          }
+        }
+      }
+    },
+    "本周最佳日：\\(bestLabel) \\(bestDay.dailyScore ?? 0)分\\(bestReason)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周最佳日：\\(bestLabel) \\(bestDay.dailyScore ?? 0)分\\(bestReason)"
+          }
+        }
+      }
+    },
+    "本周状态有所下滑，注意调整作息和训练强度": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周状态有所下滑，注意调整作息和训练强度"
+          }
+        }
+      }
+    },
+    "本周运动": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周运动"
+          }
+        }
+      }
+    },
+    "本月概览": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本月概览"
+          }
+        }
+      }
+    },
+    "杠铃划船": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "杠铃划船"
+          }
+        }
+      }
+    },
+    "极限": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "极限"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peak"
+          }
+        }
+      }
+    },
+    "构建": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "构建"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Build"
+          }
+        }
+      }
+    },
+    "查看你这一周的健康表现、趋势分析和下周建议": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看你这一周的健康表现、趋势分析和下周建议"
+          }
+        }
+      }
+    },
+    "查看完整周报": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看完整周报"
+          }
+        }
+      }
+    },
+    "查看详情": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看详情"
+          }
+        }
+      }
+    },
+    "查看趋势": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看趋势"
+          }
+        }
+      }
+    },
+    "标准": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "标准"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standard"
+          }
+        }
+      }
+    },
+    "核心功能": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "核心功能"
+          }
+        }
+      }
+    },
+    "根据恢复状态推荐训练强度\\n到达健身房自动提醒": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "根据恢复状态推荐训练强度\\n到达健身房自动提醒"
+          }
+        }
+      }
+    },
+    "椭圆机": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "椭圆机"
+          }
+        }
+      }
+    },
+    "正在生成分享图片...": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在生成分享图片..."
+          }
+        }
+      }
+    },
+    "步": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "步"
+          }
+        }
+      }
+    },
+    "步数": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "步数"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steps"
+          }
+        }
+      }
+    },
+    "步行": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "步行"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walking"
+          }
+        }
+      }
+    },
+    "每 15 分钟采集一次，平衡精度和电量": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每 15 分钟采集一次，平衡精度和电量"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every 15 minutes, balanced"
+          }
+        }
+      }
+    },
+    "每 30 分钟或数据有重大变化时自动推送": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每 30 分钟或数据有重大变化时自动推送"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-push every 30 min or on significant changes"
+          }
+        }
+      }
+    },
+    "每 30 分钟采集一次，更省电": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每 30 分钟采集一次，更省电"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every 30 minutes, saves battery"
+          }
+        }
+      }
+    },
+    "每 5 分钟采集一次，更精确但耗电更多": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每 5 分钟采集一次，更精确但耗电更多"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every 5 minutes, more accurate but uses more battery"
+          }
+        }
+      }
+    },
+    "每天定时推送恢复评分和训练建议": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天定时推送恢复评分和训练建议"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daily recovery score and training advice"
+          }
+        }
+      }
+    },
+    "每日健康摘要": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每日健康摘要"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daily Health Summary"
+          }
+        }
+      }
+    },
+    "每日状态评分": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每日状态评分"
+          }
+        }
+      }
+    },
+    "每日评分": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每日评分"
+          }
+        }
+      }
+    },
+    "注意休息": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注意休息"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Take it easy"
+          }
+        }
+      }
+    },
+    "活动消耗": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "活动消耗"
+          }
+        }
+      }
+    },
+    "活跃 +": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "活跃 +"
+          }
+        }
+      }
+    },
+    "活跃千卡": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "活跃千卡"
+          }
+        }
+      }
+    },
+    "活跃卡路里": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "活跃卡路里"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Active Calories"
+          }
+        }
+      }
+    },
+    "深睡": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深睡"
+          }
+        }
+      }
+    },
+    "深蹲": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深蹲"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Squat"
+          }
+        }
+      }
+    },
+    "添加健身房": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加健身房"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Gym"
+          }
+        }
+      }
+    },
+    "添加健身房位置\\nPulse 会在你到达时智能提醒训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加健身房位置\\nPulse 会在你到达时智能提醒训练"
+          }
+        }
+      }
+    },
+    "渐进超载": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "渐进超载"
+          }
+        }
+      }
+    },
+    "游泳": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "游泳"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Swimming"
+          }
+        }
+      }
+    },
+    "演示模式": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "演示模式"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demo Mode"
+          }
+        }
+      }
+    },
+    "热身": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "热身"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warm-up"
+          }
+        }
+      }
+    },
+    "燃脂": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "燃脂"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fat Burn"
+          }
+        }
+      }
+    },
+    "爬楼梯": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "爬楼梯"
+          }
+        }
+      }
+    },
+    "版本": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "版本"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version"
+          }
+        }
+      }
+    },
+    "状态一般": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态一般"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Average"
+          }
+        }
+      }
+    },
+    "状态不错，正常安排就好": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态不错，正常安排就好"
+          }
+        }
+      }
+    },
+    "状态优秀，可以适当增加训练强度或尝试新挑战": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态优秀，可以适当增加训练强度或尝试新挑战"
+          }
+        }
+      }
+    },
+    "状态保持稳定，身体适应良好": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态保持稳定，身体适应良好"
+          }
+        }
+      }
+    },
+    "状态良好": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态良好"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good"
+          }
+        }
+      }
+    },
+    "状态还不错，正常安排训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态还不错，正常安排训练"
+          }
+        }
+      }
+    },
+    "瑜伽": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "瑜伽"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yoga"
+          }
+        }
+      }
+    },
+    "目标：每晚睡眠 ≥ 7 小时，尝试固定就寝时间": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目标：每晚睡眠 ≥ 7 小时，尝试固定就寝时间"
+          }
+        }
+      }
+    },
+    "省电模式": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "省电模式"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Power Saving"
+          }
+        }
+      }
+    },
+    "睡眠": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep"
+          }
+        }
+      }
+    },
+    "睡眠 \\(sleepDisplay) · 恢复 \\(insight.recoveryScore)分": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠 \\(sleepDisplay) · 恢复 \\(insight.recoveryScore)分"
+          }
+        }
+      }
+    },
+    "睡眠不足，今天注意补觉": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠不足，今天注意补觉"
+          }
+        }
+      }
+    },
+    "睡眠严重不足": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠严重不足"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Severe sleep deficit"
+          }
+        }
+      }
+    },
+    "睡眠偏少，训练可以但别过猛": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠偏少，训练可以但别过猛"
+          }
+        }
+      }
+    },
+    "睡眠质量较差，今天可能精力不足，注意补觉": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠质量较差，今天可能精力不足，注意补觉"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poor sleep — energy may be low, try to catch up"
+          }
+        }
+      }
+    },
+    "睡眠连续 3 天超 7 小时": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠连续 3 天超 7 小时"
+          }
+        }
+      }
+    },
+    "知道了": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "知道了"
+          }
+        }
+      }
+    },
+    "硬拉": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "硬拉"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deadlift"
+          }
+        }
+      }
+    },
+    "确认选择": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确认选择"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirm"
+          }
+        }
+      }
+    },
+    "移除": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove"
+          }
+        }
+      }
+    },
+    "稍后设置": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "稍后设置"
+          }
+        }
+      }
+    },
+    "等待同步": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待同步"
+          }
+        }
+      }
+    },
+    "篮球": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "篮球"
+          }
+        }
+      }
+    },
+    "类型": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "类型"
+          }
+        }
+      }
+    },
+    "终端运行 openclaw pair --qr 获取二维码": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "终端运行 openclaw pair --qr 获取二维码"
+          }
+        }
+      }
+    },
+    "继续保持良好习惯": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续保持良好习惯"
+          }
+        }
+      }
+    },
+    "继续加油": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续加油"
+          }
+        }
+      }
+    },
+    "绳索飞鸟": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "绳索飞鸟"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cable Fly"
+          }
+        }
+      }
+    },
+    "综合 HRV、心率、睡眠等数据\\n生成 0-100 恢复评分": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "综合 HRV、心率、睡眠等数据\\n生成 0-100 恢复评分"
+          }
+        }
+      }
+    },
+    "网球": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网球"
+          }
+        }
+      }
+    },
+    "罗马尼亚硬拉": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "罗马尼亚硬拉"
+          }
+        }
+      }
+    },
+    "羽毛球": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "羽毛球"
+          }
+        }
+      }
+    },
+    "肩": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "肩"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shoulders"
+          }
+        }
+      }
+    },
+    "肩推": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "肩推"
+          }
+        }
+      }
+    },
+    "肩部": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "肩部"
+          }
+        }
+      }
+    },
+    "背": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "背"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
+    "背部": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "背部"
+          }
+        }
+      }
+    },
+    "胸": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "胸"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chest"
+          }
+        }
+      }
+    },
+    "胸部": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "胸部"
+          }
+        }
+      }
+    },
+    "腿": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "腿"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legs"
+          }
+        }
+      }
+    },
+    "腿 Legs": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "腿 Legs"
+          }
+        }
+      }
+    },
+    "腿举": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "腿举"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leg Press"
+          }
+        }
+      }
+    },
+    "腿部": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "腿部"
+          }
+        }
+      }
+    },
+    "自动推送健康数据": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动推送健康数据"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-push Health Data"
+          }
+        }
+      }
+    },
+    "舞蹈": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "舞蹈"
+          }
+        }
+      }
+    },
+    "血氧": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "血氧"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blood Oxygen"
+          }
+        }
+      }
+    },
+    "表盘 Complication 实时显示\\n手腕上即时查看状态": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表盘 Complication 实时显示\\n手腕上即时查看状态"
+          }
+        }
+      }
+    },
+    "计划": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "计划"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plan"
+          }
+        }
+      }
+    },
+    "训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Train"
+          }
+        }
+      }
+    },
+    "训练天数": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练天数"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Training Days"
+          }
+        }
+      }
+    },
+    "训练完成": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练完成"
+          }
+        }
+      }
+    },
+    "训练建议": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练建议"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Training Advice"
+          }
+        }
+      }
+    },
+    "训练日历": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练日历"
+          }
+        }
+      }
+    },
+    "训练未开始": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练未开始"
+          }
+        }
+      }
+    },
+    "训练计划": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练计划"
+          }
+        }
+      }
+    },
+    "训练轮换": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练轮换"
+          }
+        }
+      }
+    },
+    "设置": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        }
+      }
+    },
+    "设置健身房位置": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置健身房位置"
+          }
+        }
+      }
+    },
+    "设置常去地点": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置常去地点"
+          }
+        }
+      }
+    },
+    "评分": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "评分"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Score"
+          }
+        }
+      }
+    },
+    "读取心率、HRV、睡眠等健康数据": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "读取心率、HRV、睡眠等健康数据"
+          }
+        }
+      }
+    },
+    "趋势": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "趋势"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trend"
+          }
+        }
+      }
+    },
+    "足球": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "足球"
+          }
+        }
+      }
+    },
+    "跑步": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跑步"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running"
+          }
+        }
+      }
+    },
+    "跳过": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跳过"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        }
+      }
+    },
+    "跳过今天": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跳过今天"
+          }
+        }
+      }
+    },
+    "身体仍在恢复，建议轻松活动如散步或瑜伽": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身体仍在恢复，建议轻松活动如散步或瑜伽"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Still recovering — light activity like walking or yoga"
+          }
+        }
+      }
+    },
+    "身体在喊停，今天好好休息吧 😴": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身体在喊停，今天好好休息吧 😴"
+          }
+        }
+      }
+    },
+    "身体在恢复中，避免高强度": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身体在恢复中，避免高强度"
+          }
+        }
+      }
+    },
+    "身体恢复不错，适合中等强度训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身体恢复不错，适合中等强度训练"
+          }
+        }
+      }
+    },
+    "身体恢复很好，适合高强度训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身体恢复很好，适合高强度训练"
+          }
+        }
+      }
+    },
+    "身体恢复非常好，今天是挑战自我的好时机": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身体恢复非常好，今天是挑战自我的好时机"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Great recovery — push yourself today"
+          }
+        }
+      }
+    },
+    "身体时间线": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身体时间线"
+          }
+        }
+      }
+    },
+    "身体需要休息，今天别硬撑": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身体需要休息，今天别硬撑"
+          }
+        }
+      }
+    },
+    "身体需要休息，建议今天不训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身体需要休息，建议今天不训练"
+          }
+        }
+      }
+    },
+    "身体需要充分休息，今天建议完全休息": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身体需要充分休息，今天建议完全休息"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your body needs rest today"
+          }
+        }
+      }
+    },
+    "轻松恢复": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轻松恢复"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Light Recovery"
+          }
+        }
+      }
+    },
+    "轻量": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轻量"
+          }
+        }
+      }
+    },
+    "过去 24h": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "过去 24h"
+          }
+        }
+      }
+    },
+    "运动": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "运动"
+          }
+        }
+      }
+    },
+    "运动天数": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "运动天数"
+          }
+        }
+      }
+    },
+    "还不错": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还不错"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fair"
+          }
+        }
+      }
+    },
+    "还没有运动记录": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还没有运动记录"
+          }
+        }
+      }
+    },
+    "连接 OpenClaw": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接 OpenClaw"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect OpenClaw"
+          }
+        }
+      }
+    },
+    "连接你的 OpenClaw Gateway": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接你的 OpenClaw Gateway"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect your OpenClaw Gateway"
+          }
+        }
+      }
+    },
+    "连接失败，请检查 URL 和 Token": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接失败，请检查 URL 和 Token"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connection failed. Check URL and Token"
+          }
+        }
+      }
+    },
+    "连接状态": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接状态"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connection Status"
+          }
+        }
+      }
+    },
+    "连接错误": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接错误"
+          }
+        }
+      }
+    },
+    "连续 3 晚不足 6 小时，累积睡眠债会影响恢复和表现": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连续 3 晚不足 6 小时，累积睡眠债会影响恢复和表现"
+          }
+        }
+      }
+    },
+    "连续 3 晚睡眠不足": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连续 3 晚睡眠不足"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 consecutive nights of poor sleep"
+          }
+        }
+      }
+    },
+    "连续 \\(nights) 晚睡眠不足 6 小时": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连续 \\(nights) 晚睡眠不足 6 小时"
+          }
+        }
+      }
+    },
+    "适合中等强度": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "适合中等强度"
+          }
+        }
+      }
+    },
+    "适合训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "适合训练"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ready to train"
+          }
+        }
+      }
+    },
+    "适合高强度": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "适合高强度"
+          }
+        }
+      }
+    },
+    "选择训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择训练"
+          }
+        }
+      }
+    },
+    "通知": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知"
+          }
+        }
+      }
+    },
+    "通知权限": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知权限"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications"
+          }
+        }
+      }
+    },
+    "通知状态": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知状态"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status"
+          }
+        }
+      }
+    },
+    "醒来": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "醒来"
+          }
+        }
+      }
+    },
+    "采集频率": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "采集频率"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collection Frequency"
+          }
+        }
+      }
+    },
+    "重新配置": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新配置"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reconfigure"
+          }
+        }
+      }
+    },
+    "隐私说明": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐私说明"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy"
+          }
+        }
+      }
+    },
+    "需要一些权限": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要一些权限"
+          }
+        }
+      }
+    },
+    "需要休息": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要休息"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rest"
+          }
+        }
+      }
+    },
+    "需要相机权限来扫描二维码": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要相机权限来扫描二维码"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera access needed to scan QR code"
+          }
+        }
+      }
+    },
+    "静息": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息"
+          }
+        }
+      }
+    },
+    "静息卡路里": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息卡路里"
+          }
+        }
+      }
+    },
+    "静息心率": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resting HR"
+          }
+        }
+      }
+    },
+    "静息心率 --": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率 --"
+          }
+        }
+      }
+    },
+    "静息心率 58bpm": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率 58bpm"
+          }
+        }
+      }
+    },
+    "静息心率 62bpm": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率 62bpm"
+          }
+        }
+      }
+    },
+    "静息心率 \\(Int(rhr))bpm": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率 \\(Int(rhr))bpm"
+          }
+        }
+      }
+    },
+    "静息心率偏高": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率偏高"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resting HR elevated"
+          }
+        }
+      }
+    },
+    "静息心率偏高(\\(Int(rhr))bpm)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率偏高(\\(Int(rhr))bpm)"
+          }
+        }
+      }
+    },
+    "静息心率偏高：当前 \\(Int(current))bpm，基线 \\(Int(baseline))bpm": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率偏高：当前 \\(Int(current))bpm，基线 \\(Int(baseline))bpm"
+          }
+        }
+      }
+    },
+    "静息心率显著偏高": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率显著偏高"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resting HR significantly elevated"
+          }
+        }
+      }
+    },
+    "静息心率近期偏高，可能是疲劳或压力信号": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率近期偏高，可能是疲劳或压力信号"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resting HR elevated — possible fatigue or stress"
+          }
+        }
+      }
+    },
+    "面拉": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "面拉"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face Pull"
+          }
+        }
+      }
+    },
+    "频率": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "频率"
+          }
+        }
+      }
+    },
+    "验证中...": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "验证中..."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifying..."
+          }
+        }
+      }
+    },
+    "验证并连接": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "验证并连接"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verify & Connect"
+          }
+        }
+      }
+    },
+    "骑行": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "骑行"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycling"
+          }
+        }
+      }
+    },
+    "骑车": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "骑车"
+          }
+        }
+      }
+    },
+    "高强度": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高强度"
+          }
+        }
+      }
+    },
+    "高强度训练": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高强度训练"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High Intensity"
+          }
+        }
+      }
+    },
+    "高频": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高频"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High Frequency"
+          }
+        }
+      }
+    },
+    "（HRV 表现良好 \\(Int(hrv))ms）": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "（HRV 表现良好 \\(Int(hrv))ms）"
+          }
+        }
+      }
+    },
+    "（充足睡眠 \\(sleep / 60)h\\(sleep % 60)m）": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "（充足睡眠 \\(sleep / 60)h\\(sleep % 60)m）"
+          }
+        }
+      }
+    },
+    "（睡眠不足 \\(sleep / 60)h\\(sleep % 60)m）": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "（睡眠不足 \\(sleep / 60)h\\(sleep % 60)m）"
+          }
+        }
+      }
+    },
+    "（静息心率偏高 \\(Int(rhr))bpm）": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "（静息心率偏高 \\(Int(rhr))bpm）"
+          }
+        }
+      }
+    },
+    "，": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "，"
+          }
+        }
+      }
+    },
+    "：": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "："
+          }
+        }
+      }
+    },
+    "📊 本周健康周报已生成": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "📊 本周健康周报已生成"
+          }
+        }
+      }
+    }
+  }
+}

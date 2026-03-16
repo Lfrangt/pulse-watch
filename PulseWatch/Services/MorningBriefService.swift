@@ -81,6 +81,9 @@ final class MorningBriefService: NSObject {
     /// 今日是否已跳过
     private var skippedToday = false
 
+    /// 通知权限是否已授予
+    var isAuthorized = false
+
     // MARK: - Init
 
     private override init() {
@@ -92,11 +95,31 @@ final class MorningBriefService: NSObject {
     /// Call at app launch: register categories, request permission, schedule tasks
     func setup() {
         registerCategories()
-        requestAuthorization()
-        rescheduleMorningBrief()
-        scheduleWeeklyReportReminder()
         registerBackgroundTask()
-        scheduleBGRefresh()
+        requestAuthorization { [weak self] granted in
+            guard let self, granted else { return }
+            DispatchQueue.main.async {
+                self.rescheduleMorningBrief()
+                self.scheduleWeeklyReportReminder()
+                self.scheduleBGRefresh()
+            }
+        }
+    }
+
+    /// Re-check authorization and reschedule if needed (call when returning to foreground)
+    func refreshAuthorizationStatus() {
+        UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
+            guard let self else { return }
+            let authorized = settings.authorizationStatus == .authorized ||
+                             settings.authorizationStatus == .provisional
+            DispatchQueue.main.async {
+                self.isAuthorized = authorized
+                if authorized && self.isEnabled {
+                    self.rescheduleMorningBrief()
+                    self.scheduleBGRefresh()
+                }
+            }
+        }
     }
 
     // MARK: - Background Task (refresh notification content before delivery)
@@ -177,17 +200,46 @@ final class MorningBriefService: NSObject {
         }
     }
 
-    /// 请求通知权限
-    private func requestAuthorization() {
+    /// 请求通知权限（含 provisional 以确保首次即可投递静默通知）
+    private func requestAuthorization(completion: ((Bool) -> Void)? = nil) {
         let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if granted {
-                self.logger.info("通知权限已获取")
-            } else if let error {
-                self.logger.error("通知权限请求失败: \(error.localizedDescription)")
+        center.delegate = self
+
+        // 先检查当前状态，避免重复弹窗
+        center.getNotificationSettings { [weak self] settings in
+            guard let self else { return }
+
+            switch settings.authorizationStatus {
+            case .authorized, .provisional:
+                DispatchQueue.main.async { self.isAuthorized = true }
+                self.logger.info("通知权限已存在: \(settings.authorizationStatus.rawValue)")
+                completion?(true)
+
+            case .notDetermined:
+                // 首次请求：含 provisional 确保即使用户未响应也能静默投递
+                center.requestAuthorization(options: [.alert, .sound, .badge, .provisional]) { granted, error in
+                    DispatchQueue.main.async { self.isAuthorized = granted }
+                    if granted {
+                        self.logger.info("通知权限已获取")
+                    } else if let error {
+                        self.logger.error("通知权限请求失败: \(error.localizedDescription)")
+                    }
+                    completion?(granted)
+                }
+
+            case .denied:
+                DispatchQueue.main.async { self.isAuthorized = false }
+                self.logger.info("通知权限被拒绝 — 用户需在设置中手动开启")
+                completion?(false)
+
+            case .ephemeral:
+                DispatchQueue.main.async { self.isAuthorized = true }
+                completion?(true)
+
+            @unknown default:
+                completion?(false)
             }
         }
-        center.delegate = self
     }
 
     /// 注册通知 Categories 和 Actions
@@ -229,7 +281,7 @@ final class MorningBriefService: NSObject {
 
     /// 调度每日 Morning Brief 通知
     func rescheduleMorningBrief() {
-        guard isEnabled else { return }
+        guard isEnabled, isAuthorized else { return }
 
         let center = UNUserNotificationCenter.current()
 

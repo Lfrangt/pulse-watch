@@ -1,8 +1,11 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 @main
 struct PulseWatchApp: App {
+
+    @Environment(\.scenePhase) private var scenePhase
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -88,6 +91,12 @@ struct PulseWatchApp: App {
                 }
         }
         .modelContainer(sharedModelContainer)
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                // Re-check notification permission when returning from Settings
+                MorningBriefService.shared.refreshAuthorizationStatus()
+            }
+        }
     }
 }
 

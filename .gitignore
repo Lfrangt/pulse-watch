@@ -22,3 +22,18 @@ Package.resolved
 .idea/
 *.xcworkspace
 !*.xcworkspace/contents.xcworkspacedata
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+fastlane/README.md
+.env
+.env.local
+*.p8
+
+# Bundler
+vendor/bundle
+.bundle
+Gemfile.lock

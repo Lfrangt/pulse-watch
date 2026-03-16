@@ -1,0 +1,122 @@
+default_platform(:ios)
+
+platform :ios do
+  # ─── Shared ────────────────────────────────────────────────
+  before_all do
+    # Regenerate Xcode project from project.yml (XcodeGen)
+    if which("xcodegen")
+      sh("cd .. && xcodegen generate")
+      UI.success("✅ Xcode project regenerated via XcodeGen")
+    else
+      UI.important("⚠️  xcodegen not found — using existing .xcodeproj")
+    end
+  end
+
+  # ─── Helper: App Store Connect API Key ─────────────────────
+  # Create an API key at https://appstoreconnect.apple.com/access/api
+  # Set env vars: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_CONTENT (or ASC_KEY_FILEPATH)
+  private_lane :load_asc_api_key do
+    if ENV["ASC_KEY_ID"] && ENV["ASC_ISSUER_ID"] && (ENV["ASC_KEY_CONTENT"] || ENV["ASC_KEY_FILEPATH"])
+      app_store_connect_api_key(
+        key_id: ENV["ASC_KEY_ID"],
+        issuer_id: ENV["ASC_ISSUER_ID"],
+        key_content: ENV["ASC_KEY_CONTENT"],
+        key_filepath: ENV["ASC_KEY_FILEPATH"],
+        is_key_content_base64: ENV["ASC_KEY_BASE64"] == "true",
+        duration: 1200,
+        in_house: false
+      )
+    else
+      UI.important("⚠️  ASC API Key not configured — will fall back to Apple ID auth")
+      nil
+    end
+  end
+
+  # ─── Beta: TestFlight ──────────────────────────────────────
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    api_key = load_asc_api_key
+
+    # Increment build number (timestamp-based for uniqueness)
+    increment_build_number(
+      build_number: Time.now.strftime("%Y%m%d%H%M"),
+      xcodeproj: "PulseWatch.xcodeproj"
+    )
+
+    build_app(
+      scheme: "PulseWatch",
+      export_method: "app-store",
+      clean: true,
+      output_directory: "./build/fastlane",
+      output_name: "PulseWatch.ipa",
+      export_options: {
+        provisioningProfiles: {
+          "com.abundra.pulse" => "match AppStore com.abundra.pulse"
+        }
+      }.merge(api_key ? {} : {})
+    )
+
+    if api_key
+      upload_to_testflight(
+        api_key: api_key,
+        skip_waiting_for_build_processing: true
+      )
+    else
+      upload_to_testflight(
+        skip_waiting_for_build_processing: true
+      )
+    end
+
+    UI.success("🚀 Build uploaded to TestFlight!")
+  end
+
+  # ─── Release: App Store ────────────────────────────────────
+  desc "Build and upload to App Store Connect (manual release)"
+  lane :release do
+    api_key = load_asc_api_key
+
+    increment_build_number(
+      build_number: Time.now.strftime("%Y%m%d%H%M"),
+      xcodeproj: "PulseWatch.xcodeproj"
+    )
+
+    build_app(
+      scheme: "PulseWatch",
+      export_method: "app-store",
+      clean: true,
+      output_directory: "./build/fastlane",
+      output_name: "PulseWatch.ipa"
+    )
+
+    if api_key
+      upload_to_app_store(
+        api_key: api_key,
+        force: true,
+        submit_for_review: false,
+        automatic_release: false,
+        skip_metadata: true,
+        skip_screenshots: true
+      )
+    else
+      upload_to_app_store(
+        force: true,
+        submit_for_review: false,
+        automatic_release: false,
+        skip_metadata: true,
+        skip_screenshots: true
+      )
+    end
+
+    UI.success("📦 Build uploaded to App Store Connect! Go to ASC to submit for review.")
+  end
+
+  # ─── Tests ─────────────────────────────────────────────────
+  desc "Run UI tests"
+  lane :test do
+    run_tests(
+      scheme: "PulseWatch",
+      devices: ["iPhone 16 Pro Max"],
+      clean: true
+    )
+  end
+end

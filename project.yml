@@ -125,6 +125,23 @@ targets:
         com.apple.security.application-groups:
           - group.com.abundra.pulse.shared
 
+  PulseWatchUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: PulseWatchUITests
+    info:
+      path: PulseWatchUITests/Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse.uitests
+        TARGETED_DEVICE_FAMILY: "1"
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: 1
+        TEST_TARGET_NAME: PulseWatch
+    dependencies:
+      - target: PulseWatch
+
   PulseWatchWatchWidgetExtension:
     type: app-extension
     platform: watchOS
@@ -156,8 +173,13 @@ schemes:
     build:
       targets:
         PulseWatch: all
+        PulseWatchUITests: [test]
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - PulseWatchUITests
 
   PulseWatchWatch:
     build:

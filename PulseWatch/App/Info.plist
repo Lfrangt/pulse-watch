@@ -49,8 +49,13 @@
 	<array>
 		<string>location</string>
 		<string>processing</string>
+		<string>fetch</string>
 		<string>health-update</string>
 		<string>remote-notification</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.abundra.pulse.morning-brief-refresh</string>
 	</array>
 	<key>UILaunchScreen</key>
 	<dict>

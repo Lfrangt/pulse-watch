@@ -49,8 +49,11 @@ targets:
         UIBackgroundModes:
           - location
           - processing
+          - fetch
           - health-update
           - remote-notification
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.abundra.pulse.morning-brief-refresh
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse

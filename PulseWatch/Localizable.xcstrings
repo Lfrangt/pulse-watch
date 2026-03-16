@@ -872,6 +872,9 @@
         }
       }
     },
+    "Complete a workout with Apple Watch\nand it will be saved here automatically." : {
+
+    },
     "Confirm" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1183,6 +1186,19 @@
           }
         }
       }
+    },
+    "Delete %@ on %@?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete %1$@ on %2$@?"
+          }
+        }
+      }
+    },
+    "Delete Record" : {
+
     },
     "Demo Mode" : {
       "localizations" : {
@@ -1685,6 +1701,9 @@
           }
         }
       }
+    },
+    "Heart Rate Zones" : {
+
     },
     "High Frequency" : {
       "localizations" : {
@@ -2488,6 +2507,9 @@
           }
         }
       }
+    },
+    "No Workout History" : {
+
     },
     "No workout records yet" : {
       "localizations" : {
@@ -3687,6 +3709,9 @@
           }
         }
       }
+    },
+    "This action cannot be undone. The original HealthKit data will not be affected." : {
+
     },
     "This Week" : {
       "localizations" : {

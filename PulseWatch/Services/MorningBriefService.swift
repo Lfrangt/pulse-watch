@@ -1,5 +1,6 @@
 import Foundation
 import UserNotifications
+import BackgroundTasks
 import SwiftData
 import os
 
@@ -18,6 +19,9 @@ final class MorningBriefService: NSObject {
         static let morningBrief = "com.abundra.pulse.morning-brief"
         static let anomalyPrefix = "com.abundra.pulse.anomaly"
     }
+
+    /// BGTaskScheduler task ID for refreshing morning brief content
+    static let bgTaskID = "com.abundra.pulse.morning-brief-refresh"
 
     /// 通知 Category 标识
     private enum CategoryID {

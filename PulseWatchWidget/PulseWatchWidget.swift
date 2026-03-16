@@ -25,6 +25,9 @@ enum WidgetDataProvider {
             return .placeholder
         }
 
+        // 计算心率趋势方向
+        let hrTrend = computeHeartRateTrend(from: status)
+
         return WidgetHealthData(
             score: status.recoveryScore,
             headline: headlineForScore(status.recoveryScore),
@@ -32,8 +35,11 @@ enum WidgetDataProvider {
             hrv: Int(status.latestVitals.hrv ?? 0),
             sleepHours: status.todaySummary.sleepHours ?? 0,
             steps: status.todaySummary.totalSteps ?? 0,
+            activeCalories: Int(status.todaySummary.activeCalories ?? 0),
             insight: status.trainingAdvice,
-            lastUpdated: status.timestamp
+            lastUpdated: status.timestamp,
+            heartRateTrend: hrTrend,
+            dailyScores: status.weekTrend.dailyScores
         )
     }
 
@@ -44,6 +50,40 @@ enum WidgetDataProvider {
         case 50..<70: return String(localized: "Fair")
         case 70..<85: return String(localized: "Good")
         default: return String(localized: "Peak")
+        }
+    }
+
+    /// 根据 weekTrend 中的 HRV 趋势推算心率趋势箭头
+    private static func computeHeartRateTrend(from status: SharedHealthStatus) -> HeartRateTrend {
+        let scores = status.weekTrend.dailyScores
+        guard scores.count >= 2 else { return .stable }
+        let recent = scores.suffix(2).map(\.score)
+        let last = recent.last ?? 0
+        let prev = recent.first ?? 0
+        if last > prev + 5 { return .up }
+        if last < prev - 5 { return .down }
+        return .stable
+    }
+}
+
+// MARK: - 心率趋势方向
+
+enum HeartRateTrend {
+    case up, down, stable
+
+    var arrow: String {
+        switch self {
+        case .up: return "↑"
+        case .down: return "↓"
+        case .stable: return "→"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .up: return "arrow.up.right"
+        case .down: return "arrow.down.right"
+        case .stable: return "arrow.right"
         }
     }
 }
@@ -99,8 +139,11 @@ struct WidgetHealthData {
     let hrv: Int
     let sleepHours: Double
     let steps: Int
+    let activeCalories: Int
     let insight: String
     let lastUpdated: Date
+    let heartRateTrend: HeartRateTrend
+    let dailyScores: [SharedDayScore]
 
     static let placeholder = WidgetHealthData(
         score: 72,
@@ -109,8 +152,19 @@ struct WidgetHealthData {
         hrv: 45,
         sleepHours: 7.5,
         steps: 6500,
+        activeCalories: 320,
         insight: "Ready for moderate-high intensity",
-        lastUpdated: .now
+        lastUpdated: .now,
+        heartRateTrend: .stable,
+        dailyScores: [
+            SharedDayScore(date: "2026-03-09", score: 65),
+            SharedDayScore(date: "2026-03-10", score: 70),
+            SharedDayScore(date: "2026-03-11", score: 68),
+            SharedDayScore(date: "2026-03-12", score: 74),
+            SharedDayScore(date: "2026-03-13", score: 71),
+            SharedDayScore(date: "2026-03-14", score: 76),
+            SharedDayScore(date: "2026-03-15", score: 72),
+        ]
     )
 }
 
@@ -181,7 +235,120 @@ private extension Color {
     }
 }
 
-// MARK: - Small Widget — 评分圆环 + 数值
+// ╔════════════════════════════════════════════════════════════╗
+// ║  LOCK SCREEN WIDGETS                                      ║
+// ╚════════════════════════════════════════════════════════════╝
+
+// MARK: - Lock Screen — accessoryCircular（心率 + 趋势箭头）
+
+struct PulseLockScreenCircular: View {
+    let data: WidgetHealthData
+
+    var body: some View {
+        ZStack {
+            // 评分进度环
+            AccessoryWidgetBackground()
+
+            Gauge(value: Double(data.score), in: 0...100) {
+                // Label (不在 circular 显示)
+            } currentValueLabel: {
+                VStack(spacing: -1) {
+                    if data.heartRate > 0 {
+                        Text("\(data.heartRate)")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                    } else {
+                        Text("--")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                    }
+                    HStack(spacing: 1) {
+                        Image(systemName: "heart.fill")
+                            .font(.system(size: 6))
+                        Image(systemName: data.heartRateTrend.systemImage)
+                            .font(.system(size: 6, weight: .bold))
+                    }
+                }
+            }
+            .gaugeStyle(.accessoryCircular)
+        }
+        .widgetURL(URL(string: "pulse://dashboard"))
+    }
+}
+
+// MARK: - Lock Screen — accessoryRectangular（评分 + HR + HRV + 睡眠）
+
+struct PulseLockScreenRectangular: View {
+    let data: WidgetHealthData
+
+    var body: some View {
+        HStack(spacing: 8) {
+            // 左侧：评分 gauge
+            Gauge(value: Double(data.score), in: 0...100) {
+                Text("")
+            } currentValueLabel: {
+                Text("\(data.score)")
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+            }
+            .gaugeStyle(.accessoryCircular)
+            .frame(width: 40)
+
+            // 右侧：指标列表
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 3) {
+                    Image(systemName: "heart.fill")
+                        .font(.system(size: 8))
+                    Text(data.heartRate > 0 ? "\(data.heartRate) bpm" : "-- bpm")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                    Text(data.heartRateTrend.arrow)
+                        .font(.system(size: 9, weight: .bold))
+                }
+
+                HStack(spacing: 3) {
+                    Image(systemName: "waveform.path.ecg")
+                        .font(.system(size: 8))
+                    Text(data.hrv > 0 ? "HRV \(data.hrv)ms" : "HRV --")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                }
+
+                HStack(spacing: 3) {
+                    Image(systemName: "moon.fill")
+                        .font(.system(size: 8))
+                    Text(data.sleepHours > 0 ? formatSleepCompact(data.sleepHours) : "--")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                }
+            }
+        }
+        .widgetURL(URL(string: "pulse://dashboard"))
+    }
+
+    private func formatSleepCompact(_ hours: Double) -> String {
+        let h = Int(hours)
+        let m = Int((hours - Double(h)) * 60)
+        return "\(h)h\(m)m"
+    }
+}
+
+// MARK: - Lock Screen — accessoryInline（简洁一行文字）
+
+struct PulseLockScreenInline: View {
+    let data: WidgetHealthData
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "heart.fill")
+            if data.heartRate > 0 {
+                Text("\(data.heartRate)bpm")
+            }
+            Text("·")
+            Text("Score \(data.score)")
+        }
+    }
+}
+
+// ╔════════════════════════════════════════════════════════════╗
+// ║  HOME SCREEN WIDGETS                                      ║
+// ╚════════════════════════════════════════════════════════════╝
+
+// MARK: - Small Widget — 今日摘要（评分环 + HR/步数/卡路里）
 
 struct PulseWidgetSmall: View {
     let data: WidgetHealthData
@@ -198,9 +365,134 @@ struct PulseWidgetSmall: View {
                 endRadius: 80
             )
 
+            VStack(spacing: 8) {
+                // 评分圆环 + 心率
+                HStack(spacing: 10) {
+                    // 迷你评分环
+                    ZStack {
+                        Circle()
+                            .stroke(WidgetColors.border, lineWidth: 4)
+                            .frame(width: 50, height: 50)
+
+                        Circle()
+                            .trim(from: 0, to: CGFloat(data.score) / 100)
+                            .stroke(
+                                statusColor,
+                                style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                            )
+                            .frame(width: 50, height: 50)
+                            .rotationEffect(.degrees(-90))
+
+                        VStack(spacing: -2) {
+                            Text("\(data.score)")
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .foregroundStyle(WidgetColors.textPrimary)
+                            Text("pts")
+                                .font(.system(size: 7, weight: .medium, design: .rounded))
+                                .foregroundStyle(WidgetColors.textTertiary)
+                        }
+                    }
+
+                    // 心率 + 状态
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(data.headline)
+                            .font(.system(size: 12, weight: .semibold, design: .rounded))
+                            .foregroundStyle(statusColor)
+
+                        if data.heartRate > 0 {
+                            HStack(spacing: 2) {
+                                Image(systemName: "heart.fill")
+                                    .font(.system(size: 9))
+                                    .foregroundStyle(WidgetColors.statusPoor)
+                                Text("\(data.heartRate)")
+                                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                    .foregroundStyle(WidgetColors.textPrimary)
+                                Image(systemName: data.heartRateTrend.systemImage)
+                                    .font(.system(size: 8, weight: .bold))
+                                    .foregroundStyle(WidgetColors.textSecondary)
+                            }
+                        }
+                    }
+                }
+
+                // 底部三格指标
+                HStack(spacing: 6) {
+                    SmallMetricPill(
+                        icon: "figure.walk",
+                        value: formatSteps(data.steps),
+                        color: WidgetColors.statusGood
+                    )
+                    SmallMetricPill(
+                        icon: "flame.fill",
+                        value: data.activeCalories > 0 ? "\(data.activeCalories)" : "--",
+                        color: WidgetColors.statusModerate
+                    )
+                    SmallMetricPill(
+                        icon: "moon.fill",
+                        value: formatSleepShort(data.sleepHours),
+                        color: WidgetColors.sleepPurple
+                    )
+                }
+            }
+        }
+        .widgetURL(URL(string: "pulse://dashboard"))
+    }
+
+    private func formatSteps(_ steps: Int) -> String {
+        guard steps > 0 else { return "--" }
+        if steps >= 1000 {
+            return String(format: "%.1fk", Double(steps) / 1000)
+        }
+        return "\(steps)"
+    }
+
+    private func formatSleepShort(_ hours: Double) -> String {
+        guard hours > 0 else { return "--" }
+        return String(format: "%.1f", hours)
+    }
+}
+
+/// 迷你指标药丸（Small Widget 底部用）
+struct SmallMetricPill: View {
+    let icon: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 2) {
+            Image(systemName: icon)
+                .font(.system(size: 8))
+                .foregroundStyle(color)
+            Text(value)
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(WidgetColors.textPrimary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(WidgetColors.cardBackground)
+        )
+    }
+}
+
+// MARK: - Medium Widget — 评分圆环 + 四格指标 + 7天迷你趋势线
+
+struct PulseWidgetMedium: View {
+    let data: WidgetHealthData
+
+    private var statusColor: Color { WidgetColors.statusColor(for: data.score) }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // 左侧：评分圆环
             VStack(spacing: 6) {
-                // 评分圆环
                 ZStack {
+                    Circle()
+                        .fill(statusColor.opacity(0.1))
+                        .frame(width: 78, height: 78)
+                        .blur(radius: 6)
+
                     Circle()
                         .stroke(WidgetColors.border, lineWidth: 5)
                         .frame(width: 72, height: 72)
@@ -216,75 +508,33 @@ struct PulseWidgetSmall: View {
 
                     VStack(spacing: 0) {
                         Text("\(data.score)")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .font(.system(size: 24, weight: .bold, design: .rounded))
                             .foregroundStyle(WidgetColors.textPrimary)
 
-                        Text("pts")
-                            .font(.system(size: 10, weight: .medium, design: .rounded))
-                            .foregroundStyle(WidgetColors.textTertiary)
+                        Text(data.headline)
+                            .font(.system(size: 9, weight: .medium, design: .rounded))
+                            .foregroundStyle(statusColor)
                     }
                 }
 
-                Text(data.headline)
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(statusColor)
-            }
-        }
-        .widgetURL(URL(string: "pulse://dashboard"))
-    }
-}
-
-// MARK: - Medium Widget — 评分圆环 + 四格指标
-
-struct PulseWidgetMedium: View {
-    let data: WidgetHealthData
-
-    private var statusColor: Color { WidgetColors.statusColor(for: data.score) }
-
-    var body: some View {
-        HStack(spacing: 14) {
-            // 左侧：评分圆环
-            ZStack {
-                // 光晕
-                Circle()
-                    .fill(statusColor.opacity(0.1))
-                    .frame(width: 88, height: 88)
-                    .blur(radius: 8)
-
-                Circle()
-                    .stroke(WidgetColors.border, lineWidth: 5)
-                    .frame(width: 80, height: 80)
-
-                Circle()
-                    .trim(from: 0, to: CGFloat(data.score) / 100)
-                    .stroke(
-                        statusColor,
-                        style: StrokeStyle(lineWidth: 5, lineCap: .round)
-                    )
-                    .frame(width: 80, height: 80)
-                    .rotationEffect(.degrees(-90))
-
-                VStack(spacing: 0) {
-                    Text("\(data.score)")
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
-                        .foregroundStyle(WidgetColors.textPrimary)
-
-                    Text(data.headline)
-                        .font(.system(size: 9, weight: .medium, design: .rounded))
-                        .foregroundStyle(statusColor)
+                // 迷你 7 天趋势线
+                if !data.dailyScores.isEmpty {
+                    MiniSparkline(scores: data.dailyScores.map(\.score), color: statusColor)
+                        .frame(width: 64, height: 20)
                 }
             }
-            .frame(width: 90)
+            .frame(width: 86)
 
             // 右侧：四格指标
             VStack(spacing: 6) {
                 HStack(spacing: 6) {
                     WidgetMetricTile(
                         icon: "heart.fill",
-                        label: "HR",
+                        label: String(localized: "HR"),
                         value: data.heartRate > 0 ? "\(data.heartRate)" : "--",
                         unit: "bpm",
-                        color: WidgetColors.statusPoor
+                        color: WidgetColors.statusPoor,
+                        trendImage: data.heartRateTrend.systemImage
                     )
                     WidgetMetricTile(
                         icon: "waveform.path.ecg",
@@ -297,17 +547,17 @@ struct PulseWidgetMedium: View {
                 HStack(spacing: 6) {
                     WidgetMetricTile(
                         icon: "moon.fill",
-                        label: "Sleep",
+                        label: String(localized: "Sleep"),
                         value: formatSleep(data.sleepHours),
                         unit: "",
                         color: WidgetColors.sleepPurple
                     )
                     WidgetMetricTile(
-                        icon: "figure.walk",
-                        label: "Steps",
-                        value: formatSteps(data.steps),
-                        unit: "",
-                        color: WidgetColors.statusGood
+                        icon: "flame.fill",
+                        label: String(localized: "Cal"),
+                        value: data.activeCalories > 0 ? "\(data.activeCalories)" : "--",
+                        unit: "kcal",
+                        color: WidgetColors.statusModerate
                     )
                 }
             }
@@ -321,17 +571,72 @@ struct PulseWidgetMedium: View {
         let m = Int((hours - Double(h)) * 60)
         return "\(h)h\(m)m"
     }
+}
 
-    private func formatSteps(_ steps: Int) -> String {
-        guard steps > 0 else { return "--" }
-        if steps >= 1000 {
-            return String(format: "%.1fk", Double(steps) / 1000)
+// MARK: - 迷你 7 天趋势 Sparkline
+
+struct MiniSparkline: View {
+    let scores: [Int]
+    let color: Color
+
+    var body: some View {
+        GeometryReader { geo in
+            let count = scores.count
+            guard count >= 2 else { return AnyView(EmptyView()) }
+
+            let minVal = Double(scores.min() ?? 0) - 5
+            let maxVal = Double(scores.max() ?? 100) + 5
+            let range = max(maxVal - minVal, 1)
+            let stepX = geo.size.width / CGFloat(count - 1)
+
+            let points: [CGPoint] = scores.enumerated().map { i, score in
+                let x = CGFloat(i) * stepX
+                let y = geo.size.height - (CGFloat(Double(score) - minVal) / CGFloat(range)) * geo.size.height
+                return CGPoint(x: x, y: y)
+            }
+
+            return AnyView(
+                ZStack {
+                    // 面积填充
+                    Path { path in
+                        path.move(to: CGPoint(x: points[0].x, y: geo.size.height))
+                        for pt in points {
+                            path.addLine(to: pt)
+                        }
+                        path.addLine(to: CGPoint(x: points.last!.x, y: geo.size.height))
+                        path.closeSubpath()
+                    }
+                    .fill(
+                        LinearGradient(
+                            colors: [color.opacity(0.25), color.opacity(0.05)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+
+                    // 折线
+                    Path { path in
+                        path.move(to: points[0])
+                        for pt in points.dropFirst() {
+                            path.addLine(to: pt)
+                        }
+                    }
+                    .stroke(color, style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+
+                    // 最后一个点高亮
+                    if let last = points.last {
+                        Circle()
+                            .fill(color)
+                            .frame(width: 4, height: 4)
+                            .position(last)
+                    }
+                }
+            )
         }
-        return "\(steps)"
     }
 }
 
-// MARK: - 指标小格子
+// MARK: - 指标小格子（带可选趋势箭头）
 
 struct WidgetMetricTile: View {
     let icon: String
@@ -339,6 +644,7 @@ struct WidgetMetricTile: View {
     let value: String
     let unit: String
     let color: Color
+    var trendImage: String? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -355,7 +661,11 @@ struct WidgetMetricTile: View {
                 Text(value)
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundStyle(WidgetColors.textPrimary)
-                if !unit.isEmpty {
+                if let trend = trendImage {
+                    Image(systemName: trend)
+                        .font(.system(size: 7, weight: .bold))
+                        .foregroundStyle(WidgetColors.textSecondary)
+                } else if !unit.isEmpty {
                     Text(unit)
                         .font(.system(size: 8, weight: .regular, design: .rounded))
                         .foregroundStyle(WidgetColors.textTertiary)
@@ -372,7 +682,7 @@ struct WidgetMetricTile: View {
     }
 }
 
-// MARK: - Large Widget — 评分圆环 + 指标 + 今日洞察
+// MARK: - Large Widget — 评分圆环 + 指标 + 7天趋势 + 今日洞察
 
 struct PulseWidgetLarge: View {
     let data: WidgetHealthData
@@ -408,7 +718,7 @@ struct PulseWidgetLarge: View {
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Today")
+                    Text(String(localized: "Today"))
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(WidgetColors.textTertiary)
 
@@ -416,7 +726,7 @@ struct PulseWidgetLarge: View {
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .foregroundStyle(statusColor)
 
-                    Text("Updated \(timeAgoString(data.lastUpdated))")
+                    Text(String(localized: "Updated \(timeAgoString(data.lastUpdated))"))
                         .font(.system(size: 10, weight: .regular, design: .rounded))
                         .foregroundStyle(WidgetColors.textTertiary)
                 }
@@ -428,7 +738,7 @@ struct PulseWidgetLarge: View {
             HStack(spacing: 8) {
                 LargeWidgetMetric(
                     icon: "heart.fill",
-                    label: "HR",
+                    label: String(localized: "HR"),
                     value: data.heartRate > 0 ? "\(data.heartRate)" : "--",
                     unit: "bpm",
                     color: WidgetColors.statusPoor
@@ -442,18 +752,36 @@ struct PulseWidgetLarge: View {
                 )
                 LargeWidgetMetric(
                     icon: "moon.fill",
-                    label: "Sleep",
+                    label: String(localized: "Sleep"),
                     value: formatSleep(data.sleepHours),
                     unit: "",
                     color: WidgetColors.sleepPurple
                 )
                 LargeWidgetMetric(
-                    icon: "figure.walk",
-                    label: "Steps",
-                    value: formatSteps(data.steps),
-                    unit: "",
-                    color: WidgetColors.statusGood
+                    icon: "flame.fill",
+                    label: String(localized: "Cal"),
+                    value: data.activeCalories > 0 ? "\(data.activeCalories)" : "--",
+                    unit: "kcal",
+                    color: WidgetColors.statusModerate
                 )
+            }
+
+            // 7天趋势图
+            if data.dailyScores.count >= 2 {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                            .font(.system(size: 10))
+                            .foregroundStyle(WidgetColors.accent)
+                        Text(String(localized: "7-Day Trend"))
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .foregroundStyle(WidgetColors.textSecondary)
+                    }
+
+                    LargeSparkline(scores: data.dailyScores, color: statusColor)
+                        .frame(height: 36)
+                }
+                .padding(.horizontal, 4)
             }
 
             // 底部：今日洞察卡片
@@ -462,7 +790,7 @@ struct PulseWidgetLarge: View {
                     Image(systemName: "sparkles")
                         .font(.system(size: 11))
                         .foregroundStyle(WidgetColors.accent)
-                    Text("Insights")
+                    Text(String(localized: "Insights"))
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                         .foregroundStyle(WidgetColors.accent)
                 }
@@ -470,10 +798,10 @@ struct PulseWidgetLarge: View {
                 Text(insightText)
                     .font(.system(size: 13, weight: .regular, design: .rounded))
                     .foregroundStyle(WidgetColors.textPrimary)
-                    .lineLimit(3)
+                    .lineLimit(2)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(12)
+            .padding(10)
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(WidgetColors.cardBackground)
@@ -486,38 +814,35 @@ struct PulseWidgetLarge: View {
         .widgetURL(URL(string: "pulse://dashboard"))
     }
 
-    /// 根据评分和数据生成洞察文本
     private var insightText: String {
         let advice = translateAdvice(data.insight)
-
         if data.sleepHours > 0 && data.sleepHours < 6 {
-            return "Under 6h sleep — focus on recovery today. \(advice)"
+            return String(localized: "Under 6h sleep — focus on recovery today. \(advice)")
         } else if data.score >= 80 {
-            return "Great shape! \(advice) — seize the window."
+            return String(localized: "Great shape! \(advice) — seize the window.")
         } else if data.score >= 60 {
-            return "\(advice). Stay hydrated and refuel with protein."
+            return String(localized: "\(advice). Stay hydrated and refuel with protein.")
         } else {
-            return "Recovery needed. \(advice). Sleep is the best recovery."
+            return String(localized: "Recovery needed. \(advice). Sleep is the best recovery.")
         }
     }
 
-    /// 将英文训练建议翻译为中文
     private func translateAdvice(_ advice: String) -> String {
         switch advice.lowercased() {
-        case "intense": return "High intensity"
-        case "moderate": return "Moderate intensity"
-        case "light": return "Light activity"
-        case "rest": return "Rest recommended"
+        case "intense": return String(localized: "High intensity")
+        case "moderate": return String(localized: "Moderate intensity")
+        case "light": return String(localized: "Light activity")
+        case "rest": return String(localized: "Rest recommended")
         default: return advice
         }
     }
 
     private func timeAgoString(_ date: Date) -> String {
         let interval = Date().timeIntervalSince(date)
-        if interval < 60 { return "Just now" }
+        if interval < 60 { return String(localized: "Just now") }
         if interval < 3600 { return "\(Int(interval / 60))m ago" }
         if interval < 86400 { return "\(Int(interval / 3600))h ago" }
-        return ">1 day ago"
+        return String(localized: ">1 day ago")
     }
 
     private func formatSleep(_ hours: Double) -> String {
@@ -526,13 +851,69 @@ struct PulseWidgetLarge: View {
         let m = Int((hours - Double(h)) * 60)
         return "\(h)h\(m)m"
     }
+}
 
-    private func formatSteps(_ steps: Int) -> String {
-        guard steps > 0 else { return "--" }
-        if steps >= 1000 {
-            return String(format: "%.1fk", Double(steps) / 1000)
+// MARK: - Large Widget 趋势图（带日期标签）
+
+struct LargeSparkline: View {
+    let scores: [SharedDayScore]
+    let color: Color
+
+    var body: some View {
+        GeometryReader { geo in
+            let values = scores.map(\.score)
+            let count = values.count
+            guard count >= 2 else { return AnyView(EmptyView()) }
+
+            let minVal = Double(values.min() ?? 0) - 5
+            let maxVal = Double(values.max() ?? 100) + 5
+            let range = max(maxVal - minVal, 1)
+            let stepX = geo.size.width / CGFloat(count - 1)
+
+            let points: [CGPoint] = values.enumerated().map { i, score in
+                let x = CGFloat(i) * stepX
+                let y = geo.size.height - (CGFloat(Double(score) - minVal) / CGFloat(range)) * geo.size.height
+                return CGPoint(x: x, y: y)
+            }
+
+            return AnyView(
+                ZStack {
+                    // 面积填充
+                    Path { path in
+                        path.move(to: CGPoint(x: points[0].x, y: geo.size.height))
+                        for pt in points {
+                            path.addLine(to: pt)
+                        }
+                        path.addLine(to: CGPoint(x: points.last!.x, y: geo.size.height))
+                        path.closeSubpath()
+                    }
+                    .fill(
+                        LinearGradient(
+                            colors: [color.opacity(0.2), color.opacity(0.03)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+
+                    // 折线
+                    Path { path in
+                        path.move(to: points[0])
+                        for pt in points.dropFirst() {
+                            path.addLine(to: pt)
+                        }
+                    }
+                    .stroke(color, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+
+                    // 数据点
+                    ForEach(Array(points.enumerated()), id: \.offset) { i, pt in
+                        Circle()
+                            .fill(i == points.count - 1 ? color : color.opacity(0.6))
+                            .frame(width: i == points.count - 1 ? 5 : 3, height: i == points.count - 1 ? 5 : 3)
+                            .position(pt)
+                    }
+                }
+            )
         }
-        return "\(steps)"
     }
 }
 
@@ -574,7 +955,11 @@ struct LargeWidgetMetric: View {
     }
 }
 
-// MARK: - Widget Entry View（分发三种尺寸）
+// ╔════════════════════════════════════════════════════════════╗
+// ║  WIDGET ENTRY VIEW + DEFINITIONS                          ║
+// ╚════════════════════════════════════════════════════════════╝
+
+// MARK: - Home Screen Widget Entry View
 
 struct PulseWidgetEntryView: View {
     @Environment(\.widgetFamily) var family
@@ -599,7 +984,27 @@ struct PulseWidgetEntryView: View {
     }
 }
 
-// MARK: - Widget 定义
+// MARK: - Lock Screen Widget Entry View
+
+struct PulseLockScreenEntryView: View {
+    @Environment(\.widgetFamily) var family
+    let entry: PulseWidgetEntry
+
+    var body: some View {
+        switch family {
+        case .accessoryCircular:
+            PulseLockScreenCircular(data: entry.data)
+        case .accessoryRectangular:
+            PulseLockScreenRectangular(data: entry.data)
+        case .accessoryInline:
+            PulseLockScreenInline(data: entry.data)
+        default:
+            PulseLockScreenCircular(data: entry.data)
+        }
+    }
+}
+
+// MARK: - Home Screen Widget 定义
 
 struct PulseHomeWidget: Widget {
     let kind = "PulseHomeWidget"
@@ -608,10 +1013,25 @@ struct PulseHomeWidget: Widget {
         StaticConfiguration(kind: kind, provider: PulseWidgetProvider()) { entry in
             PulseWidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("Pulse Status")
-        .description("Today's health score, heart rate, HRV, sleep and steps")
+        .configurationDisplayName(String(localized: "Pulse Status"))
+        .description(String(localized: "Today's health score, heart rate, HRV, sleep and steps"))
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         .contentMarginsDisabled()
+    }
+}
+
+// MARK: - Lock Screen Widget 定义
+
+struct PulseLockScreenWidget: Widget {
+    let kind = "PulseLockScreenWidget"
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: PulseWidgetProvider()) { entry in
+            PulseLockScreenEntryView(entry: entry)
+        }
+        .configurationDisplayName(String(localized: "Pulse Lock Screen"))
+        .description(String(localized: "Heart rate and recovery score at a glance"))
+        .supportedFamilies([.accessoryCircular, .accessoryRectangular, .accessoryInline])
     }
 }
 
@@ -621,10 +1041,11 @@ struct PulseHomeWidget: Widget {
 struct PulseWatchWidgetBundle: WidgetBundle {
     var body: some Widget {
         PulseHomeWidget()
+        PulseLockScreenWidget()
     }
 }
 
-// MARK: - Preview
+// MARK: - Previews
 
 #Preview("Small", as: .systemSmall) {
     PulseHomeWidget()
@@ -640,6 +1061,24 @@ struct PulseWatchWidgetBundle: WidgetBundle {
 
 #Preview("Large", as: .systemLarge) {
     PulseHomeWidget()
+} timeline: {
+    PulseWidgetEntry(date: .now, data: .placeholder)
+}
+
+#Preview("Lock Circular", as: .accessoryCircular) {
+    PulseLockScreenWidget()
+} timeline: {
+    PulseWidgetEntry(date: .now, data: .placeholder)
+}
+
+#Preview("Lock Rectangular", as: .accessoryRectangular) {
+    PulseLockScreenWidget()
+} timeline: {
+    PulseWidgetEntry(date: .now, data: .placeholder)
+}
+
+#Preview("Lock Inline", as: .accessoryInline) {
+    PulseLockScreenWidget()
 } timeline: {
     PulseWidgetEntry(date: .now, data: .placeholder)
 }

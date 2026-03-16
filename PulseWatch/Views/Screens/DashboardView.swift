@@ -50,7 +50,7 @@ struct DashboardView: View {
                                 .staggered(index: 1)
                             
                             // 温和提示：也可以戴上手表
-                            Text("Or wear your Apple Watch to collect data")
+                            Text(String(localized: "Or wear your Apple Watch to collect data"))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                                 .padding(.horizontal, PulseTheme.spacingM)
@@ -934,12 +934,12 @@ struct DashboardView: View {
             }
             
             VStack(spacing: PulseTheme.spacingM) {
-                Text("Enable Health Access")
+                Text(String(localized: "Enable Health Access"))
                     .font(PulseTheme.titleFont)
                     .foregroundStyle(PulseTheme.textPrimary)
                     .multilineTextAlignment(.center)
                 
-                Text("Pulse Watch needs access to your health data to provide personalized insights and recovery scores.")
+                Text(String(localized: "Pulse Watch needs access to your health data to provide personalized insights, recovery scores, and training recommendations."))
                     .font(PulseTheme.bodyFont)
                     .foregroundStyle(PulseTheme.textSecondary)
                     .multilineTextAlignment(.center)
@@ -952,7 +952,7 @@ struct DashboardView: View {
                 HStack(spacing: PulseTheme.spacingS) {
                     Image(systemName: "gear")
                         .font(.system(size: 16, weight: .medium))
-                    Text("Open Settings")
+                    Text(String(localized: "Open Settings"))
                         .font(PulseTheme.bodyFont.weight(.semibold))
                 }
                 .foregroundStyle(PulseTheme.background)

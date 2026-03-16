@@ -236,11 +236,11 @@ struct WorkoutHistoryListView: View {
             }
 
             VStack(spacing: PulseTheme.spacingS) {
-                Text("Complete Your First Workout")
+                Text(String(localized: "Complete Your First Workout"))
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
 
-                Text("Start a workout on Apple Watch and your history will appear here")
+                Text(String(localized: "Start a workout on Apple Watch and your history will appear here"))
                     .font(PulseTheme.bodyFont)
                     .foregroundStyle(PulseTheme.textSecondary)
                     .multilineTextAlignment(.center)
@@ -249,7 +249,7 @@ struct WorkoutHistoryListView: View {
             
             // 支持的训练类型提示
             VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
-                Text("Supported workout types:")
+                Text(String(localized: "Supported workout types:"))
                     .font(PulseTheme.captionFont.weight(.medium))
                     .foregroundStyle(PulseTheme.textTertiary)
                 
@@ -257,12 +257,12 @@ struct WorkoutHistoryListView: View {
                     GridItem(.flexible()),
                     GridItem(.flexible())
                 ], spacing: PulseTheme.spacingXS) {
-                    workoutTypeItem(icon: "dumbbell.fill", name: "Strength Training")
-                    workoutTypeItem(icon: "figure.run", name: "Running")
-                    workoutTypeItem(icon: "figure.walk", name: "Walking")
-                    workoutTypeItem(icon: "figure.cycling", name: "Cycling")
+                    workoutTypeItem(icon: "dumbbell.fill", name: String(localized: "Strength Training"))
+                    workoutTypeItem(icon: "figure.run", name: String(localized: "Running"))
+                    workoutTypeItem(icon: "figure.walk", name: String(localized: "Walking"))
+                    workoutTypeItem(icon: "figure.cycling", name: String(localized: "Cycling"))
                     workoutTypeItem(icon: "figure.mixed.cardio", name: "HIIT")
-                    workoutTypeItem(icon: "heart.fill", name: "Other")
+                    workoutTypeItem(icon: "heart.fill", name: String(localized: "Other"))
                 }
             }
             .padding(PulseTheme.spacingM)

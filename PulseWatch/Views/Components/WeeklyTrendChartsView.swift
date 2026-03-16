@@ -92,12 +92,12 @@ struct WeeklyTrendChartsView: View {
             placeholderChartSilhouette
             
             VStack(spacing: PulseTheme.spacingS) {
-                Text("Start wearing Apple Watch to collect data")
+                Text(String(localized: "Start wearing Apple Watch to collect data"))
                     .font(PulseTheme.bodyFont)
                     .foregroundStyle(PulseTheme.textSecondary)
                     .multilineTextAlignment(.center)
                 
-                Text("Trends will appear here once you have a few days of health data")
+                Text(String(localized: "Trends will appear here once you have a few days of health data"))
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
                     .multilineTextAlignment(.center)

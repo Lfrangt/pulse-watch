@@ -371,7 +371,7 @@ struct SettingsView: View {
             settingRow {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Authorization Status")
+                        Text(String(localized: "Authorization Status"))
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
                         Text(healthManager.authorizationStatus.description)
@@ -392,7 +392,7 @@ struct SettingsView: View {
                 Button {
                     openAppSettings()
                 } label: {
-                    Text("Open Settings")
+                    Text(String(localized: "Open Settings"))
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.accent)
                         .frame(maxWidth: .infinity)
@@ -403,16 +403,16 @@ struct SettingsView: View {
             // 数据类型访问状态
             settingRow {
                 VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                    Text("Data Access")
+                    Text(String(localized: "Data Access"))
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
                     VStack(spacing: PulseTheme.spacingXS) {
-                        dataAccessRow(icon: "heart.fill", name: "Heart Rate", isAuthorized: checkDataTypeAuthorization(HKQuantityType(.heartRate)))
-                        dataAccessRow(icon: "waveform.path.ecg", name: "HRV", isAuthorized: checkDataTypeAuthorization(HKQuantityType(.heartRateVariabilitySDNN)))
-                        dataAccessRow(icon: "figure.walk", name: "Steps", isAuthorized: checkDataTypeAuthorization(HKQuantityType(.stepCount)))
-                        dataAccessRow(icon: "moon.fill", name: "Sleep", isAuthorized: checkDataTypeAuthorization(HKCategoryType(.sleepAnalysis)))
-                        dataAccessRow(icon: "lungs.fill", name: "Blood Oxygen", isAuthorized: checkDataTypeAuthorization(HKQuantityType(.oxygenSaturation)))
+                        dataAccessRow(icon: "heart.fill", name: String(localized: "Heart Rate"), isAuthorized: checkDataTypeAuthorization(HKQuantityType(.heartRate)))
+                        dataAccessRow(icon: "waveform.path.ecg", name: String(localized: "HRV"), isAuthorized: checkDataTypeAuthorization(HKQuantityType(.heartRateVariabilitySDNN)))
+                        dataAccessRow(icon: "figure.walk", name: String(localized: "Steps"), isAuthorized: checkDataTypeAuthorization(HKQuantityType(.stepCount)))
+                        dataAccessRow(icon: "moon.fill", name: String(localized: "Sleep"), isAuthorized: checkDataTypeAuthorization(HKCategoryType(.sleepAnalysis)))
+                        dataAccessRow(icon: "lungs.fill", name: String(localized: "Blood Oxygen"), isAuthorized: checkDataTypeAuthorization(HKQuantityType(.oxygenSaturation)))
                     }
                 }
             }

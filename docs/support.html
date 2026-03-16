@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support — Pulse Watch</title>
+    <style>
+        :root {
+            --bg: #0A0A0F;
+            --surface: #14141F;
+            --border: rgba(255,255,255,0.06);
+            --text: #E8E8ED;
+            --text-secondary: #8E8E9A;
+            --accent: #5B8DEF;
+            --accent-glow: rgba(91,141,239,0.15);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 80px;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 32px;
+            text-decoration: none;
+        }
+        .back-link:hover { color: var(--accent); }
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 48px;
+        }
+        .contact-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 40px;
+        }
+        .contact-card h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-top: 1px solid var(--border);
+        }
+        .contact-item:first-of-type { border-top: none; }
+        .contact-item .icon { font-size: 20px; width: 32px; text-align: center; }
+        .contact-item a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .contact-item a:hover { text-decoration: underline; }
+        .contact-item .label {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .faq-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .faq-q {
+            padding: 20px 24px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .faq-q:hover { background: rgba(255,255,255,0.02); }
+        .faq-q .chevron {
+            color: var(--text-secondary);
+            transition: transform 0.2s;
+            font-size: 12px;
+        }
+        .faq-item.open .faq-q .chevron { transform: rotate(90deg); }
+        .faq-a {
+            padding: 0 24px 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            display: none;
+            line-height: 1.8;
+        }
+        .faq-item.open .faq-a { display: block; }
+        .version-info {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .version-info span { color: var(--text); font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Pulse Watch</a>
+
+        <h1>Support</h1>
+        <p class="subtitle">Need help? We're here for you.</p>
+
+        <div class="contact-card">
+            <h2 style="font-size:18px; margin-bottom:16px;">Contact Us</h2>
+            <div class="contact-item">
+                <span class="icon">📧</span>
+                <div>
+                    <a href="mailto:abundra.dev@gmail.com">abundra.dev@gmail.com</a>
+                    <div class="label">We typically respond within 24 hours</div>
+                </div>
+            </div>
+            <div class="contact-item">
+                <span class="icon">🐛</span>
+                <div>
+                    <a href="https://github.com/Lfrangt/pulse-watch/issues" target="_blank">GitHub Issues</a>
+                    <div class="label">Bug reports & feature requests</div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Frequently Asked Questions</h2>
+
+        <div class="faq-item open">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                What data does Pulse Watch access?
+                <span class="chevron">▶</span>
+            </div>
+            <div class="faq-a">
+                Pulse Watch reads heart rate, HRV, blood oxygen, sleep, steps, and energy data from Apple HealthKit. <strong>All data stays on your device</strong> — nothing is uploaded to our servers. See our <a href="privacy-policy.html">Privacy Policy</a> for details.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                Why isn't my health data showing up?
+                <span class="chevron">▶</span>
+            </div>
+            <div class="faq-a">
+                Make sure you've granted HealthKit permissions. Go to <strong>iPhone Settings → Privacy & Security → Health → Pulse Watch</strong> and enable all data types. If you just got an Apple Watch, it may take a few hours to accumulate enough data for the daily score.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                How is the daily health score calculated?
+                <span class="chevron">▶</span>
+            </div>
+            <div class="faq-a">
+                Your daily score (0–100) is a weighted combination of: resting heart rate trend, HRV stability, sleep duration and quality, and recent activity levels. The algorithm adapts to your personal baseline over time — so it gets more accurate the longer you use it.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                Does the app work without an Apple Watch?
+                <span class="chevron">▶</span>
+            </div>
+            <div class="faq-a">
+                Pulse Watch is designed for Apple Watch users. While the app will open on iPhone, core features (heart rate, HRV, workout tracking) require an Apple Watch paired with your iPhone to collect health data.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                What is OpenClaw integration?
+                <span class="chevron">▶</span>
+            </div>
+            <div class="faq-a">
+                OpenClaw is an optional AI coaching feature. If you run your own OpenClaw server, you can connect Pulse Watch to receive personalized health insights and training advice. This is entirely opt-in and you control the server. Most users don't need this feature.
+            </div>
+        </div>
+
+        <div class="version-info">
+            <p><span>Pulse Watch</span> v1.0 · Built by <a href="https://github.com/Lfrangt" style="color:var(--accent);text-decoration:none;">Abundra</a></p>
+            <p style="margin-top:4px;">Requires iOS 17.0+ · Apple Watch with watchOS 10.0+</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleFaq(el) {
+            el.parentElement.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulse Watch — Your Health, Visualized</title>
+    <meta name="description" content="Pulse Watch turns Apple Watch health data into actionable daily insights. Privacy-first. No subscriptions.">
+    <style>
+        :root {
+            --bg: #0A0A0F;
+            --surface: #14141F;
+            --border: rgba(255,255,255,0.06);
+            --text: #E8E8ED;
+            --text-secondary: #8E8E9A;
+            --accent: #5B8DEF;
+            --accent-glow: rgba(91,141,239,0.15);
+            --green: #34D399;
+            --orange: #F59E0B;
+            --red: #EF4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 100px 24px 80px;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff 0%, #9BB8F0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero .tagline {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 480px;
+            margin: 0 auto 40px;
+        }
+        .cta-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .cta-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+        .cta-primary:hover { background: #4A7CE0; transform: translateY(-1px); }
+        .cta-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .cta-secondary:hover { border-color: var(--accent); }
+
+        /* Features */
+        .features {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 28px;
+            transition: border-color 0.2s;
+        }
+        .feature-card:hover { border-color: rgba(91,141,239,0.3); }
+        .feature-icon { font-size: 32px; margin-bottom: 16px; }
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Highlights */
+        .highlights {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            text-align: center;
+        }
+        .highlights h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .highlights .sub {
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+        .pill-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .pill {
+            padding: 10px 20px;
+            border-radius: 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .pill strong { color: var(--text); }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 24px 60px;
+            border-top: 1px solid var(--border);
+            max-width: 720px;
+            margin: 60px auto 0;
+        }
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            margin: 0 16px;
+        }
+        footer a:hover { color: var(--accent); }
+        footer .copyright {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 20px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <div class="hero-icon">⌚</div>
+        <h1>Pulse Watch</h1>
+        <p class="tagline">Turn your Apple Watch health data into a single daily score. Know when to push hard and when to rest.</p>
+        <div class="cta-group">
+            <a href="#" class="cta-btn cta-primary">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M15.6 10.8c0-2.1 1.7-3.1 1.8-3.2-1-1.4-2.5-1.6-3-1.7-1.3-.1-2.5.8-3.2.8-.6 0-1.6-.7-2.7-.7-1.4 0-2.7.8-3.4 2-1.5 2.5-.4 6.3 1 8.4.7 1 1.6 2.2 2.7 2.1 1.1 0 1.5-.7 2.8-.7 1.3 0 1.6.7 2.7.7 1.2 0 1.9-1 2.6-2.1.8-1.2 1.2-2.3 1.2-2.4-.1 0-2.5-1-2.5-3.2zm-2.3-5.9c.6-.7 1-1.7.9-2.6-.8 0-1.9.6-2.5 1.3-.5.6-1 1.7-.9 2.6.9.1 1.9-.5 2.5-1.3z"/></svg>
+                Download on App Store
+            </a>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">💯</div>
+            <h3>Daily Health Score</h3>
+            <p>One number (0–100) that tells you how your body is doing today. Based on heart rate, HRV, sleep, and activity — personalized to your baseline.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📈</div>
+            <h3>7-Day Trends</h3>
+            <p>See how your heart rate, HRV, and sleep evolve over the week. Spot patterns. Make better decisions about training and recovery.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🏋️</div>
+            <h3>Workout History</h3>
+            <p>Every workout auto-synced from Apple Watch. Heart rate zones, calories, duration — all in one place with shareable achievement cards.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚠️</div>
+            <h3>Heart Rate Alerts</h3>
+            <p>Get notified when your resting heart rate goes above or below safe thresholds. Customizable limits with smart cooldown to avoid alert fatigue.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Privacy First</h3>
+            <p>All data stays on your device. No accounts, no cloud, no tracking. Your health data is yours — period.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3>AI Coach (Optional)</h3>
+            <p>Connect your own AI server for personalized training advice. Completely optional — the app works perfectly without it.</p>
+        </div>
+    </section>
+
+    <section class="highlights">
+        <h2>Built Different</h2>
+        <p class="sub">No subscription. No cloud. No compromises.</p>
+        <div class="pill-row">
+            <div class="pill"><strong>iOS 17+</strong></div>
+            <div class="pill"><strong>watchOS 10+</strong></div>
+            <div class="pill">🌙 Dark Mode Native</div>
+            <div class="pill">🌐 English & 中文</div>
+            <div class="pill">♿ VoiceOver Ready</div>
+            <div class="pill">📱 Widgets</div>
+        </div>
+    </section>
+
+    <footer>
+        <div>
+            <a href="privacy-policy.html">Privacy Policy</a>
+            <a href="support.html">Support</a>
+            <a href="https://github.com/Lfrangt/pulse-watch" target="_blank">GitHub</a>
+        </div>
+        <p class="copyright">© 2026 Abundra. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

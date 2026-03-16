@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — Pulse Watch</title>
+    <style>
+        :root {
+            --bg: #0A0A0F;
+            --surface: #14141F;
+            --border: rgba(255,255,255,0.06);
+            --text: #E8E8ED;
+            --text-secondary: #8E8E9A;
+            --accent: #5B8DEF;
+            --accent-glow: rgba(91,141,239,0.15);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 80px;
+        }
+        .lang-switch {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 40px;
+        }
+        .lang-switch button {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .lang-switch button.active {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .lang-switch button:hover { border-color: var(--accent); }
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .updated {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 48px;
+        }
+        .summary-box {
+            background: var(--accent-glow);
+            border: 1px solid rgba(91,141,239,0.2);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 40px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .summary-box .icon { font-size: 20px; margin-right: 8px; }
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 40px;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        p, li {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 6px; }
+        strong { color: var(--text); }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .section {
+            border-top: 1px solid var(--border);
+            padding-top: 32px;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 32px;
+            text-decoration: none;
+        }
+        .back-link:hover { color: var(--accent); }
+        .lang-content { display: none; }
+        .lang-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Pulse Watch</a>
+
+        <div class="lang-switch">
+            <button class="active" onclick="switchLang('en')">English</button>
+            <button onclick="switchLang('zh')">中文</button>
+        </div>
+
+        <!-- English -->
+        <div id="lang-en" class="lang-content active">
+            <h1>Privacy Policy</h1>
+            <p class="updated">Last Updated: March 16, 2026</p>
+
+            <div class="summary-box">
+                <span class="icon">🔒</span> Pulse Watch is privacy-first. <strong>All your health data stays on your device.</strong> We never collect, store, or transmit your personal health information to any server.
+            </div>
+
+            <h2>Data We Access</h2>
+
+            <h3>Health Data (HealthKit)</h3>
+            <p>Pulse Watch reads the following from Apple HealthKit:</p>
+            <ul>
+                <li>Heart rate, resting heart rate, heart rate variability (HRV)</li>
+                <li>Blood oxygen saturation (SpO2)</li>
+                <li>Sleep analysis (duration, stages)</li>
+                <li>Step count</li>
+                <li>Active and resting energy burned</li>
+            </ul>
+            <p>The App writes workout data to HealthKit when you complete a workout on Apple Watch.</p>
+            <p><strong>All HealthKit data is processed and stored locally on your device using Apple's SwiftData framework. It is never transmitted to external servers.</strong></p>
+
+            <h3>Location Data</h3>
+            <p>The App uses location services to detect when you arrive at a saved gym location for automatic training suggestions. Location data is processed entirely on-device, never uploaded to any server, and never shared with third parties.</p>
+
+            <h3>Camera</h3>
+            <p>The App uses the camera solely to scan QR codes for optional OpenClaw pairing. No images or video are stored or transmitted.</p>
+
+            <h3>Analytics</h3>
+            <p>The App uses <a href="https://telemetrydeck.com/privacy" target="_blank">TelemetryDeck</a> for anonymous, privacy-preserving usage analytics. TelemetryDeck does not collect personal information and complies with GDPR. No health data is included in analytics.</p>
+
+            <div class="section">
+                <h2>Optional: OpenClaw Integration</h2>
+                <p>If you choose to connect to your own OpenClaw instance (an optional AI coaching feature), the App transmits aggregated health summaries to your specified server. This connection is:</p>
+                <ul>
+                    <li>Entirely opt-in</li>
+                    <li>Configured by you with your own server URL and credentials</li>
+                    <li>Secured with bearer token authentication over HTTPS</li>
+                    <li>Disconnectable at any time</li>
+                </ul>
+                <p>We do not operate or have access to your OpenClaw server.</p>
+            </div>
+
+            <div class="section">
+                <h2>Data Storage</h2>
+                <p>All data is stored locally on your device:</p>
+                <ul>
+                    <li><strong>Health records:</strong> SwiftData (on-device database)</li>
+                    <li><strong>Preferences:</strong> UserDefaults (on-device)</li>
+                    <li><strong>OpenClaw token:</strong> iOS Keychain (encrypted, on-device)</li>
+                    <li><strong>Widget data:</strong> App Group container (on-device)</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Data Sharing</h2>
+                <p>We do not sell, share, or transmit your personal data to any third party.</p>
+            </div>
+
+            <div class="section">
+                <h2>Children's Privacy</h2>
+                <p>Pulse Watch is not directed at children under 13. We do not knowingly collect data from children.</p>
+            </div>
+
+            <div class="section">
+                <h2>Your Rights</h2>
+                <p>Since all data is stored locally, you have full control:</p>
+                <ul>
+                    <li><strong>Access:</strong> View all your data in the App at any time</li>
+                    <li><strong>Deletion:</strong> Delete the App to remove all data, or clear data from Settings</li>
+                    <li><strong>Portability:</strong> Your health data remains in Apple HealthKit</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Changes</h2>
+                <p>We may update this policy from time to time. Changes will be reflected in the "Last Updated" date above.</p>
+            </div>
+
+            <div class="section">
+                <h2>Contact</h2>
+                <p>Questions? Reach us at <a href="mailto:abundra.dev@gmail.com">abundra.dev@gmail.com</a> or via <a href="https://github.com/Lfrangt/pulse-watch/issues" target="_blank">GitHub Issues</a>.</p>
+            </div>
+        </div>
+
+        <!-- Chinese -->
+        <div id="lang-zh" class="lang-content">
+            <h1>隐私政策</h1>
+            <p class="updated">最后更新：2026年3月16日</p>
+
+            <div class="summary-box">
+                <span class="icon">🔒</span> Pulse Watch 隐私优先。<strong>您的所有健康数据均存储在您的设备上。</strong>我们绝不收集、存储或传输您的个人健康信息到任何服务器。
+            </div>
+
+            <h2>我们访问的数据</h2>
+
+            <h3>健康数据 (HealthKit)</h3>
+            <p>Pulse Watch 从 Apple HealthKit 读取以下数据：</p>
+            <ul>
+                <li>心率、静息心率、心率变异性 (HRV)</li>
+                <li>血氧饱和度 (SpO2)</li>
+                <li>睡眠分析（时长、阶段）</li>
+                <li>步数</li>
+                <li>活动与静息能量消耗</li>
+            </ul>
+            <p>当您在 Apple Watch 上完成训练时，本应用会将运动数据写入 HealthKit。</p>
+            <p><strong>所有 HealthKit 数据均使用 Apple 的 SwiftData 框架在设备本地处理和存储，绝不会传输到外部服务器。</strong></p>
+
+            <h3>位置数据</h3>
+            <p>本应用使用位置服务检测您是否到达已保存的健身房位置，以提供自动训练建议。位置数据完全在设备上处理，绝不上传到任何服务器，也绝不与第三方共享。</p>
+
+            <h3>相机</h3>
+            <p>本应用仅使用相机扫描 OpenClaw 配对二维码。不存储或传输任何图像或视频。</p>
+
+            <h3>分析</h3>
+            <p>本应用使用 <a href="https://telemetrydeck.com/privacy" target="_blank">TelemetryDeck</a> 进行匿名、隐私保护的使用分析。TelemetryDeck 不收集个人信息，符合 GDPR 规定。分析数据中不包含任何健康数据。</p>
+
+            <div class="section">
+                <h2>可选：OpenClaw 集成</h2>
+                <p>如果您选择将本应用连接到您自己的 OpenClaw 实例（可选的 AI 教练功能），本应用会将聚合的健康摘要传输到您指定的服务器。此连接：</p>
+                <ul>
+                    <li>完全由用户选择启用</li>
+                    <li>由您使用自己的服务器 URL 和凭据配置</li>
+                    <li>通过 HTTPS 的 Bearer Token 认证保护</li>
+                    <li>您可以随时断开连接</li>
+                </ul>
+                <p>我们不运营也无法访问您的 OpenClaw 服务器。</p>
+            </div>
+
+            <div class="section">
+                <h2>数据存储</h2>
+                <p>所有数据存储在设备本地：</p>
+                <ul>
+                    <li><strong>健康记录：</strong>SwiftData（设备数据库）</li>
+                    <li><strong>偏好设置：</strong>UserDefaults（设备本地）</li>
+                    <li><strong>OpenClaw 令牌：</strong>iOS 钥匙串（加密存储）</li>
+                    <li><strong>小组件数据：</strong>App Group 容器（设备本地）</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>数据共享</h2>
+                <p>我们不会向任何第三方出售、共享或传输您的个人数据。</p>
+            </div>
+
+            <div class="section">
+                <h2>儿童隐私</h2>
+                <p>Pulse Watch 不面向 13 岁以下儿童。我们不会故意收集儿童数据。</p>
+            </div>
+
+            <div class="section">
+                <h2>您的权利</h2>
+                <p>由于所有数据存储在本地，您拥有完全控制权：</p>
+                <ul>
+                    <li><strong>访问：</strong>随时在应用中查看所有数据</li>
+                    <li><strong>删除：</strong>删除应用即可移除所有数据，或在设置中清除</li>
+                    <li><strong>可携带：</strong>您的健康数据保留在 Apple HealthKit 中</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>政策变更</h2>
+                <p>我们可能会不时更新本隐私政策。变更将在上方"最后更新"日期中体现。</p>
+            </div>
+
+            <div class="section">
+                <h2>联系方式</h2>
+                <p>如有问题，请通过 <a href="mailto:abundra.dev@gmail.com">abundra.dev@gmail.com</a> 或 <a href="https://github.com/Lfrangt/pulse-watch/issues" target="_blank">GitHub Issues</a> 联系我们。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchLang(lang) {
+            document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.lang-switch button').forEach(el => el.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+            document.querySelector('.lang-switch button' + (lang === 'en' ? ':first-child' : ':last-child')).classList.add('active');
+        }
+    </script>
+</body>
+</html>

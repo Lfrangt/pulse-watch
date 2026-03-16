@@ -1081,7 +1081,7 @@ struct SettingsView: View {
             // 隐私政策链接
             settingRow {
                 Button {
-                    if let url = URL(string: "https://pulsewatch.app/privacy") {
+                    if let url = URL(string: "https://lfrangt.github.io/pulse-watch/privacy-policy.html") {
                         #if os(iOS)
                         UIApplication.shared.open(url)
                         #endif
@@ -1108,7 +1108,7 @@ struct SettingsView: View {
             // 反馈邮件
             settingRow {
                 Button {
-                    if let url = URL(string: "mailto:feedback@pulsewatch.app?subject=Pulse%20Watch%20Feedback%20v\(appVersion)") {
+                    if let url = URL(string: "mailto:abundra.dev@gmail.com?subject=Pulse%20Watch%20Feedback%20v\(appVersion)") {
                         #if os(iOS)
                         UIApplication.shared.open(url)
                         #endif

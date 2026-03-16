@@ -65,8 +65,8 @@ struct HistoryView: View {
     // MARK: - 时间范围
 
     enum TimeRange: String, CaseIterable {
-        case week = "7天"
-        case month = "30天"
+        case week = "7d"
+        case month = "30d"
 
         var days: Int {
             switch self {

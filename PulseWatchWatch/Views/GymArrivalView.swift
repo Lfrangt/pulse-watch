@@ -42,7 +42,7 @@ struct GymArrivalView: View {
 
                 if let plan = trainingPlan {
                     VStack(spacing: 4) {
-                        Text("建议练\(localizedGroup(plan.targetMuscleGroup))")
+                        Text("Suggested: \(localizedGroup(plan.targetMuscleGroup))")
                             .font(.system(size: 13, weight: .medium, design: .rounded))
                             .foregroundStyle(Color(hex: "9A938C"))
 

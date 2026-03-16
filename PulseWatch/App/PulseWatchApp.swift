@@ -122,7 +122,7 @@ struct MainTabView: View {
         }
         .tint(PulseTheme.accent)
         .onChange(of: selectedTab) { _, newTab in
-            let tabNames = ["今日", "趋势", "设置"]
+            let tabNames = ["Today", "Trends", "Settings"]
             let name = newTab < tabNames.count ? tabNames[newTab] : "unknown"
             Analytics.trackTabSwitch(to: name)
             if newTab == 2 {

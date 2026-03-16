@@ -167,10 +167,10 @@ final class OpenClawBridge {
     // MARK: - 连接状态
 
     enum ConnectionStatus: String {
-        case connected = "已连接"
-        case disconnected = "未连接"
-        case syncing = "同步中"
-        case error = "连接错误"
+        case connected = "Connected"
+        case disconnected = "Disconnected"
+        case syncing = "Syncing"
+        case error = "Error"
 
         var icon: String {
             switch self {
@@ -586,9 +586,9 @@ final class OpenClawBridge {
         if interval < 60 {
             return String(localized: "Just now")
         } else if interval < 3600 {
-            return "\(Int(interval / 60)) 分钟前"
+            return "\(Int(interval / 60))m ago"
         } else if interval < 86400 {
-            return "\(Int(interval / 3600)) 小时前"
+            return "\(Int(interval / 3600))h ago"
         } else {
             let fmt = DateFormatter()
             fmt.dateFormat = "M月d日 HH:mm"

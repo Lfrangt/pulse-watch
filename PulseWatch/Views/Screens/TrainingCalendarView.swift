@@ -282,7 +282,7 @@ struct TrainingCalendarView: View {
                         Image(systemName: "heart.fill")
                             .font(.system(size: 12))
                             .foregroundStyle(PulseTheme.statusColor(for: score))
-                        Text("恢复 \(score)")
+                        Text("Recovery \(score)")
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.statusColor(for: score))
                     }
@@ -308,7 +308,7 @@ struct TrainingCalendarView: View {
                             .font(.system(size: 15, weight: .medium, design: .rounded))
                             .foregroundStyle(PulseTheme.textPrimary)
 
-                        Text("\(workout.durationMinutes) 分钟")
+                        Text("\(workout.durationMinutes) min")
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textSecondary)
 
@@ -374,7 +374,7 @@ struct TrainingCalendarView: View {
                 let repText = repRange.count == 1 ? "\(repRange[0])" :
                     "\(repRange.min() ?? 0)-\(repRange.max() ?? 0)"
 
-                Text("\(totalSets) 组 x \(repText) 次")
+                Text("\(totalSets) sets x \(repText) reps")
                     .font(.system(size: 12, weight: .regular, design: .rounded))
                     .foregroundStyle(PulseTheme.textTertiary)
 

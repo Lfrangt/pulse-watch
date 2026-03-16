@@ -122,10 +122,10 @@ struct ScoreEngine {
         
         var notes: [String] = []
         if let hrv, hrv < 35 {
-            notes.append("HRV 偏低(\(Int(hrv))ms)")
+            notes.append("HRV low (\(Int(hrv))ms)")
         }
         if let rhr = restingHR, rhr > 75 {
-            notes.append("静息心率偏高(\(Int(rhr))bpm)")
+            notes.append("RHR elevated (\(Int(rhr))bpm)")
         }
         
         return notes.isEmpty ? nil : notes.joined(separator: ", ")
@@ -180,7 +180,7 @@ struct ScoreEngine {
             daysSinceLastTrained: min(maxDays, 99),
             suggestedExercises: exercises,
             intensity: intensity,
-            reason: "上次练\(localizedGroup(bestGroup))是\(maxDays)天前"
+            reason: "Last \(localizedGroup(bestGroup)) was \(maxDays)d ago"
         )
     }
     

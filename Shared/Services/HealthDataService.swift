@@ -181,11 +181,11 @@ enum HealthAnomaly {
     var message: String {
         switch self {
         case .hrvDrop(let current, let baseline):
-            return "HRV 骤降：当前 \(Int(current))ms，基线 \(Int(baseline))ms"
+            return "HRV drop: \(Int(current))ms vs baseline \(Int(baseline))ms"
         case .elevatedRestingHR(let current, let baseline):
-            return "静息心率偏高：当前 \(Int(current))bpm，基线 \(Int(baseline))bpm"
+            return "RHR elevated: \(Int(current))bpm vs baseline \(Int(baseline))bpm"
         case .poorSleepStreak(let nights):
-            return "连续 \(nights) 晚睡眠不足 6 小时"
+            return "\(nights) nights under 6h sleep"
         }
     }
 

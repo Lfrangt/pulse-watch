@@ -657,21 +657,21 @@ struct WeeklyReportView: View {
             // 最佳日原因
             var bestReason = ""
             if let sleep = bestDay.sleepDurationMinutes, sleep >= 420 {
-                bestReason = "（充足睡眠 \(sleep / 60)h\(sleep % 60)m）"
+                bestReason = "(Good sleep \(sleep / 60)h\(sleep % 60)m)"
             } else if let hrv = bestDay.averageHRV, hrv > 50 {
-                bestReason = "（HRV 表现良好 \(Int(hrv))ms）"
+                bestReason = "(Good HRV \(Int(hrv))ms)"
             }
-            insights.append("本周最佳日：\(bestLabel) \(bestDay.dailyScore ?? 0)分\(bestReason)")
+            insights.append("Best: \(bestLabel) \(bestDay.dailyScore ?? 0)pts\(bestReason)")
 
             // 最差日原因
             if bestDay.dateString != worstDay.dateString {
                 var worstReason = ""
                 if let sleep = worstDay.sleepDurationMinutes, sleep > 0, sleep < 360 {
-                    worstReason = "（睡眠不足 \(sleep / 60)h\(sleep % 60)m）"
+                    worstReason = "(Low sleep \(sleep / 60)h\(sleep % 60)m)"
                 } else if let rhr = worstDay.restingHeartRate, rhr > 70 {
-                    worstReason = "（静息心率偏高 \(Int(rhr))bpm）"
+                    worstReason = "(Elevated RHR \(Int(rhr))bpm)"
                 }
-                insights.append("本周最低日：\(worstLabel) \(worstDay.dailyScore ?? 0)分\(worstReason)")
+                insights.append("Worst: \(worstLabel) \(worstDay.dailyScore ?? 0)pts\(worstReason)")
             }
         }
 
@@ -694,7 +694,7 @@ struct WeeklyReportView: View {
         if sleeps.count >= 3 {
             let avg = Double(sleeps.reduce(0, +)) / Double(sleeps.count) / 60.0
             if avg < 6.5 {
-                insights.append("本周平均睡眠 \(String(format: "%.1f", avg)) hours — consider sleeping more")
+                insights.append("Avg sleep \(String(format: "%.1f", avg))h this week — consider sleeping more")
             }
         }
 

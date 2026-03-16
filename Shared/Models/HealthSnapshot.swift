@@ -107,9 +107,9 @@ struct TrainingPlan: Codable {
     var reason: String               // "HRV 正常，上次练胸是 3 天前"
     
     enum Intensity: String, Codable {
-        case light = "轻量"
-        case moderate = "中等"
-        case heavy = "高强度"
+        case light = "Light"
+        case moderate = "Moderate"
+        case heavy = "High Intensity"
     }
 }
 

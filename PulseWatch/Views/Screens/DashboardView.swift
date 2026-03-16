@@ -894,7 +894,7 @@ struct DashboardView: View {
         }) else { return }
 
         let group = brief?.trainingPlan?.targetMuscleGroup ?? "chest"
-        let reason = brief?.trainingPlan?.reason ?? "到达\(location.name)"
+        let reason = brief?.trainingPlan?.reason ?? "Arrived at \(location.name)"
 
         connectivityManager.sendGymArrival(muscleGroup: group, reason: reason)
         showGymPrompt = true

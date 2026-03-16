@@ -14,14 +14,14 @@ enum HealthMetricType: String, Codable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .heartRate: return "心率"
-        case .heartRateVariability: return "心率变异性"
-        case .restingHeartRate: return "静息心率"
-        case .bloodOxygen: return "血氧"
-        case .stepCount: return "步数"
-        case .activeCalories: return "活跃卡路里"
-        case .restingCalories: return "静息卡路里"
-        case .sleepAnalysis: return "睡眠"
+        case .heartRate: return String(localized: "Heart Rate")
+        case .heartRateVariability: return String(localized: "HRV")
+        case .restingHeartRate: return String(localized: "Resting HR")
+        case .bloodOxygen: return String(localized: "Blood Oxygen")
+        case .stepCount: return String(localized: "Steps")
+        case .activeCalories: return String(localized: "Active Calories")
+        case .restingCalories: return String(localized: "Resting Calories")
+        case .sleepAnalysis: return String(localized: "Sleep")
         }
     }
 
@@ -30,9 +30,9 @@ enum HealthMetricType: String, Codable, CaseIterable {
         case .heartRate, .restingHeartRate: return "bpm"
         case .heartRateVariability: return "ms"
         case .bloodOxygen: return "%"
-        case .stepCount: return "步"
+        case .stepCount: return "steps"
         case .activeCalories, .restingCalories: return "kcal"
-        case .sleepAnalysis: return "分钟"
+        case .sleepAnalysis: return "min"
         }
     }
 }

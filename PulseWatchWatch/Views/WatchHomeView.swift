@@ -228,8 +228,8 @@ struct WatchHomeView: View {
     private func syncLabel(_ date: Date) -> String {
         let interval = Date().timeIntervalSince(date)
         if interval < 60 { return String(localized: "Just synced") }
-        if interval < 3600 { return "\(Int(interval / 60))分钟前同步" }
-        return "\(Int(interval / 3600))小时前同步"
+        if interval < 3600 { return "\(Int(interval / 60))m ago" }
+        return "\(Int(interval / 3600))h ago"
     }
 
     private func loadLocalData() {

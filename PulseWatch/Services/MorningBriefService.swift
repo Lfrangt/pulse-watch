@@ -214,8 +214,8 @@ final class MorningBriefService: NSObject {
             sleepDisplay = String(localized: "No Data")
         }
 
-        content.title = "☀️ 早安 · 状态 \(insight.dailyScore)分"
-        content.subtitle = "睡眠 \(sleepDisplay) · 恢复 \(insight.recoveryScore)分"
+        content.title = "☀️ Morning · Score \(insight.dailyScore)"
+        content.subtitle = "Sleep \(sleepDisplay) · Recovery \(insight.recoveryScore)"
         content.body = insight.insights.first ?? insight.trainingAdvice.label
 
         return content

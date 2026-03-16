@@ -99,7 +99,7 @@ struct HomeView: View {
                 Button("OK") {}
             } message: {
                 if let plan = brief?.trainingPlan {
-                    Text("建议今天练\(localizedGroup(plan.targetMuscleGroup))，已通知手表")
+                    Text("Suggested: \(localizedGroup(plan.targetMuscleGroup)) — Watch notified")
                 } else {
                     Text("Watch notified")
                 }
@@ -268,7 +268,7 @@ struct HomeView: View {
 
         // Send gym arrival to Watch
         let group = brief?.trainingPlan?.targetMuscleGroup ?? "chest"
-        let reason = brief?.trainingPlan?.reason ?? "到达\(location.name)"
+        let reason = brief?.trainingPlan?.reason ?? "Arrived at \(location.name)"
 
         connectivityManager.sendGymArrival(muscleGroup: group, reason: reason)
         showGymPrompt = true

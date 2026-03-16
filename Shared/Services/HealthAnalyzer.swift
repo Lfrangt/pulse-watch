@@ -651,9 +651,9 @@ struct Anomaly: Identifiable {
 /// 异常指标类型
 enum AnomalyMetric: String {
     case hrv = "HRV"
-    case restingHeartRate = "静息心率"
-    case sleep = "睡眠"
-    case bloodOxygen = "血氧"
+    case restingHeartRate = "Resting HR"
+    case sleep = "Sleep"
+    case bloodOxygen = "Blood Oxygen"
 }
 
 /// 异常严重等级

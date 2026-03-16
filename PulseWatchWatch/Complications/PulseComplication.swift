@@ -30,7 +30,7 @@ struct PulseEntry: TimelineEntry {
 
 struct PulseComplicationProvider: TimelineProvider {
     func placeholder(in context: Context) -> PulseEntry {
-        PulseEntry(date: .now, score: 72, headline: "状态良好", heartRate: 68, steps: 6500)
+        PulseEntry(date: .now, score: 72, headline: "Good", heartRate: 68, steps: 6500)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (PulseEntry) -> Void) {
@@ -193,7 +193,7 @@ struct PulseComplicationWidget: Widget {
             PulseComplicationEntryView(entry: entry)
         }
         .configurationDisplayName("Pulse")
-        .description("今日状态评分 · 点击查看摘要")
+        .description("Today's Score · Tap for details")
         .supportedFamilies([.accessoryCircular, .accessoryRectangular, .accessoryInline])
     }
 }

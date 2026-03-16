@@ -61,6 +61,7 @@
 		A85956F0D9882C577AB59B48 /* DailySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8941CCC61662258ECB2889D /* DailySummary.swift */; };
 		B12CC726298E718F0B1E05E6 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C93FB5DBBD7437C3C0479A6 /* LocationManager.swift */; };
 		BAC6D54255750F06A13EC211 /* ShareCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 137D4F7F2B9141C04B4C6D30 /* ShareCardView.swift */; };
+		966311A1C44E78E943870BDE /* WeeklyTrendChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A03882316FC5F55A9A4766 /* WeeklyTrendChartsView.swift */; };
 		BB53B22404DE95F68119A70D /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78EF6591F143A435A280533 /* KeychainHelper.swift */; };
 		BBD408C0FE46E86A1634B244 /* WatchHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69357AC37E6D0E47B4931BFD /* WatchHomeView.swift */; };
 		BD2DF800197AAA403C5EE3DA /* RecoveryTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363204A6CBD545ECC1DD5485 /* RecoveryTimelineView.swift */; };
@@ -127,6 +128,7 @@
 		04762B973BF706C0FCA20C34 /* MorningBriefService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorningBriefService.swift; sourceTree = "<group>"; };
 		0B0BDF3A5D302AEE99BC17EF /* GymSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymSearchView.swift; sourceTree = "<group>"; };
 		137D4F7F2B9141C04B4C6D30 /* ShareCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCardView.swift; sourceTree = "<group>"; };
+		32A03882316FC5F55A9A4766 /* WeeklyTrendChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyTrendChartsView.swift; sourceTree = "<group>"; };
 		1C93FB5DBBD7437C3C0479A6 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		2BD1EDEE975D246E28C222AE /* OpenClawBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawBridge.swift; sourceTree = "<group>"; };
 		2D7EAB8DD243A4A5F0B782B0 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -374,6 +376,7 @@
 				363204A6CBD545ECC1DD5485 /* RecoveryTimelineView.swift */,
 				137D4F7F2B9141C04B4C6D30 /* ShareCardView.swift */,
 				CB91463719D9CE6B82F0FEBB /* StatusCard.swift */,
+				32A03882316FC5F55A9A4766 /* WeeklyTrendChartsView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -667,6 +670,7 @@
 				023DD41747CDC71643CFDB8F /* SettingsView.swift in Sources */,
 				BAC6D54255750F06A13EC211 /* ShareCardView.swift in Sources */,
 				60BACF24F4F514EF36D9C6AB /* StatusCard.swift in Sources */,
+				966311A1C44E78E943870BDE /* WeeklyTrendChartsView.swift in Sources */,
 				D749651C64A3488B31717FCB /* TrainingCalendarView.swift in Sources */,
 				2C424EF36C7A4E94C959B5D6 /* WatchConnectivityManager.swift in Sources */,
 				3AF9CB80C91C1EFBF44BB697 /* WeeklyReportView.swift in Sources */,

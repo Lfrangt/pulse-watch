@@ -1,7 +1,7 @@
 import SwiftUI
 import SwiftData
 
-/// Tab 1: 今日状态总览 — 评分大圆环 + 洞察卡片 + 指标网格 + 训练建议
+/// Tab 1: 今日状态总览 — 评分大圆环 + 洞察卡片 + 指标网格 + 趋势图 + 训练建议
 struct DashboardView: View {
 
     @AppStorage("pulse.demo.enabled") private var demoMode = false
@@ -25,6 +25,7 @@ struct DashboardView: View {
     @State private var demoTimelineEvents: [TimelineEvent] = []
 
     @Query(sort: \WorkoutRecord.date, order: .reverse) private var recentWorkouts: [WorkoutRecord]
+    @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
     @Query private var savedLocations: [SavedLocation]
     @Environment(\.modelContext) private var modelContext
 
@@ -60,35 +61,42 @@ struct DashboardView: View {
                             .staggered(index: 3)
                     }
 
+                    // 7天健康趋势图
+                    WeeklyTrendChartsView(
+                        summaries: allSummaries,
+                        demoMode: demoMode
+                    )
+                    .staggered(index: 4)
+
                     // 身体时间线（有数据时显示）
                     recoveryTimelineSection
-                        .staggered(index: 4)
+                        .staggered(index: 5)
 
                     // 训练建议卡片
                     if let advice = insight?.trainingAdvice {
                         trainingAdviceCard(advice: advice)
-                            .staggered(index: 4)
+                            .staggered(index: 6)
                     } else if let plan = brief?.trainingPlan, plan.targetMuscleGroup != "rest" {
                         TrainingCard(plan: plan)
-                            .staggered(index: 4)
+                            .staggered(index: 6)
                     }
 
                     // 恢复提醒
                     if let note = brief?.recoveryNote {
                         RecoveryCard(note: note)
-                            .staggered(index: 5)
+                            .staggered(index: 7)
                     }
 
                     // 最近训练
                     if !recentWorkouts.isEmpty {
                         recentWorkoutsSection
-                            .staggered(index: 6)
+                            .staggered(index: 8)
                     }
 
                     // 健身房设置提示
                     if !hasGymLocation {
                         gymSetupPrompt
-                            .staggered(index: 7)
+                            .staggered(index: 9)
                     }
 
                     Spacer(minLength: 60)
@@ -148,7 +156,7 @@ struct DashboardView: View {
                 Button("OK") {}
             } message: {
                 if let plan = brief?.trainingPlan {
-                    Text("建议今天练\(localizedGroup(plan.targetMuscleGroup))，已通知手表")
+                    Text("Suggested: \(localizedGroup(plan.targetMuscleGroup)) — Watch notified")
                 } else {
                     Text("Watch notified")
                 }
@@ -660,7 +668,7 @@ struct DashboardView: View {
             Spacer()
 
             // 时长
-            Text("\(workout.durationMinutes)分钟")
+            Text("(workout.durationMinutes) min")
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textSecondary)
         }
@@ -713,7 +721,7 @@ struct DashboardView: View {
         switch days {
         case 0: return String(localized: "Today")
         case 1: return String(localized: "Yesterday")
-        default: return "\(days)天前"
+        default: return "(days)d ago"
         }
     }
 

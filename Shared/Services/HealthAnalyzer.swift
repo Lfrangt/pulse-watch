@@ -323,7 +323,7 @@ final class HealthAnalyzer {
                             metric: .hrv,
                             severity: .high,
                             message: String(localized: "HRV significantly low"),
-                            detail: "当前 \(Int(currentHRV))ms，低于个人基线 \(Int(mean))ms 超过 2 个标准差",
+                            detail: "Current \(Int(currentHRV))ms, >2σ below baseline \(Int(mean))ms",
                             currentValue: currentHRV,
                             baselineValue: mean,
                             zScore: zScore
@@ -333,7 +333,7 @@ final class HealthAnalyzer {
                             metric: .hrv,
                             severity: .medium,
                             message: String(localized: "HRV below baseline"),
-                            detail: "当前 \(Int(currentHRV))ms，低于个人均值 \(Int(mean))ms",
+                            detail: "Current \(Int(currentHRV))ms, below avg \(Int(mean))ms",
                             currentValue: currentHRV,
                             baselineValue: mean,
                             zScore: zScore
@@ -358,7 +358,7 @@ final class HealthAnalyzer {
                             metric: .restingHeartRate,
                             severity: .high,
                             message: String(localized: "Resting HR significantly elevated"),
-                            detail: "当前 \(Int(currentRHR))bpm，高于个人基线 \(Int(mean))bpm 超过 2 个标准差",
+                            detail: "Current \(Int(currentRHR))bpm, >2σ above baseline \(Int(mean))bpm",
                             currentValue: currentRHR,
                             baselineValue: mean,
                             zScore: zScore
@@ -368,7 +368,7 @@ final class HealthAnalyzer {
                             metric: .restingHeartRate,
                             severity: .medium,
                             message: String(localized: "Resting HR elevated"),
-                            detail: "当前 \(Int(currentRHR))bpm，高于个人均值 \(Int(mean))bpm",
+                            detail: "Current \(Int(currentRHR))bpm, above avg \(Int(mean))bpm",
                             currentValue: currentRHR,
                             baselineValue: mean,
                             zScore: zScore
@@ -398,7 +398,7 @@ final class HealthAnalyzer {
                             metric: .sleep,
                             severity: .high,
                             message: String(localized: "Severe sleep deficit"),
-                            detail: "昨晚 \(hoursNow)h\(minsNow)m，远低于你的平均 \(hoursAvg)h\(minsAvg)m",
+                            detail: "Last night \(hoursNow)h\(minsNow)m, well below avg \(hoursAvg)h\(minsAvg)m",
                             currentValue: Double(sleepMinutes),
                             baselineValue: mean,
                             zScore: zScore

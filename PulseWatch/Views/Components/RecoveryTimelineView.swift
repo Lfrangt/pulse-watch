@@ -72,7 +72,7 @@ enum TimelineEventBuilder {
                 icon: "moon.fill",
                 title: String(localized: "Asleep"),
                 detail: "\(sleepHours)h\(sleepMins)m · \(String(localized: "Deep")) ~\(String(format: "%.1f", deepHours / 60))h",
-                impact: insight.sleepScore >= 70 ? "恢复 +\(min(20, insight.sleepScore / 5))" : String(localized: "Fair Recovery"),
+                impact: insight.sleepScore >= 70 ? "Recovery +\(min(20, insight.sleepScore / 5))" : String(localized: "Fair Recovery"),
                 impactPositive: insight.sleepScore >= 50,
                 color: sleepColor
             ))
@@ -84,7 +84,7 @@ enum TimelineEventBuilder {
             let rhrText: String
             let rhrGood: Bool
             if let rhr = hk.latestRestingHR {
-                rhrText = "静息心率 \(Int(rhr))bpm"
+                rhrText = "Resting HR \(Int(rhr))bpm"
                 rhrGood = rhr < 70
             } else {
                 rhrText = String(localized: "Resting HR --")
@@ -143,14 +143,15 @@ enum TimelineEventBuilder {
             } else if steps >= 1000 {
                 stepsText = String(format: String(localized: "%.1fk steps"), Double(steps) / 1000)
             } else {
-                stepsText = "\(steps) 步"
+                stepsText = "\(steps) steps"
             }
 
+            let activeCal = String(localized: "Active cal")
             events.append(TimelineEvent(
                 time: activityTime,
                 icon: "figure.walk",
                 title: String(localized: "Daily Activity"),
-                detail: "\(stepsText) · 活跃卡路里 +\(Int(calories))kcal",
+                detail: "\(stepsText) · \(activeCal) +\(Int(calories))kcal",
                 impact: steps >= 8000 ? String(localized: "Active +") : String(localized: "Keep going"),
                 impactPositive: steps >= 5000,
                 color: PulseTheme.accent
@@ -450,19 +451,19 @@ struct TimelineNodeView: View {
         // 根据时段添加前缀
         switch hour {
         case 0..<6:
-            return "凌晨 \(timeStr)"
+            return "\(timeStr)"
         case 6..<9:
-            return "早上 \(timeStr)"
+            return "\(timeStr)"
         case 9..<12:
-            return "上午 \(timeStr)"
+            return "\(timeStr)"
         case 12..<14:
-            return "中午 \(timeStr)"
+            return "\(timeStr)"
         case 14..<18:
-            return "下午 \(timeStr)"
+            return "\(timeStr)"
         case 18..<21:
-            return "傍晚 \(timeStr)"
+            return "\(timeStr)"
         default:
-            return "晚上 \(timeStr)"
+            return "\(timeStr)"
         }
     }
 }

@@ -104,19 +104,19 @@ struct MainTabView: View {
         TabView(selection: $selectedTab) {
             DashboardView()
                 .tabItem {
-                    Label("今日", systemImage: "heart.text.clipboard")
+                    Label("Today", systemImage: "heart.text.clipboard")
                 }
                 .tag(0)
 
             HistoryView()
                 .tabItem {
-                    Label("趋势", systemImage: "chart.xyaxis.line")
+                    Label("Trends", systemImage: "chart.xyaxis.line")
                 }
                 .tag(1)
 
             SettingsView()
                 .tabItem {
-                    Label("设置", systemImage: "gearshape.fill")
+                    Label("Settings", systemImage: "gearshape.fill")
                 }
                 .tag(2)
         }

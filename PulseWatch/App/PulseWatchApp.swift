@@ -67,17 +67,23 @@ struct PulseWatchApp: App {
                         _ = OpenClawBridge.shared.handleURL(url)
                     }
                 }
-                .onReceive(NotificationCenter.default.publisher(for: .watchWorkoutCompleted)) { _ in
-                    // Watch workout ended → sync HealthKit workout history + push to OpenClaw
+                .onReceive(NotificationCenter.default.publisher(for: .watchWorkoutCompleted)) { notification in
+                    // Watch workout ended → sync HealthKit + push Watch data to OpenClaw immediately
                     Task {
                         await WorkoutHistoryService.shared.syncWorkouts()
-                        await OpenClawBridge.shared.pushHealthStatus()
+                        await MainActor.run {
+                            if let data = notification.userInfo as? [String: Any] {
+                                OpenClawBridge.shared.handleWatchWorkoutCompleted(data)
+                            }
+                        }
                     }
                 }
-                .onReceive(NotificationCenter.default.publisher(for: .watchHealthSnapshotReceived)) { _ in
-                    // Watch pushed fresh health data → check if OpenClaw needs a push
+                .onReceive(NotificationCenter.default.publisher(for: .watchHealthSnapshotReceived)) { notification in
+                    // Watch pushed fresh health data → forward to OpenClaw bridge
                     Task { @MainActor in
-                        OpenClawBridge.shared.checkAndPushIfNeeded()
+                        if let data = notification.userInfo as? [String: Any] {
+                            OpenClawBridge.shared.handleWatchHealthSnapshot(data)
+                        }
                     }
                 }
         }

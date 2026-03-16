@@ -295,11 +295,24 @@ final class OpenClawBridge {
             return
         }
 
+        // 附加 Watch 实时训练数据（如果有尚未被 HealthKit 同步的最新训练）
+        var watchWorkoutNote = ""
+        if let w = lastWatchWorkout,
+           Date().timeIntervalSince(w.timestamp) < 300 {
+            watchWorkoutNote = """
+
+            [RECENT_WATCH_WORKOUT]
+            category: \(w.category), duration: \(w.durationSeconds)s, calories: \(Int(w.activeCalories)), avgHR: \(Int(w.averageHeartRate)), maxHR: \(Int(w.maxHeartRate))
+            [/RECENT_WATCH_WORKOUT]
+            """
+            lastWatchWorkout = nil // 已包含在推送中，清除缓存
+        }
+
         let messageContent = """
         [HEALTH_DATA]
         \(statusJSON)
         [/HEALTH_DATA]
-
+        \(watchWorkoutNote)
         Analyze the health data above. Provide a daily health summary and training advice. Reply in JSON with fields: morningBrief, trainingAdvice, alerts, recoveryScore, summary.
         """
 
@@ -581,6 +594,51 @@ final class OpenClawBridge {
         default:
             logger.info("未知指令: \(action)")
         }
+    }
+
+    // MARK: - Watch 数据处理
+
+    /// 处理从 Watch 通过 WCSession 接收到的训练完成数据。
+    /// 将 Watch 端实时数据直接附加到下一次推送中，无需等待 HealthKit 同步。
+    @MainActor
+    func handleWatchWorkoutCompleted(_ data: [String: Any]) {
+        guard isEnabled, config != nil else { return }
+
+        // 缓存 Watch 端实时训练数据用于下次推送
+        lastWatchWorkout = WatchWorkoutData(
+            category: data["category"] as? String ?? "unknown",
+            durationSeconds: data["durationSeconds"] as? Int ?? 0,
+            activeCalories: data["activeCalories"] as? Double ?? 0,
+            averageHeartRate: data["averageHeartRate"] as? Double ?? 0,
+            maxHeartRate: data["maxHeartRate"] as? Double ?? 0,
+            timestamp: Date()
+        )
+
+        logger.info("收到 Watch 训练数据: \(self.lastWatchWorkout?.category ?? "")")
+
+        // 立即推送（无需等待 HealthKit 同步延迟）
+        Task { @MainActor in
+            await pushHealthStatus()
+        }
+    }
+
+    /// 处理 Watch 推送的健康快照数据
+    @MainActor
+    func handleWatchHealthSnapshot(_ data: [String: Any]) {
+        guard isEnabled, config != nil else { return }
+        checkAndPushIfNeeded()
+    }
+
+    /// 缓存的 Watch 实时训练数据
+    private var lastWatchWorkout: WatchWorkoutData?
+
+    struct WatchWorkoutData {
+        let category: String
+        let durationSeconds: Int
+        let activeCalories: Double
+        let averageHeartRate: Double
+        let maxHeartRate: Double
+        let timestamp: Date
     }
 
     // MARK: - 连接管理

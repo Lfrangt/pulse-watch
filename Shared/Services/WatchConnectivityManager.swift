@@ -26,6 +26,9 @@ final class WatchConnectivityManager: NSObject {
     /// Timestamp of last sync
     var lastSyncDate: Date?
 
+    /// Whether the counterpart is currently reachable
+    var isReachable: Bool = false
+
     private var session: WCSession?
 
     // MARK: - Lifecycle
@@ -141,6 +144,41 @@ final class WatchConnectivityManager: NSObject {
         }
     }
 
+    // MARK: - Watch → iPhone: Health Snapshot
+
+    /// Send current Watch HealthKit data to iPhone for OpenClaw and widget sync.
+    /// Call this after HealthKit observer queries produce new data on the Watch.
+    func sendHealthSnapshot(
+        heartRate: Double?,
+        hrv: Double?,
+        restingHeartRate: Double?,
+        steps: Int?,
+        activeCalories: Double?,
+        sleepMinutes: Int?
+    ) {
+        guard let session, session.activationState == .activated else { return }
+
+        var payload: [String: Any] = [
+            "type": "healthSnapshot",
+            "timestamp": Date().timeIntervalSince1970
+        ]
+        if let heartRate { payload["heartRate"] = heartRate }
+        if let hrv { payload["hrv"] = hrv }
+        if let restingHeartRate { payload["restingHeartRate"] = restingHeartRate }
+        if let steps { payload["steps"] = steps }
+        if let activeCalories { payload["activeCalories"] = activeCalories }
+        if let sleepMinutes { payload["sleepMinutes"] = sleepMinutes }
+
+        if session.isReachable {
+            session.sendMessage(payload, replyHandler: nil) { error in
+                print("WC sendHealthSnapshot error: \(error.localizedDescription)")
+                session.transferUserInfo(payload)
+            }
+        } else {
+            session.transferUserInfo(payload)
+        }
+    }
+
     // MARK: - Dismiss Gym Arrival
 
     func dismissGymArrival() {
@@ -211,6 +249,13 @@ final class WatchConnectivityManager: NSObject {
                 object: nil,
                 userInfo: data
             )
+        case "healthSnapshot":
+            // Watch pushed its latest HealthKit data — forward to iPhone services
+            NotificationCenter.default.post(
+                name: .watchHealthSnapshotReceived,
+                object: nil,
+                userInfo: data
+            )
         default:
             break
         }
@@ -227,9 +272,19 @@ extension WatchConnectivityManager: WCSessionDelegate {
             return
         }
 
+        DispatchQueue.main.async { [weak self] in
+            self?.isReachable = session.isReachable
+        }
+
         // Load any pending application context
         if !session.receivedApplicationContext.isEmpty {
             processContext(session.receivedApplicationContext)
+        }
+    }
+
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        DispatchQueue.main.async { [weak self] in
+            self?.isReachable = session.isReachable
         }
     }
 
@@ -268,4 +323,5 @@ extension WatchConnectivityManager: WCSessionDelegate {
 extension Notification.Name {
     static let watchWorkoutStarted = Notification.Name("pulse.watchWorkoutStarted")
     static let watchWorkoutCompleted = Notification.Name("pulse.watchWorkoutCompleted")
+    static let watchHealthSnapshotReceived = Notification.Name("pulse.watchHealthSnapshotReceived")
 }

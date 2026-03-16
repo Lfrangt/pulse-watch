@@ -186,8 +186,12 @@ final class HealthKitService {
             await saveRecords(records)
             await updateDailySummary(for: Date())
 
-            // 数据更新后推送到 OpenClaw
+            // 数据更新后推送到 OpenClaw (iPhone) 或同步到 iPhone (Watch)
+            #if os(iOS)
             OpenClawBridge.shared.checkAndPushIfNeeded()
+            #elseif os(watchOS)
+            pushHealthSnapshotToiPhone()
+            #endif
 
         } catch {
             logger.error("Anchored Query 失败 [\(type.identifier)]: \(error.localizedDescription)")
@@ -236,8 +240,12 @@ final class HealthKitService {
             await saveRecords(records)
             await updateDailySummary(for: Date())
 
-            // 数据更新后推送到 OpenClaw
+            // 数据更新后推送到 OpenClaw (iPhone) 或同步到 iPhone (Watch)
+            #if os(iOS)
             OpenClawBridge.shared.checkAndPushIfNeeded()
+            #elseif os(watchOS)
+            pushHealthSnapshotToiPhone()
+            #endif
 
         } catch {
             logger.error("Sleep Anchored Query 失败: \(error.localizedDescription)")
@@ -373,6 +381,34 @@ final class HealthKitService {
         logger.info("初始全量采集完成")
         Analytics.trackHealthDataSync()
     }
+
+    // MARK: - Watch → iPhone Health Sync
+
+    #if os(watchOS)
+    /// Push latest Watch HealthKit data to iPhone via WatchConnectivity.
+    /// Called after observer queries produce new data on the Watch side.
+    @MainActor
+    private func pushHealthSnapshotToiPhone() {
+        guard let container = modelContainer else { return }
+        let context = container.mainContext
+
+        let today = Calendar.current.startOfDay(for: Date())
+        let dateString = DailySummary.dateFormatter.string(from: today)
+        let predicate = #Predicate<DailySummary> { $0.dateString == dateString }
+        let descriptor = FetchDescriptor<DailySummary>(predicate: predicate)
+
+        guard let summary = try? context.fetch(descriptor).first else { return }
+
+        WatchConnectivityManager.shared.sendHealthSnapshot(
+            heartRate: summary.averageHeartRate,
+            hrv: summary.averageHRV,
+            restingHeartRate: summary.restingHeartRate,
+            steps: summary.totalSteps,
+            activeCalories: summary.activeCalories,
+            sleepMinutes: summary.sleepDurationMinutes
+        )
+    }
+    #endif
 
     // MARK: - 辅助方法
 

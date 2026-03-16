@@ -74,6 +74,12 @@ struct PulseWatchApp: App {
                         await OpenClawBridge.shared.pushHealthStatus()
                     }
                 }
+                .onReceive(NotificationCenter.default.publisher(for: .watchHealthSnapshotReceived)) { _ in
+                    // Watch pushed fresh health data → check if OpenClaw needs a push
+                    Task { @MainActor in
+                        OpenClawBridge.shared.checkAndPushIfNeeded()
+                    }
+                }
         }
         .modelContainer(sharedModelContainer)
     }

@@ -186,6 +186,15 @@ final class HealthKitService {
             await saveRecords(records)
             await updateDailySummary(for: Date())
 
+            // 心率异常检测：静息心率数据到达时触发
+            #if os(iOS)
+            if type.identifier == HKQuantityTypeIdentifier.restingHeartRate.rawValue,
+               let latestSample = results.addedSamples.last {
+                let bpm = latestSample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
+                HeartRateAlertService.shared.checkHeartRate(bpm)
+            }
+            #endif
+
             // 数据更新后推送到 OpenClaw (iPhone) 或同步到 iPhone (Watch)
             #if os(iOS)
             OpenClawBridge.shared.checkAndPushIfNeeded()

@@ -15,6 +15,7 @@ struct PulseWatchApp: App {
             HealthRecord.self,
             DailySummary.self,
             WorkoutHistoryEntry.self,
+            HeartRateAlertEvent.self,
         ])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -47,6 +48,10 @@ struct PulseWatchApp: App {
 
         // Morning Brief 通知系统
         MorningBriefService.shared.setup()
+
+        // 心率异常提醒
+        HeartRateAlertService.shared.modelContainer = container
+        HeartRateAlertService.shared.registerCategory()
 
         // Background health data sync to OpenClaw
         OpenClawBridge.shared.registerBackgroundSync()

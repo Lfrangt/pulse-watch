@@ -4518,6 +4518,96 @@
           }
         }
       }
+    },
+    "Heart Rate Alerts": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "心率异常提醒"
+          }
+        }
+      }
+    },
+    "Alert when resting heart rate is abnormal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率异常时推送通知提醒"
+          }
+        }
+      }
+    },
+    "High Threshold": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高心率阈值"
+          }
+        }
+      }
+    },
+    "Low Threshold": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "低心率阈值"
+          }
+        }
+      }
+    },
+    "Same alert won't repeat within 1 hour": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同一异常 1 小时内不重复提醒"
+          }
+        }
+      }
+    },
+    "⚠️ High Heart Rate Alert": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ 心率过高警告"
+          }
+        }
+      }
+    },
+    "⚠️ Low Heart Rate Alert": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ 心率过低警告"
+          }
+        }
+      }
+    },
+    "Your resting heart rate is %lld bpm, above your %lld bpm threshold. Consider resting and monitoring.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您的静息心率为 %lld bpm，超过 %lld bpm 阈值。建议休息并持续关注。"
+          }
+        }
+      }
+    },
+    "Your resting heart rate is %lld bpm, below your %lld bpm threshold. If you feel dizzy, seek medical attention.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您的静息心率为 %lld bpm，低于 %lld bpm 阈值。如感到头晕，请就医。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

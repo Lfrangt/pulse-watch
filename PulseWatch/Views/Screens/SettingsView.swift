@@ -12,6 +12,9 @@ struct SettingsView: View {
     @AppStorage("pulse.brief.hour") private var briefHour = 7
     @AppStorage("pulse.brief.minute") private var briefMinute = 30
     @AppStorage("pulse.training.reminder.enabled") private var trainingReminderEnabled = true
+    @AppStorage("pulse.hr.alert.enabled") private var hrAlertEnabled = true
+    @AppStorage("pulse.hr.alert.high") private var hrAlertHigh = 120
+    @AppStorage("pulse.hr.alert.low") private var hrAlertLow = 40
     @AppStorage("pulse.collection.frequency") private var collectionFrequency = "normal"
     @AppStorage("pulse.openclaw.enabled") private var openClawEnabled = false
     @AppStorage("pulse.demo.enabled") private var demoModeEnabled = false
@@ -52,33 +55,37 @@ struct SettingsView: View {
                     notificationSection
                         .staggered(index: 2)
 
+                    // 心率异常提醒
+                    heartRateAlertSection
+                        .staggered(index: 3)
+
                     // HealthKit 数据权限
                     healthDataSection
-                        .staggered(index: 3)
+                        .staggered(index: 4)
 
                     // 单位设置
                     unitSection
-                        .staggered(index: 4)
+                        .staggered(index: 5)
 
                     // 数据采集频率
                     collectionSection
-                        .staggered(index: 5)
+                        .staggered(index: 6)
 
                     // 数据管理
                     dataManagementSection
-                        .staggered(index: 6)
+                        .staggered(index: 7)
 
                     // OpenClaw（预留）
                     openClawSection
-                        .staggered(index: 7)
+                        .staggered(index: 8)
 
                     // 开发者选项
                     developerSection
-                        .staggered(index: 8)
+                        .staggered(index: 9)
 
                     // 关于
                     aboutSection
-                        .staggered(index: 9)
+                        .staggered(index: 10)
 
                     Spacer(minLength: 40)
                 }
@@ -320,6 +327,93 @@ struct SettingsView: View {
     }
 
     // 手动坐标输入已移除 — 使用 GymSearchView 地址搜索代替
+
+    // MARK: - 心率异常提醒
+
+    private var heartRateAlertSection: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            sectionHeader(icon: "heart.circle.fill", title: String(localized: "Heart Rate Alerts"))
+
+            // 总开关
+            settingRow {
+                Toggle(isOn: $hrAlertEnabled) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Heart Rate Alerts")
+                            .font(PulseTheme.bodyFont)
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text("Alert when resting heart rate is abnormal")
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .tint(PulseTheme.accent)
+                .onChange(of: hrAlertEnabled) {
+                    HeartRateAlertService.shared.isEnabled = hrAlertEnabled
+                }
+            }
+
+            if hrAlertEnabled {
+                // 高心率阈值
+                settingRow {
+                    VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                        HStack {
+                            Text("High Threshold")
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Spacer()
+                            Text("\(hrAlertHigh) bpm")
+                                .font(PulseTheme.bodyFont.monospacedDigit())
+                                .foregroundStyle(PulseTheme.statusPoor)
+                        }
+                        Slider(value: Binding(
+                            get: { Double(hrAlertHigh) },
+                            set: { hrAlertHigh = Int($0) }
+                        ), in: 90...180, step: 5)
+                        .tint(PulseTheme.statusPoor)
+                        .onChange(of: hrAlertHigh) {
+                            HeartRateAlertService.shared.highThreshold = hrAlertHigh
+                        }
+                    }
+                }
+
+                // 低心率阈值
+                settingRow {
+                    VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                        HStack {
+                            Text("Low Threshold")
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Spacer()
+                            Text("\(hrAlertLow) bpm")
+                                .font(PulseTheme.bodyFont.monospacedDigit())
+                                .foregroundStyle(PulseTheme.accent)
+                        }
+                        Slider(value: Binding(
+                            get: { Double(hrAlertLow) },
+                            set: { hrAlertLow = Int($0) }
+                        ), in: 30...60, step: 5)
+                        .tint(PulseTheme.accent)
+                        .onChange(of: hrAlertLow) {
+                            HeartRateAlertService.shared.lowThreshold = hrAlertLow
+                        }
+                    }
+                }
+
+                // 说明
+                HStack(spacing: PulseTheme.spacingS) {
+                    Image(systemName: "clock.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                    Text("Same alert won't repeat within 1 hour")
+                        .font(.system(size: 11, weight: .regular, design: .rounded))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                        .lineSpacing(2)
+                }
+                .padding(.horizontal, PulseTheme.spacingXS)
+            }
+        }
+        .pulseCard()
+    }
 
     // MARK: - 通知权限
 

@@ -568,6 +568,7 @@ struct SettingsView: View {
                         savedGatewayURL = url
                         savedAgentID = agent
                         isConnected = true
+                        Analytics.trackOpenClawPaired()
                         #if os(iOS)
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                         #endif
@@ -651,6 +652,7 @@ struct SettingsView: View {
                         savedGatewayURL = gatewayURL
                         savedAgentID = agent
                         isConnected = true
+                        Analytics.trackOpenClawPaired()
                         withAnimation(.spring(response: 0.3)) {
                             showGatewayConfig = false
                         }

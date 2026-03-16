@@ -12,6 +12,7 @@ struct DashboardView: View {
     @State private var brief: ScoreEngine.DailyBrief?
     @State private var insight: HealthInsight?
     @State private var showLocationSetup = false
+    @State private var showShareSheet = false
     @State private var showGymPrompt = false
     @State private var breathe = false
 
@@ -107,13 +108,37 @@ struct DashboardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showLocationSetup = true
-                    } label: {
-                        Image(systemName: "location.circle")
-                            .font(.system(size: 18))
-                            .foregroundStyle(PulseTheme.textTertiary)
+                    HStack(spacing: 12) {
+                        if brief != nil {
+                            Button {
+                                showShareSheet = true
+                            } label: {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.system(size: 16))
+                                    .foregroundStyle(PulseTheme.textTertiary)
+                            }
+                        }
+                        Button {
+                            showLocationSetup = true
+                        } label: {
+                            Image(systemName: "location.circle")
+                                .font(.system(size: 18))
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
                     }
+                }
+            }
+            .sheet(isPresented: $showShareSheet) {
+                if let brief, let image = ShareCardView(
+                    score: brief.score,
+                    headline: brief.headline,
+                    workoutType: nil,
+                    duration: nil,
+                    calories: nil,
+                    date: .now
+                ).renderImage() {
+                    ShareSheet(items: [image])
+                        .onAppear { Analytics.trackShareTapped(source: "dashboard") }
                 }
             }
             .sheet(isPresented: $showLocationSetup) {

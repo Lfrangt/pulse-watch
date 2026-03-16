@@ -356,6 +356,7 @@ struct OnboardingView: View {
             Button {
                 withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
                     onboardingCompleted = true
+                    Analytics.trackOnboardingCompleted()
                 }
             } label: {
                 Text("开始使用")
@@ -376,6 +377,7 @@ struct OnboardingView: View {
                 Button {
                     withAnimation {
                         onboardingCompleted = true
+                        Analytics.trackOnboardingCompleted()
                     }
                 } label: {
                     Text("跳过")

@@ -57,6 +57,7 @@ struct HistoryView: View {
             .sheet(isPresented: $showWeeklyReport) {
                 WeeklyReportView()
                     .preferredColorScheme(.dark)
+                    .onAppear { Analytics.trackWeeklyReportViewed() }
             }
         }
     }

@@ -67,4 +67,19 @@ enum Analytics {
     static func trackShareTapped(source: String = "unknown") {
         TelemetryDeck.signal("share_tapped", parameters: ["source": source])
     }
+
+    /// Onboarding 完成
+    static func trackOnboardingCompleted() {
+        TelemetryDeck.signal("onboarding_completed")
+    }
+
+    /// OpenClaw 配对成功
+    static func trackOpenClawPaired() {
+        TelemetryDeck.signal("openclaw_paired")
+    }
+
+    /// 周报查看
+    static func trackWeeklyReportViewed() {
+        TelemetryDeck.signal("weekly_report_viewed")
+    }
 }

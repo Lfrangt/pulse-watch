@@ -12,6 +12,7 @@ struct WorkoutHistoryListView: View {
     @State private var entryToDelete: WorkoutHistoryEntry?
     @State private var entryToShare: WorkoutHistoryEntry?
     @State private var showShareScreen = false
+    @State private var showAddWorkout = false
 
     var body: some View {
         NavigationStack {
@@ -26,6 +27,22 @@ struct WorkoutHistoryListView: View {
             .navigationTitle("Workout History")
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showAddWorkout = true
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 18))
+                            .foregroundStyle(PulseTheme.accent)
+                    }
+                    .accessibilityLabel(String(localized: "Add Workout"))
+                }
+            }
+            .sheet(isPresented: $showAddWorkout) {
+                ManualWorkoutView()
+                    .preferredColorScheme(.dark)
+            }
             .alert(
                 String(localized: "Delete Workout"),
                 isPresented: $showDeleteConfirm,
@@ -167,14 +184,25 @@ struct WorkoutHistoryListView: View {
 
         return HStack(spacing: PulseTheme.spacingM) {
             // 运动类型 icon
-            ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(color.opacity(0.12))
-                    .frame(width: 40, height: 40)
+            ZStack(alignment: .bottomTrailing) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(color.opacity(0.12))
+                        .frame(width: 40, height: 40)
 
-                Image(systemName: entry.activityIcon)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(color)
+                    Image(systemName: entry.activityIcon)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(color)
+                }
+
+                // 手动添加标识
+                if entry.isManual {
+                    Image(systemName: "pencil.circle.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(PulseTheme.accent)
+                        .background(Circle().fill(PulseTheme.cardBackground).frame(width: 14, height: 14))
+                        .offset(x: 3, y: 3)
+                }
             }
 
             // 名称 + 日期 + 肌群 badge

@@ -18,6 +18,8 @@ final class WorkoutHistoryEntry {
     var sourceName: String               // 数据来源（Apple Watch 等）
     var heartRateZonesData: Data?        // JSON encoded [HRZoneEntry]
     var muscleGroupTagsRaw: String?      // JSON encoded [String] — muscle group tags
+    var isManual: Bool                   // 手动添加 vs HealthKit 自动同步
+    var notes: String?                   // 用户备注
     var syncedAt: Date                   // 同步时间
 
     init(
@@ -30,9 +32,13 @@ final class WorkoutHistoryEntry {
         totalDistance: Double? = nil,
         averageHeartRate: Double? = nil,
         maxHeartRate: Double? = nil,
-        sourceName: String = "HealthKit"
+        sourceName: String = "HealthKit",
+        isManual: Bool = false,
+        notes: String? = nil
     ) {
         self.id = UUID()
+        self.isManual = isManual
+        self.notes = notes
         self.hkWorkoutUUID = hkWorkoutUUID
         self.activityType = activityType
         self.startDate = startDate

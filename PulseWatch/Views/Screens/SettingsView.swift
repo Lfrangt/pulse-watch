@@ -113,7 +113,7 @@ struct SettingsView: View {
                                 Text("时")
                                     .font(PulseTheme.captionFont)
                                     .foregroundStyle(PulseTheme.textTertiary)
-                                Picker("小时", selection: $briefHour) {
+                                Picker(String(localized: "小时"), selection: $briefHour) {
                                     ForEach(5..<12, id: \.self) { h in
                                         Text("\(h)").tag(h)
                                     }
@@ -128,7 +128,7 @@ struct SettingsView: View {
                                 Text("分")
                                     .font(PulseTheme.captionFont)
                                     .foregroundStyle(PulseTheme.textTertiary)
-                                Picker("分钟", selection: $briefMinute) {
+                                Picker(String(localized: "分钟"), selection: $briefMinute) {
                                     ForEach([0, 15, 30, 45], id: \.self) { m in
                                         Text(String(format: "%02d", m)).tag(m)
                                     }
@@ -157,7 +157,7 @@ struct SettingsView: View {
 
     private var gymSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "dumbbell.fill", title: "健身房位置")
+            sectionHeader(icon: "dumbbell.fill", title: String(localized: "健身房位置"))
 
             if let gym = gymLocations.first {
                 // 已保存 — 显示地点信息
@@ -289,7 +289,7 @@ struct SettingsView: View {
 
     private var notificationSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "bell.badge.fill", title: "通知权限")
+            sectionHeader(icon: "bell.badge.fill", title: String(localized: "通知权限"))
 
             settingRow {
                 HStack {
@@ -329,7 +329,7 @@ struct SettingsView: View {
 
     private var collectionSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "waveform.path.ecg", title: "数据采集")
+            sectionHeader(icon: "waveform.path.ecg", title: String(localized: "数据采集"))
 
             settingRow {
                 VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
@@ -337,7 +337,7 @@ struct SettingsView: View {
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
-                    Picker("频率", selection: $collectionFrequency) {
+                    Picker(String(localized: "频率"), selection: $collectionFrequency) {
                         Text("省电模式").tag("low")
                         Text("标准").tag("normal")
                         Text("高频").tag("high")
@@ -372,7 +372,7 @@ struct SettingsView: View {
         let isPaired = bridge.config != nil
 
         return VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "cpu", title: "连接 OpenClaw")
+            sectionHeader(icon: "cpu", title: String(localized: "连接 OpenClaw"))
 
             // 说明
             settingRow {
@@ -421,7 +421,7 @@ struct SettingsView: View {
                         showGatewayConfig.toggle()
                     }
                 } label: {
-                    Text(showGatewayConfig ? "取消" : "重新配置")
+                    Text(showGatewayConfig ? String(localized: "取消") : String(localized: "重新配置"))
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textSecondary)
                         .frame(maxWidth: .infinity)
@@ -671,7 +671,7 @@ struct SettingsView: View {
                         Image(systemName: "link")
                             .font(.system(size: 14, weight: .medium))
                     }
-                    Text(isPairing ? "验证中..." : "验证并连接")
+                    Text(isPairing ? String(localized: "验证中...") : String(localized: "验证并连接"))
                         .font(PulseTheme.bodyFont.weight(.medium))
                 }
                 .foregroundStyle(PulseTheme.accent)
@@ -690,7 +690,7 @@ struct SettingsView: View {
             if let result = pairResult {
                 HStack(spacing: PulseTheme.spacingXS) {
                     Image(systemName: result ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    Text(result ? "已连接" : "连接失败，请检查 URL 和 Token")
+                    Text(result ? String(localized: "已连接") : String(localized: "连接失败，请检查 URL 和 Token"))
                 }
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(result ? PulseTheme.statusGood : PulseTheme.statusPoor)
@@ -704,7 +704,7 @@ struct SettingsView: View {
 
     private var developerSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "hammer.fill", title: "开发者选项")
+            sectionHeader(icon: "hammer.fill", title: String(localized: "开发者选项"))
 
             settingRow {
                 Toggle(isOn: $demoModeEnabled) {
@@ -727,13 +727,13 @@ struct SettingsView: View {
 
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "info.circle.fill", title: "关于")
+            sectionHeader(icon: "info.circle.fill", title: String(localized: "关于"))
 
             settingRow {
                 VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                    aboutRow(label: "版本", value: appVersion)
+                    aboutRow(label: String(localized: "版本"), value: appVersion)
                     Divider().overlay(PulseTheme.border)
-                    aboutRow(label: "构建", value: buildNumber)
+                    aboutRow(label: String(localized: "构建"), value: buildNumber)
                 }
             }
 
@@ -802,7 +802,7 @@ struct SettingsView: View {
         case .provisional: return "临时授权"
         case .ephemeral: return "临时授权"
         case .notDetermined: return "未设置"
-        @unknown default: return "未知"
+        @unknown default: return String(localized: "未知")
         }
     }
 
@@ -826,9 +826,9 @@ struct SettingsView: View {
 
     private var frequencyDescription: String {
         switch collectionFrequency {
-        case "low": return "每 30 分钟采集一次，更省电"
-        case "high": return "每 5 分钟采集一次，更精确但耗电更多"
-        default: return "每 15 分钟采集一次，平衡精度和电量"
+        case "low": return String(localized: "每 30 分钟采集一次，更省电")
+        case "high": return String(localized: "每 5 分钟采集一次，更精确但耗电更多")
+        default: return String(localized: "每 15 分钟采集一次，平衡精度和电量")
         }
     }
 
@@ -864,7 +864,7 @@ struct SettingsView: View {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             if let location = locationManager.saveCurrentAsLocation(
-                name: "健身房",
+                name: String(localized: "健身房"),
                 type: "gym",
                 radius: 100
             ) {

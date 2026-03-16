@@ -113,11 +113,11 @@ enum PulseTheme {
 
     static func statusLabel(for score: Int) -> String {
         switch score {
-        case 0..<30: return "需要休息"
-        case 30..<50: return "状态一般"
-        case 50..<70: return "还不错"
-        case 70..<85: return "状态良好"
-        default: return "巅峰状态"
+        case 0..<30: return String(localized: "需要休息")
+        case 30..<50: return String(localized: "状态一般")
+        case 50..<70: return String(localized: "还不错")
+        case 70..<85: return String(localized: "状态良好")
+        default: return String(localized: "巅峰状态")
         }
     }
 }

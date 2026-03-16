@@ -95,7 +95,7 @@ struct HomeView: View {
             .sheet(isPresented: $showLocationSetup) {
                 LocationSetupView()
             }
-            .alert("到达健身房", isPresented: $showGymPrompt) {
+            .alert(String(localized: "到达健身房"), isPresented: $showGymPrompt) {
                 Button("好的") {}
             } message: {
                 if let plan = brief?.trainingPlan {
@@ -202,11 +202,11 @@ struct HomeView: View {
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: .now)
         switch hour {
-        case 5..<12: return "早上好"
-        case 12..<14: return "中午好"
-        case 14..<18: return "下午好"
-        case 18..<22: return "晚上好"
-        default: return "夜深了"
+        case 5..<12: return String(localized: "早上好")
+        case 12..<14: return String(localized: "中午好")
+        case 14..<18: return String(localized: "下午好")
+        case 18..<22: return String(localized: "晚上好")
+        default: return String(localized: "夜深了")
         }
     }
 
@@ -276,10 +276,10 @@ struct HomeView: View {
 
     private func localizedGroup(_ group: String) -> String {
         switch group {
-        case "chest": return "胸"
-        case "back": return "背"
-        case "legs": return "腿"
-        case "shoulders": return "肩"
+        case "chest": return String(localized: "胸")
+        case "back": return String(localized: "背")
+        case "legs": return String(localized: "腿")
+        case "shoulders": return String(localized: "肩")
         default: return group
         }
     }
@@ -370,7 +370,7 @@ struct LocationSetupView: View {
         // Brief delay for location to update
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             if let location = locationManager.saveCurrentAsLocation(
-                name: "健身房",
+                name: String(localized: "健身房"),
                 type: "gym",
                 radius: 100
             ) {

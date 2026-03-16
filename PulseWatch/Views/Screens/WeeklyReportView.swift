@@ -79,7 +79,7 @@ struct WeeklyReportView: View {
 
         guard let monday = cal.date(byAdding: .day, value: -daysSinceMonday, to: cal.startOfDay(for: now)),
               let sunday = cal.date(byAdding: .day, value: 6, to: monday) else {
-            return "本周"
+            return String(localized: "本周")
         }
 
         let fmt = DateFormatter()
@@ -236,7 +236,7 @@ struct WeeklyReportView: View {
                 .foregroundStyle(PulseTheme.textTertiary)
 
             if data.isEmpty {
-                emptyPlaceholder("暂无本周数据")
+                emptyPlaceholder(String(localized: "暂无本周数据"))
             } else {
                 HStack(alignment: .bottom, spacing: 6) {
                     ForEach(data, id: \.dayLabel) { item in
@@ -302,7 +302,7 @@ struct WeeklyReportView: View {
             ], spacing: PulseTheme.spacingS) {
                 metricTile(
                     icon: "heart.fill",
-                    label: "静息心率",
+                    label: String(localized: "静息心率"),
                     value: thisHR.map { "\(Int($0))" } ?? "--",
                     unit: "bpm",
                     delta: percentDelta(thisHR, lastHR),
@@ -321,16 +321,16 @@ struct WeeklyReportView: View {
 
                 metricTile(
                     icon: "moon.fill",
-                    label: "睡眠",
+                    label: String(localized: "睡眠"),
                     value: thisSleep.map { String(format: "%.1f", $0) } ?? "--",
-                    unit: "小时",
+                    unit: String(localized: "小时"),
                     delta: percentDelta(thisSleep, lastSleep),
                     color: Color(hex: "8B7EC8")
                 )
 
                 metricTile(
                     icon: "figure.walk",
-                    label: "步数",
+                    label: String(localized: "步数"),
                     value: thisSteps.map { formatSteps(Int($0)) } ?? "--",
                     unit: "",
                     delta: percentDelta(thisSteps, lastSteps),
@@ -492,7 +492,7 @@ struct WeeklyReportView: View {
             let image = Image(uiImage: uiImage)
             ShareLink(
                 item: image,
-                preview: SharePreview("Pulse 周报", image: image)
+                preview: SharePreview(String(localized: "Pulse 周报"), image: image)
             ) {
                 HStack(spacing: PulseTheme.spacingS) {
                     Image(systemName: "square.and.arrow.up")
@@ -572,7 +572,7 @@ struct WeeklyReportView: View {
         let now = Date()
         let weekday = cal.component(.weekday, from: now)
         let daysSinceMonday = (weekday + 5) % 7
-        let labels = ["一", "二", "三", "四", "五", "六", "日"]
+        let labels = [String(localized: "一"), String(localized: "二"), String(localized: "三"), String(localized: "四"), String(localized: "五"), String(localized: "六"), String(localized: "日")]
 
         guard let monday = cal.date(byAdding: .day, value: -daysSinceMonday, to: cal.startOfDay(for: now)) else {
             return []
@@ -639,7 +639,7 @@ struct WeeklyReportView: View {
         let scores = summaries.compactMap(\.dailyScore)
 
         guard !scores.isEmpty else {
-            return ["本周数据不足，请佩戴设备积累更多数据"]
+            return [String(localized: "本周数据不足，请佩戴设备积累更多数据")]
         }
 
         // 最佳/最差日分析
@@ -680,11 +680,11 @@ struct WeeklyReportView: View {
         if let lastAvg {
             let diff = avgScore - lastAvg
             if diff > 5 {
-                insights.append("整体状态较上周提升，保持当前的生活节奏")
+                insights.append(String(localized: "整体状态较上周提升，保持当前的生活节奏"))
             } else if diff < -5 {
-                insights.append("本周状态有所下滑，注意调整作息和训练强度")
+                insights.append(String(localized: "本周状态有所下滑，注意调整作息和训练强度"))
             } else {
-                insights.append("状态保持稳定，身体适应良好")
+                insights.append(String(localized: "状态保持稳定，身体适应良好"))
             }
         }
 
@@ -697,7 +697,7 @@ struct WeeklyReportView: View {
             }
         }
 
-        return insights.isEmpty ? ["数据积累中，下周将有更详细的分析"] : insights
+        return insights.isEmpty ? [String(localized: "数据积累中，下周将有更详细的分析")] : insights
     }
 
     // MARK: - 下周建议生成
@@ -708,18 +708,18 @@ struct WeeklyReportView: View {
         let scores = summaries.compactMap(\.dailyScore)
 
         guard !scores.isEmpty else {
-            return ["持续佩戴设备，积累健康数据基线"]
+            return [String(localized: "持续佩戴设备，积累健康数据基线")]
         }
 
         let avgScore = scores.reduce(0, +) / scores.count
 
         // 基于评分趋势建议
         if avgScore >= 75 {
-            advice.append("状态优秀，可以适当增加训练强度或尝试新挑战")
+            advice.append(String(localized: "状态优秀，可以适当增加训练强度或尝试新挑战"))
         } else if avgScore >= 55 {
-            advice.append("保持当前训练节奏，注意恢复和营养补充")
+            advice.append(String(localized: "保持当前训练节奏，注意恢复和营养补充"))
         } else {
-            advice.append("建议减少高强度训练，优先保证睡眠质量")
+            advice.append(String(localized: "建议减少高强度训练，优先保证睡眠质量"))
         }
 
         // 睡眠建议
@@ -727,7 +727,7 @@ struct WeeklyReportView: View {
         if sleeps.count >= 3 {
             let avg = Double(sleeps.reduce(0, +)) / Double(sleeps.count) / 60.0
             if avg < 7 {
-                advice.append("目标：每晚睡眠 ≥ 7 小时，尝试固定就寝时间")
+                advice.append(String(localized: "目标：每晚睡眠 ≥ 7 小时，尝试固定就寝时间"))
             }
         }
 
@@ -739,11 +739,11 @@ struct WeeklyReportView: View {
             } / Double(hrvValues.count)
 
             if trend < -2 {
-                advice.append("HRV 呈下降趋势，关注压力管理和恢复质量")
+                advice.append(String(localized: "HRV 呈下降趋势，关注压力管理和恢复质量"))
             }
         }
 
-        return advice.isEmpty ? ["继续保持良好习惯"] : advice
+        return advice.isEmpty ? [String(localized: "继续保持良好习惯")] : advice
     }
 
     // MARK: - 空占位

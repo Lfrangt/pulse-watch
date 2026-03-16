@@ -8,7 +8,7 @@ struct SummaryView: View {
     @State private var connectivity = WatchConnectivityManager.shared
 
     @State private var score: Int = 0
-    @State private var headline: String = "加载中…"
+    @State private var headline: String = String(localized: "加载中…")
     @State private var heartRate: Int = 0
     @State private var hrv: Double = 0
     @State private var sleepMinutes: Int = 0
@@ -116,7 +116,7 @@ struct SummaryView: View {
             HStack(spacing: 8) {
                 MetricCard(
                     icon: "heart.fill",
-                    label: "心率",
+                    label: String(localized: "心率"),
                     value: heartRate > 0 ? "\(heartRate)" : "--",
                     unit: "bpm",
                     color: PulseTheme.statusPoor
@@ -134,14 +134,14 @@ struct SummaryView: View {
             HStack(spacing: 8) {
                 MetricCard(
                     icon: "moon.fill",
-                    label: "睡眠",
+                    label: String(localized: "睡眠"),
                     value: sleepMinutes > 0 ? formatSleep(sleepMinutes) : "--",
                     unit: "",
                     color: Color(hex: "8B7EC8")
                 )
                 MetricCard(
                     icon: "figure.walk",
-                    label: "步数",
+                    label: String(localized: "步数"),
                     value: formatSteps(steps),
                     unit: "",
                     color: PulseTheme.statusGood

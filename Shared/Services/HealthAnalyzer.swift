@@ -322,7 +322,7 @@ final class HealthAnalyzer {
                         anomalies.append(Anomaly(
                             metric: .hrv,
                             severity: .high,
-                            message: "HRV 显著偏低",
+                            message: String(localized: "HRV 显著偏低"),
                             detail: "当前 \(Int(currentHRV))ms，低于个人基线 \(Int(mean))ms 超过 2 个标准差",
                             currentValue: currentHRV,
                             baselineValue: mean,
@@ -332,7 +332,7 @@ final class HealthAnalyzer {
                         anomalies.append(Anomaly(
                             metric: .hrv,
                             severity: .medium,
-                            message: "HRV 偏低",
+                            message: String(localized: "HRV 偏低"),
                             detail: "当前 \(Int(currentHRV))ms，低于个人均值 \(Int(mean))ms",
                             currentValue: currentHRV,
                             baselineValue: mean,
@@ -357,7 +357,7 @@ final class HealthAnalyzer {
                         anomalies.append(Anomaly(
                             metric: .restingHeartRate,
                             severity: .high,
-                            message: "静息心率显著偏高",
+                            message: String(localized: "静息心率显著偏高"),
                             detail: "当前 \(Int(currentRHR))bpm，高于个人基线 \(Int(mean))bpm 超过 2 个标准差",
                             currentValue: currentRHR,
                             baselineValue: mean,
@@ -367,7 +367,7 @@ final class HealthAnalyzer {
                         anomalies.append(Anomaly(
                             metric: .restingHeartRate,
                             severity: .medium,
-                            message: "静息心率偏高",
+                            message: String(localized: "静息心率偏高"),
                             detail: "当前 \(Int(currentRHR))bpm，高于个人均值 \(Int(mean))bpm",
                             currentValue: currentRHR,
                             baselineValue: mean,
@@ -397,7 +397,7 @@ final class HealthAnalyzer {
                         anomalies.append(Anomaly(
                             metric: .sleep,
                             severity: .high,
-                            message: "睡眠严重不足",
+                            message: String(localized: "睡眠严重不足"),
                             detail: "昨晚 \(hoursNow)h\(minsNow)m，远低于你的平均 \(hoursAvg)h\(minsAvg)m",
                             currentValue: Double(sleepMinutes),
                             baselineValue: mean,
@@ -414,8 +414,8 @@ final class HealthAnalyzer {
             anomalies.append(Anomaly(
                 metric: .sleep,
                 severity: .high,
-                message: "连续 3 晚睡眠不足",
-                detail: "连续 3 晚不足 6 小时，累积睡眠债会影响恢复和表现",
+                message: String(localized: "连续 3 晚睡眠不足"),
+                detail: String(localized: "连续 3 晚不足 6 小时，累积睡眠债会影响恢复和表现"),
                 currentValue: Double(recentSleep.last ?? 0),
                 baselineValue: 420,  // 7 小时参考值
                 zScore: -3.0
@@ -440,35 +440,35 @@ final class HealthAnalyzer {
         // 恢复状态总结
         switch recoveryScore {
         case 85...:
-            insights.append("身体恢复非常好，今天是挑战自我的好时机")
+            insights.append(String(localized: "身体恢复非常好，今天是挑战自我的好时机"))
         case 70..<85:
-            insights.append("恢复状态良好，可以正常安排训练")
+            insights.append(String(localized: "恢复状态良好，可以正常安排训练"))
         case 50..<70:
-            insights.append("恢复中等，建议适度训练，注意倾听身体")
+            insights.append(String(localized: "恢复中等，建议适度训练，注意倾听身体"))
         case 30..<50:
-            insights.append("身体仍在恢复，建议轻松活动如散步或瑜伽")
+            insights.append(String(localized: "身体仍在恢复，建议轻松活动如散步或瑜伽"))
         default:
-            insights.append("身体需要充分休息，今天建议完全休息")
+            insights.append(String(localized: "身体需要充分休息，今天建议完全休息"))
         }
 
         // 睡眠洞察
         if sleepScore > 0 {
             if sleepScore >= 80 {
-                insights.append("昨晚睡眠质量很好，为今天打下了好基础")
+                insights.append(String(localized: "昨晚睡眠质量很好，为今天打下了好基础"))
             } else if sleepScore < 40 {
-                insights.append("睡眠质量较差，今天可能精力不足，注意补觉")
+                insights.append(String(localized: "睡眠质量较差，今天可能精力不足，注意补觉"))
             }
         }
 
         // 趋势洞察
         if trends.hrvTrend == .improving {
-            insights.append("HRV 近期呈上升趋势，身体适应能力在增强")
+            insights.append(String(localized: "HRV 近期呈上升趋势，身体适应能力在增强"))
         } else if trends.hrvTrend == .declining {
-            insights.append("HRV 近期有下降趋势，注意控制训练量和压力")
+            insights.append(String(localized: "HRV 近期有下降趋势，注意控制训练量和压力"))
         }
 
         if trends.rhrTrend == .declining {
-            insights.append("静息心率近期偏高，可能是疲劳或压力信号")
+            insights.append(String(localized: "静息心率近期偏高，可能是疲劳或压力信号"))
         }
 
         // 异常洞察

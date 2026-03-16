@@ -119,7 +119,7 @@ struct DashboardView: View {
             .sheet(isPresented: $showLocationSetup) {
                 LocationSetupView()
             }
-            .alert("到达健身房", isPresented: $showGymPrompt) {
+            .alert(String(localized: "到达健身房"), isPresented: $showGymPrompt) {
                 Button("好的") {}
             } message: {
                 if let plan = brief?.trainingPlan {
@@ -373,7 +373,7 @@ struct DashboardView: View {
             if let hr = currentHeartRate {
                 metricTile(
                     icon: "heart.fill",
-                    label: "心率",
+                    label: String(localized: "心率"),
                     value: "\(Int(hr))",
                     unit: "bpm",
                     color: PulseTheme.statusPoor,
@@ -399,7 +399,7 @@ struct DashboardView: View {
             if let sleep = currentSleep {
                 metricTile(
                     icon: "moon.fill",
-                    label: "睡眠",
+                    label: String(localized: "睡眠"),
                     value: sleep,
                     unit: "",
                     color: Color(hex: "8B7EC8"),
@@ -412,7 +412,7 @@ struct DashboardView: View {
             if currentSteps > 0 {
                 metricTile(
                     icon: "figure.run",
-                    label: "步数",
+                    label: String(localized: "步数"),
                     value: formatSteps(currentSteps),
                     unit: "",
                     color: PulseTheme.statusGood,
@@ -425,7 +425,7 @@ struct DashboardView: View {
             if currentCalories > 0 {
                 metricTile(
                     icon: "flame.fill",
-                    label: "卡路里",
+                    label: String(localized: "卡路里"),
                     value: "\(Int(currentCalories))",
                     unit: "kcal",
                     color: PulseTheme.statusModerate,
@@ -438,7 +438,7 @@ struct DashboardView: View {
             if let spo2 = currentBloodOxygen {
                 metricTile(
                     icon: "lungs.fill",
-                    label: "血氧",
+                    label: String(localized: "血氧"),
                     value: "\(Int(spo2))%",
                     unit: "",
                     color: PulseTheme.statusGood,
@@ -667,12 +667,12 @@ struct DashboardView: View {
     /// 训练分类 -> 中文名称
     private func workoutCategoryName(_ category: String) -> String {
         switch category {
-        case "chest": return "胸部"
-        case "back": return "背部"
-        case "legs": return "腿部"
-        case "shoulders": return "肩部"
-        case "arms": return "手臂"
-        case "cardio": return "有氧"
+        case "chest": return String(localized: "胸部")
+        case "back": return String(localized: "背部")
+        case "legs": return String(localized: "腿部")
+        case "shoulders": return String(localized: "肩部")
+        case "arms": return String(localized: "手臂")
+        case "cardio": return String(localized: "有氧")
         default: return category
         }
     }
@@ -686,8 +686,8 @@ struct DashboardView: View {
         let days = calendar.dateComponents([.day], from: startOfDate, to: startOfToday).day ?? 0
 
         switch days {
-        case 0: return "今天"
-        case 1: return "昨天"
+        case 0: return String(localized: "今天")
+        case 1: return String(localized: "昨天")
         default: return "\(days)天前"
         }
     }
@@ -771,11 +771,11 @@ struct DashboardView: View {
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: .now)
         switch hour {
-        case 5..<12: return "早上好"
-        case 12..<14: return "中午好"
-        case 14..<18: return "下午好"
-        case 18..<22: return "晚上好"
-        default: return "夜深了"
+        case 5..<12: return String(localized: "早上好")
+        case 12..<14: return String(localized: "中午好")
+        case 14..<18: return String(localized: "下午好")
+        case 18..<22: return String(localized: "晚上好")
+        default: return String(localized: "夜深了")
         }
     }
 
@@ -861,10 +861,10 @@ struct DashboardView: View {
 
     private func localizedGroup(_ group: String) -> String {
         switch group {
-        case "chest": return "胸"
-        case "back": return "背"
-        case "legs": return "腿"
-        case "shoulders": return "肩"
+        case "chest": return String(localized: "胸")
+        case "back": return String(localized: "背")
+        case "legs": return String(localized: "腿")
+        case "shoulders": return String(localized: "肩")
         default: return group
         }
     }

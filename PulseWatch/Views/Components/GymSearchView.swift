@@ -22,7 +22,7 @@ struct GymSearchView: View {
                         .font(.system(size: 15))
                         .foregroundStyle(PulseTheme.textTertiary)
 
-                    TextField("搜索健身房", text: $searchText)
+                    TextField(String(localized: "搜索健身房"), text: $searchText)
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
                         .autocorrectionDisabled()
@@ -147,7 +147,7 @@ struct GymSearchView: View {
             // 地图预览
             Map(position: $cameraPosition) {
                 Marker(
-                    place.name ?? "健身房",
+                    place.name ?? String(localized: "健身房"),
                     coordinate: place.placemark.coordinate
                 )
                 .tint(PulseTheme.accent)
@@ -160,7 +160,7 @@ struct GymSearchView: View {
 
             // 地点信息
             VStack(alignment: .leading, spacing: 6) {
-                Text(place.name ?? "健身房")
+                Text(place.name ?? String(localized: "健身房"))
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
 
@@ -179,7 +179,7 @@ struct GymSearchView: View {
             // 确认按钮
             Button {
                 let coord = place.placemark.coordinate
-                let name = place.name ?? "健身房"
+                let name = place.name ?? String(localized: "健身房")
                 onSelected(name, coord.latitude, coord.longitude)
                 dismiss()
             } label: {

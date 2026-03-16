@@ -12,9 +12,9 @@ struct TrainingPlanView: View {
 
     /// 推荐的肌群轮换（Push / Pull / Legs 周期）
     private let rotations: [(group: String, label: String, icon: String, exercises: [String])] = [
-        ("push", "推 Push", "arrow.up.circle.fill", ["卧推", "肩推", "三头下压"]),
-        ("pull", "拉 Pull", "arrow.down.circle.fill", ["硬拉", "划船", "二头弯举"]),
-        ("legs", "腿 Legs", "figure.walk.circle.fill", ["深蹲", "腿举", "小腿提踵"]),
+        ("push", String(localized: "推 Push"), "arrow.up.circle.fill", [String(localized: "卧推"), String(localized: "肩推"), String(localized: "三头下压")]),
+        ("pull", String(localized: "拉 Pull"), "arrow.down.circle.fill", [String(localized: "硬拉"), String(localized: "划船"), String(localized: "二头弯举")]),
+        ("legs", String(localized: "腿 Legs"), "figure.walk.circle.fill", [String(localized: "深蹲"), String(localized: "腿举"), String(localized: "小腿提踵")]),
     ]
 
     var body: some View {
@@ -241,10 +241,10 @@ struct TrainingPlanView: View {
     private var trainingAdviceLabel: String {
         let score = recoveryScore
         switch score {
-        case 80...:  return "适合高强度"
-        case 60..<80: return "适合中等强度"
-        case 40..<60: return "建议轻松恢复"
-        default:      return "建议休息"
+        case 80...:  return String(localized: "适合高强度")
+        case 60..<80: return String(localized: "适合中等强度")
+        case 40..<60: return String(localized: "建议轻松恢复")
+        default:      return String(localized: "建议休息")
         }
     }
 

@@ -76,8 +76,8 @@ struct WorkoutView: View {
             HStack(spacing: 0) {
                 statItem(
                     value: "\(stats.activeDays)",
-                    unit: "天",
-                    label: "运动天数",
+                    unit: String(localized: "天"),
+                    label: String(localized: "运动天数"),
                     color: PulseTheme.statusGood
                 )
 
@@ -86,7 +86,7 @@ struct WorkoutView: View {
                 statItem(
                     value: formatDuration(stats.totalMinutes),
                     unit: "",
-                    label: "总时长",
+                    label: String(localized: "总时长"),
                     color: PulseTheme.accent
                 )
 
@@ -95,7 +95,7 @@ struct WorkoutView: View {
                 statItem(
                     value: "\(Int(stats.totalCalories))",
                     unit: "kcal",
-                    label: "总消耗",
+                    label: String(localized: "总消耗"),
                     color: PulseTheme.statusModerate
                 )
             }
@@ -388,11 +388,11 @@ struct WorkoutView: View {
             }
 
             let zones: [HeartRateZone] = [
-                HeartRateZone(name: "热身", percentage: Double(zoneCounts[0]) / total, color: Color(hex: "7FB069")),
-                HeartRateZone(name: "燃脂", percentage: Double(zoneCounts[1]) / total, color: Color(hex: "A8C256")),
-                HeartRateZone(name: "有氧", percentage: Double(zoneCounts[2]) / total, color: Color(hex: "D4A056")),
-                HeartRateZone(name: "无氧", percentage: Double(zoneCounts[3]) / total, color: Color(hex: "D47456")),
-                HeartRateZone(name: "极限", percentage: Double(zoneCounts[4]) / total, color: Color(hex: "C75C5C")),
+                HeartRateZone(name: String(localized: "热身"), percentage: Double(zoneCounts[0]) / total, color: Color(hex: "7FB069")),
+                HeartRateZone(name: String(localized: "燃脂"), percentage: Double(zoneCounts[1]) / total, color: Color(hex: "A8C256")),
+                HeartRateZone(name: String(localized: "有氧"), percentage: Double(zoneCounts[2]) / total, color: Color(hex: "D4A056")),
+                HeartRateZone(name: String(localized: "无氧"), percentage: Double(zoneCounts[3]) / total, color: Color(hex: "D47456")),
+                HeartRateZone(name: String(localized: "极限"), percentage: Double(zoneCounts[4]) / total, color: Color(hex: "C75C5C")),
             ]
 
             heartRateZones[workout.uuid] = zones
@@ -464,7 +464,7 @@ struct WorkoutView: View {
         case .tableTennis:          return "乒乓球"
         case .badminton:            return "羽毛球"
         case .cooldown:             return "放松恢复"
-        default:                    return "运动"
+        default:                    return String(localized: "运动")
         }
     }
 
@@ -480,9 +480,9 @@ struct WorkoutView: View {
     private func formatWorkoutDate(_ date: Date) -> String {
         let calendar = Calendar.current
         if calendar.isDateInToday(date) {
-            return "今天 " + timeString(date)
+            return String(localized: "今天 ") + timeString(date)
         } else if calendar.isDateInYesterday(date) {
-            return "昨天 " + timeString(date)
+            return String(localized: "昨天 ") + timeString(date)
         } else {
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: "zh_CN")

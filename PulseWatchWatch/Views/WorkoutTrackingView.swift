@@ -303,10 +303,10 @@ struct WorkoutTrackingView: View {
 
     private var summaryGrid: some View {
         let items: [(String, String, String, String)] = [
-            ("clock", "时长", manager.formattedDuration, "9A938C"),
-            ("heart.fill", "平均心率", "\(Int(manager.averageHeartRate))", "C75C5C"),
-            ("heart.fill", "最大心率", "\(Int(manager.maxHeartRateRecorded))", "9B3D3D"),
-            ("flame.fill", "活跃千卡", manager.formattedCalories, "D4A056"),
+            ("clock", String(localized: "时长"), manager.formattedDuration, "9A938C"),
+            ("heart.fill", String(localized: "平均心率"), "\(Int(manager.averageHeartRate))", "C75C5C"),
+            ("heart.fill", String(localized: "最大心率"), "\(Int(manager.maxHeartRateRecorded))", "9B3D3D"),
+            ("flame.fill", String(localized: "活跃千卡"), manager.formattedCalories, "D4A056"),
         ]
 
         return LazyVGrid(

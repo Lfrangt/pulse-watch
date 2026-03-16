@@ -102,10 +102,10 @@ struct GymArrivalView: View {
 
     private func localizedGroup(_ group: String) -> String {
         switch group {
-        case "chest": return "胸"
-        case "back": return "背"
-        case "legs": return "腿"
-        case "shoulders": return "肩"
+        case "chest": return String(localized: "胸")
+        case "back": return String(localized: "背")
+        case "legs": return String(localized: "腿")
+        case "shoulders": return String(localized: "肩")
         default: return group
         }
     }
@@ -118,7 +118,7 @@ struct GymArrivalView: View {
             daysSinceLastTrained: 3,
             suggestedExercises: [],
             intensity: .heavy,
-            reason: "上次练胸是3天前"
+            reason: String(localized: "上次练胸是3天前")
         )
     )
 }

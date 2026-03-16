@@ -21,7 +21,7 @@ struct TrainingCalendarView: View {
     // MARK: - 常量
 
     private let calendar = Calendar.current
-    private let weekdayHeaders = ["一", "二", "三", "四", "五", "六", "日"]
+    private let weekdayHeaders = [String(localized: "一"), String(localized: "二"), String(localized: "三"), String(localized: "四"), String(localized: "五"), String(localized: "六"), String(localized: "日")]
 
     // MARK: - 训练分类颜色
 
@@ -46,12 +46,12 @@ struct TrainingCalendarView: View {
     /// 训练类别中文名
     private func categoryLabel(for category: String) -> String {
         switch category.lowercased() {
-        case "chest":      return "胸部"
-        case "back":       return "背部"
-        case "legs":       return "腿部"
-        case "shoulders":  return "肩部"
-        case "arms":       return "手臂"
-        case "cardio":     return "有氧"
+        case "chest":      return String(localized: "胸部")
+        case "back":       return String(localized: "背部")
+        case "legs":       return String(localized: "腿部")
+        case "shoulders":  return String(localized: "肩部")
+        case "arms":       return String(localized: "手臂")
+        case "cardio":     return String(localized: "有氧")
         default:           return category
         }
     }
@@ -421,7 +421,7 @@ struct TrainingCalendarView: View {
                 // 训练天数
                 statItem(
                     value: "\(trainingDays)",
-                    label: "训练天数",
+                    label: String(localized: "训练天数"),
                     icon: "calendar",
                     color: PulseTheme.accent
                 )
@@ -434,7 +434,7 @@ struct TrainingCalendarView: View {
                 // 最常练部位
                 statItem(
                     value: topCategory != nil ? categoryLabel(for: topCategory!.key) : "—",
-                    label: "最常练的部位",
+                    label: String(localized: "最常练的部位"),
                     icon: "figure.strengthtraining.traditional",
                     color: topCategory != nil ? categoryColor(for: topCategory!.key) : PulseTheme.textTertiary
                 )
@@ -447,7 +447,7 @@ struct TrainingCalendarView: View {
                 // 总训练时长
                 statItem(
                     value: totalMinutes >= 60 ? "\(totalMinutes / 60)h\(totalMinutes % 60)m" : "\(totalMinutes)m",
-                    label: "总训练时长",
+                    label: String(localized: "总训练时长"),
                     icon: "clock.fill",
                     color: PulseTheme.statusModerate
                 )
@@ -480,11 +480,11 @@ struct TrainingCalendarView: View {
 
     private var categoryLegend: some View {
         let legends: [(String, String, Color)] = [
-            ("推 (胸/肩)", "chest",   Color(hex: "5B8DEF")),
-            ("拉 (背)",   "back",    Color(hex: "7FB069")),
-            ("腿",        "legs",    Color(hex: "D4A056")),
-            ("手臂",      "arms",    Color(hex: "C9A96E")),
-            ("有氧",      "cardio",  Color(hex: "C75C5C")),
+            (String(localized: "推 (胸/肩)"), "chest",   Color(hex: "5B8DEF")),
+            (String(localized: "拉 (背)"),   "back",    Color(hex: "7FB069")),
+            (String(localized: "腿"),        "legs",    Color(hex: "D4A056")),
+            (String(localized: "手臂"),      "arms",    Color(hex: "C9A96E")),
+            (String(localized: "有氧"),      "cardio",  Color(hex: "C75C5C")),
         ]
 
         return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {

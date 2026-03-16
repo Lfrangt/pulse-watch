@@ -132,29 +132,29 @@ struct OnboardingView: View {
                 featureRow(
                     icon: "gauge.open.with.lines.needle.33percent.and.arrowtriangle",
                     color: PulseTheme.accent,
-                    title: "每日状态评分",
-                    description: "综合 HRV、心率、睡眠等数据\n生成 0-100 恢复评分"
+                    title: String(localized: "每日状态评分"),
+                    description: String(localized: "综合 HRV、心率、睡眠等数据\n生成 0-100 恢复评分")
                 )
 
                 featureRow(
                     icon: "brain.head.profile.fill",
                     color: PulseTheme.statusGood,
-                    title: "AI 健康洞察",
-                    description: "智能分析趋势和异常\n所有计算在设备本地完成"
+                    title: String(localized: "AI 健康洞察"),
+                    description: String(localized: "智能分析趋势和异常\n所有计算在设备本地完成")
                 )
 
                 featureRow(
                     icon: "dumbbell.fill",
                     color: PulseTheme.statusModerate,
-                    title: "训练建议",
-                    description: "根据恢复状态推荐训练强度\n到达健身房自动提醒"
+                    title: String(localized: "训练建议"),
+                    description: String(localized: "根据恢复状态推荐训练强度\n到达健身房自动提醒")
                 )
 
                 featureRow(
                     icon: "applewatch",
                     color: PulseTheme.statusPoor,
-                    title: "手表联动",
-                    description: "表盘 Complication 实时显示\n手腕上即时查看状态"
+                    title: String(localized: "手表联动"),
+                    description: String(localized: "表盘 Complication 实时显示\n手腕上即时查看状态")
                 )
             }
             .padding(.horizontal, PulseTheme.spacingM)
@@ -226,21 +226,21 @@ struct OnboardingView: View {
                 permissionRow(
                     icon: "heart.fill",
                     title: "HealthKit",
-                    description: "读取心率、HRV、睡眠等健康数据",
+                    description: String(localized: "读取心率、HRV、睡眠等健康数据"),
                     granted: permissionsGranted
                 )
 
                 permissionRow(
                     icon: "bell.fill",
-                    title: "通知",
-                    description: "发送每日健康摘要和异常提醒",
+                    title: String(localized: "通知"),
+                    description: String(localized: "发送每日健康摘要和异常提醒"),
                     granted: permissionsGranted
                 )
 
                 permissionRow(
                     icon: "location.fill",
-                    title: "位置",
-                    description: "到达健身房时智能提醒训练计划",
+                    title: String(localized: "位置"),
+                    description: String(localized: "到达健身房时智能提醒训练计划"),
                     granted: permissionsGranted
                 )
             }

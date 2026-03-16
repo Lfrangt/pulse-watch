@@ -9,7 +9,7 @@ struct WatchHomeView: View {
 
     // Local fallback values
     @State private var localScore: Int = 0
-    @State private var localHeadline: String = "加载中…"
+    @State private var localHeadline: String = String(localized: "加载中…")
     @State private var localInsight: String = ""
     @State private var localHeartRate: Int = 0
     @State private var localSteps: String = "--"
@@ -227,7 +227,7 @@ struct WatchHomeView: View {
 
     private func syncLabel(_ date: Date) -> String {
         let interval = Date().timeIntervalSince(date)
-        if interval < 60 { return "刚刚同步" }
+        if interval < 60 { return String(localized: "刚刚同步") }
         if interval < 3600 { return "\(Int(interval / 60))分钟前同步" }
         return "\(Int(interval / 3600))小时前同步"
     }
@@ -242,7 +242,7 @@ struct WatchHomeView: View {
                 let score = healthManager.calculateDailyScore()
                 localScore = score
                 localHeadline = PulseTheme.statusLabel(for: score)
-                localInsight = score >= 70 ? "适合训练" : "注意休息"
+                localInsight = score >= 70 ? String(localized: "适合训练") : String(localized: "注意休息")
                 localHeartRate = Int(healthManager.latestHeartRate ?? 0)
 
                 let steps = healthManager.todaySteps

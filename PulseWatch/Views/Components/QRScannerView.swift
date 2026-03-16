@@ -113,7 +113,7 @@ struct QRScannerView: View {
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: String],
               let url = json["url"], !url.isEmpty,
               let token = json["token"], !token.isEmpty else {
-            error = "无效的配对二维码"
+            error = String(localized: "无效的配对二维码")
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { error = nil }
             return
         }

@@ -11,19 +11,19 @@ enum DemoDataProvider {
         ScoreEngine.DailyBrief(
             score: 78,
             headline: PulseTheme.statusLabel(for: 78),
-            insight: "身体恢复不错，适合中等强度训练",
+            insight: String(localized: "身体恢复不错，适合中等强度训练"),
             sleepSummary: "7h12m",
             recoveryNote: nil,
             trainingPlan: TrainingPlan(
                 targetMuscleGroup: "chest",
                 daysSinceLastTrained: 3,
                 suggestedExercises: [
-                    SuggestedExercise(name: "平板卧推", sets: 4, reps: 8, suggestedWeight: 80),
-                    SuggestedExercise(name: "上斜哑铃卧推", sets: 3, reps: 10, suggestedWeight: 30),
-                    SuggestedExercise(name: "绳索飞鸟", sets: 3, reps: 12, suggestedWeight: 15),
+                    SuggestedExercise(name: String(localized: "平板卧推"), sets: 4, reps: 8, suggestedWeight: 80),
+                    SuggestedExercise(name: String(localized: "上斜哑铃卧推"), sets: 3, reps: 10, suggestedWeight: 30),
+                    SuggestedExercise(name: String(localized: "绳索飞鸟"), sets: 3, reps: 12, suggestedWeight: 15),
                 ],
                 intensity: .moderate,
-                reason: "上次练胸是3天前"
+                reason: String(localized: "上次练胸是3天前")
             )
         )
     }
@@ -43,8 +43,8 @@ enum DemoDataProvider {
                 monthAvgScore: 72
             ),
             insights: [
-                "HRV 趋势上升 12%",
-                "睡眠连续 3 天超 7 小时",
+                String(localized: "HRV 趋势上升 12%"),
+                String(localized: "睡眠连续 3 天超 7 小时"),
             ],
             anomalies: [],
             generatedAt: .now
@@ -78,36 +78,36 @@ enum DemoDataProvider {
             TimelineEvent(
                 time: bedtime,
                 icon: "moon.fill",
-                title: "入睡",
-                detail: "总计 7h12m · 深睡约 1.8h",
-                impact: "恢复 +15",
+                title: String(localized: "入睡"),
+                detail: String(localized: "总计 7h12m · 深睡约 1.8h"),
+                impact: String(localized: "恢复 +15"),
                 impactPositive: true,
                 color: Color(hex: "8B7EC8")
             ),
             TimelineEvent(
                 time: wakeTime,
                 icon: "sunrise.fill",
-                title: "醒来",
-                detail: "静息心率 58bpm",
-                impact: "恢复良好",
+                title: String(localized: "醒来"),
+                detail: String(localized: "静息心率 58bpm"),
+                impact: String(localized: "恢复良好"),
                 impactPositive: true,
                 color: PulseTheme.statusGood
             ),
             TimelineEvent(
                 time: activityTime,
                 icon: "figure.walk",
-                title: "日间活动",
-                detail: "8.4k 步 · 活跃卡路里 +320kcal",
-                impact: "活跃 +",
+                title: String(localized: "日间活动"),
+                detail: String(localized: "8.4k 步 · 活跃卡路里 +320kcal"),
+                impact: String(localized: "活跃 +"),
                 impactPositive: true,
                 color: PulseTheme.accent
             ),
             TimelineEvent(
                 time: now,
                 icon: "heart.text.clipboard",
-                title: "当前状态",
-                detail: "HRV 48ms ↑ · 中等强度",
-                impact: "可以训练",
+                title: String(localized: "当前状态"),
+                detail: String(localized: "HRV 48ms ↑ · 中等强度"),
+                impact: String(localized: "可以训练"),
                 impactPositive: true,
                 color: PulseTheme.accent,
                 isCurrent: true

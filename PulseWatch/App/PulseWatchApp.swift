@@ -58,7 +58,7 @@ struct PulseWatchApp: App {
 
         // App Store 评价引导 — 记录活跃天数
         Task { @MainActor in
-            ReviewManager.shared.recordAppActive()
+            ReviewRequestManager.shared.recordAppActive()
         }
 
         Task {
@@ -83,6 +83,7 @@ struct PulseWatchApp: App {
                     Task {
                         await WorkoutHistoryService.shared.syncWorkouts()
                         await MainActor.run {
+                            ReviewRequestManager.shared.recordWorkoutCompleted()
                             if let data = notification.userInfo as? [String: Any] {
                                 OpenClawBridge.shared.handleWatchWorkoutCompleted(data)
                             }

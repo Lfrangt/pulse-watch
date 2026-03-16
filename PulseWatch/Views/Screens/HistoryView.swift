@@ -59,6 +59,14 @@ struct HistoryView: View {
                     .preferredColorScheme(.dark)
                     .onAppear { Analytics.trackWeeklyReportViewed() }
             }
+            .onAppear {
+                // In-App Review: 查看趋势图时检查是否有 7 天完整数据
+                let calendar = Calendar.current
+                let sevenDaysAgo = calendar.startOfDay(for: calendar.date(byAdding: .day, value: -7, to: .now)!)
+                let recentWithScores = allSummaries.filter { $0.date >= sevenDaysAgo && $0.dailyScore != nil }
+                let hasSevenDayData = recentWithScores.count >= 7
+                ReviewRequestManager.shared.recordTrendsViewed(hasSevenDayData: hasSevenDayData)
+            }
         }
     }
 

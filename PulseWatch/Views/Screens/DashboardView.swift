@@ -899,11 +899,10 @@ struct DashboardView: View {
 
             if let brief {
                 Analytics.trackScoreViewed(score: brief.score)
-                ReviewManager.shared.recordScoreViewed()
             }
 
-            // 同步 workout 总数到 ReviewManager
-            ReviewManager.shared.syncWorkoutCount(recentWorkouts.count)
+            // 同步 workout 总数到 ReviewRequestManager
+            ReviewRequestManager.shared.syncWorkoutCount(recentWorkouts.count)
 
             // 生成 AI 洞察
             insight = await MainActor.run {

@@ -22,16 +22,20 @@
 - Summary view with key health metrics
 - Haptic feedback for workout milestones
 
+**Sharing & Social:**
+- Social share cards — generate shareable workout achievement images
+
 **Data & Privacy:**
 - All health data stored locally on-device (SwiftData)
 - Background HealthKit data collection with incremental sync
-- WatchConnectivity sync between iPhone and Apple Watch
+- WatchConnectivity sync between iPhone and Apple Watch (health snapshots + workout events)
 - No accounts, no cloud, no subscriptions
 
 ### Known Limitations
 - OpenClaw integration requires user's own OpenClaw instance
 - Heart rate zone calculation uses estimated max HR (220 - age default 190)
 - Gym detection requires location permission (always-on for geofencing)
+- Morning Brief notifications require notification permission (provisional delivery available)
 
 ### TestFlight Feedback
 Please report issues and feedback via TestFlight or GitHub Issues.
@@ -59,5 +63,8 @@ Please report issues and feedback via TestFlight or GitHub Issues.
 - 训练计划视图
 - 触觉反馈
 
+**分享：**
+- 社交分享卡片 — 训练成就图片生成
+
 **数据隐私：**
-所有数据本地存储，无需账号，无云端，无订阅。
+所有数据本地存储，无需账号，无云端，无订阅。Watch 健康快照 + 训练数据通过 WatchConnectivity 同步。

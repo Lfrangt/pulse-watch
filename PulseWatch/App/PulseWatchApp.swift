@@ -124,7 +124,7 @@ struct RootView: View {
     }
 }
 
-// MARK: - 主 Tab 导航（3 tabs）
+// MARK: - 主 Tab 导航（4 tabs）
 
 struct MainTabView: View {
 
@@ -143,28 +143,42 @@ struct MainTabView: View {
         TabView(selection: $selectedTab) {
             DashboardView()
                 .tabItem {
-                    Label("Today", systemImage: "heart.text.clipboard")
+                    Label(String(localized: "Today"), systemImage: "heart.text.clipboard")
+                        .accessibilityLabel(String(localized: "Today"))
+                        .accessibilityHint(String(localized: "Opens your dashboard"))
                 }
                 .tag(0)
 
-            HistoryView()
+            WorkoutView()
                 .tabItem {
-                    Label("Trends", systemImage: "chart.xyaxis.line")
+                    Label(String(localized: "Exercise"), systemImage: "figure.run")
+                        .accessibilityLabel(String(localized: "Exercise"))
+                        .accessibilityHint(String(localized: "Opens your workouts and training history"))
                 }
                 .tag(1)
 
-            SettingsView()
+            HistoryView()
                 .tabItem {
-                    Label("Settings", systemImage: "gearshape.fill")
+                    Label(String(localized: "Trends"), systemImage: "chart.xyaxis.line")
+                        .accessibilityLabel(String(localized: "Trends"))
+                        .accessibilityHint(String(localized: "Opens historical trends and reports"))
                 }
                 .tag(2)
+
+            SettingsView()
+                .tabItem {
+                    Label(String(localized: "Settings"), systemImage: "gearshape.fill")
+                        .accessibilityLabel(String(localized: "Settings"))
+                        .accessibilityHint(String(localized: "Opens app settings"))
+                }
+                .tag(3)
         }
         .tint(PulseTheme.accent)
         .onChange(of: selectedTab) { _, newTab in
-            let tabNames = ["Today", "Trends", "Settings"]
+            let tabNames = ["Today", "Exercise", "Trends", "Settings"]
             let name = newTab < tabNames.count ? tabNames[newTab] : "unknown"
             Analytics.trackTabSwitch(to: name)
-            if newTab == 2 {
+            if newTab == 3 {
                 Analytics.trackSettingsOpened()
             }
         }

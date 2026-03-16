@@ -191,6 +191,8 @@ struct HomeView: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(String(localized: "Set Gym Location"))
+        .accessibilityHint(String(localized: "Opens gym location setup for automatic arrival reminders"))
     }
 
     // MARK: - Computed

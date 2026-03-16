@@ -95,21 +95,28 @@ struct WorkoutHistoryDetailView: View {
                 Image(systemName: entry.activityIcon)
                     .font(.system(size: 32, weight: .medium))
                     .foregroundStyle(color)
+                    .accessibilityHidden(true)
             }
 
             // 运动名称
             Text(entry.activityName)
                 .font(.system(size: 24, weight: .semibold, design: .rounded))
                 .foregroundStyle(PulseTheme.textPrimary)
+                .minimumScaleFactor(0.7)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
 
             // 日期时间
             Text(formatFullDate(entry.startDate))
                 .font(PulseTheme.bodyFont)
                 .foregroundStyle(PulseTheme.textSecondary)
+                .minimumScaleFactor(0.7)
+                .lineLimit(1)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, PulseTheme.spacingXL)
         .pulseCard()
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - 关键指标网格
@@ -207,6 +214,9 @@ struct WorkoutHistoryDetailView: View {
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
                 .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(unit.isEmpty ? value : "\(value) \(unit)")
     }
 
     // MARK: - 心率区间分布
@@ -223,10 +233,12 @@ struct WorkoutHistoryDetailView: View {
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(PulseTheme.statusPoor)
                 }
+                .accessibilityHidden(true)
 
                 Text("Heart Rate Zones")
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
             }
 
             ForEach(entry.heartRateZones) { zone in
@@ -254,6 +266,9 @@ struct WorkoutHistoryDetailView: View {
                         .foregroundStyle(PulseTheme.textTertiary)
                         .frame(width: 40, alignment: .trailing)
                 }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(zone.name)
+                .accessibilityValue("\(Int(zone.percentage * 100)) \(String(localized: "percent"))")
             }
         }
         .pulseCard()
@@ -305,22 +320,28 @@ struct WorkoutHistoryDetailView: View {
             Image(systemName: "applewatch")
                 .font(.system(size: 14))
                 .foregroundStyle(PulseTheme.textTertiary)
+                .accessibilityHidden(true)
 
             Text(String(localized: "Source:") + " \(entry.sourceName)")
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textTertiary)
+                .minimumScaleFactor(0.7)
+                .lineLimit(1)
 
             Spacer()
 
             Text(String(localized: "Synced:") + " \(formatShortDate(entry.syncedAt))")
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textTertiary)
+                .minimumScaleFactor(0.7)
+                .lineLimit(1)
         }
         .padding(PulseTheme.spacingM)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
                 .fill(PulseTheme.surface)
         )
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - 删除按钮
@@ -348,6 +369,8 @@ struct WorkoutHistoryDetailView: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(String(localized: "Delete Record"))
+        .accessibilityHint(String(localized: "Deletes this workout record from the app"))
     }
 
     // MARK: - 格式化

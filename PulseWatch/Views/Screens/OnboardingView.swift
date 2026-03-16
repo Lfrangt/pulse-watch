@@ -110,6 +110,8 @@ struct OnboardingView: View {
                     .foregroundStyle(PulseTheme.statusGood)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Example recovery score of 82 out of 100, rated Good"))
     }
 
     // MARK: - Page 2: 趋势图
@@ -197,6 +199,8 @@ struct OnboardingView: View {
             .padding(.horizontal, PulseTheme.spacingM)
         }
         .frame(width: 260)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Example 7-day trend chart showing improving health data"))
     }
 
     // MARK: - Page 3: 训练记录
@@ -219,6 +223,8 @@ struct OnboardingView: View {
             workoutRow(icon: "figure.outdoor.cycle", name: String(localized: "Cycling"), duration: "25 min", cal: "210 kcal", color: PulseTheme.statusGood)
         }
         .frame(width: 260)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Example workout list showing Running, Strength, and Cycling sessions"))
     }
 
     private func workoutRow(icon: String, name: String, duration: String, cal: String, color: Color) -> some View {
@@ -315,6 +321,8 @@ struct OnboardingView: View {
             }
             .buttonStyle(PulseButtonStyle())
             .padding(.horizontal, PulseTheme.spacingL)
+            .accessibilityLabel(String(localized: "Get Started"))
+            .accessibilityHint(String(localized: "Requests health permissions and starts the app"))
 
             Spacer()
         }
@@ -332,6 +340,8 @@ struct OnboardingView: View {
             )
         }
         .padding(.horizontal, PulseTheme.spacingXL)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Example AI Coach messages: personalized training advice based on your recovery data"))
     }
 
     private func chatBubble(text: String, isAI: Bool) -> some View {
@@ -370,6 +380,8 @@ struct OnboardingView: View {
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                 }
+                .accessibilityLabel(String(localized: "Skip onboarding"))
+                .accessibilityHint(String(localized: "Skips the introduction and goes to the main app"))
             } else {
                 Spacer().frame(width: 44)
             }
@@ -385,6 +397,8 @@ struct OnboardingView: View {
                         .animation(.spring(response: 0.3), value: currentPage)
                 }
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(String(localized: "Page \(currentPage + 1) of \(totalPages)"))
 
             Spacer()
 
@@ -399,6 +413,8 @@ struct OnboardingView: View {
                         .font(.system(size: 36))
                         .foregroundStyle(PulseTheme.accent)
                 }
+                .accessibilityLabel(String(localized: "Next page"))
+                .accessibilityHint(String(localized: "Goes to the next introduction page"))
             } else {
                 Spacer().frame(width: 44)
             }
@@ -407,6 +423,7 @@ struct OnboardingView: View {
 
     // MARK: - Actions
 
+    /// Request permissions button accessibility
     private func requestPermissionsAndStart() {
         Task {
             // HealthKit

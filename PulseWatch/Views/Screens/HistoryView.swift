@@ -157,6 +157,12 @@ struct HistoryView: View {
                     }
                 }
                 .frame(height: 180)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "Daily score trend"))
+                .accessibilityValue({
+                    let avg = data.map(\.score).reduce(0, +) / max(data.count, 1)
+                    return String(localized: "Average score \(avg) over \(data.count) days")
+                }())
             }
         }
     }
@@ -218,6 +224,12 @@ struct HistoryView: View {
                 ])
                 .chartLegend(.visible)
                 .frame(height: 180)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "Heart rate trend"))
+                .accessibilityValue({
+                    let avg = Int(data.map(\.avg).reduce(0, +) / max(Double(data.count), 1))
+                    return String(localized: "Average \(avg) bpm over \(data.count) days")
+                }())
             }
         }
     }
@@ -279,6 +291,12 @@ struct HistoryView: View {
                     }
                 }
                 .frame(height: 180)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "HRV trend"))
+                .accessibilityValue({
+                    let avg = Int(data.map(\.value).reduce(0, +) / max(Double(data.count), 1))
+                    return String(localized: "Average \(avg) milliseconds over \(data.count) days")
+                }())
             }
         }
     }
@@ -337,6 +355,12 @@ struct HistoryView: View {
                     }
                 }
                 .frame(height: 180)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "Sleep trend"))
+                .accessibilityValue({
+                    let avg = data.map(\.hours).reduce(0, +) / max(Double(data.count), 1)
+                    return String(localized: "Average \(String(format: "%.1f", avg)) hours over \(data.count) days")
+                }())
             }
         }
     }
@@ -361,9 +385,11 @@ struct HistoryView: View {
                 Image(systemName: "doc.text.magnifyingglass")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(PulseTheme.accent)
+                    .accessibilityHidden(true)
                 Text("Weekly Comparison")
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
             }
 
             VStack(spacing: 0) {
@@ -442,6 +468,12 @@ struct HistoryView: View {
             .frame(width: 60, alignment: .trailing)
         }
         .padding(.vertical, 10)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel({
+            let thisText = thisWeek.map { formatComparisonValue($0, suffix: suffix) } ?? String(localized: "No data")
+            let lastText = lastWeek.map { formatComparisonValue($0, suffix: suffix) } ?? String(localized: "No data")
+            return "\(label): \(String(localized: "This week")) \(thisText), \(String(localized: "Last week")) \(lastText)"
+        }())
     }
 
     private func formatComparisonValue(_ value: Double, suffix: String) -> String {
@@ -503,10 +535,12 @@ struct HistoryView: View {
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(color)
                 }
+                .accessibilityHidden(true)
 
                 Text(title)
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
             }
 
             content()
@@ -571,17 +605,21 @@ struct HistoryView: View {
                 Image(systemName: icon)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(PulseTheme.accent)
+                    .accessibilityHidden(true)
             }
 
             Text(title)
                 .font(PulseTheme.bodyFont.weight(.medium))
                 .foregroundStyle(PulseTheme.textPrimary)
+                .minimumScaleFactor(0.8)
+                .lineLimit(1)
 
             Spacer()
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(PulseTheme.textTertiary)
+                .accessibilityHidden(true)
         }
         .padding(PulseTheme.spacingM)
         .frame(maxWidth: .infinity)
@@ -594,6 +632,9 @@ struct HistoryView: View {
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
                 .stroke(PulseTheme.accent.opacity(0.15), lineWidth: 0.5)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(.isButton)
     }
 
     // MARK: - 数据计算

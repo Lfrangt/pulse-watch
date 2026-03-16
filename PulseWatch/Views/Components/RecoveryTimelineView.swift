@@ -231,6 +231,7 @@ struct RecoveryTimelineView: View {
             Text("Body Timeline")
                 .font(PulseTheme.headlineFont)
                 .foregroundStyle(PulseTheme.textPrimary)
+                .accessibilityAddTraits(.isHeader)
 
             Spacer()
 
@@ -250,6 +251,7 @@ struct RecoveryTimelineView: View {
                 Image(systemName: "clock.badge.questionmark")
                     .font(.system(size: 28, weight: .light))
                     .foregroundStyle(PulseTheme.textTertiary)
+                    .accessibilityHidden(true)
 
                 Text("No timeline data yet")
                     .font(PulseTheme.captionFont)
@@ -258,6 +260,7 @@ struct RecoveryTimelineView: View {
             .padding(.vertical, PulseTheme.spacingXL)
             Spacer()
         }
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - 时间线主体
@@ -303,6 +306,9 @@ struct TimelineNodeView: View {
             eventContent
         }
         .padding(.vertical, PulseTheme.spacingXS)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(formattedTime), \(event.title)")
+        .accessibilityValue("\(event.detail). \(event.impact)")
         .onAppear {
             // 当前节点启动脉冲动画
             if event.isCurrent {

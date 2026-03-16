@@ -520,6 +520,7 @@ struct SettingsView: View {
                 .font(.system(size: 12))
                 .foregroundStyle(PulseTheme.accent)
                 .frame(width: 20)
+                .accessibilityHidden(true)
 
             Text(name)
                 .font(PulseTheme.captionFont)
@@ -530,7 +531,11 @@ struct SettingsView: View {
             Image(systemName: isAuthorized ? "checkmark.circle.fill" : "xmark.circle")
                 .font(.system(size: 14))
                 .foregroundStyle(isAuthorized ? PulseTheme.statusGood : PulseTheme.textTertiary)
+                .accessibilityHidden(true)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(name)
+        .accessibilityValue(isAuthorized ? String(localized: "Authorized") : String(localized: "Not authorized"))
     }
 
     private func checkDataTypeAuthorization(_ type: HKObjectType) -> Bool {
@@ -1149,9 +1154,13 @@ struct SettingsView: View {
             Image(systemName: icon)
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(PulseTheme.accent)
+                .accessibilityHidden(true)
             Text(title)
                 .font(PulseTheme.headlineFont)
                 .foregroundStyle(PulseTheme.textPrimary)
+                .minimumScaleFactor(0.8)
+                .lineLimit(1)
+                .accessibilityAddTraits(.isHeader)
         }
     }
 

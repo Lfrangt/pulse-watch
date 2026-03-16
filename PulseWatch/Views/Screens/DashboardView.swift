@@ -200,6 +200,7 @@ struct DashboardView: View {
             Text(greeting)
                 .font(PulseTheme.titleFont)
                 .foregroundStyle(PulseTheme.textPrimary)
+                .accessibilityAddTraits(.isHeader)
             Spacer()
         }
         .padding(.top, PulseTheme.spacingM)
@@ -245,12 +246,19 @@ struct DashboardView: View {
                         .font(.system(size: 64, weight: .bold, design: .rounded))
                         .foregroundStyle(PulseTheme.textPrimary)
                         .contentTransition(.numericText())
+                        .minimumScaleFactor(0.6)
+                        .lineLimit(1)
+                        .accessibilityHidden(true)
 
                     Text(headline)
                         .font(.system(size: 14, weight: .medium, design: .rounded))
                         .foregroundStyle(statusColor)
+                        .accessibilityHidden(true)
                 }
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(String(localized: "Recovery Score"))
+            .accessibilityValue(String(localized: "\(score) out of 100, \(headline)"))
             .onAppear {
                 guard !ringAnimated else { return }
                 ringAnimated = true
@@ -330,6 +338,7 @@ struct DashboardView: View {
                     .frame(width: 260, height: 260)
                     .blur(radius: 30)
             }
+            .accessibilityHidden(true)
             .onAppear {
                 emptyPulse = true
             }
@@ -338,6 +347,7 @@ struct DashboardView: View {
                 .font(PulseTheme.bodyFont)
                 .foregroundStyle(PulseTheme.textSecondary)
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.vertical, PulseTheme.spacingXL)
         .frame(maxWidth: .infinity)
@@ -359,6 +369,7 @@ struct DashboardView: View {
             Text("Today's Insights")
                 .font(PulseTheme.headlineFont)
                 .foregroundStyle(PulseTheme.textPrimary)
+                .accessibilityAddTraits(.isHeader)
 
             ForEach(Array(insights.prefix(3).enumerated()), id: \.offset) { _, text in
                 HStack(alignment: .top, spacing: PulseTheme.spacingS) {
@@ -366,6 +377,7 @@ struct DashboardView: View {
                         .fill(PulseTheme.accent.opacity(0.6))
                         .frame(width: 6, height: 6)
                         .padding(.top, 6)
+                        .accessibilityHidden(true)
 
                     Text(text)
                         .font(PulseTheme.bodyFont)
@@ -375,6 +387,7 @@ struct DashboardView: View {
             }
         }
         .pulseCard()
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - 关键指标网格（隐藏空值瓷砖）
@@ -558,11 +571,14 @@ struct DashboardView: View {
                 Text(value)
                     .font(.system(size: 24, weight: .semibold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
 
                 if !unit.isEmpty {
                     Text(unit)
                         .font(PulseTheme.metricLabelFont)
                         .foregroundStyle(PulseTheme.textTertiary)
+                        .minimumScaleFactor(0.7)
                 }
             }
         }
@@ -577,6 +593,10 @@ struct DashboardView: View {
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
                 .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(unit.isEmpty ? value : "\(value) \(unit)")
+        .accessibilityAddTraits(.isStaticText)
     }
 
     // MARK: - 训练建议卡片
@@ -632,6 +652,9 @@ struct DashboardView: View {
             .fill(adviceColor.opacity(0.3))
             .frame(width: 3)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Training Advice"))
+        .accessibilityValue(advice.label)
     }
 
     private func adviceLevel(_ advice: TrainingAdvice) -> Int {
@@ -651,6 +674,7 @@ struct DashboardView: View {
                 .font(PulseTheme.headlineFont)
                 .foregroundStyle(PulseTheme.textPrimary)
                 .padding(.leading, PulseTheme.spacingXS)
+                .accessibilityAddTraits(.isHeader)
 
             ForEach(Array(recentWorkouts.prefix(3)), id: \.id) { workout in
                 workoutRow(workout)
@@ -699,6 +723,9 @@ struct DashboardView: View {
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
                 .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(workoutCategoryName(workout.category)), \(relativeDate(workout.date))")
+        .accessibilityValue("\(workout.durationMinutes) \(String(localized: "minutes"))")
     }
 
     /// 训练分类 -> SF Symbol 图标
@@ -787,6 +814,8 @@ struct DashboardView: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(String(localized: "Set Gym Location"))
+        .accessibilityHint(String(localized: "Opens gym location setup for automatic arrival reminders"))
     }
 
     // MARK: - 身体时间线
@@ -965,6 +994,8 @@ struct DashboardView: View {
                 )
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(String(localized: "Open Settings"))
+            .accessibilityHint(String(localized: "Opens system settings to enable Health data access"))
         }
         .padding(.vertical, PulseTheme.spacingXL)
         .frame(maxWidth: .infinity)

@@ -91,6 +91,8 @@ struct WorkoutShareScreen: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("\(r.rawValue) \(r.label)")
+                .accessibilityAddTraits(selectedRatio == r ? .isSelected : [])
             }
         }
         .padding(.horizontal, PulseTheme.spacingL)
@@ -141,6 +143,8 @@ struct WorkoutShareScreen: View {
         }
         .buttonStyle(PulseButtonStyle())
         .disabled(isRendering)
+        .accessibilityLabel(String(localized: "Share"))
+        .accessibilityHint(String(localized: "Renders the workout card and opens the share sheet"))
     }
 
     // MARK: - Render

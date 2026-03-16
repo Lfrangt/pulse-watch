@@ -217,6 +217,10 @@ struct WorkoutHistoryListView: View {
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
                 .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(entry.activityName), \(formatRelativeDate(entry.startDate))")
+        .accessibilityValue("\(formatDuration(entry.durationMinutes))\(entry.totalCalories.map { ", \(Int($0)) kcal" } ?? "")")
+        .accessibilityHint(String(localized: "Double tap to view details"))
     }
 
     // MARK: - 空状态

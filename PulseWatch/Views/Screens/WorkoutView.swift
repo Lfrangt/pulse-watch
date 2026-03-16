@@ -77,9 +77,11 @@ struct WorkoutView: View {
                 Image(systemName: "calendar")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(PulseTheme.accent)
+                    .accessibilityHidden(true)
                 Text("This Week's Exercise")
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
                 Spacer()
             }
 
@@ -111,6 +113,8 @@ struct WorkoutView: View {
             }
         }
         .pulseCard()
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "This Week's Exercise"))
     }
 
     private func statItem(value: String, unit: String, label: String, color: Color) -> some View {
@@ -224,6 +228,10 @@ struct WorkoutView: View {
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
                 .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
         )
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("\(workoutName(workout)), \(formatWorkoutDate(workout.startDate))")
+        .accessibilityValue("\(formatDuration(Int(workout.duration / 60)))\(workout.totalEnergyBurned.map { ", \(Int($0.doubleValue(for: .kilocalorie()))) kcal" } ?? "")")
+        .accessibilityHint(isExpanded ? String(localized: "Double tap to collapse heart rate zones") : String(localized: "Double tap to expand heart rate zones"))
         .staggered(index: index)
     }
 
@@ -234,6 +242,7 @@ struct WorkoutView: View {
             Text("Heart Rate Zone")
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textSecondary)
+                .accessibilityAddTraits(.isHeader)
 
             ForEach(zones) { zone in
                 HStack(spacing: PulseTheme.spacingS) {
@@ -259,6 +268,9 @@ struct WorkoutView: View {
                         .foregroundStyle(PulseTheme.textTertiary)
                         .frame(width: 36, alignment: .trailing)
                 }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(zone.name)
+                .accessibilityValue("\(Int(zone.percentage * 100)) \(String(localized: "percent"))")
             }
         }
         .padding(.top, PulseTheme.spacingXS)
@@ -276,6 +288,7 @@ struct WorkoutView: View {
                 Image(systemName: "figure.run")
                     .font(.system(size: 32, weight: .light))
                     .foregroundStyle(PulseTheme.accent)
+                    .accessibilityHidden(true)
             }
 
             VStack(spacing: PulseTheme.spacingS) {
@@ -292,6 +305,7 @@ struct WorkoutView: View {
         }
         .padding(.vertical, PulseTheme.spacingXL * 2)
         .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
     }
 
     private var loadingView: some View {

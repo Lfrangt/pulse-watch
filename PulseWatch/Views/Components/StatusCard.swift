@@ -45,6 +45,8 @@ struct StatusCard: View {
                         .font(PulseTheme.scoreFont)
                         .foregroundStyle(PulseTheme.textPrimary)
                         .contentTransition(.numericText())
+                        .minimumScaleFactor(0.6)
+                        .lineLimit(1)
                 }
 
                 VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
@@ -62,6 +64,9 @@ struct StatusCard: View {
                 Spacer(minLength: 0)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Recovery Score"))
+        .accessibilityValue(String(localized: "\(score) out of 100, \(headline). \(insight)"))
         .padding(PulseTheme.spacingL)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
@@ -177,11 +182,14 @@ struct MetricRow: View {
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(color)
             }
+            .accessibilityHidden(true)
 
             // Label
             Text(label)
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textSecondary)
+                .minimumScaleFactor(0.7)
+                .lineLimit(1)
 
             Spacer()
 
@@ -190,6 +198,8 @@ struct MetricRow: View {
                 Text(value)
                     .font(PulseTheme.metricFont)
                     .foregroundStyle(PulseTheme.textPrimary)
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
 
                 if let unit {
                     Text(unit)
@@ -200,6 +210,9 @@ struct MetricRow: View {
         }
         .padding(.vertical, 10)
         .padding(.horizontal, PulseTheme.spacingS)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(unit.map { "\(value) \($0)" } ?? value)
     }
 }
 
@@ -289,6 +302,9 @@ struct TrainingCard: View {
             .fill(intensityColor.opacity(0.3))
             .frame(width: 3)
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(String(localized: "Today's Training Plan"))
+        .accessibilityHint(String(localized: "Shows your recommended exercises for today based on recovery data"))
     }
 
     private var intensityColor: Color {

@@ -56,6 +56,7 @@ struct WeeklyTrendChartsView: View {
                 Text(String(localized: "7-Day Trends"))
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
 
                 Spacer()
 
@@ -104,9 +105,10 @@ struct WeeklyTrendChartsView: View {
             }
         }
         .padding(.vertical, PulseTheme.spacingL)
+        .accessibilityElement(children: .combine)
     }
     
-    private var placeholderChartSilhouette: some View {
+    private var placeholderChartSilhouette: some View { /* decorative only */
         VStack(spacing: PulseTheme.spacingS) {
             // 模拟的图表轮廓
             HStack(alignment: .bottom, spacing: 6) {
@@ -152,6 +154,7 @@ struct WeeklyTrendChartsView: View {
                 .frame(width: 160, height: 40)
             }
         }
+        .accessibilityHidden(true)
     }
 
     // MARK: - 心率折线图
@@ -229,6 +232,9 @@ struct WeeklyTrendChartsView: View {
                     }
                 }
                 .frame(height: 120)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "Heart Rate trend chart"))
+                .accessibilityValue(hrData.isEmpty ? String(localized: "No data") : heartRateSummary(hrData))
             }
         }
     }
@@ -300,6 +306,9 @@ struct WeeklyTrendChartsView: View {
                     }
                 }
                 .frame(height: 120)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "HRV trend chart"))
+                .accessibilityValue(hrvData.isEmpty ? String(localized: "No data") : hrvSummary(hrvData))
             }
         }
     }
@@ -373,6 +382,9 @@ struct WeeklyTrendChartsView: View {
                     }
                 }
                 .frame(height: 120)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "Sleep trend chart"))
+                .accessibilityValue(sleepData.isEmpty ? String(localized: "No data") : sleepSummary(sleepData))
             }
         }
     }
@@ -384,10 +396,12 @@ struct WeeklyTrendChartsView: View {
             Image(systemName: icon)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(color)
+                .accessibilityHidden(true)
 
             Text(title)
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .foregroundStyle(PulseTheme.textPrimary)
+                .accessibilityAddTraits(.isHeader)
 
             Spacer()
 
@@ -397,6 +411,7 @@ struct WeeklyTrendChartsView: View {
                     .foregroundStyle(PulseTheme.textSecondary)
             }
         }
+        .accessibilityElement(children: .combine)
     }
 
     private var miniEmptyPlaceholder: some View {
@@ -408,6 +423,7 @@ struct WeeklyTrendChartsView: View {
             Spacer()
         }
         .frame(height: 60)
+        .accessibilityLabel(String(localized: "Insufficient data to display chart"))
     }
 
     // MARK: - Summary 计算

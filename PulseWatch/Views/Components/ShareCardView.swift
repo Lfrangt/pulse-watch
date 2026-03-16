@@ -57,6 +57,9 @@ struct ShareCardView: View {
         }
         .frame(width: ratio.displaySize.width, height: ratio.displaySize.height)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Share card for \(workoutName)"))
+        .accessibilityValue("\(formatDuration(durationMinutes))\(calories.map { ", \($0) kcal" } ?? "")")
     }
 
     // MARK: - Background

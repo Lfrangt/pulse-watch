@@ -30,6 +30,7 @@
 		3BE750BEC5F4DA16CB6C6BB0 /* PulseWatchWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDBD8ABD5C19A640CEBBC99D /* PulseWatchWatchApp.swift */; };
 		3E28450D7E3D6DB335653DB4 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F2AEDCA575EB20BD7D18E40 /* HistoryView.swift */; };
 		440147DA10654220399E01C4 /* SwiftData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B905C71E8936EB9DB9FD75 /* SwiftData.framework */; };
+		45D0A502CB1409C957F97E7B /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38391093558DC51B8526D406 /* Analytics.swift */; };
 		4A6365C02853DEA90A19D208 /* ScoreEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C689D7ED34748CC72C57C9D /* ScoreEngine.swift */; };
 		4A88CB8CC9ADE27277ED8A92 /* ScoreEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C689D7ED34748CC72C57C9D /* ScoreEngine.swift */; };
 		515988C37B829EAE6F38104B /* WorkoutTrackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD42A291856B9B4DCE954001 /* WorkoutTrackingView.swift */; };
@@ -49,8 +50,11 @@
 		9107EB66D56CCAF8400EFAAA /* HealthRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423E402954856FBC1F53AFD4 /* HealthRecord.swift */; };
 		954756E5B470C6E549220EEF /* DailySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8941CCC61662258ECB2889D /* DailySummary.swift */; };
 		97964B755D121E84C1B6856F /* HealthRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423E402954856FBC1F53AFD4 /* HealthRecord.swift */; };
+		9ABE917F706F6635F1E353EC /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = 2F9F3B85A84BD2312D7CCAE6 /* TelemetryDeck */; };
 		9BB34FF3E9D37F1FEF03FA6F /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C93FB5DBBD7437C3C0479A6 /* LocationManager.swift */; };
 		A1FDE0A560C4AF84E9451881 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1C0D07C1855FDE1FE7E6D5 /* HomeView.swift */; };
+		A2937491C94125D6A7F56604 /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = BDFD603A72EC31CEE1FA50F0 /* TelemetryDeck */; };
+		A5598B904FD562BE33311F63 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38391093558DC51B8526D406 /* Analytics.swift */; };
 		A6699509D400627420C6D418 /* HealthSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B43CF30861598DBA2C32FFCB /* HealthSnapshot.swift */; };
 		A7E8BDCD7A72838576AEAC31 /* HealthAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 749A187F075B3040BC72947E /* HealthAnalyzer.swift */; };
 		A85956F0D9882C577AB59B48 /* DailySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8941CCC61662258ECB2889D /* DailySummary.swift */; };
@@ -125,6 +129,7 @@
 		2F2AEDCA575EB20BD7D18E40 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		363204A6CBD545ECC1DD5485 /* RecoveryTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryTimelineView.swift; sourceTree = "<group>"; };
 		36ED27B3D9E0F37CE264F67B /* WorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutView.swift; sourceTree = "<group>"; };
+		38391093558DC51B8526D406 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		3F5B090F59F8EDC17549FEC2 /* DemoDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDataProvider.swift; sourceTree = "<group>"; };
 		423E402954856FBC1F53AFD4 /* HealthRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthRecord.swift; sourceTree = "<group>"; };
 		448F93975172D1B5FF12A497 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -177,6 +182,22 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		49DC161C4B4CE5CF2E85933C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9ABE917F706F6635F1E353EC /* TelemetryDeck in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C70CEA86E4CCE162EA73B6B3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2937491C94125D6A7F56604 /* TelemetryDeck in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D78F183E475D215DBCBE4E7E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -217,6 +238,7 @@
 		3B5FB9B30DAAC2255BA13DE1 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				38391093558DC51B8526D406 /* Analytics.swift */,
 				624D05567DAEB29F5F5F6D38 /* GymCoordinator.swift */,
 				749A187F075B3040BC72947E /* HealthAnalyzer.swift */,
 				62B314F45ABCFD3CDEFC751D /* HealthDataService.swift */,
@@ -439,6 +461,7 @@
 			buildPhases = (
 				8D970E33F4CFC98C03DE083D /* Sources */,
 				F0115157B0F63A1A5E24462C /* Resources */,
+				C70CEA86E4CCE162EA73B6B3 /* Frameworks */,
 				847419070C6E803C7F891137 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -448,6 +471,7 @@
 			);
 			name = PulseWatch;
 			packageProductDependencies = (
+				BDFD603A72EC31CEE1FA50F0 /* TelemetryDeck */,
 			);
 			productName = PulseWatch;
 			productReference = 85D6B65839C9820E62C6141A /* PulseWatch.app */;
@@ -459,6 +483,7 @@
 			buildPhases = (
 				38A12F58DE43C1EB87234BA4 /* Sources */,
 				C47138F1026987E7EA9A3EC3 /* Resources */,
+				49DC161C4B4CE5CF2E85933C /* Frameworks */,
 				F276FAE6A90A1CC88E3FD094 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -468,6 +493,7 @@
 			);
 			name = PulseWatchWatch;
 			packageProductDependencies = (
+				2F9F3B85A84BD2312D7CCAE6 /* TelemetryDeck */,
 			);
 			productName = PulseWatchWatch;
 			productReference = 7DE41B5DD16B2F31475F9460 /* PulseWatchWatch.app */;
@@ -509,6 +535,9 @@
 			);
 			mainGroup = 49ED658B5A0F2AEA389F6D01;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B9CC0511D2CB99D1F79CE730 /* XCRemoteSwiftPackageReference "SwiftSDK" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7F2B1726F4BD273D0042E707 /* Products */;
 			projectDirPath = "";
@@ -559,6 +588,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5598B904FD562BE33311F63 /* Analytics.swift in Sources */,
 				A85956F0D9882C577AB59B48 /* DailySummary.swift in Sources */,
 				5AF2668F1996BFA0EA981730 /* GymArrivalView.swift in Sources */,
 				83F37F4DCF2C79966B016C4C /* GymCoordinator.swift in Sources */,
@@ -596,6 +626,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				45D0A502CB1409C957F97E7B /* Analytics.swift in Sources */,
 				37C0AE89CC67FAE5F629520F /* AppIconView.swift in Sources */,
 				8D5549A30D2F578A86560129 /* DailySummary.swift in Sources */,
 				5DFB4A4238D5002DE2C96573 /* DashboardView.swift in Sources */,
@@ -970,6 +1001,30 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B9CC0511D2CB99D1F79CE730 /* XCRemoteSwiftPackageReference "SwiftSDK" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/TelemetryDeck/SwiftSDK";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2F9F3B85A84BD2312D7CCAE6 /* TelemetryDeck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B9CC0511D2CB99D1F79CE730 /* XCRemoteSwiftPackageReference "SwiftSDK" */;
+			productName = TelemetryDeck;
+		};
+		BDFD603A72EC31CEE1FA50F0 /* TelemetryDeck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B9CC0511D2CB99D1F79CE730 /* XCRemoteSwiftPackageReference "SwiftSDK" */;
+			productName = TelemetryDeck;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A8805EC5A1B79312458C27F2 /* Project object */;
 }

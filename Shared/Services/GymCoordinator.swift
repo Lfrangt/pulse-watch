@@ -56,6 +56,8 @@ final class GymCoordinator {
             recentWorkouts: []
         )
 
+        Analytics.trackGymArrival()
+
         if let plan = brief.trainingPlan {
             lastSentPlan = plan
             WatchConnectivityManager.shared.sendGymArrival(

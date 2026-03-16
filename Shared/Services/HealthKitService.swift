@@ -371,6 +371,7 @@ final class HealthKitService {
             await performSleepAnchoredQuery(for: sleepType)
         }
         logger.info("初始全量采集完成")
+        Analytics.trackHealthDataSync()
     }
 
     // MARK: - 辅助方法

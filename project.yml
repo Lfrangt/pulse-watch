@@ -57,6 +57,8 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
     dependencies:
       - target: PulseWatchWidget
+      - package: TelemetryDeck
+        product: TelemetryDeck
     entitlements:
       path: PulseWatch/App/PulseWatch.entitlements
       properties:
@@ -101,6 +103,8 @@ targets:
       - path: Shared
     dependencies:
       - target: PulseWatchWatchWidgetExtension
+      - package: TelemetryDeck
+        product: TelemetryDeck
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse.watchkitapp
@@ -136,6 +140,11 @@ targets:
     entitlements:
       path: PulseWatchWatch/Complications/PulseWatchWatchWidgetExtension.entitlements
       properties: {}
+
+packages:
+  TelemetryDeck:
+    url: https://github.com/TelemetryDeck/SwiftSDK
+    from: "2.0.0"
 
 schemes:
   PulseWatch:

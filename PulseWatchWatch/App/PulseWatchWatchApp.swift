@@ -22,6 +22,8 @@ struct PulseWatchWatchApp: App {
     }()
 
     init() {
+        Analytics.initialize()
+
         WatchConnectivityManager.shared.activate()
 
         // 注入 ModelContainer 到数据服务

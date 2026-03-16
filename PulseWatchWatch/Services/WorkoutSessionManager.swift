@@ -168,6 +168,9 @@ final class WorkoutSessionManager: NSObject {
 
         // 触觉反馈
         HapticManager.workoutStarted()
+
+        // 埋点
+        Analytics.trackWorkoutStart(type: type.label)
     }
 
     // MARK: - 暂停/恢复
@@ -217,6 +220,9 @@ final class WorkoutSessionManager: NSObject {
 
         state = .ended
         HapticManager.workoutStopped()
+
+        // 埋点
+        Analytics.trackWorkoutComplete(type: "\(currentWorkoutType.rawValue)", durationMinutes: elapsedSeconds / 60)
     }
 
     // MARK: - 重置（返回空闲）

@@ -22,6 +22,10 @@ struct PulseWatchApp: App {
     }()
 
     init() {
+        // Analytics
+        Analytics.initialize()
+        Analytics.trackAppLaunch()
+
         // 网络与位置
         WatchConnectivityManager.shared.activate()
         LocationManager.shared.requestAuthorization()
@@ -112,5 +116,13 @@ struct MainTabView: View {
                 .tag(2)
         }
         .tint(PulseTheme.accent)
+        .onChange(of: selectedTab) { _, newTab in
+            let tabNames = ["今日", "趋势", "设置"]
+            let name = newTab < tabNames.count ? tabNames[newTab] : "unknown"
+            Analytics.trackTabSwitch(to: name)
+            if newTab == 2 {
+                Analytics.trackSettingsOpened()
+            }
+        }
     }
 }

@@ -818,6 +818,10 @@ struct DashboardView: View {
                 recentWorkouts: recentWorkouts
             )
 
+            if let brief {
+                Analytics.trackScoreViewed(score: brief.score)
+            }
+
             // 生成 AI 洞察
             insight = await MainActor.run {
                 HealthAnalyzer.shared.generateInsight()

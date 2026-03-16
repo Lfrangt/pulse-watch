@@ -528,6 +528,7 @@ struct WeeklyReportView: View {
 
     @MainActor
     private func renderShareImage() {
+        Analytics.trackShareTapped(source: "weekly_report")
         let renderer = ImageRenderer(content:
             reportCardForShare
                 .frame(width: 390)

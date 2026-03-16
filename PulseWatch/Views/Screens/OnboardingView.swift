@@ -69,14 +69,29 @@ struct OnboardingView: View {
 
     // MARK: - Page 1: 欢迎
 
+    @State private var pulseAnimation = false
+
     private var welcomePage: some View {
         VStack(spacing: PulseTheme.spacingL) {
             Spacer()
 
-            // App 图标占位
+            // App 图标 + 脉冲动画
             ZStack {
+                // 呼吸脉冲环
                 Circle()
-                    .fill(PulseTheme.accent.opacity(0.1))
+                    .stroke(PulseTheme.accent.opacity(0.15), lineWidth: 2)
+                    .frame(width: 140, height: 140)
+                    .scaleEffect(pulseAnimation ? 1.3 : 1.0)
+                    .opacity(pulseAnimation ? 0 : 0.6)
+
+                Circle()
+                    .stroke(PulseTheme.accent.opacity(0.1), lineWidth: 1.5)
+                    .frame(width: 140, height: 140)
+                    .scaleEffect(pulseAnimation ? 1.6 : 1.0)
+                    .opacity(pulseAnimation ? 0 : 0.3)
+
+                Circle()
+                    .fill(PulseTheme.accent.opacity(0.08))
                     .frame(width: 120, height: 120)
                     .blur(radius: 20)
 
@@ -95,10 +110,15 @@ struct OnboardingView: View {
                         )
                     )
             }
+            .onAppear {
+                withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: false)) {
+                    pulseAnimation = true
+                }
+            }
 
             VStack(spacing: PulseTheme.spacingS) {
-                Text("Pulse Watch")
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                Text("Pulse")
+                    .font(.system(size: 42, weight: .bold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
 
                 Text("Your Smart Health Companion")
@@ -113,8 +133,27 @@ struct OnboardingView: View {
                 .lineSpacing(4)
                 .padding(.horizontal, PulseTheme.spacingL)
 
+            // 差异化卖点
+            HStack(spacing: 20) {
+                sellingPoint(icon: "lock.fill", text: "On-device")
+                sellingPoint(icon: "dollarsign.circle.fill", text: "Buy once")
+                sellingPoint(icon: "xmark.circle.fill", text: "No ads")
+            }
+            .padding(.top, PulseTheme.spacingS)
+
             Spacer()
             Spacer()
+        }
+    }
+
+    private func sellingPoint(icon: String, text: String) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 16))
+                .foregroundStyle(PulseTheme.textTertiary)
+            Text(text)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(PulseTheme.textTertiary)
         }
     }
 
@@ -349,6 +388,17 @@ struct OnboardingView: View {
                     .lineSpacing(4)
                     .padding(.horizontal, PulseTheme.spacingM)
             }
+
+            // 小提示
+            HStack(spacing: PulseTheme.spacingS) {
+                Image(systemName: "applewatch")
+                    .font(.system(size: 14))
+                    .foregroundStyle(PulseTheme.textTertiary)
+                Text("Keep wearing your watch to build your baseline")
+                    .font(.system(size: 13, weight: .regular, design: .rounded))
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+            .padding(.horizontal, PulseTheme.spacingL)
 
             Spacer()
 

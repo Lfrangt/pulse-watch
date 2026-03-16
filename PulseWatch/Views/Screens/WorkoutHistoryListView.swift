@@ -10,6 +10,8 @@ struct WorkoutHistoryListView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var showDeleteConfirm = false
     @State private var entryToDelete: WorkoutHistoryEntry?
+    @State private var entryToShare: WorkoutHistoryEntry?
+    @State private var showShareScreen = false
 
     var body: some View {
         NavigationStack {
@@ -39,6 +41,12 @@ struct WorkoutHistoryListView: View {
             } message: { entry in
                 Text("Delete \(entry.activityName) on \(formatDate(entry.startDate))?")
             }
+            .fullScreenCover(isPresented: $showShareScreen) {
+                if let entry = entryToShare {
+                    WorkoutShareScreen(entry: entry)
+                        .preferredColorScheme(.dark)
+                }
+            }
         }
     }
 
@@ -63,6 +71,13 @@ struct WorkoutHistoryListView: View {
                             }
                             .buttonStyle(.plain)
                             .contextMenu {
+                                Button {
+                                    entryToShare = entry
+                                    showShareScreen = true
+                                } label: {
+                                    Label(String(localized: "Share"), systemImage: "square.and.arrow.up")
+                                }
+
                                 Button(role: .destructive) {
                                     entryToDelete = entry
                                     showDeleteConfirm = true

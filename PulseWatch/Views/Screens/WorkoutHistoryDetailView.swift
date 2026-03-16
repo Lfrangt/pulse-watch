@@ -8,6 +8,7 @@ struct WorkoutHistoryDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirm = false
+    @State private var showShareScreen = false
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -48,7 +49,22 @@ struct WorkoutHistoryDetailView: View {
         .background(PulseTheme.background)
         .navigationTitle(entry.activityName)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showShareScreen = true
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(PulseTheme.accent)
+                }
+            }
+        }
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .fullScreenCover(isPresented: $showShareScreen) {
+            WorkoutShareScreen(entry: entry)
+                .preferredColorScheme(.dark)
+        }
         .alert(
             String(localized: "Delete Workout"),
             isPresented: $showDeleteConfirm

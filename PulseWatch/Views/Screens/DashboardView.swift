@@ -138,13 +138,17 @@ struct DashboardView: View {
             }
             .sheet(isPresented: $showShareSheet) {
                 if let brief, let image = ShareCardView(
-                    score: brief.score,
-                    headline: brief.headline,
-                    workoutType: nil,
-                    duration: nil,
+                    workoutName: brief.headline,
+                    workoutIcon: "heart.circle.fill",
+                    workoutColorHex: brief.score >= 70 ? "7FB069" : (brief.score >= 40 ? "D4A056" : "C75C5C"),
+                    durationMinutes: 0,
                     calories: nil,
+                    averageHeartRate: nil,
+                    maxHeartRate: nil,
+                    distance: nil,
+                    heartRateZones: [],
                     date: .now
-                ).renderImage() {
+                ).renderImage(for: .story) {
                     ShareSheet(items: [image])
                         .onAppear { Analytics.trackShareTapped(source: "dashboard") }
                 }

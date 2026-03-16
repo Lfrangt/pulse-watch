@@ -1,204 +1,374 @@
 import SwiftUI
 
-/// 分享卡片 — 生成可分享的成绩图片
+/// 社交分享卡 — 训练完成后生成可分享的成绩图片
 /// 支持 Instagram Story (9:16) 和正方形 (1:1)
+/// 深色暖调设计，与 Pulse Watch 主题一致
 struct ShareCardView: View {
-    let score: Int
-    let headline: String
-    let workoutType: String?
-    let duration: String?
+
+    // MARK: - Data
+
+    let workoutName: String
+    let workoutIcon: String
+    let workoutColorHex: String
+    let durationMinutes: Int
     let calories: Int?
+    let averageHeartRate: Int?
+    let maxHeartRate: Int?
+    let distance: Double?           // meters
+    let heartRateZones: [ShareHRZone]
     let date: Date
-
-    enum CardRatio: String, CaseIterable {
-        case story = "9:16"
-        case square = "1:1"
-
-        var size: CGSize {
-            switch self {
-            case .story: return CGSize(width: 1080, height: 1920)
-            case .square: return CGSize(width: 1080, height: 1080)
-            }
-        }
-    }
 
     var ratio: CardRatio = .story
 
-    var body: some View {
-        ZStack {
-            // 背景渐变
-            backgroundGradient
+    // MARK: - Card Ratio
 
-            VStack(spacing: ratio == .story ? 40 : 24) {
-                if ratio == .story { Spacer() }
+    enum CardRatio: String, CaseIterable, Identifiable {
+        case story = "Story"
+        case square = "Square"
 
-                // 日期
-                Text(dateString)
-                    .font(.system(size: 18, weight: .medium, design: .rounded))
-                    .foregroundStyle(Color.white.opacity(0.6))
+        var id: String { rawValue }
 
-                // 大评分圆环
-                scoreRing
-                    .frame(width: ringSize, height: ringSize)
-
-                // 训练信息
-                if workoutType != nil || duration != nil || calories != nil {
-                    trainingInfo
-                }
-
-                if ratio == .story { Spacer() }
-
-                // 品牌水印
-                watermark
-
-                if ratio == .story {
-                    Spacer().frame(height: 40)
-                }
+        var renderSize: CGSize {
+            switch self {
+            case .story:  return CGSize(width: 1080, height: 1920)
+            case .square: return CGSize(width: 1080, height: 1080)
             }
-            .padding(32)
         }
-        .frame(width: ratio.size.width / 3, height: ratio.size.height / 3)
+
+        /// Display size = render / 3 for preview
+        var displaySize: CGSize {
+            CGSize(width: renderSize.width / 3, height: renderSize.height / 3)
+        }
+
+        var label: String {
+            switch self {
+            case .story:  return "9:16"
+            case .square: return "1:1"
+            }
+        }
     }
 
-    // MARK: - 背景
+    // MARK: - Body
 
-    private var backgroundGradient: some View {
-        let statusColor = PulseTheme.statusColor(for: score)
-        return ZStack {
-            // 深色底
+    var body: some View {
+        ZStack {
+            backgroundView
+            contentStack
+        }
+        .frame(width: ratio.displaySize.width, height: ratio.displaySize.height)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    // MARK: - Background
+
+    private var workoutColor: Color { Color(hex: workoutColorHex) }
+
+    private var backgroundView: some View {
+        ZStack {
+            // Deep warm base
             LinearGradient(
-                colors: [Color(hex: "0D0C0B"), Color(hex: "1A1715")],
+                colors: [Color(hex: "0D0C0B"), Color(hex: "1A1715"), Color(hex: "0D0C0B")],
                 startPoint: .top,
                 endPoint: .bottom
             )
 
-            // 状态色光晕
+            // Workout color ambient glow — top
             RadialGradient(
-                colors: [statusColor.opacity(0.3), Color.clear],
-                center: .center,
-                startRadius: 20,
-                endRadius: 250
+                colors: [workoutColor.opacity(0.2), Color.clear],
+                center: .top,
+                startRadius: 10,
+                endRadius: 300
             )
+
+            // Subtle bottom accent glow
+            RadialGradient(
+                colors: [PulseTheme.accent.opacity(0.08), Color.clear],
+                center: .bottom,
+                startRadius: 10,
+                endRadius: 200
+            )
+
+            // Noise texture simulation — subtle grain
+            Rectangle()
+                .fill(.white.opacity(0.01))
         }
     }
 
-    // MARK: - 评分圆环
+    // MARK: - Content
 
-    private var ringSize: CGFloat { ratio == .story ? 180 : 140 }
+    private var contentStack: some View {
+        VStack(spacing: ratio == .story ? 28 : 18) {
+            if ratio == .story { Spacer().frame(height: 20) }
 
-    private var scoreRing: some View {
-        let statusColor = PulseTheme.statusColor(for: score)
-        let progress = CGFloat(score) / 100.0
+            // Date
+            dateLabel
 
-        return ZStack {
-            // 光晕
-            Circle()
-                .fill(statusColor.opacity(0.12))
-                .frame(width: ringSize + 30, height: ringSize + 30)
-                .blur(radius: 20)
+            // Workout type header
+            workoutHeader
 
-            // 轨道
-            Circle()
-                .stroke(Color.white.opacity(0.08), lineWidth: 10)
+            // Key metrics row
+            metricsRow
 
-            // 进度弧
-            Circle()
-                .trim(from: 0, to: progress)
-                .stroke(
-                    AngularGradient(
-                        colors: [statusColor.opacity(0.5), statusColor],
-                        center: .center,
-                        startAngle: .degrees(-90),
-                        endAngle: .degrees(270)
-                    ),
-                    style: StrokeStyle(lineWidth: 10, lineCap: .round)
+            // Heart rate zones
+            if !heartRateZones.isEmpty {
+                hrZonesCard
+            }
+
+            // Heart rate summary (if available)
+            if averageHeartRate != nil || maxHeartRate != nil {
+                hrSummaryRow
+            }
+
+            if ratio == .story { Spacer() }
+
+            // Watermark
+            watermark
+
+            if ratio == .story { Spacer().frame(height: 24) }
+        }
+        .padding(.horizontal, 28)
+        .padding(.vertical, ratio == .square ? 24 : 0)
+    }
+
+    // MARK: - Date
+
+    private var dateLabel: some View {
+        Text(formattedDate)
+            .font(.system(size: 14, weight: .medium, design: .rounded))
+            .foregroundStyle(.white.opacity(0.45))
+    }
+
+    // MARK: - Workout Header
+
+    private var workoutHeader: some View {
+        VStack(spacing: 10) {
+            // Icon circle
+            ZStack {
+                Circle()
+                    .fill(workoutColor.opacity(0.15))
+                    .frame(width: ratio == .story ? 72 : 56, height: ratio == .story ? 72 : 56)
+
+                // Outer glow
+                Circle()
+                    .fill(workoutColor.opacity(0.06))
+                    .frame(width: ratio == .story ? 96 : 72, height: ratio == .story ? 96 : 72)
+                    .blur(radius: 12)
+
+                Image(systemName: workoutIcon)
+                    .font(.system(size: ratio == .story ? 28 : 22, weight: .medium))
+                    .foregroundStyle(workoutColor)
+            }
+
+            Text(workoutName)
+                .font(.system(size: ratio == .story ? 26 : 20, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+        }
+    }
+
+    // MARK: - Metrics Row
+
+    private var metricsRow: some View {
+        HStack(spacing: 0) {
+            // Duration
+            metricPill(
+                icon: "clock.fill",
+                value: formatDuration(durationMinutes),
+                color: PulseTheme.accent
+            )
+
+            metricDivider
+
+            // Calories
+            if let cal = calories, cal > 0 {
+                metricPill(
+                    icon: "flame.fill",
+                    value: "\(cal) kcal",
+                    color: PulseTheme.statusModerate
                 )
-                .rotationEffect(.degrees(-90))
-
-            // 分数
-            VStack(spacing: 2) {
-                Text("\(score)")
-                    .font(.system(size: 52, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-
-                Text(headline)
-                    .font(.system(size: 14, weight: .medium, design: .rounded))
-                    .foregroundStyle(statusColor)
-            }
-        }
-    }
-
-    // MARK: - 训练信息
-
-    private var trainingInfo: some View {
-        VStack(spacing: 12) {
-            if let type = workoutType {
-                infoChip(icon: "dumbbell.fill", text: type)
             }
 
-            HStack(spacing: 16) {
-                if let dur = duration {
-                    infoChip(icon: "clock.fill", text: dur)
-                }
-                if let cal = calories, cal > 0 {
-                    infoChip(icon: "flame.fill", text: "\(cal) kcal")
-                }
+            // Distance (if relevant)
+            if let dist = distance, dist > 100 {
+                metricDivider
+                metricPill(
+                    icon: "location.fill",
+                    value: String(format: "%.1f km", dist / 1000),
+                    color: PulseTheme.statusGood
+                )
             }
         }
-    }
-
-    private func infoChip(icon: String, text: String) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.system(size: 13))
-                .foregroundStyle(PulseTheme.accent)
-            Text(text)
-                .font(.system(size: 15, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.85))
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
+        .padding(.vertical, 14)
+        .padding(.horizontal, 16)
         .background(
-            Capsule()
-                .fill(Color.white.opacity(0.08))
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white.opacity(0.04))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                )
         )
     }
 
-    // MARK: - 水印
+    private func metricPill(icon: String, value: String, color: Color) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(color)
+
+            Text(value)
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.9))
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var metricDivider: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.08))
+            .frame(width: 0.5, height: 32)
+    }
+
+    // MARK: - Heart Rate Zones
+
+    private var hrZonesCard: some View {
+        VStack(alignment: .leading, spacing: ratio == .story ? 10 : 7) {
+            Text(String(localized: "Heart Rate Zones"))
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.5))
+                .padding(.bottom, 2)
+
+            ForEach(heartRateZones) { zone in
+                HStack(spacing: 8) {
+                    Text(zone.name)
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(hex: zone.colorHex))
+                        .frame(width: 52, alignment: .leading)
+
+                    // Bar
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            RoundedRectangle(cornerRadius: 3, style: .continuous)
+                                .fill(Color(hex: zone.colorHex).opacity(0.12))
+
+                            RoundedRectangle(cornerRadius: 3, style: .continuous)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [Color(hex: zone.colorHex).opacity(0.7), Color(hex: zone.colorHex)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .frame(width: max(4, geo.size.width * zone.percentage))
+                        }
+                    }
+                    .frame(height: ratio == .story ? 10 : 8)
+
+                    Text("\(Int(zone.percentage * 100))%")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.4))
+                        .frame(width: 32, alignment: .trailing)
+                }
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white.opacity(0.03))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(Color.white.opacity(0.05), lineWidth: 0.5)
+                )
+        )
+    }
+
+    // MARK: - HR Summary
+
+    private var hrSummaryRow: some View {
+        HStack(spacing: 20) {
+            if let avg = averageHeartRate {
+                HStack(spacing: 6) {
+                    Image(systemName: "heart.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(PulseTheme.statusPoor.opacity(0.8))
+                    Text(String(localized: "Avg") + " \(avg) bpm")
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.6))
+                }
+            }
+
+            if let max = maxHeartRate {
+                HStack(spacing: 6) {
+                    Image(systemName: "heart.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(PulseTheme.statusPoor)
+                    Text(String(localized: "Max") + " \(max) bpm")
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.6))
+                }
+            }
+        }
+    }
+
+    // MARK: - Watermark
 
     private var watermark: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
+            // Pulse Watch icon
             Image(systemName: "heart.circle.fill")
-                .font(.system(size: 16))
-                .foregroundStyle(PulseTheme.accent)
-            Text("Tracked with Pulse 💪")
-                .font(.system(size: 14, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.4))
+                .font(.system(size: 18, weight: .medium))
+                .foregroundStyle(PulseTheme.accent.opacity(0.6))
+
+            Text("Tracked with Pulse Watch")
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.3))
         }
     }
 
     // MARK: - Helpers
 
-    private var dateString: String {
+    private var formattedDate: String {
         let fmt = DateFormatter()
-        fmt.dateFormat = "MMM d, yyyy"
+        fmt.dateFormat = "MMM d, yyyy · HH:mm"
         return fmt.string(from: date)
     }
 
-    // MARK: - 渲染为图片
+    private func formatDuration(_ minutes: Int) -> String {
+        if minutes >= 60 {
+            let h = minutes / 60
+            let m = minutes % 60
+            return m > 0 ? "\(h)h\(m)min" : "\(h)h"
+        }
+        return "\(minutes) min"
+    }
+
+    // MARK: - Render to Image
 
     @MainActor
-    func renderImage(ratio: CardRatio = .story) -> UIImage? {
+    func renderImage(for targetRatio: CardRatio) -> UIImage? {
         var card = self
-        card.ratio = ratio
-        let size = CGSize(width: ratio.size.width / 3, height: ratio.size.height / 3)
-        let renderer = ImageRenderer(content: card.frame(width: size.width, height: size.height))
-        renderer.scale = 3.0 // @3x for high quality
+        card.ratio = targetRatio
+        let size = targetRatio.displaySize
+
+        let renderer = ImageRenderer(
+            content: card
+                .frame(width: size.width, height: size.height)
+                .environment(\.colorScheme, .dark)
+        )
+        renderer.scale = 3.0   // @3x → full 1080px output
         return renderer.uiImage
     }
 }
 
-// MARK: - Share Helper
+// MARK: - ShareHRZone
+
+struct ShareHRZone: Identifiable {
+    var id: String { name }
+    let name: String
+    let percentage: Double      // 0.0 ~ 1.0
+    let colorHex: String
+}
+
+// MARK: - ShareSheet
 
 struct ShareSheet: UIViewControllerRepresentable {
     let items: [Any]
@@ -210,14 +380,49 @@ struct ShareSheet: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
-#Preview {
+// MARK: - Preview
+
+#Preview("Story") {
     ShareCardView(
-        score: 85,
-        headline: "Peak",
-        workoutType: "Push Day",
-        duration: "48 min",
+        workoutName: "Push Day",
+        workoutIcon: "dumbbell.fill",
+        workoutColorHex: "D4A056",
+        durationMinutes: 48,
         calories: 320,
+        averageHeartRate: 142,
+        maxHeartRate: 175,
+        distance: nil,
+        heartRateZones: [
+            ShareHRZone(name: "Warm-up", percentage: 0.10, colorHex: "7FB069"),
+            ShareHRZone(name: "Fat Burn", percentage: 0.15, colorHex: "A8C256"),
+            ShareHRZone(name: "Cardio", percentage: 0.40, colorHex: "D4A056"),
+            ShareHRZone(name: "Anaerobic", percentage: 0.25, colorHex: "D47456"),
+            ShareHRZone(name: "Peak", percentage: 0.10, colorHex: "C75C5C"),
+        ],
         date: .now
+    )
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Square") {
+    ShareCardView(
+        workoutName: "Running",
+        workoutIcon: "figure.run",
+        workoutColorHex: "C75C5C",
+        durationMinutes: 35,
+        calories: 410,
+        averageHeartRate: 158,
+        maxHeartRate: 185,
+        distance: 5230,
+        heartRateZones: [
+            ShareHRZone(name: "Warm-up", percentage: 0.05, colorHex: "7FB069"),
+            ShareHRZone(name: "Fat Burn", percentage: 0.10, colorHex: "A8C256"),
+            ShareHRZone(name: "Cardio", percentage: 0.45, colorHex: "D4A056"),
+            ShareHRZone(name: "Anaerobic", percentage: 0.30, colorHex: "D47456"),
+            ShareHRZone(name: "Peak", percentage: 0.10, colorHex: "C75C5C"),
+        ],
+        date: .now,
+        ratio: .square
     )
     .preferredColorScheme(.dark)
 }

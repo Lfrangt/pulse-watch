@@ -344,6 +344,10 @@ final class MorningBriefService: NSObject {
         // 标题：Good Morning · Score 78
         content.title = String(format: String(localized: "Good Morning · Score %d"), score)
 
+        // 三分副标题（如果有）
+        content.subtitle = String(format: String(localized: "Sleep %d · Activity %d · Readiness %d"),
+                                  insight.sleepScore, 0, insight.recoveryScore)
+
         // 睡眠显示（昨晚）
         let summary = HealthDataService.shared.fetchTodaySummary()
         let sleepMinutes = summary?.sleepDurationMinutes ?? 0

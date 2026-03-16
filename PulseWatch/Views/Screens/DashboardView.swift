@@ -30,6 +30,12 @@ struct DashboardView: View {
     // Strain
     @State private var todayStrain: Int = 0
 
+    // Tri-Score
+    @State private var triScore: TriScoreService.TriScore?
+    @State private var expandedScoreType: ScoreType? = nil
+
+    enum ScoreType { case sleep, activity, readiness }
+
     // Health Age
     @State private var healthAgeResult: HealthAgeService.HealthAgeResult?
     @State private var healthAgeExpanded = false
@@ -70,6 +76,12 @@ struct DashboardView: View {
                         // 空数据状态 — 温暖邀请
                         emptyStateCard
                             .staggered(index: 1)
+                    }
+
+                    // 三大评分 (Sleep / Activity / Readiness)
+                    if let tri = triScore {
+                        triScoreCard(tri)
+                            .staggered(index: 2)
                     }
 
                     // 🔥 Streak badge
@@ -697,6 +709,114 @@ struct DashboardView: View {
         }
     }
 
+    // MARK: - 三大评分卡片
+
+    private func triScoreCard(_ tri: TriScoreService.TriScore) -> some View {
+        VStack(spacing: PulseTheme.spacingM) {
+            // 三圆环并排
+            HStack(spacing: 0) {
+                triScoreRing(
+                    score: tri.sleep.score,
+                    label: String(localized: "Sleep"),
+                    icon: "moon.fill",
+                    color: Color(hex: "8B7EC8"),
+                    type: .sleep
+                )
+                triScoreRing(
+                    score: tri.activity.score,
+                    label: String(localized: "Activity"),
+                    icon: "flame.fill",
+                    color: Color(hex: "D4A056"),
+                    type: .activity
+                )
+                triScoreRing(
+                    score: tri.readiness.score,
+                    label: String(localized: "Readiness"),
+                    icon: "bolt.heart.fill",
+                    color: PulseTheme.accent,
+                    type: .readiness
+                )
+            }
+
+            // 展开详情
+            if let expanded = expandedScoreType {
+                let detail: TriScoreService.ScoreDetail = {
+                    switch expanded {
+                    case .sleep:     return tri.sleep
+                    case .activity:  return tri.activity
+                    case .readiness: return tri.readiness
+                    }
+                }()
+
+                Divider().background(PulseTheme.border)
+
+                VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                    // 建议
+                    Text(detail.advice)
+                        .font(PulseTheme.bodyFont)
+                        .foregroundStyle(PulseTheme.textSecondary)
+
+                    // 各因素
+                    ForEach(detail.factors.indices, id: \.self) { i in
+                        let f = detail.factors[i]
+                        HStack {
+                            Text(f.name)
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                            Spacer()
+                            Text(f.value)
+                                .font(PulseTheme.captionFont.weight(.medium))
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(f.weight)
+                                .font(.system(size: 10))
+                                .foregroundStyle(PulseTheme.textTertiary)
+                                .frame(width: 30, alignment: .trailing)
+                        }
+                    }
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .pulseCard()
+    }
+
+    private func triScoreRing(score: Int, label: String, icon: String, color: Color, type: ScoreType) -> some View {
+        Button {
+            withAnimation(.spring(response: 0.3)) {
+                expandedScoreType = expandedScoreType == type ? nil : type
+            }
+        } label: {
+            VStack(spacing: 6) {
+                ZStack {
+                    Circle()
+                        .stroke(PulseTheme.border, lineWidth: 5)
+                        .frame(width: 64, height: 64)
+                    Circle()
+                        .trim(from: 0, to: CGFloat(score) / 100)
+                        .stroke(color, style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                        .frame(width: 64, height: 64)
+                        .rotationEffect(.degrees(-90))
+                    VStack(spacing: 0) {
+                        Text("\(score)")
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundStyle(PulseTheme.textPrimary)
+                    }
+                }
+                HStack(spacing: 3) {
+                    Image(systemName: icon)
+                        .font(.system(size: 9))
+                        .foregroundStyle(color)
+                    Text(label)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(label) \(score)")
+    }
+
     // MARK: - 🔥 Streak Badge
 
     private func streakBadge(streak: Int) -> some View {
@@ -1178,6 +1298,7 @@ struct DashboardView: View {
             currentStreak = StreakService.shared.currentStreak
             todayStrain = StrainScoreService.demoStrain
             healthAgeResult = HealthAgeService.demoResult
+            triScore = TriScoreService.demoTriScore
             ringAnimated = false
             isLoading = false
             return
@@ -1240,6 +1361,9 @@ struct DashboardView: View {
 
         // Health Age
         healthAgeResult = HealthAgeService.shared.compute(modelContext: modelContext)
+
+        // Tri-Score
+        triScore = TriScoreService.shared.compute(modelContext: modelContext)
 
         isLoading = false
     }

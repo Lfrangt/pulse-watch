@@ -1,0 +1,31 @@
+Stop deciphering dashboards. Pulse reads your Apple Watch health data and gives you one number: your daily health score.
+
+Heart rate, HRV, sleep, steps, blood oxygen — collected automatically, scored from 0 to 100. Open the app, see your score, know how your body is doing. That's it.
+
+WHAT YOU GET:
+
+• Daily Health Score — sleep, HRV, resting heart rate, and activity distilled into a single actionable number
+• Morning Brief — wake up to a personalized health summary notification
+• Real-time workout tracking — heart rate zones on your Apple Watch, live during every session
+• 7-day trend charts — heart rate, HRV, and sleep trends so you can spot patterns
+• Training history — every workout saved with duration, heart rate zones, and calories
+• Heart rate alerts — get notified when your resting heart rate is unusually high or low
+• Gym detection — arrive at the gym and get automatic PPL training suggestions
+• Widgets everywhere — Home Screen, Lock Screen, and Apple Watch complications
+• Share your wins — generate workout achievement cards for Instagram, Twitter, or group chats
+
+WHY PULSE:
+
+No subscription. Buy once, own forever. Your health data never leaves your device — no accounts, no cloud uploads, no tracking. Just you and your data.
+
+Most health apps bury you in charts. Pulse gives you one score and tells you what it means. Less time analyzing, more time living.
+
+OPTIONAL AI COACHING:
+
+Connect your own OpenClaw instance for AI-powered training advice, anomaly alerts, and conversational health coaching. Your data stays on your server, not ours.
+
+REQUIREMENTS:
+
+• iPhone with iOS 17.0+
+• Apple Watch with watchOS 10.0+ (recommended for full features)
+• HealthKit data from Apple Watch or compatible sensors

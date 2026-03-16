@@ -1,0 +1,10 @@
+Welcome to Pulse! Your personal AI health agent for Apple Watch.
+
+• Daily Health Score (0-100) based on sleep, HRV, heart rate, and activity
+• Real-time workout tracking with heart rate zones
+• 7-day trend charts for heart rate, HRV, and sleep
+• Morning Brief notifications
+• Heart rate anomaly alerts
+• Home Screen, Lock Screen, and Apple Watch widgets
+• Social share cards for your workout achievements
+• All data stored locally on your device — no subscriptions, no cloud

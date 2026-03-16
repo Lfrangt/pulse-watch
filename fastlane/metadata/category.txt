@@ -1,0 +1,9 @@
+Primary: Health & Fitness (MZGenre.HealthAndFitness = 6013)
+Secondary: Medical (MZGenre.Medical = 6020)
+
+Notes:
+- Health & Fitness is the natural home for workout + health score apps
+- Medical as secondary covers heart rate monitoring and health anomaly alerts
+- In App Store Connect: select "Health & Fitness" as primary category
+- Secondary category "Medical" signals clinical-adjacent health monitoring
+- Age Rating: 4+ (no objectionable content, health data is user's own)

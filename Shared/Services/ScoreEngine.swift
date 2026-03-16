@@ -8,7 +8,7 @@ struct ScoreEngine {
     
     struct DailyBrief {
         let score: Int                    // 0-100
-        let headline: String             // String(localized: "状态良好") / String(localized: "需要休息")
+        let headline: String             // String(localized: "Good") / String(localized: "Rest")
         let insight: String              // One-line actionable insight
         let sleepSummary: String?
         let recoveryNote: String?
@@ -89,19 +89,19 @@ struct ScoreEngine {
     
     private static func generateInsight(score: Int, hrv: Double?, sleepMinutes: Int) -> String {
         if score >= 80 {
-            return String(localized: "身体恢复很好，适合高强度训练")
+            return String(localized: "Great recovery — go hard today")
         } else if score >= 60 {
             if sleepMinutes < 360 {
-                return String(localized: "睡眠不足，今天注意补觉")
+                return String(localized: "Sleep deficit — try to catch up today")
             }
-            return String(localized: "状态不错，正常安排就好")
+            return String(localized: "Looking good — train as planned")
         } else if score >= 40 {
             if let hrv, hrv < 30 {
-                return String(localized: "HRV偏低，建议轻量活动或休息")
+                return String(localized: "HRV low — try light activity or rest")
             }
-            return String(localized: "身体在恢复中，避免高强度")
+            return String(localized: "Still recovering — avoid high intensity")
         } else {
-            return String(localized: "身体需要休息，今天别硬撑")
+            return String(localized: "Your body needs rest — don't push it")
         }
     }
     
@@ -111,7 +111,7 @@ struct ScoreEngine {
         guard total > 0 else { return nil }
         let hours = total / 60
         let mins = total % 60
-        let deepLabel = String(localized: "深睡")
+        let deepLabel = String(localized: "Deep")
         return "\(hours)h\(mins)m · \(deepLabel) \(deep)m · REM \(rem)m"
     }
     
@@ -128,7 +128,7 @@ struct ScoreEngine {
             notes.append("静息心率偏高(\(Int(rhr))bpm)")
         }
         
-        return notes.isEmpty ? nil : notes.joined(separator: "，")
+        return notes.isEmpty ? nil : notes.joined(separator: ", ")
     }
     
     // MARK: - Training Suggestion
@@ -140,7 +140,7 @@ struct ScoreEngine {
                 daysSinceLastTrained: 0,
                 suggestedExercises: [],
                 intensity: .light,
-                reason: String(localized: "身体需要休息，建议今天不训练")
+                reason: String(localized: "Rest day — skip training today")
             )
         }
         
@@ -186,11 +186,11 @@ struct ScoreEngine {
     
     private static func localizedGroup(_ group: String) -> String {
         switch group {
-        case "chest": return String(localized: "胸")
-        case "back": return String(localized: "背")
-        case "legs": return String(localized: "腿")
-        case "shoulders": return String(localized: "肩")
-        case "arms": return String(localized: "手臂")
+        case "chest": return String(localized: "Chest")
+        case "back": return String(localized: "Back")
+        case "legs": return String(localized: "Legs")
+        case "shoulders": return String(localized: "Shoulders")
+        case "arms": return String(localized: "Arms")
         default: return group
         }
     }
@@ -202,27 +202,27 @@ struct ScoreEngine {
         switch group {
         case "chest":
             return [
-                SuggestedExercise(name: String(localized: "平板卧推"), sets: sets, reps: reps, suggestedWeight: nil),
-                SuggestedExercise(name: String(localized: "上斜哑铃卧推"), sets: 3, reps: 10, suggestedWeight: nil),
-                SuggestedExercise(name: String(localized: "绳索飞鸟"), sets: 3, reps: 12, suggestedWeight: nil),
+                SuggestedExercise(name: String(localized: "Flat Bench Press"), sets: sets, reps: reps, suggestedWeight: nil),
+                SuggestedExercise(name: String(localized: "Incline Dumbbell Press"), sets: 3, reps: 10, suggestedWeight: nil),
+                SuggestedExercise(name: String(localized: "Cable Fly"), sets: 3, reps: 12, suggestedWeight: nil),
             ]
         case "back":
             return [
-                SuggestedExercise(name: String(localized: "引体向上"), sets: sets, reps: reps, suggestedWeight: nil),
-                SuggestedExercise(name: String(localized: "杠铃划船"), sets: 3, reps: 10, suggestedWeight: nil),
-                SuggestedExercise(name: String(localized: "坐姿划船"), sets: 3, reps: 12, suggestedWeight: nil),
+                SuggestedExercise(name: String(localized: "Pull-up"), sets: sets, reps: reps, suggestedWeight: nil),
+                SuggestedExercise(name: String(localized: "Barbell Row"), sets: 3, reps: 10, suggestedWeight: nil),
+                SuggestedExercise(name: String(localized: "Seated Row"), sets: 3, reps: 12, suggestedWeight: nil),
             ]
         case "legs":
             return [
-                SuggestedExercise(name: String(localized: "深蹲"), sets: sets, reps: reps, suggestedWeight: nil),
-                SuggestedExercise(name: String(localized: "腿举"), sets: 3, reps: 10, suggestedWeight: nil),
-                SuggestedExercise(name: String(localized: "罗马尼亚硬拉"), sets: 3, reps: 10, suggestedWeight: nil),
+                SuggestedExercise(name: String(localized: "Squat"), sets: sets, reps: reps, suggestedWeight: nil),
+                SuggestedExercise(name: String(localized: "Leg Press"), sets: 3, reps: 10, suggestedWeight: nil),
+                SuggestedExercise(name: String(localized: "Romanian Deadlift"), sets: 3, reps: 10, suggestedWeight: nil),
             ]
         case "shoulders":
             return [
-                SuggestedExercise(name: String(localized: "哑铃推举"), sets: sets, reps: reps, suggestedWeight: nil),
-                SuggestedExercise(name: String(localized: "侧平举"), sets: 3, reps: 12, suggestedWeight: nil),
-                SuggestedExercise(name: String(localized: "面拉"), sets: 3, reps: 15, suggestedWeight: nil),
+                SuggestedExercise(name: String(localized: "Dumbbell Press"), sets: sets, reps: reps, suggestedWeight: nil),
+                SuggestedExercise(name: String(localized: "Lateral Raise"), sets: 3, reps: 12, suggestedWeight: nil),
+                SuggestedExercise(name: String(localized: "Face Pull"), sets: 3, reps: 15, suggestedWeight: nil),
             ]
         default:
             return []

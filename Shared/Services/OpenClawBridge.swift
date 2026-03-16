@@ -297,7 +297,7 @@ final class OpenClawBridge {
         let body: [String: Any] = [
             "model": cfg.agentID,
             "messages": [
-                ["role": "system", "content": String(localized: "你是 Pulse Coach，用户的私人健身教练 AI。根据 HealthKit 数据给出精准的健康分析和训练建议。回复 JSON 格式。")],
+                ["role": "system", "content": String(localized: "You are Pulse Coach, a personal fitness AI. Analyze HealthKit data and provide health insights and training advice. Reply in JSON.")],
                 ["role": "user", "content": messageContent]
             ],
             "max_tokens": 1024
@@ -580,11 +580,11 @@ final class OpenClawBridge {
     // MARK: - 格式化
 
     var lastSyncDisplay: String {
-        guard let time = lastSyncTime else { return String(localized: "从未同步") }
+        guard let time = lastSyncTime else { return String(localized: "Never synced") }
 
         let interval = Date().timeIntervalSince(time)
         if interval < 60 {
-            return String(localized: "刚刚")
+            return String(localized: "Just now")
         } else if interval < 3600 {
             return "\(Int(interval / 60)) 分钟前"
         } else if interval < 86400 {

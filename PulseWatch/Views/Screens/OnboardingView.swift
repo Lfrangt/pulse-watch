@@ -101,12 +101,12 @@ struct OnboardingView: View {
                     .font(.system(size: 36, weight: .bold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
 
-                Text("你的智能健康伙伴")
+                Text("Your Smart Health Companion")
                     .font(.system(size: 18, weight: .medium, design: .rounded))
                     .foregroundStyle(PulseTheme.accent)
             }
 
-            Text("基于 Apple Watch 数据，用 AI 分析你的身体状态\n每天给出个性化的恢复评分和训练建议")
+            Text("AI analyzes your Apple Watch data\nDaily recovery scores and training advice")
                 .font(PulseTheme.bodyFont)
                 .foregroundStyle(PulseTheme.textSecondary)
                 .multilineTextAlignment(.center)
@@ -124,7 +124,7 @@ struct OnboardingView: View {
         VStack(spacing: PulseTheme.spacingXL) {
             Spacer()
 
-            Text("核心功能")
+            Text("Key Features")
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(PulseTheme.textPrimary)
 
@@ -132,29 +132,29 @@ struct OnboardingView: View {
                 featureRow(
                     icon: "gauge.open.with.lines.needle.33percent.and.arrowtriangle",
                     color: PulseTheme.accent,
-                    title: String(localized: "每日状态评分"),
-                    description: String(localized: "综合 HRV、心率、睡眠等数据\n生成 0-100 恢复评分")
+                    title: String(localized: "Daily Score"),
+                    description: String(localized: "Combines HRV, heart rate, sleep\nGenerates 0-100 recovery score")
                 )
 
                 featureRow(
                     icon: "brain.head.profile.fill",
                     color: PulseTheme.statusGood,
-                    title: String(localized: "AI 健康洞察"),
-                    description: String(localized: "智能分析趋势和异常\n所有计算在设备本地完成")
+                    title: String(localized: "AI Health Insights"),
+                    description: String(localized: "Smart trend & anomaly detection\nAll processing done on-device")
                 )
 
                 featureRow(
                     icon: "dumbbell.fill",
                     color: PulseTheme.statusModerate,
-                    title: String(localized: "训练建议"),
-                    description: String(localized: "根据恢复状态推荐训练强度\n到达健身房自动提醒")
+                    title: String(localized: "Training Advice"),
+                    description: String(localized: "Training intensity based on recovery\nAuto-remind at the gym")
                 )
 
                 featureRow(
                     icon: "applewatch",
                     color: PulseTheme.statusPoor,
-                    title: String(localized: "手表联动"),
-                    description: String(localized: "表盘 Complication 实时显示\n手腕上即时查看状态")
+                    title: String(localized: "Watch Sync"),
+                    description: String(localized: "Watch face complication\nGlance at your status anytime")
                 )
             }
             .padding(.horizontal, PulseTheme.spacingM)
@@ -210,11 +210,11 @@ struct OnboardingView: View {
             }
 
             VStack(spacing: PulseTheme.spacingS) {
-                Text("需要一些权限")
+                Text("Permissions Needed")
                     .font(.system(size: 28, weight: .bold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
 
-                Text("你的数据仅存储在设备上\n我们不会上传任何信息")
+                Text("Your data stays on your device\nWe never upload anything")
                     .font(PulseTheme.bodyFont)
                     .foregroundStyle(PulseTheme.textSecondary)
                     .multilineTextAlignment(.center)
@@ -226,21 +226,21 @@ struct OnboardingView: View {
                 permissionRow(
                     icon: "heart.fill",
                     title: "HealthKit",
-                    description: String(localized: "读取心率、HRV、睡眠等健康数据"),
+                    description: String(localized: "Read heart rate, HRV, sleep data"),
                     granted: permissionsGranted
                 )
 
                 permissionRow(
                     icon: "bell.fill",
-                    title: String(localized: "通知"),
-                    description: String(localized: "发送每日健康摘要和异常提醒"),
+                    title: String(localized: "Notifications"),
+                    description: String(localized: "Daily health summaries and anomaly alerts"),
                     granted: permissionsGranted
                 )
 
                 permissionRow(
                     icon: "location.fill",
-                    title: String(localized: "位置"),
-                    description: String(localized: "到达健身房时智能提醒训练计划"),
+                    title: String(localized: "Location"),
+                    description: String(localized: "Smart reminders when you arrive at the gym"),
                     granted: permissionsGranted
                 )
             }
@@ -256,10 +256,10 @@ struct OnboardingView: View {
                             .tint(PulseTheme.background)
                     } else if permissionsGranted {
                         Image(systemName: "checkmark.circle.fill")
-                        Text("已授权")
+                        Text("Authorized")
                     } else {
                         Image(systemName: "hand.raised.fill")
-                        Text("一键授权")
+                        Text("One-tap Authorize")
                     }
                 }
             }
@@ -338,11 +338,11 @@ struct OnboardingView: View {
             }
 
             VStack(spacing: PulseTheme.spacingS) {
-                Text("一切就绪")
+                Text("All Set")
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
 
-                Text("Pulse Watch 正在后台收集你的健康数据\n几小时后就能看到你的第一份状态评分")
+                Text("Pulse Watch is collecting health data\nYour first score will appear in a few hours")
                     .font(PulseTheme.bodyFont)
                     .foregroundStyle(PulseTheme.textSecondary)
                     .multilineTextAlignment(.center)
@@ -359,7 +359,7 @@ struct OnboardingView: View {
                     Analytics.trackOnboardingCompleted()
                 }
             } label: {
-                Text("开始使用")
+                Text("Get Started")
             }
             .buttonStyle(PulseButtonStyle())
             .padding(.horizontal, PulseTheme.spacingL)
@@ -380,7 +380,7 @@ struct OnboardingView: View {
                         Analytics.trackOnboardingCompleted()
                     }
                 } label: {
-                    Text("跳过")
+                    Text("Skip")
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                 }

@@ -38,11 +38,11 @@ final class WorkoutSessionManager: NSObject {
 
         var label: String {
             switch self {
-            case .warmup:    return "热身"
-            case .fatBurn:   return "燃脂"
-            case .cardio:    return "有氧"
-            case .anaerobic: return "无氧"
-            case .peak:      return "极限"
+            case .warmup:    return "Warm-up"
+            case .fatBurn:   return "Fat Burn"
+            case .cardio:    return "Cardio"
+            case .anaerobic: return "Anaerobic"
+            case .peak:      return "Peak"
             }
         }
 
@@ -100,10 +100,10 @@ final class WorkoutSessionManager: NSObject {
 
         var label: String {
             switch self {
-            case .strength: return "力量训练"
-            case .running:  return "跑步"
-            case .cycling:  return "骑车"
-            case .yoga:     return "瑜伽"
+            case .strength: return "Strength"
+            case .running:  return "Running"
+            case .cycling:  return "Cycling"
+            case .yoga:     return "Yoga"
             case .hiit:     return "HIIT"
             }
         }

@@ -95,13 +95,13 @@ struct HomeView: View {
             .sheet(isPresented: $showLocationSetup) {
                 LocationSetupView()
             }
-            .alert(String(localized: "到达健身房"), isPresented: $showGymPrompt) {
-                Button("好的") {}
+            .alert(String(localized: "Arrived at Gym"), isPresented: $showGymPrompt) {
+                Button("OK") {}
             } message: {
                 if let plan = brief?.trainingPlan {
                     Text("建议今天练\(localizedGroup(plan.targetMuscleGroup))，已通知手表")
                 } else {
-                    Text("已通知手表")
+                    Text("Watch notified")
                 }
             }
             .task {
@@ -164,11 +164,11 @@ struct HomeView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("设置健身房位置")
+                    Text("Set Gym Location")
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
-                    Text("到达时自动提醒训练")
+                    Text("Auto-remind when arriving")
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                 }
@@ -202,11 +202,11 @@ struct HomeView: View {
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: .now)
         switch hour {
-        case 5..<12: return String(localized: "早上好")
-        case 12..<14: return String(localized: "中午好")
-        case 14..<18: return String(localized: "下午好")
-        case 18..<22: return String(localized: "晚上好")
-        default: return String(localized: "夜深了")
+        case 5..<12: return String(localized: "Good Morning")
+        case 12..<14: return String(localized: "Good Afternoon")
+        case 14..<18: return String(localized: "Good Afternoon")
+        case 18..<22: return String(localized: "Good Evening")
+        default: return String(localized: "Late Night")
         }
     }
 
@@ -276,10 +276,10 @@ struct HomeView: View {
 
     private func localizedGroup(_ group: String) -> String {
         switch group {
-        case "chest": return String(localized: "胸")
-        case "back": return String(localized: "背")
-        case "legs": return String(localized: "腿")
-        case "shoulders": return String(localized: "肩")
+        case "chest": return String(localized: "Chest")
+        case "back": return String(localized: "Back")
+        case "legs": return String(localized: "Legs")
+        case "shoulders": return String(localized: "Shoulders")
         default: return group
         }
     }
@@ -310,11 +310,11 @@ struct LocationSetupView: View {
                         .foregroundStyle(PulseTheme.accent)
                 }
 
-                Text("设置常去地点")
+                Text("Set Frequent Location")
                     .font(PulseTheme.titleFont)
                     .foregroundStyle(PulseTheme.textPrimary)
 
-                Text("添加健身房位置\nPulse 会在你到达时智能提醒训练")
+                Text("Add gym location\nPulse will remind you when you arrive")
                     .font(PulseTheme.bodyFont)
                     .foregroundStyle(PulseTheme.textSecondary)
                     .multilineTextAlignment(.center)
@@ -325,7 +325,7 @@ struct LocationSetupView: View {
                     HStack(spacing: PulseTheme.spacingS) {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundStyle(PulseTheme.statusGood)
-                        Text("已保存")
+                        Text("Saved")
                             .foregroundStyle(PulseTheme.statusGood)
                     }
                     .font(PulseTheme.bodyFont)
@@ -338,14 +338,14 @@ struct LocationSetupView: View {
                             ProgressView()
                                 .tint(PulseTheme.background)
                         } else {
-                            Text("使用当前位置添加健身房")
+                            Text("Add gym using current location")
                         }
                     }
                     .buttonStyle(PulseButtonStyle())
                     .disabled(isSaving)
                 }
 
-                Button("稍后设置") {
+                Button("Set Up Later") {
                     dismiss()
                 }
                 .foregroundStyle(PulseTheme.textTertiary)
@@ -356,7 +356,7 @@ struct LocationSetupView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("关闭") { dismiss() }
+                    Button("Close") { dismiss() }
                         .foregroundStyle(PulseTheme.textSecondary)
                 }
             }
@@ -370,7 +370,7 @@ struct LocationSetupView: View {
         // Brief delay for location to update
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             if let location = locationManager.saveCurrentAsLocation(
-                name: String(localized: "健身房"),
+                name: String(localized: "Gym"),
                 type: "gym",
                 radius: 100
             ) {

@@ -36,7 +36,7 @@ struct GymArrivalView: View {
                     .scaleEffect(appeared ? 1.0 : 0.5)
                 }
 
-                Text("在健身房？")
+                Text("At the Gym?")
                     .font(.system(size: 17, weight: .semibold, design: .rounded))
                     .foregroundStyle(Color(hex: "F5F0EB"))
 
@@ -56,7 +56,7 @@ struct GymArrivalView: View {
 
                 // Start button
                 Button(action: onStartWorkout) {
-                    Label("开始训练", systemImage: "play.fill")
+                    Label("Start Workout", systemImage: "play.fill")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color(hex: "0D0C0B"))
                         .frame(maxWidth: .infinity)
@@ -70,7 +70,7 @@ struct GymArrivalView: View {
                 .buttonStyle(.plain)
 
                 // Dismiss
-                Button("不了", action: onDismiss)
+                Button("Skip", action: onDismiss)
                     .font(.system(size: 13, design: .rounded))
                     .foregroundStyle(Color(hex: "5C564F"))
             }
@@ -102,10 +102,10 @@ struct GymArrivalView: View {
 
     private func localizedGroup(_ group: String) -> String {
         switch group {
-        case "chest": return String(localized: "胸")
-        case "back": return String(localized: "背")
-        case "legs": return String(localized: "腿")
-        case "shoulders": return String(localized: "肩")
+        case "chest": return String(localized: "Chest")
+        case "back": return String(localized: "Back")
+        case "legs": return String(localized: "Legs")
+        case "shoulders": return String(localized: "Shoulders")
         default: return group
         }
     }
@@ -118,7 +118,7 @@ struct GymArrivalView: View {
             daysSinceLastTrained: 3,
             suggestedExercises: [],
             intensity: .heavy,
-            reason: String(localized: "上次练胸是3天前")
+            reason: String(localized: "Last chest day was 3 days ago")
         )
     )
 }

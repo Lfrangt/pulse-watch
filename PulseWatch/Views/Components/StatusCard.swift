@@ -112,7 +112,7 @@ struct MetricsCard: View {
     var body: some View {
         VStack(spacing: 0) {
             if let hr = heartRate {
-                MetricRow(icon: "heart.fill", label: String(localized: "心率"), value: "\(Int(hr))", unit: "bpm", color: PulseTheme.statusPoor)
+                MetricRow(icon: "heart.fill", label: String(localized: "Heart Rate"), value: "\(Int(hr))", unit: "bpm", color: PulseTheme.statusPoor)
                 metricDivider
             }
 
@@ -122,18 +122,18 @@ struct MetricsCard: View {
             }
 
             if let spo2 = bloodOxygen {
-                MetricRow(icon: "lungs.fill", label: String(localized: "血氧"), value: "\(Int(spo2))%", color: PulseTheme.statusGood)
+                MetricRow(icon: "lungs.fill", label: String(localized: "Blood Oxygen"), value: "\(Int(spo2))%", color: PulseTheme.statusGood)
                 metricDivider
             }
 
-            MetricRow(icon: "figure.walk", label: String(localized: "步数"), value: formatSteps(steps), color: PulseTheme.statusGood)
+            MetricRow(icon: "figure.walk", label: String(localized: "Steps"), value: formatSteps(steps), color: PulseTheme.statusGood)
             metricDivider
 
-            MetricRow(icon: "flame.fill", label: String(localized: "活动消耗"), value: "\(Int(calories))", unit: "kcal", color: PulseTheme.statusModerate)
+            MetricRow(icon: "flame.fill", label: String(localized: "Active Calories"), value: "\(Int(calories))", unit: "kcal", color: PulseTheme.statusModerate)
 
             if let sleep = sleepSummary {
                 metricDivider
-                MetricRow(icon: "moon.fill", label: String(localized: "睡眠"), value: sleep, color: Color(hex: "8B7EC8"))
+                MetricRow(icon: "moon.fill", label: String(localized: "Sleep"), value: sleep, color: Color(hex: "8B7EC8"))
             }
         }
         .pulseCard(padding: PulseTheme.spacingM)
@@ -222,7 +222,7 @@ struct TrainingCard: View {
                         .foregroundStyle(PulseTheme.accent)
                 }
 
-                Text("今日训练")
+                Text("Today's Training")
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
 
@@ -341,7 +341,7 @@ struct RecoveryCard: View {
 #Preview {
     ScrollView {
         VStack(spacing: 16) {
-            StatusCard(score: 78, headline: String(localized: "状态良好"), insight: String(localized: "身体恢复很好，适合高强度训练"))
+            StatusCard(score: 78, headline: String(localized: "Good"), insight: String(localized: "Great recovery — go hard today"))
 
             MetricsCard(
                 heartRate: 72,
@@ -356,15 +356,15 @@ struct RecoveryCard: View {
                 targetMuscleGroup: "chest",
                 daysSinceLastTrained: 3,
                 suggestedExercises: [
-                    SuggestedExercise(name: String(localized: "平板卧推"), sets: 4, reps: 8, suggestedWeight: 60),
-                    SuggestedExercise(name: String(localized: "上斜哑铃卧推"), sets: 3, reps: 10, suggestedWeight: 22),
-                    SuggestedExercise(name: String(localized: "绳索飞鸟"), sets: 3, reps: 12, suggestedWeight: 15),
+                    SuggestedExercise(name: String(localized: "Flat Bench Press"), sets: 4, reps: 8, suggestedWeight: 60),
+                    SuggestedExercise(name: String(localized: "Incline Dumbbell Press"), sets: 3, reps: 10, suggestedWeight: 22),
+                    SuggestedExercise(name: String(localized: "Cable Fly"), sets: 3, reps: 12, suggestedWeight: 15),
                 ],
                 intensity: .heavy,
-                reason: String(localized: "上次练胸是3天前")
+                reason: String(localized: "Last chest day was 3 days ago")
             ))
 
-            RecoveryCard(note: String(localized: "HRV 偏低(28ms)，静息心率偏高(78bpm)"))
+            RecoveryCard(note: String(localized: "HRV low (28ms), resting HR elevated (78bpm)"))
         }
         .padding()
     }

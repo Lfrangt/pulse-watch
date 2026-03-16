@@ -49,7 +49,7 @@ struct WorkoutTrackingView: View {
     private var workoutPicker: some View {
         ScrollView {
             VStack(spacing: 10) {
-                Text("选择训练")
+                Text("Choose Workout")
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
 
@@ -193,7 +193,7 @@ struct WorkoutTrackingView: View {
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
                     .monospacedDigit()
-                Text("时长")
+                Text("Duration")
                     .font(.system(size: 10, design: .rounded))
                     .foregroundStyle(PulseTheme.textTertiary)
             }
@@ -209,7 +209,7 @@ struct WorkoutTrackingView: View {
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
                     .contentTransition(.numericText())
-                Text("千卡")
+                Text("kcal")
                     .font(.system(size: 10, design: .rounded))
                     .foregroundStyle(PulseTheme.textTertiary)
             }
@@ -267,7 +267,7 @@ struct WorkoutTrackingView: View {
                         .font(.system(size: 28))
                         .foregroundStyle(PulseTheme.statusGood)
 
-                    Text("训练完成")
+                    Text("Workout Complete")
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .foregroundStyle(PulseTheme.textPrimary)
                 }
@@ -283,7 +283,7 @@ struct WorkoutTrackingView: View {
                     manager.reset()
                     onClose()
                 } label: {
-                    Text("完成")
+                    Text("Done")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color(hex: "0D0C0B"))
                         .frame(maxWidth: .infinity)
@@ -303,10 +303,10 @@ struct WorkoutTrackingView: View {
 
     private var summaryGrid: some View {
         let items: [(String, String, String, String)] = [
-            ("clock", String(localized: "时长"), manager.formattedDuration, "9A938C"),
-            ("heart.fill", String(localized: "平均心率"), "\(Int(manager.averageHeartRate))", "C75C5C"),
-            ("heart.fill", String(localized: "最大心率"), "\(Int(manager.maxHeartRateRecorded))", "9B3D3D"),
-            ("flame.fill", String(localized: "活跃千卡"), manager.formattedCalories, "D4A056"),
+            ("clock", String(localized: "Duration"), manager.formattedDuration, "9A938C"),
+            ("heart.fill", String(localized: "Avg Heart Rate"), "\(Int(manager.averageHeartRate))", "C75C5C"),
+            ("heart.fill", String(localized: "Max Heart Rate"), "\(Int(manager.maxHeartRateRecorded))", "9B3D3D"),
+            ("flame.fill", String(localized: "Active kcal"), manager.formattedCalories, "D4A056"),
         ]
 
         return LazyVGrid(
@@ -341,7 +341,7 @@ struct WorkoutTrackingView: View {
         let totalSeconds = max(manager.elapsedSeconds, 1)
 
         return VStack(alignment: .leading, spacing: 6) {
-            Text("心率区间")
+            Text("Heart Rate Zone")
                 .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(PulseTheme.textSecondary)
 

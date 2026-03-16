@@ -536,7 +536,7 @@
 				};
 			};
 			buildConfigurationList = 638C6D3662979EA449E17533 /* Build configuration list for PBXProject "PulseWatch" */;
-			developmentRegion = "zh-Hans";
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,

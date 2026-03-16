@@ -22,10 +22,10 @@ struct QRScannerView: View {
                     Image(systemName: "camera.fill")
                         .font(.system(size: 40))
                         .foregroundStyle(.gray)
-                    Text("需要相机权限来扫描二维码")
+                    Text("Camera access needed to scan QR code")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(.white)
-                    Button("前往设置") {
+                    Button("Open Settings") {
                         if let url = URL(string: UIApplication.openSettingsURLString) {
                             UIApplication.shared.open(url)
                         }
@@ -78,10 +78,10 @@ struct QRScannerView: View {
                             .foregroundStyle(.red)
                             .multilineTextAlignment(.center)
                     } else {
-                        Text("扫描 OpenClaw 配对二维码")
+                        Text("Scan OpenClaw pairing QR code")
                             .font(.system(size: 16, weight: .medium, design: .rounded))
                             .foregroundStyle(.white)
-                        Text("在终端运行 openclaw pair --qr")
+                        Text("Run openclaw pair --qr in terminal")
                             .font(.system(size: 13, weight: .regular, design: .monospaced))
                             .foregroundStyle(.white.opacity(0.6))
                     }
@@ -113,7 +113,7 @@ struct QRScannerView: View {
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: String],
               let url = json["url"], !url.isEmpty,
               let token = json["token"], !token.isEmpty else {
-            error = String(localized: "无效的配对二维码")
+            error = String(localized: "Invalid pairing QR code")
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { error = nil }
             return
         }

@@ -322,7 +322,7 @@ final class HealthAnalyzer {
                         anomalies.append(Anomaly(
                             metric: .hrv,
                             severity: .high,
-                            message: String(localized: "HRV 显著偏低"),
+                            message: String(localized: "HRV significantly low"),
                             detail: "当前 \(Int(currentHRV))ms，低于个人基线 \(Int(mean))ms 超过 2 个标准差",
                             currentValue: currentHRV,
                             baselineValue: mean,
@@ -332,7 +332,7 @@ final class HealthAnalyzer {
                         anomalies.append(Anomaly(
                             metric: .hrv,
                             severity: .medium,
-                            message: String(localized: "HRV 偏低"),
+                            message: String(localized: "HRV below baseline"),
                             detail: "当前 \(Int(currentHRV))ms，低于个人均值 \(Int(mean))ms",
                             currentValue: currentHRV,
                             baselineValue: mean,
@@ -357,7 +357,7 @@ final class HealthAnalyzer {
                         anomalies.append(Anomaly(
                             metric: .restingHeartRate,
                             severity: .high,
-                            message: String(localized: "静息心率显著偏高"),
+                            message: String(localized: "Resting HR significantly elevated"),
                             detail: "当前 \(Int(currentRHR))bpm，高于个人基线 \(Int(mean))bpm 超过 2 个标准差",
                             currentValue: currentRHR,
                             baselineValue: mean,
@@ -367,7 +367,7 @@ final class HealthAnalyzer {
                         anomalies.append(Anomaly(
                             metric: .restingHeartRate,
                             severity: .medium,
-                            message: String(localized: "静息心率偏高"),
+                            message: String(localized: "Resting HR elevated"),
                             detail: "当前 \(Int(currentRHR))bpm，高于个人均值 \(Int(mean))bpm",
                             currentValue: currentRHR,
                             baselineValue: mean,
@@ -397,7 +397,7 @@ final class HealthAnalyzer {
                         anomalies.append(Anomaly(
                             metric: .sleep,
                             severity: .high,
-                            message: String(localized: "睡眠严重不足"),
+                            message: String(localized: "Severe sleep deficit"),
                             detail: "昨晚 \(hoursNow)h\(minsNow)m，远低于你的平均 \(hoursAvg)h\(minsAvg)m",
                             currentValue: Double(sleepMinutes),
                             baselineValue: mean,
@@ -414,8 +414,8 @@ final class HealthAnalyzer {
             anomalies.append(Anomaly(
                 metric: .sleep,
                 severity: .high,
-                message: String(localized: "连续 3 晚睡眠不足"),
-                detail: String(localized: "连续 3 晚不足 6 小时，累积睡眠债会影响恢复和表现"),
+                message: String(localized: "3 consecutive nights of poor sleep"),
+                detail: String(localized: "3 consecutive nights under 6h — sleep debt affects recovery"),
                 currentValue: Double(recentSleep.last ?? 0),
                 baselineValue: 420,  // 7 小时参考值
                 zScore: -3.0
@@ -440,41 +440,41 @@ final class HealthAnalyzer {
         // 恢复状态总结
         switch recoveryScore {
         case 85...:
-            insights.append(String(localized: "身体恢复非常好，今天是挑战自我的好时机"))
+            insights.append(String(localized: "Great recovery — push yourself today"))
         case 70..<85:
-            insights.append(String(localized: "恢复状态良好，可以正常安排训练"))
+            insights.append(String(localized: "Good recovery, train normally"))
         case 50..<70:
-            insights.append(String(localized: "恢复中等，建议适度训练，注意倾听身体"))
+            insights.append(String(localized: "Moderate recovery, listen to your body"))
         case 30..<50:
-            insights.append(String(localized: "身体仍在恢复，建议轻松活动如散步或瑜伽"))
+            insights.append(String(localized: "Still recovering — light activity like walking or yoga"))
         default:
-            insights.append(String(localized: "身体需要充分休息，今天建议完全休息"))
+            insights.append(String(localized: "Your body needs rest today"))
         }
 
         // 睡眠洞察
         if sleepScore > 0 {
             if sleepScore >= 80 {
-                insights.append(String(localized: "昨晚睡眠质量很好，为今天打下了好基础"))
+                insights.append(String(localized: "Great sleep last night — solid foundation for today"))
             } else if sleepScore < 40 {
-                insights.append(String(localized: "睡眠质量较差，今天可能精力不足，注意补觉"))
+                insights.append(String(localized: "Poor sleep — energy may be low, try to catch up"))
             }
         }
 
         // 趋势洞察
         if trends.hrvTrend == .improving {
-            insights.append(String(localized: "HRV 近期呈上升趋势，身体适应能力在增强"))
+            insights.append(String(localized: "HRV trending up — your body is adapting well"))
         } else if trends.hrvTrend == .declining {
-            insights.append(String(localized: "HRV 近期有下降趋势，注意控制训练量和压力"))
+            insights.append(String(localized: "HRV declining — watch training load and stress"))
         }
 
         if trends.rhrTrend == .declining {
-            insights.append(String(localized: "静息心率近期偏高，可能是疲劳或压力信号"))
+            insights.append(String(localized: "Resting HR elevated — possible fatigue or stress"))
         }
 
         // 异常洞察
         for anomaly in anomalies.prefix(2) {
             if anomaly.severity == .high {
-                insights.append(anomaly.message + "：" + anomaly.detail)
+                insights.append(anomaly.message + ": " + anomaly.detail)
             }
         }
 
@@ -583,10 +583,10 @@ enum TrainingAdvice: String, Codable {
 
     var label: String {
         switch self {
-        case .intense:  return "高强度训练"
-        case .moderate: return "中等强度"
-        case .light:    return "轻松恢复"
-        case .rest:     return "完全休息"
+        case .intense:  return "High Intensity"
+        case .moderate: return "Moderate"
+        case .light:    return "Light Recovery"
+        case .rest:     return "Rest Day"
         }
     }
 
@@ -609,10 +609,10 @@ enum Trend: String {
 
     var label: String {
         switch self {
-        case .improving:    return "上升趋势"
-        case .stable:       return "保持平稳"
-        case .declining:    return "下降趋势"
-        case .insufficient: return "数据不足"
+        case .improving:    return "Improving"
+        case .stable:       return "Stable"
+        case .declining:    return "Declining"
+        case .insufficient: return "Insufficient Data"
         }
     }
 

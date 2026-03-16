@@ -239,9 +239,9 @@ enum PulseError: LocalizedError {
     
     var errorDescription: String? {
         switch self {
-        case .healthDataUnavailable: return "健康数据不可用"
-        case .locationNotAuthorized: return "位置权限未授权"
-        case .workoutNotStarted: return "训练未开始"
+        case .healthDataUnavailable: return "Health data unavailable"
+        case .locationNotAuthorized: return "Location not authorized"
+        case .workoutNotStarted: return "Not Started"
         }
     }
 }

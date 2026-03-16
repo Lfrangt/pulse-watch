@@ -66,7 +66,7 @@ struct SettingsView: View {
                 .padding(.top, PulseTheme.spacingS)
             }
             .background(PulseTheme.background)
-            .navigationTitle("设置")
+            .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .task {
@@ -85,10 +85,10 @@ struct SettingsView: View {
             settingRow {
                 Toggle(isOn: $morningBriefEnabled) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("每日健康摘要")
+                        Text("Daily Health Summary")
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("每天定时推送恢复评分和训练建议")
+                        Text("Daily recovery score and training advice")
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -103,17 +103,17 @@ struct SettingsView: View {
             if morningBriefEnabled {
                 settingRow {
                     VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                        Text("推送时间")
+                        Text("Notification Time")
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
 
                         HStack(spacing: PulseTheme.spacingM) {
                             // 小时
                             HStack(spacing: 4) {
-                                Text("时")
+                                Text("h")
                                     .font(PulseTheme.captionFont)
                                     .foregroundStyle(PulseTheme.textTertiary)
-                                Picker(String(localized: "小时"), selection: $briefHour) {
+                                Picker(String(localized: "hour"), selection: $briefHour) {
                                     ForEach(5..<12, id: \.self) { h in
                                         Text("\(h)").tag(h)
                                     }
@@ -125,10 +125,10 @@ struct SettingsView: View {
 
                             // 分钟
                             HStack(spacing: 4) {
-                                Text("分")
+                                Text("pts")
                                     .font(PulseTheme.captionFont)
                                     .foregroundStyle(PulseTheme.textTertiary)
-                                Picker(String(localized: "分钟"), selection: $briefMinute) {
+                                Picker(String(localized: "min"), selection: $briefMinute) {
                                     ForEach([0, 15, 30, 45], id: \.self) { m in
                                         Text(String(format: "%02d", m)).tag(m)
                                     }
@@ -157,7 +157,7 @@ struct SettingsView: View {
 
     private var gymSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "dumbbell.fill", title: String(localized: "健身房位置"))
+            sectionHeader(icon: "dumbbell.fill", title: String(localized: "Gym Location"))
 
             if let gym = gymLocations.first {
                 // 已保存 — 显示地点信息
@@ -167,7 +167,7 @@ struct SettingsView: View {
                             Text(gym.name)
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text("到达时自动提醒开始训练")
+                            Text("Auto-remind when you arrive")
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -185,7 +185,7 @@ struct SettingsView: View {
                     Button {
                         showGymSearch = true
                     } label: {
-                        Text("更换")
+                        Text("Change")
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.accent)
                     }
@@ -193,7 +193,7 @@ struct SettingsView: View {
                     Button {
                         removeGymLocation(gym)
                     } label: {
-                        Text("移除")
+                        Text("Remove")
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.statusPoor)
                     }
@@ -207,7 +207,7 @@ struct SettingsView: View {
                     HStack(spacing: PulseTheme.spacingS) {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 14, weight: .medium))
-                        Text("搜索健身房")
+                        Text("Search Gym")
                             .font(PulseTheme.bodyFont.weight(.medium))
                     }
                     .foregroundStyle(PulseTheme.accent)
@@ -233,7 +233,7 @@ struct SettingsView: View {
                             Image(systemName: "location.fill")
                                 .font(.system(size: 13))
                         }
-                        Text("使用当前位置")
+                        Text("Use Current Location")
                             .font(PulseTheme.captionFont)
                     }
                     .foregroundStyle(PulseTheme.textSecondary)
@@ -246,7 +246,7 @@ struct SettingsView: View {
                 if gymSaveSuccess {
                     HStack(spacing: PulseTheme.spacingXS) {
                         Image(systemName: "checkmark.circle.fill")
-                        Text("已保存")
+                        Text("Saved")
                     }
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.statusGood)
@@ -289,12 +289,12 @@ struct SettingsView: View {
 
     private var notificationSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "bell.badge.fill", title: String(localized: "通知权限"))
+            sectionHeader(icon: "bell.badge.fill", title: String(localized: "Notifications"))
 
             settingRow {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("通知状态")
+                        Text("Status")
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
                         Text(notificationStatusText)
@@ -314,7 +314,7 @@ struct SettingsView: View {
                 Button {
                     openAppSettings()
                 } label: {
-                    Text("前往系统设置开启")
+                    Text("Open System Settings")
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.accent)
                         .frame(maxWidth: .infinity)
@@ -329,18 +329,18 @@ struct SettingsView: View {
 
     private var collectionSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "waveform.path.ecg", title: String(localized: "数据采集"))
+            sectionHeader(icon: "waveform.path.ecg", title: String(localized: "Data Collection"))
 
             settingRow {
                 VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                    Text("采集频率")
+                    Text("Collection Frequency")
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
-                    Picker(String(localized: "频率"), selection: $collectionFrequency) {
-                        Text("省电模式").tag("low")
-                        Text("标准").tag("normal")
-                        Text("高频").tag("high")
+                    Picker(String(localized: "Frequency"), selection: $collectionFrequency) {
+                        Text("Power Saving").tag("low")
+                        Text("Standard").tag("normal")
+                        Text("High Frequency").tag("high")
                     }
                     .pickerStyle(.segmented)
 
@@ -372,16 +372,16 @@ struct SettingsView: View {
         let isPaired = bridge.config != nil
 
         return VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "cpu", title: String(localized: "连接 OpenClaw"))
+            sectionHeader(icon: "cpu", title: String(localized: "Connect OpenClaw"))
 
             // 说明
             settingRow {
                 VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                    Text("连接你的 OpenClaw Gateway")
+                    Text("Connect your OpenClaw Gateway")
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
-                    Text("健康数据通过 API 推送给你的 AI Agent，获取个性化训练建议和健康分析")
+                    Text("Push health data to your AI Agent for personalized training advice")
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                         .lineSpacing(3)
@@ -397,7 +397,7 @@ struct SettingsView: View {
                             Image(systemName: "checkmark.seal.fill")
                                 .font(.system(size: 14))
                                 .foregroundStyle(PulseTheme.statusGood)
-                            Text("Gateway 已连接")
+                            Text("Gateway Connected")
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
                         }
@@ -421,7 +421,7 @@ struct SettingsView: View {
                         showGatewayConfig.toggle()
                     }
                 } label: {
-                    Text(showGatewayConfig ? String(localized: "取消") : String(localized: "重新配置"))
+                    Text(showGatewayConfig ? String(localized: "Cancel") : String(localized: "Reconfigure"))
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textSecondary)
                         .frame(maxWidth: .infinity)
@@ -438,7 +438,7 @@ struct SettingsView: View {
                     HStack(spacing: PulseTheme.spacingS) {
                         Image(systemName: "qrcode.viewfinder")
                             .font(.system(size: 16, weight: .medium))
-                        Text("扫码连接")
+                        Text("Scan to Connect")
                             .font(PulseTheme.bodyFont.weight(.medium))
                     }
                     .foregroundStyle(PulseTheme.accent)
@@ -455,7 +455,7 @@ struct SettingsView: View {
                 HStack(spacing: PulseTheme.spacingXS) {
                     Image(systemName: "terminal")
                         .font(.system(size: 11))
-                    Text("终端运行 openclaw pair --qr 获取二维码")
+                    Text("Run openclaw pair --qr in terminal")
                         .font(.system(size: 11, weight: .regular, design: .monospaced))
                 }
                 .foregroundStyle(PulseTheme.textTertiary)
@@ -467,7 +467,7 @@ struct SettingsView: View {
                         showGatewayConfig = true
                     }
                 } label: {
-                    Text("手动输入")
+                    Text("Manual Input")
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                         .frame(maxWidth: .infinity)
@@ -485,10 +485,10 @@ struct SettingsView: View {
                 settingRow {
                     Toggle(isOn: $openClawEnabled) {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("自动推送健康数据")
+                            Text("Auto-push Health Data")
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text("每 30 分钟或数据有重大变化时自动推送")
+                            Text("Auto-push every 30 min or on significant changes")
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -505,7 +505,7 @@ struct SettingsView: View {
                 settingRow {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("连接状态")
+                            Text("Connection Status")
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
                             Text("\(bridge.connectionStatus.rawValue) · \(bridge.lastSyncDisplay)")
@@ -537,7 +537,7 @@ struct SettingsView: View {
                     Image(systemName: "lock.shield.fill")
                         .font(.system(size: 12))
                         .foregroundStyle(PulseTheme.statusGood)
-                    Text("数据直接发送到你的 OpenClaw Gateway，不经过第三方服务器")
+                    Text("Data sent directly to your OpenClaw Gateway, no third parties")
                         .font(.system(size: 11, weight: .regular, design: .rounded))
                         .foregroundStyle(PulseTheme.textTertiary)
                         .lineSpacing(2)
@@ -673,7 +673,7 @@ struct SettingsView: View {
                         Image(systemName: "link")
                             .font(.system(size: 14, weight: .medium))
                     }
-                    Text(isPairing ? String(localized: "验证中...") : String(localized: "验证并连接"))
+                    Text(isPairing ? String(localized: "Verifying...") : String(localized: "Verify & Connect"))
                         .font(PulseTheme.bodyFont.weight(.medium))
                 }
                 .foregroundStyle(PulseTheme.accent)
@@ -692,7 +692,7 @@ struct SettingsView: View {
             if let result = pairResult {
                 HStack(spacing: PulseTheme.spacingXS) {
                     Image(systemName: result ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    Text(result ? String(localized: "已连接") : String(localized: "连接失败，请检查 URL 和 Token"))
+                    Text(result ? String(localized: "Connected") : String(localized: "Connection failed. Check URL and Token"))
                 }
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(result ? PulseTheme.statusGood : PulseTheme.statusPoor)
@@ -706,15 +706,15 @@ struct SettingsView: View {
 
     private var developerSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "hammer.fill", title: String(localized: "开发者选项"))
+            sectionHeader(icon: "hammer.fill", title: String(localized: "Developer"))
 
             settingRow {
                 Toggle(isOn: $demoModeEnabled) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("演示模式")
+                        Text("Demo Mode")
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("使用模拟数据展示完整界面效果")
+                        Text("Show UI with simulated data")
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -729,13 +729,13 @@ struct SettingsView: View {
 
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "info.circle.fill", title: String(localized: "关于"))
+            sectionHeader(icon: "info.circle.fill", title: String(localized: "About"))
 
             settingRow {
                 VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                    aboutRow(label: String(localized: "版本"), value: appVersion)
+                    aboutRow(label: String(localized: "Version"), value: appVersion)
                     Divider().overlay(PulseTheme.border)
-                    aboutRow(label: String(localized: "构建"), value: buildNumber)
+                    aboutRow(label: String(localized: "Build"), value: buildNumber)
                 }
             }
 
@@ -746,12 +746,12 @@ struct SettingsView: View {
                         Image(systemName: "lock.shield.fill")
                             .font(.system(size: 14))
                             .foregroundStyle(PulseTheme.statusGood)
-                        Text("隐私说明")
+                        Text("Privacy")
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
                     }
 
-                    Text("Pulse Watch 所有数据均存储在你的设备上，不会上传到任何服务器。健康数据仅从 Apple HealthKit 读取，用于生成本地分析和训练建议。我们不收集任何个人信息。")
+                    Text("All Pulse Watch data is stored on your device and never uploaded to any server. Health data is read only from Apple HealthKit for local analysis and training suggestions. We do not collect any personal information.")
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textSecondary)
                         .lineSpacing(3)
@@ -799,12 +799,12 @@ struct SettingsView: View {
 
     private var notificationStatusText: String {
         switch notificationStatus {
-        case .authorized: return "已开启"
-        case .denied: return "已关闭"
-        case .provisional: return "临时授权"
-        case .ephemeral: return "临时授权"
-        case .notDetermined: return "未设置"
-        @unknown default: return String(localized: "未知")
+        case .authorized: return "Enabled"
+        case .denied: return "Disabled"
+        case .provisional: return "Provisional"
+        case .ephemeral: return "Provisional"
+        case .notDetermined: return "Not Set"
+        @unknown default: return String(localized: "Unknown")
         }
     }
 
@@ -828,9 +828,9 @@ struct SettingsView: View {
 
     private var frequencyDescription: String {
         switch collectionFrequency {
-        case "low": return String(localized: "每 30 分钟采集一次，更省电")
-        case "high": return String(localized: "每 5 分钟采集一次，更精确但耗电更多")
-        default: return String(localized: "每 15 分钟采集一次，平衡精度和电量")
+        case "low": return String(localized: "Every 30 minutes, saves battery")
+        case "high": return String(localized: "Every 5 minutes, more accurate but uses more battery")
+        default: return String(localized: "Every 15 minutes, balanced")
         }
     }
 
@@ -866,7 +866,7 @@ struct SettingsView: View {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             if let location = locationManager.saveCurrentAsLocation(
-                name: String(localized: "健身房"),
+                name: String(localized: "Gym"),
                 type: "gym",
                 radius: 100
             ) {

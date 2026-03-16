@@ -22,7 +22,7 @@ struct GymSearchView: View {
                         .font(.system(size: 15))
                         .foregroundStyle(PulseTheme.textTertiary)
 
-                    TextField(String(localized: "搜索健身房"), text: $searchText)
+                    TextField(String(localized: "Search Gym"), text: $searchText)
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
                         .autocorrectionDisabled()
@@ -64,7 +64,7 @@ struct GymSearchView: View {
                         Image(systemName: "dumbbell.fill")
                             .font(.system(size: 32))
                             .foregroundStyle(PulseTheme.textTertiary.opacity(0.5))
-                        Text("搜索你常去的健身房")
+                        Text("Search for your gym")
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                         Spacer()
@@ -79,12 +79,12 @@ struct GymSearchView: View {
                 }
             }
             .background(PulseTheme.background)
-            .navigationTitle("添加健身房")
+            .navigationTitle("Add Gym")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("取消") { dismiss() }
+                    Button("Cancel") { dismiss() }
                         .foregroundStyle(PulseTheme.textSecondary)
                 }
             }
@@ -147,7 +147,7 @@ struct GymSearchView: View {
             // 地图预览
             Map(position: $cameraPosition) {
                 Marker(
-                    place.name ?? String(localized: "健身房"),
+                    place.name ?? String(localized: "Gym"),
                     coordinate: place.placemark.coordinate
                 )
                 .tint(PulseTheme.accent)
@@ -160,7 +160,7 @@ struct GymSearchView: View {
 
             // 地点信息
             VStack(alignment: .leading, spacing: 6) {
-                Text(place.name ?? String(localized: "健身房"))
+                Text(place.name ?? String(localized: "Gym"))
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
 
@@ -179,11 +179,11 @@ struct GymSearchView: View {
             // 确认按钮
             Button {
                 let coord = place.placemark.coordinate
-                let name = place.name ?? String(localized: "健身房")
+                let name = place.name ?? String(localized: "Gym")
                 onSelected(name, coord.latitude, coord.longitude)
                 dismiss()
             } label: {
-                Text("确认选择")
+                Text("Confirm")
                     .font(PulseTheme.bodyFont.weight(.semibold))
                     .foregroundStyle(PulseTheme.background)
                     .frame(maxWidth: .infinity)

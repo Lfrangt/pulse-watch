@@ -144,13 +144,13 @@ struct DashboardView: View {
             .sheet(isPresented: $showLocationSetup) {
                 LocationSetupView()
             }
-            .alert(String(localized: "到达健身房"), isPresented: $showGymPrompt) {
-                Button("好的") {}
+            .alert(String(localized: "Arrived at Gym"), isPresented: $showGymPrompt) {
+                Button("OK") {}
             } message: {
                 if let plan = brief?.trainingPlan {
                     Text("建议今天练\(localizedGroup(plan.targetMuscleGroup))，已通知手表")
                 } else {
-                    Text("已通知手表")
+                    Text("Watch notified")
                 }
             }
             .task {
@@ -309,7 +309,7 @@ struct DashboardView: View {
                 emptyPulse = true
             }
 
-            Text("\u{2600}\u{FE0F} 戴上手表，开始记录你的一天")
+            Text("☀️ Put on your watch to start tracking")
                 .font(PulseTheme.bodyFont)
                 .foregroundStyle(PulseTheme.textSecondary)
                 .multilineTextAlignment(.center)
@@ -331,7 +331,7 @@ struct DashboardView: View {
 
     private func insightCards(_ insights: [String]) -> some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-            Text("今日洞察")
+            Text("Today's Insights")
                 .font(PulseTheme.headlineFont)
                 .foregroundStyle(PulseTheme.textPrimary)
 
@@ -398,7 +398,7 @@ struct DashboardView: View {
             if let hr = currentHeartRate {
                 metricTile(
                     icon: "heart.fill",
-                    label: String(localized: "心率"),
+                    label: String(localized: "Heart Rate"),
                     value: "\(Int(hr))",
                     unit: "bpm",
                     color: PulseTheme.statusPoor,
@@ -424,7 +424,7 @@ struct DashboardView: View {
             if let sleep = currentSleep {
                 metricTile(
                     icon: "moon.fill",
-                    label: String(localized: "睡眠"),
+                    label: String(localized: "Sleep"),
                     value: sleep,
                     unit: "",
                     color: Color(hex: "8B7EC8"),
@@ -437,7 +437,7 @@ struct DashboardView: View {
             if currentSteps > 0 {
                 metricTile(
                     icon: "figure.run",
-                    label: String(localized: "步数"),
+                    label: String(localized: "Steps"),
                     value: formatSteps(currentSteps),
                     unit: "",
                     color: PulseTheme.statusGood,
@@ -450,7 +450,7 @@ struct DashboardView: View {
             if currentCalories > 0 {
                 metricTile(
                     icon: "flame.fill",
-                    label: String(localized: "卡路里"),
+                    label: String(localized: "Calories"),
                     value: "\(Int(currentCalories))",
                     unit: "kcal",
                     color: PulseTheme.statusModerate,
@@ -463,7 +463,7 @@ struct DashboardView: View {
             if let spo2 = currentBloodOxygen {
                 metricTile(
                     icon: "lungs.fill",
-                    label: String(localized: "血氧"),
+                    label: String(localized: "Blood Oxygen"),
                     value: "\(Int(spo2))%",
                     unit: "",
                     color: PulseTheme.statusGood,
@@ -578,7 +578,7 @@ struct DashboardView: View {
             }
 
             VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
-                Text("训练建议")
+                Text("Training Advice")
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
 
@@ -622,7 +622,7 @@ struct DashboardView: View {
 
     private var recentWorkoutsSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-            Text("最近训练")
+            Text("Recent Workouts")
                 .font(PulseTheme.headlineFont)
                 .foregroundStyle(PulseTheme.textPrimary)
                 .padding(.leading, PulseTheme.spacingXS)
@@ -692,12 +692,12 @@ struct DashboardView: View {
     /// 训练分类 -> 中文名称
     private func workoutCategoryName(_ category: String) -> String {
         switch category {
-        case "chest": return String(localized: "胸部")
-        case "back": return String(localized: "背部")
-        case "legs": return String(localized: "腿部")
-        case "shoulders": return String(localized: "肩部")
-        case "arms": return String(localized: "手臂")
-        case "cardio": return String(localized: "有氧")
+        case "chest": return String(localized: "Chest")
+        case "back": return String(localized: "Back")
+        case "legs": return String(localized: "Legs")
+        case "shoulders": return String(localized: "Shoulders")
+        case "arms": return String(localized: "Arms")
+        case "cardio": return String(localized: "Cardio")
         default: return category
         }
     }
@@ -711,8 +711,8 @@ struct DashboardView: View {
         let days = calendar.dateComponents([.day], from: startOfDate, to: startOfToday).day ?? 0
 
         switch days {
-        case 0: return String(localized: "今天")
-        case 1: return String(localized: "昨天")
+        case 0: return String(localized: "Today")
+        case 1: return String(localized: "Yesterday")
         default: return "\(days)天前"
         }
     }
@@ -735,11 +735,11 @@ struct DashboardView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("设置健身房位置")
+                    Text("Set Gym Location")
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
-                    Text("到达时自动提醒训练")
+                    Text("Auto-remind when arriving")
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                 }
@@ -796,11 +796,11 @@ struct DashboardView: View {
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: .now)
         switch hour {
-        case 5..<12: return String(localized: "早上好")
-        case 12..<14: return String(localized: "中午好")
-        case 14..<18: return String(localized: "下午好")
-        case 18..<22: return String(localized: "晚上好")
-        default: return String(localized: "夜深了")
+        case 5..<12: return String(localized: "Good Morning")
+        case 12..<14: return String(localized: "Good Afternoon")
+        case 14..<18: return String(localized: "Good Afternoon")
+        case 18..<22: return String(localized: "Good Evening")
+        default: return String(localized: "Late Night")
         }
     }
 
@@ -894,10 +894,10 @@ struct DashboardView: View {
 
     private func localizedGroup(_ group: String) -> String {
         switch group {
-        case "chest": return String(localized: "胸")
-        case "back": return String(localized: "背")
-        case "legs": return String(localized: "腿")
-        case "shoulders": return String(localized: "肩")
+        case "chest": return String(localized: "Chest")
+        case "back": return String(localized: "Back")
+        case "legs": return String(localized: "Legs")
+        case "shoulders": return String(localized: "Shoulders")
         default: return group
         }
     }

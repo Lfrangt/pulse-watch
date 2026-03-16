@@ -14,7 +14,7 @@ struct TimelineEvent: Identifiable {
     let impact: String        // 影响描述（显示为标签）
     let impactPositive: Bool  // 影响是正面还是负面
     let color: Color          // 节点颜色
-    let isCurrent: Bool       // 是否为String(localized: "当前")节点（底部脉冲动画）
+    let isCurrent: Bool       // 是否为String(localized: "Current")节点（底部脉冲动画）
 
     init(
         time: Date,
@@ -70,9 +70,9 @@ enum TimelineEventBuilder {
             events.append(TimelineEvent(
                 time: bedtime,
                 icon: "moon.fill",
-                title: String(localized: "入睡"),
-                detail: "\(sleepHours)h\(sleepMins)m · \(String(localized: "深睡")) ~\(String(format: "%.1f", deepHours / 60))h",
-                impact: insight.sleepScore >= 70 ? "恢复 +\(min(20, insight.sleepScore / 5))" : String(localized: "恢复一般"),
+                title: String(localized: "Asleep"),
+                detail: "\(sleepHours)h\(sleepMins)m · \(String(localized: "Deep")) ~\(String(format: "%.1f", deepHours / 60))h",
+                impact: insight.sleepScore >= 70 ? "恢复 +\(min(20, insight.sleepScore / 5))" : String(localized: "Fair Recovery"),
                 impactPositive: insight.sleepScore >= 50,
                 color: sleepColor
             ))
@@ -87,16 +87,16 @@ enum TimelineEventBuilder {
                 rhrText = "静息心率 \(Int(rhr))bpm"
                 rhrGood = rhr < 70
             } else {
-                rhrText = String(localized: "静息心率 --")
+                rhrText = String(localized: "Resting HR --")
                 rhrGood = true
             }
 
             events.append(TimelineEvent(
                 time: wakeTime,
                 icon: "sunrise.fill",
-                title: String(localized: "醒来"),
+                title: String(localized: "Awake"),
                 detail: rhrText,
-                impact: rhrGood ? String(localized: "恢复良好") : String(localized: "恢复偏弱"),
+                impact: rhrGood ? String(localized: "Good Recovery") : String(localized: "Weak Recovery"),
                 impactPositive: rhrGood,
                 color: rhrGood ? PulseTheme.statusGood : PulseTheme.statusModerate
             ))
@@ -109,9 +109,9 @@ enum TimelineEventBuilder {
             events.append(TimelineEvent(
                 time: placeholderBedtime,
                 icon: "moon.fill",
-                title: String(localized: "睡眠"),
-                detail: String(localized: "暂无睡眠数据"),
-                impact: String(localized: "等待同步"),
+                title: String(localized: "Sleep"),
+                detail: String(localized: "No sleep data"),
+                impact: String(localized: "Waiting to sync"),
                 impactPositive: true,
                 color: sleepColor
             ))
@@ -120,8 +120,8 @@ enum TimelineEventBuilder {
             events.append(TimelineEvent(
                 time: placeholderWake,
                 icon: "sunrise.fill",
-                title: String(localized: "醒来"),
-                detail: String(localized: "静息心率 --"),
+                title: String(localized: "Awake"),
+                detail: String(localized: "Resting HR --"),
                 impact: "--",
                 impactPositive: true,
                 color: PulseTheme.textTertiary
@@ -139,9 +139,9 @@ enum TimelineEventBuilder {
 
             let stepsText: String
             if steps >= 10000 {
-                stepsText = String(format: String(localized: "%.1fk 步"), Double(steps) / 1000)
+                stepsText = String(format: String(localized: "%.1fk steps"), Double(steps) / 1000)
             } else if steps >= 1000 {
-                stepsText = String(format: String(localized: "%.1fk 步"), Double(steps) / 1000)
+                stepsText = String(format: String(localized: "%.1fk steps"), Double(steps) / 1000)
             } else {
                 stepsText = "\(steps) 步"
             }
@@ -149,9 +149,9 @@ enum TimelineEventBuilder {
             events.append(TimelineEvent(
                 time: activityTime,
                 icon: "figure.walk",
-                title: String(localized: "日间活动"),
+                title: String(localized: "Daily Activity"),
                 detail: "\(stepsText) · 活跃卡路里 +\(Int(calories))kcal",
-                impact: steps >= 8000 ? String(localized: "活跃 +") : String(localized: "继续加油"),
+                impact: steps >= 8000 ? String(localized: "Active +") : String(localized: "Keep going"),
                 impactPositive: steps >= 5000,
                 color: PulseTheme.accent
             ))
@@ -174,9 +174,9 @@ enum TimelineEventBuilder {
         events.append(TimelineEvent(
             time: now,
             icon: "heart.text.clipboard",
-            title: String(localized: "当前状态"),
+            title: String(localized: "Current Status"),
             detail: "\(hrvText) · \(adviceText)",
-            impact: currentGood ? String(localized: "可以训练") : String(localized: "建议休息"),
+            impact: currentGood ? String(localized: "Ready to train") : String(localized: "Rest recommended"),
             impactPositive: currentGood,
             color: PulseTheme.accent,
             isCurrent: true
@@ -227,14 +227,14 @@ struct RecoveryTimelineView: View {
                     .foregroundStyle(PulseTheme.accent)
             }
 
-            Text("身体时间线")
+            Text("Body Timeline")
                 .font(PulseTheme.headlineFont)
                 .foregroundStyle(PulseTheme.textPrimary)
 
             Spacer()
 
             // 时间范围标签
-            Text("过去 24h")
+            Text("Past 24h")
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textTertiary)
         }
@@ -250,7 +250,7 @@ struct RecoveryTimelineView: View {
                     .font(.system(size: 28, weight: .light))
                     .foregroundStyle(PulseTheme.textTertiary)
 
-                Text("暂无时间线数据")
+                Text("No timeline data yet")
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
             }
@@ -432,7 +432,7 @@ struct TimelineNodeView: View {
 
     private var formattedTime: String {
         if event.isCurrent {
-            return String(localized: "当前")
+            return String(localized: "Current")
         }
 
         let calendar = Calendar.current
@@ -444,7 +444,7 @@ struct TimelineNodeView: View {
 
         // 判断是否是昨天
         if !calendar.isDate(event.time, inSameDayAs: now) {
-            return "\(String(localized: "昨晚")) \(timeStr)"
+            return "\(String(localized: "Last night")) \(timeStr)"
         }
 
         // 根据时段添加前缀
@@ -515,36 +515,36 @@ private var previewEvents: [TimelineEvent] {
         TimelineEvent(
             time: bedtime,
             icon: "moon.fill",
-            title: String(localized: "入睡"),
-            detail: String(localized: "总计 7h35m · 深睡约 2.1h"),
-            impact: String(localized: "恢复 +15"),
+            title: String(localized: "Asleep"),
+            detail: String(localized: "Total 7h35m · Deep ~2.1h"),
+            impact: String(localized: "Recovery +15"),
             impactPositive: true,
             color: Color(hex: "8B7EC8")
         ),
         TimelineEvent(
             time: wakeTime,
             icon: "sunrise.fill",
-            title: String(localized: "醒来"),
-            detail: String(localized: "静息心率 62bpm"),
-            impact: String(localized: "恢复良好"),
+            title: String(localized: "Awake"),
+            detail: String(localized: "Resting HR 62bpm"),
+            impact: String(localized: "Good Recovery"),
             impactPositive: true,
             color: PulseTheme.statusGood
         ),
         TimelineEvent(
             time: activityTime,
             icon: "figure.walk",
-            title: String(localized: "日间活动"),
-            detail: String(localized: "3.0k 步 · 活跃卡路里 +120kcal"),
-            impact: String(localized: "继续加油"),
+            title: String(localized: "Daily Activity"),
+            detail: String(localized: "3.0k steps · Active calories +120kcal"),
+            impact: String(localized: "Keep going"),
             impactPositive: true,
             color: PulseTheme.accent
         ),
         TimelineEvent(
             time: now,
             icon: "heart.text.clipboard",
-            title: String(localized: "当前状态"),
-            detail: String(localized: "HRV 48ms ↑ · 中等强度"),
-            impact: String(localized: "可以训练"),
+            title: String(localized: "Current Status"),
+            detail: String(localized: "HRV 48ms ↑ · Moderate"),
+            impact: String(localized: "Ready to train"),
             impactPositive: true,
             color: PulseTheme.accent,
             isCurrent: true

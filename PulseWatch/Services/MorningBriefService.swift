@@ -110,19 +110,19 @@ final class MorningBriefService: NSObject {
     private func registerCategories() {
         let viewAction = UNNotificationAction(
             identifier: ActionID.viewDetail,
-            title: String(localized: "查看详情"),
+            title: String(localized: "View Details"),
             options: .foreground
         )
 
         let skipAction = UNNotificationAction(
             identifier: ActionID.skipToday,
-            title: String(localized: "跳过今天"),
+            title: String(localized: "Skip Today"),
             options: .destructive
         )
 
         let dismissAction = UNNotificationAction(
             identifier: ActionID.dismiss,
-            title: String(localized: "知道了"),
+            title: String(localized: "Got it"),
             options: .destructive
         )
 
@@ -162,8 +162,8 @@ final class MorningBriefService: NSObject {
         // 通知内容在触发时由 Notification Service Extension 动态填充
         // 这里用占位内容，实际在 willPresent / didReceive 中更新
         let content = UNMutableNotificationContent()
-        content.title = String(localized: "☀️ 早安 Pulse")
-        content.body = String(localized: "今日健康摘要已准备好，点击查看")
+        content.title = String(localized: "☀️ Good Morning, Pulse")
+        content.body = String(localized: "Daily health summary ready")
         content.sound = .default
         content.categoryIdentifier = CategoryID.morningBrief
         content.interruptionLevel = .timeSensitive
@@ -211,7 +211,7 @@ final class MorningBriefService: NSObject {
         if sleepMinutes > 0 {
             sleepDisplay = "\(sleepMinutes / 60)h\(sleepMinutes % 60)m"
         } else {
-            sleepDisplay = String(localized: "无数据")
+            sleepDisplay = String(localized: "No Data")
         }
 
         content.title = "☀️ 早安 · 状态 \(insight.dailyScore)分"
@@ -312,19 +312,19 @@ final class MorningBriefService: NSObject {
     /// 一句话建议
     private func generateAdvice(score: Int, sleepMinutes: Int, hrv: Double?) -> String {
         if score >= 80 {
-            return String(localized: "今天适合高强度训练 💪")
+            return String(localized: "Ready for high intensity today 💪")
         } else if score >= 65 {
             if sleepMinutes < 360 {
-                return String(localized: "睡眠偏少，训练可以但别过猛")
+                return String(localized: "Short on sleep — train but don't overdo it")
             }
-            return String(localized: "状态还不错，正常安排训练")
+            return String(localized: "Decent — train normally")
         } else if score >= 45 {
             if let hrv, hrv < 30 {
-                return String(localized: "HRV 偏低，建议轻松恢复日 🧘")
+                return String(localized: "HRV low — consider a light recovery day 🧘")
             }
-            return String(localized: "建议轻松恢复日，散步或拉伸")
+            return String(localized: "Light recovery day — walk or stretch")
         } else {
-            return String(localized: "身体在喊停，今天好好休息吧 😴")
+            return String(localized: "Your body says stop — rest up 😴")
         }
     }
 
@@ -345,8 +345,8 @@ final class MorningBriefService: NSObject {
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
 
         let content = UNMutableNotificationContent()
-        content.title = String(localized: "📊 本周健康周报已生成")
-        content.body = String(localized: "查看你这一周的健康表现、趋势分析和下周建议")
+        content.title = String(localized: "📊 Weekly health report ready")
+        content.body = String(localized: "Your weekly health performance, trends, and advice")
         content.sound = .default
         content.categoryIdentifier = CategoryID.morningBrief
         content.interruptionLevel = .active

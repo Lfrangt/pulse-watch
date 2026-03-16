@@ -12,9 +12,9 @@ struct TrainingPlanView: View {
 
     /// 推荐的肌群轮换（Push / Pull / Legs 周期）
     private let rotations: [(group: String, label: String, icon: String, exercises: [String])] = [
-        ("push", String(localized: "推 Push"), "arrow.up.circle.fill", [String(localized: "卧推"), String(localized: "肩推"), String(localized: "三头下压")]),
-        ("pull", String(localized: "拉 Pull"), "arrow.down.circle.fill", [String(localized: "硬拉"), String(localized: "划船"), String(localized: "二头弯举")]),
-        ("legs", String(localized: "腿 Legs"), "figure.walk.circle.fill", [String(localized: "深蹲"), String(localized: "腿举"), String(localized: "小腿提踵")]),
+        ("push", String(localized: "Push"), "arrow.up.circle.fill", [String(localized: "Bench Press"), String(localized: "Shoulder Press"), String(localized: "Tricep Pushdown")]),
+        ("pull", String(localized: "Pull"), "arrow.down.circle.fill", [String(localized: "Deadlift"), String(localized: "Row"), String(localized: "Bicep Curl")]),
+        ("legs", String(localized: "Legs"), "figure.walk.circle.fill", [String(localized: "Squat"), String(localized: "Leg Press"), String(localized: "Calf Raise")]),
     ]
 
     var body: some View {
@@ -46,7 +46,7 @@ struct TrainingPlanView: View {
             ),
             for: .navigation
         )
-        .navigationTitle("训练计划")
+        .navigationTitle("Training Plan")
         .sheet(isPresented: $showWorkout) {
             WorkoutTrackingView(
                 initialType: selectedType,
@@ -79,7 +79,7 @@ struct TrainingPlanView: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("恢复评分")
+                Text("Recovery Score")
                     .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(PulseTheme.textSecondary)
                 Text(trainingAdviceLabel)
@@ -102,7 +102,7 @@ struct TrainingPlanView: View {
         let rec = recommendedRotation
 
         return VStack(alignment: .leading, spacing: 8) {
-            Text("今日推荐")
+            Text("Today's Pick")
                 .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(PulseTheme.textSecondary)
 
@@ -130,7 +130,7 @@ struct TrainingPlanView: View {
                 selectedType = .strength
                 showWorkout = true
             } label: {
-                Label("开始训练", systemImage: "play.fill")
+                Label("Start Workout", systemImage: "play.fill")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(Color(hex: "0D0C0B"))
                     .frame(maxWidth: .infinity)
@@ -153,7 +153,7 @@ struct TrainingPlanView: View {
 
     private var pplSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("训练轮换")
+            Text("Training Rotation")
                 .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(PulseTheme.textSecondary)
 
@@ -180,7 +180,7 @@ struct TrainingPlanView: View {
                     Spacer()
 
                     if isRecommended {
-                        Text("推荐")
+                        Text("Recommended")
                             .font(.system(size: 9, weight: .semibold, design: .rounded))
                             .foregroundStyle(PulseTheme.accent)
                             .padding(.horizontal, 6)
@@ -209,10 +209,10 @@ struct TrainingPlanView: View {
                 .foregroundStyle(PulseTheme.statusGood)
 
             VStack(alignment: .leading, spacing: 1) {
-                Text("渐进超载")
+                Text("Progressive Overload")
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
-                Text("本周可尝试 +2.5kg")
+                Text("Try +2.5kg this week")
                     .font(.system(size: 10, design: .rounded))
                     .foregroundStyle(PulseTheme.textSecondary)
             }
@@ -241,10 +241,10 @@ struct TrainingPlanView: View {
     private var trainingAdviceLabel: String {
         let score = recoveryScore
         switch score {
-        case 80...:  return String(localized: "适合高强度")
-        case 60..<80: return String(localized: "适合中等强度")
-        case 40..<60: return String(localized: "建议轻松恢复")
-        default:      return String(localized: "建议休息")
+        case 80...:  return String(localized: "High intensity")
+        case 60..<80: return String(localized: "Moderate intensity")
+        case 40..<60: return String(localized: "Light recovery suggested")
+        default:      return String(localized: "Rest recommended")
         }
     }
 

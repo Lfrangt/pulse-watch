@@ -9,7 +9,7 @@ struct WatchHomeView: View {
 
     // Local fallback values
     @State private var localScore: Int = 0
-    @State private var localHeadline: String = String(localized: "加载中…")
+    @State private var localHeadline: String = String(localized: "Loading...")
     @State private var localInsight: String = ""
     @State private var localHeartRate: Int = 0
     @State private var localSteps: String = "--"
@@ -74,7 +74,7 @@ struct WatchHomeView: View {
                                 Image(systemName: "calendar.badge.clock")
                                     .font(.system(size: 11))
                                     .foregroundStyle(PulseTheme.accent)
-                                Text("计划")
+                                Text("Plan")
                                     .font(.system(size: 12, weight: .medium, design: .rounded))
                                     .foregroundStyle(PulseTheme.textSecondary)
                             }
@@ -94,7 +94,7 @@ struct WatchHomeView: View {
                                 Image(systemName: "dumbbell.fill")
                                     .font(.system(size: 11))
                                     .foregroundStyle(PulseTheme.accent)
-                                Text("训练")
+                                Text("Train")
                                     .font(.system(size: 12, weight: .medium, design: .rounded))
                                     .foregroundStyle(PulseTheme.textSecondary)
                             }
@@ -227,7 +227,7 @@ struct WatchHomeView: View {
 
     private func syncLabel(_ date: Date) -> String {
         let interval = Date().timeIntervalSince(date)
-        if interval < 60 { return String(localized: "刚刚同步") }
+        if interval < 60 { return String(localized: "Just synced") }
         if interval < 3600 { return "\(Int(interval / 60))分钟前同步" }
         return "\(Int(interval / 3600))小时前同步"
     }
@@ -242,7 +242,7 @@ struct WatchHomeView: View {
                 let score = healthManager.calculateDailyScore()
                 localScore = score
                 localHeadline = PulseTheme.statusLabel(for: score)
-                localInsight = score >= 70 ? String(localized: "适合训练") : String(localized: "注意休息")
+                localInsight = score >= 70 ? String(localized: "Ready to train") : String(localized: "Take it easy")
                 localHeartRate = Int(healthManager.latestHeartRate ?? 0)
 
                 let steps = healthManager.todaySteps

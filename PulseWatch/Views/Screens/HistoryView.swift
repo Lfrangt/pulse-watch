@@ -51,7 +51,7 @@ struct HistoryView: View {
                 .padding(.top, PulseTheme.spacingS)
             }
             .background(PulseTheme.background)
-            .navigationTitle("历史趋势")
+            .navigationTitle("Historical Trends")
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .sheet(isPresented: $showWeeklyReport) {
@@ -77,7 +77,7 @@ struct HistoryView: View {
     }
 
     private var rangePicker: some View {
-        Picker(String(localized: "时间范围"), selection: $selectedRange) {
+        Picker(String(localized: "Time Range"), selection: $selectedRange) {
             ForEach(TimeRange.allCases, id: \.self) { range in
                 Text(range.rawValue).tag(range)
             }
@@ -104,7 +104,7 @@ struct HistoryView: View {
 
         return chartCard(
             icon: "chart.line.uptrend.xyaxis",
-            title: String(localized: "每日评分"),
+            title: String(localized: "Daily Score"),
             color: PulseTheme.accent
         ) {
             if data.isEmpty {
@@ -112,16 +112,16 @@ struct HistoryView: View {
             } else {
                 Chart(data, id: \.date) { item in
                     LineMark(
-                        x: .value(String(localized: "日期"), item.date),
-                        y: .value(String(localized: "评分"), item.score)
+                        x: .value(String(localized: "Date"), item.date),
+                        y: .value(String(localized: "Score"), item.score)
                     )
                     .foregroundStyle(PulseTheme.accent)
                     .interpolationMethod(.catmullRom)
                     .lineStyle(StrokeStyle(lineWidth: 2.5))
 
                     AreaMark(
-                        x: .value(String(localized: "日期"), item.date),
-                        y: .value(String(localized: "评分"), item.score)
+                        x: .value(String(localized: "Date"), item.date),
+                        y: .value(String(localized: "Score"), item.score)
                     )
                     .foregroundStyle(
                         LinearGradient(
@@ -133,8 +133,8 @@ struct HistoryView: View {
                     .interpolationMethod(.catmullRom)
 
                     PointMark(
-                        x: .value(String(localized: "日期"), item.date),
-                        y: .value(String(localized: "评分"), item.score)
+                        x: .value(String(localized: "Date"), item.date),
+                        y: .value(String(localized: "Score"), item.score)
                     )
                     .foregroundStyle(PulseTheme.accent)
                     .symbolSize(20)
@@ -171,7 +171,7 @@ struct HistoryView: View {
 
         return chartCard(
             icon: "heart.fill",
-            title: String(localized: "心率"),
+            title: String(localized: "Heart Rate"),
             color: PulseTheme.statusPoor
         ) {
             if data.isEmpty {
@@ -180,18 +180,18 @@ struct HistoryView: View {
                 Chart {
                     ForEach(data, id: \.date) { item in
                         LineMark(
-                            x: .value(String(localized: "日期"), item.date),
-                            y: .value(String(localized: "平均心率"), item.avg),
-                            series: .value(String(localized: "类型"), String(localized: "平均"))
+                            x: .value(String(localized: "Date"), item.date),
+                            y: .value(String(localized: "Avg Heart Rate"), item.avg),
+                            series: .value(String(localized: "Type"), String(localized: "Average"))
                         )
                         .foregroundStyle(PulseTheme.statusPoor)
                         .interpolationMethod(.catmullRom)
                         .lineStyle(StrokeStyle(lineWidth: 2))
 
                         LineMark(
-                            x: .value(String(localized: "日期"), item.date),
-                            y: .value(String(localized: "静息心率"), item.resting),
-                            series: .value(String(localized: "类型"), String(localized: "静息"))
+                            x: .value(String(localized: "Date"), item.date),
+                            y: .value(String(localized: "Resting HR"), item.resting),
+                            series: .value(String(localized: "Type"), String(localized: "Resting"))
                         )
                         .foregroundStyle(PulseTheme.statusPoor.opacity(0.5))
                         .interpolationMethod(.catmullRom)
@@ -213,8 +213,8 @@ struct HistoryView: View {
                     }
                 }
                 .chartForegroundStyleScale([
-                    String(localized: "平均"): PulseTheme.statusPoor,
-                    String(localized: "静息"): PulseTheme.statusPoor.opacity(0.5),
+                    String(localized: "Average"): PulseTheme.statusPoor,
+                    String(localized: "Resting"): PulseTheme.statusPoor.opacity(0.5),
                 ])
                 .chartLegend(.visible)
                 .frame(height: 180)
@@ -240,7 +240,7 @@ struct HistoryView: View {
             } else {
                 Chart(data, id: \.date) { item in
                     LineMark(
-                        x: .value(String(localized: "日期"), item.date),
+                        x: .value(String(localized: "Date"), item.date),
                         y: .value("HRV", item.value)
                     )
                     .foregroundStyle(PulseTheme.accent)
@@ -248,7 +248,7 @@ struct HistoryView: View {
                     .lineStyle(StrokeStyle(lineWidth: 2.5))
 
                     AreaMark(
-                        x: .value(String(localized: "日期"), item.date),
+                        x: .value(String(localized: "Date"), item.date),
                         y: .value("HRV", item.value)
                     )
                     .foregroundStyle(
@@ -295,7 +295,7 @@ struct HistoryView: View {
 
         return chartCard(
             icon: "moon.fill",
-            title: String(localized: "睡眠"),
+            title: String(localized: "Sleep"),
             color: Color(hex: "8B7EC8")
         ) {
             if data.isEmpty {
@@ -304,15 +304,15 @@ struct HistoryView: View {
                 Chart {
                     ForEach(data, id: \.date) { item in
                         BarMark(
-                            x: .value(String(localized: "日期"), item.date, unit: .day),
-                            y: .value(String(localized: "总时长"), item.hours)
+                            x: .value(String(localized: "Date"), item.date, unit: .day),
+                            y: .value(String(localized: "Total Duration"), item.hours)
                         )
                         .foregroundStyle(Color(hex: "8B7EC8").opacity(0.3))
                         .cornerRadius(4)
 
                         BarMark(
-                            x: .value(String(localized: "日期"), item.date, unit: .day),
-                            y: .value(String(localized: "深睡"), item.deep)
+                            x: .value(String(localized: "Date"), item.date, unit: .day),
+                            y: .value(String(localized: "Deep"), item.deep)
                         )
                         .foregroundStyle(Color(hex: "8B7EC8"))
                         .cornerRadius(4)
@@ -361,7 +361,7 @@ struct HistoryView: View {
                 Image(systemName: "doc.text.magnifyingglass")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(PulseTheme.accent)
-                Text("周报对比")
+                Text("Weekly Comparison")
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
             }
@@ -369,13 +369,13 @@ struct HistoryView: View {
             VStack(spacing: 0) {
                 // 表头
                 HStack {
-                    Text("指标")
+                    Text("Metrics")
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    Text("本周")
+                    Text("This Week")
                         .frame(width: 70, alignment: .trailing)
-                    Text("上周")
+                    Text("Last Week")
                         .frame(width: 70, alignment: .trailing)
-                    Text("变化")
+                    Text("Change")
                         .frame(width: 60, alignment: .trailing)
                 }
                 .font(PulseTheme.captionFont)
@@ -384,13 +384,13 @@ struct HistoryView: View {
 
                 reportDivider
 
-                comparisonRow(label: String(localized: "评分"), thisWeek: thisAvgScore, lastWeek: lastAvgScore, suffix: "")
+                comparisonRow(label: String(localized: "Score"), thisWeek: thisAvgScore, lastWeek: lastAvgScore, suffix: "")
                 reportDivider
-                comparisonRow(label: String(localized: "睡眠"), thisWeek: thisAvgSleep, lastWeek: lastAvgSleep, suffix: "h")
+                comparisonRow(label: String(localized: "Sleep"), thisWeek: thisAvgSleep, lastWeek: lastAvgSleep, suffix: "h")
                 reportDivider
                 comparisonRow(label: "HRV", thisWeek: thisAvgHRV, lastWeek: lastAvgHRV, suffix: "ms")
                 reportDivider
-                comparisonRow(label: String(localized: "步数"), thisWeek: thisAvgSteps, lastWeek: lastAvgSteps, suffix: "")
+                comparisonRow(label: String(localized: "Steps"), thisWeek: thisAvgSteps, lastWeek: lastAvgSteps, suffix: "")
             }
         }
         .pulseCard()
@@ -463,7 +463,7 @@ struct HistoryView: View {
             HStack(spacing: PulseTheme.spacingS) {
                 Image(systemName: "doc.richtext")
                     .font(.system(size: 15, weight: .medium))
-                Text("查看完整周报")
+                Text("View Full Report")
                     .font(PulseTheme.bodyFont.weight(.medium))
                 Spacer()
                 Image(systemName: "chevron.right")
@@ -519,7 +519,7 @@ struct HistoryView: View {
             Image(systemName: "chart.line.downtrend.xyaxis")
                 .font(.system(size: 32))
                 .foregroundStyle(PulseTheme.textTertiary)
-            Text("暂无足够数据")
+            Text("Insufficient data")
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textTertiary)
         }
@@ -536,7 +536,7 @@ struct HistoryView: View {
                 TrainingCalendarView()
                     .preferredColorScheme(.dark)
             } label: {
-                shortcutButton(icon: "calendar", title: String(localized: "训练日历"))
+                shortcutButton(icon: "calendar", title: String(localized: "Training Calendar"))
             }
             .buttonStyle(.plain)
 
@@ -544,7 +544,7 @@ struct HistoryView: View {
             Button {
                 showWeeklyReport = true
             } label: {
-                shortcutButton(icon: "doc.richtext", title: String(localized: "周报"))
+                shortcutButton(icon: "doc.richtext", title: String(localized: "Weekly Report"))
             }
             .buttonStyle(.plain)
         }

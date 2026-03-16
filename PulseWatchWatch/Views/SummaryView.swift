@@ -8,7 +8,7 @@ struct SummaryView: View {
     @State private var connectivity = WatchConnectivityManager.shared
 
     @State private var score: Int = 0
-    @State private var headline: String = String(localized: "加载中…")
+    @State private var headline: String = String(localized: "Loading...")
     @State private var heartRate: Int = 0
     @State private var hrv: Double = 0
     @State private var sleepMinutes: Int = 0
@@ -32,7 +32,7 @@ struct SummaryView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "chart.bar.fill")
                             .font(.system(size: 12))
-                        Text("查看趋势")
+                        Text("View Trends")
                             .font(.system(size: 14, weight: .medium, design: .rounded))
                     }
                     .foregroundStyle(PulseTheme.accent)
@@ -56,7 +56,7 @@ struct SummaryView: View {
             ),
             for: .navigation
         )
-        .navigationTitle("摘要")
+        .navigationTitle("Summary")
         .onAppear {
             loadData()
             withAnimation(.spring(response: 0.8, dampingFraction: 0.75)) {
@@ -116,7 +116,7 @@ struct SummaryView: View {
             HStack(spacing: 8) {
                 MetricCard(
                     icon: "heart.fill",
-                    label: String(localized: "心率"),
+                    label: String(localized: "Heart Rate"),
                     value: heartRate > 0 ? "\(heartRate)" : "--",
                     unit: "bpm",
                     color: PulseTheme.statusPoor
@@ -134,14 +134,14 @@ struct SummaryView: View {
             HStack(spacing: 8) {
                 MetricCard(
                     icon: "moon.fill",
-                    label: String(localized: "睡眠"),
+                    label: String(localized: "Sleep"),
                     value: sleepMinutes > 0 ? formatSleep(sleepMinutes) : "--",
                     unit: "",
                     color: Color(hex: "8B7EC8")
                 )
                 MetricCard(
                     icon: "figure.walk",
-                    label: String(localized: "步数"),
+                    label: String(localized: "Steps"),
                     value: formatSteps(steps),
                     unit: "",
                     color: PulseTheme.statusGood

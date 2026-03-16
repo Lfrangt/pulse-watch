@@ -41,11 +41,11 @@ struct WorkoutView: View {
                 .padding(.horizontal, PulseTheme.spacingM)
             }
             .background(PulseTheme.background)
-            .navigationTitle("运动")
+            .navigationTitle("Exercise")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("运动")
+                    Text("Exercise")
                         .font(PulseTheme.headlineFont)
                         .foregroundStyle(PulseTheme.textPrimary)
                 }
@@ -67,7 +67,7 @@ struct WorkoutView: View {
                 Image(systemName: "calendar")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(PulseTheme.accent)
-                Text("本周运动")
+                Text("This Week's Exercise")
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
                 Spacer()
@@ -76,8 +76,8 @@ struct WorkoutView: View {
             HStack(spacing: 0) {
                 statItem(
                     value: "\(stats.activeDays)",
-                    unit: String(localized: "天"),
-                    label: String(localized: "运动天数"),
+                    unit: String(localized: "days"),
+                    label: String(localized: "Active Days"),
                     color: PulseTheme.statusGood
                 )
 
@@ -86,7 +86,7 @@ struct WorkoutView: View {
                 statItem(
                     value: formatDuration(stats.totalMinutes),
                     unit: "",
-                    label: String(localized: "总时长"),
+                    label: String(localized: "Total Duration"),
                     color: PulseTheme.accent
                 )
 
@@ -95,7 +95,7 @@ struct WorkoutView: View {
                 statItem(
                     value: "\(Int(stats.totalCalories))",
                     unit: "kcal",
-                    label: String(localized: "总消耗"),
+                    label: String(localized: "Total Burned"),
                     color: PulseTheme.statusModerate
                 )
             }
@@ -221,7 +221,7 @@ struct WorkoutView: View {
 
     private func heartRateZonesView(_ zones: [HeartRateZone]) -> some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-            Text("心率区间")
+            Text("Heart Rate Zone")
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textSecondary)
 
@@ -269,11 +269,11 @@ struct WorkoutView: View {
             }
 
             VStack(spacing: PulseTheme.spacingS) {
-                Text("还没有运动记录")
+                Text("No workout records yet")
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
 
-                Text("开始一次运动后，你的记录会显示在这里。\n支持跑步、骑行、游泳、力量训练等。")
+                Text("Your workout records will appear here.\nSupports running, cycling, swimming, strength training, and more.")
                     .font(PulseTheme.bodyFont)
                     .foregroundStyle(PulseTheme.textSecondary)
                     .multilineTextAlignment(.center)
@@ -388,11 +388,11 @@ struct WorkoutView: View {
             }
 
             let zones: [HeartRateZone] = [
-                HeartRateZone(name: String(localized: "热身"), percentage: Double(zoneCounts[0]) / total, color: Color(hex: "7FB069")),
-                HeartRateZone(name: String(localized: "燃脂"), percentage: Double(zoneCounts[1]) / total, color: Color(hex: "A8C256")),
-                HeartRateZone(name: String(localized: "有氧"), percentage: Double(zoneCounts[2]) / total, color: Color(hex: "D4A056")),
-                HeartRateZone(name: String(localized: "无氧"), percentage: Double(zoneCounts[3]) / total, color: Color(hex: "D47456")),
-                HeartRateZone(name: String(localized: "极限"), percentage: Double(zoneCounts[4]) / total, color: Color(hex: "C75C5C")),
+                HeartRateZone(name: String(localized: "Warm-up"), percentage: Double(zoneCounts[0]) / total, color: Color(hex: "7FB069")),
+                HeartRateZone(name: String(localized: "Fat Burn"), percentage: Double(zoneCounts[1]) / total, color: Color(hex: "A8C256")),
+                HeartRateZone(name: String(localized: "Cardio"), percentage: Double(zoneCounts[2]) / total, color: Color(hex: "D4A056")),
+                HeartRateZone(name: String(localized: "Anaerobic"), percentage: Double(zoneCounts[3]) / total, color: Color(hex: "D47456")),
+                HeartRateZone(name: String(localized: "Peak"), percentage: Double(zoneCounts[4]) / total, color: Color(hex: "C75C5C")),
             ]
 
             heartRateZones[workout.uuid] = zones
@@ -445,26 +445,26 @@ struct WorkoutView: View {
 
     private func workoutName(_ workout: HKWorkout) -> String {
         switch workout.workoutActivityType {
-        case .running:              return "跑步"
-        case .cycling:              return "骑行"
-        case .swimming:             return "游泳"
-        case .walking:              return "步行"
-        case .hiking:               return "徒步"
-        case .yoga:                 return "瑜伽"
-        case .functionalStrengthTraining: return "功能性力量"
-        case .traditionalStrengthTraining: return "力量训练"
+        case .running:              return "Running"
+        case .cycling:              return "Cycling"
+        case .swimming:             return "Swimming"
+        case .walking:              return "Walking"
+        case .hiking:               return "Hiking"
+        case .yoga:                 return "Yoga"
+        case .functionalStrengthTraining: return "Functional Strength"
+        case .traditionalStrengthTraining: return "Strength"
         case .highIntensityIntervalTraining: return "HIIT"
-        case .dance:                return "舞蹈"
-        case .elliptical:           return "椭圆机"
-        case .rowing:               return "划船"
-        case .stairClimbing:        return "爬楼梯"
-        case .basketball:           return "篮球"
-        case .soccer:               return "足球"
-        case .tennis:               return "网球"
-        case .tableTennis:          return "乒乓球"
-        case .badminton:            return "羽毛球"
-        case .cooldown:             return "放松恢复"
-        default:                    return String(localized: "运动")
+        case .dance:                return "Dance"
+        case .elliptical:           return "Elliptical"
+        case .rowing:               return "Row"
+        case .stairClimbing:        return "Stair Climbing"
+        case .basketball:           return "Basketball"
+        case .soccer:               return "Soccer"
+        case .tennis:               return "Tennis"
+        case .tableTennis:          return "Table Tennis"
+        case .badminton:            return "Badminton"
+        case .cooldown:             return "Recovery"
+        default:                    return String(localized: "Exercise")
         }
     }
 
@@ -480,9 +480,9 @@ struct WorkoutView: View {
     private func formatWorkoutDate(_ date: Date) -> String {
         let calendar = Calendar.current
         if calendar.isDateInToday(date) {
-            return String(localized: "今天 ") + timeString(date)
+            return String(localized: "Today ") + timeString(date)
         } else if calendar.isDateInYesterday(date) {
-            return String(localized: "昨天 ") + timeString(date)
+            return String(localized: "Yesterday ") + timeString(date)
         } else {
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: "zh_CN")

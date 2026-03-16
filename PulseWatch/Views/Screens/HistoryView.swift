@@ -8,6 +8,7 @@ struct HistoryView: View {
     @State private var selectedRange: TimeRange = .week
     @State private var showWeeklyReport = false
     @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
+    @Query(sort: \WorkoutHistoryEntry.startDate, order: .reverse) private var allWorkouts: [WorkoutHistoryEntry]
 
     var body: some View {
         NavigationStack {
@@ -44,6 +45,10 @@ struct HistoryView: View {
                     // 查看完整周报按钮
                     weeklyReportButton
                         .staggered(index: 6)
+
+                    // 肌群恢复关联洞察
+                    MuscleInsightsCard(workouts: allWorkouts, summaries: allSummaries)
+                        .staggered(index: 7)
 
                     Spacer(minLength: 60)
                 }

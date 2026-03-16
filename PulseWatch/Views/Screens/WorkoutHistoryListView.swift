@@ -177,8 +177,8 @@ struct WorkoutHistoryListView: View {
                     .foregroundStyle(color)
             }
 
-            // 名称 + 日期
-            VStack(alignment: .leading, spacing: 2) {
+            // 名称 + 日期 + 肌群 badge
+            VStack(alignment: .leading, spacing: 4) {
                 Text(entry.activityName)
                     .font(PulseTheme.bodyFont.weight(.medium))
                     .foregroundStyle(PulseTheme.textPrimary)
@@ -186,6 +186,26 @@ struct WorkoutHistoryListView: View {
                 Text(formatRelativeDate(entry.startDate))
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
+
+                // 肌群 badge 行
+                let tags = entry.muscleGroupTags
+                if !tags.isEmpty {
+                    HStack(spacing: 4) {
+                        ForEach(tags.prefix(3)) { group in
+                            Text(group.label)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(group.color)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Capsule().fill(group.color.opacity(0.12)))
+                        }
+                        if tags.count > 3 {
+                            Text("+\(tags.count - 3)")
+                                .font(.system(size: 10))
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                    }
+                }
             }
 
             Spacer()

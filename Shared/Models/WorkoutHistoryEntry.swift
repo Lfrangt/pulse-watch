@@ -17,6 +17,7 @@ final class WorkoutHistoryEntry {
     var maxHeartRate: Double?             // bpm
     var sourceName: String               // 数据来源（Apple Watch 等）
     var heartRateZonesData: Data?        // JSON encoded [HRZoneEntry]
+    var muscleGroupTagsRaw: String?      // JSON encoded [String] — muscle group tags
     var syncedAt: Date                   // 同步时间
 
     init(
@@ -54,6 +55,22 @@ final class WorkoutHistoryEntry {
         }
         set {
             heartRateZonesData = try? JSONEncoder().encode(newValue)
+        }
+    }
+
+    // MARK: - 肌群标签存取
+
+    var muscleGroupTags: [MuscleGroup] {
+        get {
+            guard let raw = muscleGroupTagsRaw,
+                  let data = raw.data(using: .utf8),
+                  let strings = try? JSONDecoder().decode([String].self, from: data)
+            else { return [] }
+            return strings.compactMap { MuscleGroup(rawValue: $0) }
+        }
+        set {
+            let strings = newValue.map(\.rawValue)
+            muscleGroupTagsRaw = (try? String(data: JSONEncoder().encode(strings), encoding: .utf8)) ?? nil
         }
     }
 

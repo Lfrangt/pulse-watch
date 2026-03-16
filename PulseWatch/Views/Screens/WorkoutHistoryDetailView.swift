@@ -9,6 +9,7 @@ struct WorkoutHistoryDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirm = false
     @State private var showShareScreen = false
+    @State private var selectedMuscleGroups: Set<MuscleGroup> = []
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -33,13 +34,17 @@ struct WorkoutHistoryDetailView: View {
                         .staggered(index: 3)
                 }
 
+                // 肌群标签
+                muscleGroupCard
+                    .staggered(index: 4)
+
                 // 数据来源
                 sourceCard
-                    .staggered(index: 4)
+                    .staggered(index: 5)
 
                 // 删除按钮
                 deleteButton
-                    .staggered(index: 5)
+                    .staggered(index: 6)
 
                 Spacer(minLength: 60)
             }
@@ -47,6 +52,7 @@ struct WorkoutHistoryDetailView: View {
             .padding(.top, PulseTheme.spacingS)
         }
         .background(PulseTheme.background)
+        .onAppear { selectedMuscleGroups = Set(entry.muscleGroupTags) }
         .navigationTitle(entry.activityName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -308,6 +314,67 @@ struct WorkoutHistoryDetailView: View {
                         .foregroundStyle(PulseTheme.textSecondary)
                 }
                 .frame(maxWidth: .infinity)
+            }
+        }
+        .pulseCard()
+    }
+
+    // MARK: - 肌群标签选择器
+
+    private var muscleGroupCard: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            HStack {
+                Image(systemName: "figure.strengthtraining.traditional")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(PulseTheme.accent)
+                Text("Muscle Groups")
+                    .font(PulseTheme.headlineFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                Spacer()
+                if !selectedMuscleGroups.isEmpty {
+                    Text(String(format: String(localized: "%d selected"), selectedMuscleGroups.count))
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+            }
+
+            // 选择网格
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 4), spacing: 8) {
+                ForEach(MuscleGroup.allCases) { group in
+                    let selected = selectedMuscleGroups.contains(group)
+                    Button {
+                        if selected {
+                            selectedMuscleGroups.remove(group)
+                        } else {
+                            selectedMuscleGroups.insert(group)
+                        }
+                        entry.muscleGroupTags = Array(selectedMuscleGroups)
+                        try? modelContext.save()
+                    } label: {
+                        VStack(spacing: 4) {
+                            Text(group.emoji)
+                                .font(.system(size: 18))
+                            Text(group.label)
+                                .font(.system(size: 11, weight: selected ? .semibold : .regular))
+                                .foregroundStyle(selected ? group.color : PulseTheme.textTertiary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .fill(selected ? group.color.opacity(0.15) : PulseTheme.surface)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .stroke(selected ? group.color.opacity(0.5) : Color.clear, lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(group.label)
+                    .accessibilityAddTraits(selected ? .isSelected : [])
+                }
             }
         }
         .pulseCard()

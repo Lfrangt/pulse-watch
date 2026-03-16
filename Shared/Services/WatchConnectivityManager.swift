@@ -93,7 +93,7 @@ final class WatchConnectivityManager: NSObject {
         }
     }
 
-    // MARK: - Watch → iPhone: Workout Event
+    // MARK: - Watch → iPhone: Workout Events
 
     func sendWorkoutStarted(category: String) {
         guard let session, session.activationState == .activated else { return }
@@ -106,6 +106,36 @@ final class WatchConnectivityManager: NSObject {
 
         if session.isReachable {
             session.sendMessage(payload, replyHandler: nil)
+        } else {
+            session.transferUserInfo(payload)
+        }
+    }
+
+    /// Notify iPhone that a workout has ended so it can sync HealthKit + push to OpenClaw
+    func sendWorkoutCompleted(
+        category: String,
+        durationSeconds: Int,
+        activeCalories: Double,
+        averageHeartRate: Double,
+        maxHeartRate: Double
+    ) {
+        guard let session, session.activationState == .activated else { return }
+
+        let payload: [String: Any] = [
+            "type": "workoutCompleted",
+            "category": category,
+            "durationSeconds": durationSeconds,
+            "activeCalories": activeCalories,
+            "averageHeartRate": averageHeartRate,
+            "maxHeartRate": maxHeartRate,
+            "timestamp": Date().timeIntervalSince1970
+        ]
+
+        if session.isReachable {
+            session.sendMessage(payload, replyHandler: nil) { error in
+                print("WC sendWorkoutCompleted error: \(error.localizedDescription)")
+                session.transferUserInfo(payload)
+            }
         } else {
             session.transferUserInfo(payload)
         }
@@ -142,7 +172,7 @@ final class WatchConnectivityManager: NSObject {
 
     #if os(watchOS)
     private func updateComplicationData() {
-        let defaults = UserDefaults(suiteName: "group.com.abundra.pulse")
+        let defaults = UserDefaults(suiteName: "group.com.abundra.pulse.shared")
         if let score = receivedScore {
             defaults?.set(score, forKey: "pulse.score")
         }
@@ -169,9 +199,15 @@ final class WatchConnectivityManager: NSObject {
                 self?.pendingTrainingReason = data["reason"] as? String
             }
         case "workoutStarted":
-            // iPhone can react to this (update UI, etc.)
             NotificationCenter.default.post(
                 name: .watchWorkoutStarted,
+                object: nil,
+                userInfo: data
+            )
+        case "workoutCompleted":
+            // Trigger iPhone-side sync: HealthKit workout history + OpenClaw push
+            NotificationCenter.default.post(
+                name: .watchWorkoutCompleted,
                 object: nil,
                 userInfo: data
             )
@@ -231,4 +267,5 @@ extension WatchConnectivityManager: WCSessionDelegate {
 
 extension Notification.Name {
     static let watchWorkoutStarted = Notification.Name("pulse.watchWorkoutStarted")
+    static let watchWorkoutCompleted = Notification.Name("pulse.watchWorkoutCompleted")
 }

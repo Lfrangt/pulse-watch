@@ -221,6 +221,15 @@ final class WorkoutSessionManager: NSObject {
         state = .ended
         HapticManager.workoutStopped()
 
+        // Notify iPhone to sync workout history + push to OpenClaw
+        WatchConnectivityManager.shared.sendWorkoutCompleted(
+            category: "\(currentWorkoutType.rawValue)",
+            durationSeconds: elapsedSeconds,
+            activeCalories: activeCalories,
+            averageHeartRate: averageHeartRate,
+            maxHeartRate: maxHeartRateRecorded
+        )
+
         // 埋点
         Analytics.trackWorkoutComplete(type: "\(currentWorkoutType.rawValue)", durationMinutes: elapsedSeconds / 60)
     }

@@ -63,9 +63,15 @@ struct PulseWatchApp: App {
             RootView()
                 .preferredColorScheme(.dark)
                 .onOpenURL { url in
-                    // 处理 OpenClaw URL Scheme 请求
                     Task { @MainActor in
                         _ = OpenClawBridge.shared.handleURL(url)
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .watchWorkoutCompleted)) { _ in
+                    // Watch workout ended → sync HealthKit workout history + push to OpenClaw
+                    Task {
+                        await WorkoutHistoryService.shared.syncWorkouts()
+                        await OpenClawBridge.shared.pushHealthStatus()
                     }
                 }
         }

@@ -71,7 +71,7 @@ enum TimelineEventBuilder {
                 time: bedtime,
                 icon: "moon.fill",
                 title: String(localized: "入睡"),
-                detail: "总计 \(sleepHours)h\(sleepMins)m · 深睡约 \(String(format: "%.1f", deepHours / 60))h",
+                detail: "\(sleepHours)h\(sleepMins)m · \(String(localized: "深睡")) ~\(String(format: "%.1f", deepHours / 60))h",
                 impact: insight.sleepScore >= 70 ? "恢复 +\(min(20, insight.sleepScore / 5))" : String(localized: "恢复一般"),
                 impactPositive: insight.sleepScore >= 50,
                 color: sleepColor
@@ -444,7 +444,7 @@ struct TimelineNodeView: View {
 
         // 判断是否是昨天
         if !calendar.isDate(event.time, inSameDayAs: now) {
-            return "昨晚 \(timeStr)"
+            return "\(String(localized: "昨晚")) \(timeStr)"
         }
 
         // 根据时段添加前缀

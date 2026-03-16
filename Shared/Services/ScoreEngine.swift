@@ -111,7 +111,8 @@ struct ScoreEngine {
         guard total > 0 else { return nil }
         let hours = total / 60
         let mins = total % 60
-        return "\(hours)h\(mins)m · 深睡 \(deep)m · REM \(rem)m"
+        let deepLabel = String(localized: "深睡")
+        return "\(hours)h\(mins)m · \(deepLabel) \(deep)m · REM \(rem)m"
     }
     
     // MARK: - Recovery Note

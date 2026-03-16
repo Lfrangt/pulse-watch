@@ -40,34 +40,34 @@ struct WeeklyTrendChartsView: View {
     }
 
     var body: some View {
-        if hasData {
-            VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-                // 标题
-                HStack(spacing: PulseTheme.spacingS) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(PulseTheme.accent.opacity(0.12))
-                            .frame(width: 24, height: 24)
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            // 标题
+            HStack(spacing: PulseTheme.spacingS) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(PulseTheme.accent.opacity(0.12))
+                        .frame(width: 24, height: 24)
 
-                        Image(systemName: "chart.line.uptrend.xyaxis")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(PulseTheme.accent)
-                    }
-
-                    Text(String(localized: "7-Day Trends"))
-                        .font(PulseTheme.headlineFont)
-                        .foregroundStyle(PulseTheme.textPrimary)
-
-                    Spacer()
-
-                    // 日期范围副标题
-                    if let first = displayData.first, let last = displayData.last {
-                        Text(dateRangeLabel(from: first.date, to: last.date))
-                            .font(PulseTheme.captionFont)
-                            .foregroundStyle(PulseTheme.textTertiary)
-                    }
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(PulseTheme.accent)
                 }
 
+                Text(String(localized: "7-Day Trends"))
+                    .font(PulseTheme.headlineFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+
+                Spacer()
+
+                // 日期范围副标题
+                if hasData, let first = displayData.first, let last = displayData.last {
+                    Text(dateRangeLabel(from: first.date, to: last.date))
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+            }
+
+            if hasData {
                 // 心率趋势
                 heartRateChart
 
@@ -76,8 +76,81 @@ struct WeeklyTrendChartsView: View {
 
                 // 睡眠趋势
                 sleepChart
+            } else {
+                // 无数据占位符
+                noDataPlaceholder
             }
-            .pulseCard()
+        }
+        .pulseCard()
+    }
+    
+    // MARK: - No Data Placeholder
+    
+    private var noDataPlaceholder: some View {
+        VStack(spacing: PulseTheme.spacingM) {
+            // 占位符图表轮廓
+            placeholderChartSilhouette
+            
+            VStack(spacing: PulseTheme.spacingS) {
+                Text("Start wearing Apple Watch to collect data")
+                    .font(PulseTheme.bodyFont)
+                    .foregroundStyle(PulseTheme.textSecondary)
+                    .multilineTextAlignment(.center)
+                
+                Text("Trends will appear here once you have a few days of health data")
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .padding(.vertical, PulseTheme.spacingL)
+    }
+    
+    private var placeholderChartSilhouette: some View {
+        VStack(spacing: PulseTheme.spacingS) {
+            // 模拟的图表轮廓
+            HStack(alignment: .bottom, spacing: 6) {
+                ForEach(0..<7, id: \.self) { i in
+                    let heights: [CGFloat] = [20, 35, 25, 40, 30, 45, 35]
+                    RoundedRectangle(cornerRadius: 2, style: .continuous)
+                        .fill(PulseTheme.border.opacity(0.3))
+                        .frame(width: 8, height: heights[i])
+                }
+            }
+            
+            // 模拟的折线图
+            ZStack {
+                // 背景网格
+                HStack(spacing: 0) {
+                    ForEach(0..<4, id: \.self) { _ in
+                        Rectangle()
+                            .frame(height: 0.5)
+                            .foregroundStyle(PulseTheme.border.opacity(0.2))
+                        Spacer()
+                    }
+                }
+                .frame(height: 40)
+                
+                // 占位符线条
+                Path { path in
+                    let points: [CGPoint] = [
+                        CGPoint(x: 0, y: 30),
+                        CGPoint(x: 40, y: 20),
+                        CGPoint(x: 80, y: 35),
+                        CGPoint(x: 120, y: 15),
+                        CGPoint(x: 160, y: 25)
+                    ]
+                    
+                    if let first = points.first {
+                        path.move(to: first)
+                        for point in points.dropFirst() {
+                            path.addLine(to: point)
+                        }
+                    }
+                }
+                .stroke(PulseTheme.border.opacity(0.4), style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                .frame(width: 160, height: 40)
+            }
         }
     }
 

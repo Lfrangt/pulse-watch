@@ -43,6 +43,19 @@ struct DashboardView: View {
                             .staggered(index: 1)
                     } else if isLoading {
                         loadingCard
+                    } else if !healthManager.hasHealthData && !demoMode {
+                        // 未授权或无数据状态 — 引导用户开启权限
+                        VStack(spacing: PulseTheme.spacingM) {
+                            healthKitPermissionGuide
+                                .staggered(index: 1)
+                            
+                            // 温和提示：也可以戴上手表
+                            Text("Or wear your Apple Watch to collect data")
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                                .padding(.horizontal, PulseTheme.spacingM)
+                                .staggered(index: 2)
+                        }
                     } else {
                         // 空数据状态 — 温暖邀请
                         emptyStateCard
@@ -902,6 +915,76 @@ struct DashboardView: View {
 
         connectivityManager.sendGymArrival(muscleGroup: group, reason: reason)
         showGymPrompt = true
+    }
+
+    // MARK: - HealthKit Permission Guide (Inline)
+    
+    private var healthKitPermissionGuide: some View {
+        VStack(spacing: PulseTheme.spacingL) {
+            // Heart icon with pulse animation
+            ZStack {
+                Circle()
+                    .fill(PulseTheme.accent.opacity(0.1))
+                    .frame(width: 80, height: 80)
+                
+                Image(systemName: "heart.circle.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(PulseTheme.accent)
+                    .symbolEffect(.pulse, options: .repeating)
+            }
+            
+            VStack(spacing: PulseTheme.spacingM) {
+                Text("Enable Health Access")
+                    .font(PulseTheme.titleFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                    .multilineTextAlignment(.center)
+                
+                Text("Pulse Watch needs access to your health data to provide personalized insights and recovery scores.")
+                    .font(PulseTheme.bodyFont)
+                    .foregroundStyle(PulseTheme.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+            }
+            
+            Button {
+                openAppSettings()
+            } label: {
+                HStack(spacing: PulseTheme.spacingS) {
+                    Image(systemName: "gear")
+                        .font(.system(size: 16, weight: .medium))
+                    Text("Open Settings")
+                        .font(PulseTheme.bodyFont.weight(.semibold))
+                }
+                .foregroundStyle(PulseTheme.background)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                        .fill(PulseTheme.accent)
+                        .shadow(color: PulseTheme.accent.opacity(0.3), radius: 8, y: 4)
+                )
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, PulseTheme.spacingXL)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
+                .fill(PulseTheme.cardBackground)
+                .shadow(color: PulseTheme.cardShadow, radius: 20, y: 8)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
+                .stroke(PulseTheme.accent.opacity(0.15), lineWidth: 0.5)
+        )
+    }
+    
+    private func openAppSettings() {
+        #if os(iOS)
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url)
+        }
+        #endif
     }
 
     private func localizedGroup(_ group: String) -> String {

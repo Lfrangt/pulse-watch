@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import UserNotifications
+import HealthKit
 
 /// 设置页面 — 控制通知、健身房、数据采集等
 struct SettingsView: View {
@@ -20,6 +21,7 @@ struct SettingsView: View {
     // MARK: - 状态
 
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
+    @State private var healthManager = HealthKitManager.shared
     @State private var showLocationSetup = false
     @State private var showAbout = false
     @State private var isSavingGym = false
@@ -50,29 +52,33 @@ struct SettingsView: View {
                     notificationSection
                         .staggered(index: 2)
 
+                    // HealthKit 数据权限
+                    healthDataSection
+                        .staggered(index: 3)
+
                     // 单位设置
                     unitSection
-                        .staggered(index: 3)
+                        .staggered(index: 4)
 
                     // 数据采集频率
                     collectionSection
-                        .staggered(index: 4)
+                        .staggered(index: 5)
 
                     // 数据管理
                     dataManagementSection
-                        .staggered(index: 5)
+                        .staggered(index: 6)
 
                     // OpenClaw（预留）
                     openClawSection
-                        .staggered(index: 6)
+                        .staggered(index: 7)
 
                     // 开发者选项
                     developerSection
-                        .staggered(index: 7)
+                        .staggered(index: 8)
 
                     // 关于
                     aboutSection
-                        .staggered(index: 8)
+                        .staggered(index: 9)
 
                     Spacer(minLength: 40)
                 }
@@ -85,6 +91,7 @@ struct SettingsView: View {
             .toolbarColorScheme(.dark, for: .navigationBar)
             .task {
                 await checkNotificationStatus()
+                healthManager.checkAuthorizationStatus()
             }
         }
     }
@@ -352,6 +359,89 @@ struct SettingsView: View {
             }
         }
         .pulseCard()
+    }
+
+    // MARK: - HealthKit 数据权限
+
+    private var healthDataSection: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            sectionHeader(icon: "heart.text.square.fill", title: String(localized: "Health Data"))
+
+            // 权限状态
+            settingRow {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Authorization Status")
+                            .font(PulseTheme.bodyFont)
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text(healthManager.authorizationStatus.description)
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(healthManager.authorizationStatus.color)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: healthManager.authorizationStatus.icon)
+                        .font(.system(size: 18))
+                        .foregroundStyle(healthManager.authorizationStatus.color)
+                }
+            }
+
+            // 如果未完全授权，显示设置按钮
+            if !healthManager.isFullyAuthorized {
+                Button {
+                    openAppSettings()
+                } label: {
+                    Text("Open Settings")
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.accent)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, PulseTheme.spacingS)
+                }
+            }
+
+            // 数据类型访问状态
+            settingRow {
+                VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                    Text("Data Access")
+                        .font(PulseTheme.bodyFont)
+                        .foregroundStyle(PulseTheme.textPrimary)
+
+                    VStack(spacing: PulseTheme.spacingXS) {
+                        dataAccessRow(icon: "heart.fill", name: "Heart Rate", isAuthorized: checkDataTypeAuthorization(HKQuantityType(.heartRate)))
+                        dataAccessRow(icon: "waveform.path.ecg", name: "HRV", isAuthorized: checkDataTypeAuthorization(HKQuantityType(.heartRateVariabilitySDNN)))
+                        dataAccessRow(icon: "figure.walk", name: "Steps", isAuthorized: checkDataTypeAuthorization(HKQuantityType(.stepCount)))
+                        dataAccessRow(icon: "moon.fill", name: "Sleep", isAuthorized: checkDataTypeAuthorization(HKCategoryType(.sleepAnalysis)))
+                        dataAccessRow(icon: "lungs.fill", name: "Blood Oxygen", isAuthorized: checkDataTypeAuthorization(HKQuantityType(.oxygenSaturation)))
+                    }
+                }
+            }
+        }
+        .pulseCard()
+    }
+
+    private func dataAccessRow(icon: String, name: String, isAuthorized: Bool) -> some View {
+        HStack(spacing: PulseTheme.spacingS) {
+            Image(systemName: icon)
+                .font(.system(size: 12))
+                .foregroundStyle(PulseTheme.accent)
+                .frame(width: 20)
+
+            Text(name)
+                .font(PulseTheme.captionFont)
+                .foregroundStyle(PulseTheme.textSecondary)
+
+            Spacer()
+
+            Image(systemName: isAuthorized ? "checkmark.circle.fill" : "xmark.circle")
+                .font(.system(size: 14))
+                .foregroundStyle(isAuthorized ? PulseTheme.statusGood : PulseTheme.textTertiary)
+        }
+    }
+
+    private func checkDataTypeAuthorization(_ type: HKObjectType) -> Bool {
+        let status = HKHealthStore().authorizationStatus(for: type)
+        return status == .sharingAuthorized
     }
 
     // MARK: - 数据采集频率

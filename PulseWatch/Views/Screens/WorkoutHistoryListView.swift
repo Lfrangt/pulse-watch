@@ -230,27 +230,70 @@ struct WorkoutHistoryListView: View {
                     .fill(PulseTheme.accent.opacity(0.08))
                     .frame(width: 100, height: 100)
 
-                Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
+                Image(systemName: "figure.run")
                     .font(.system(size: 40, weight: .light))
                     .foregroundStyle(PulseTheme.accent)
             }
 
             VStack(spacing: PulseTheme.spacingS) {
-                Text("No Workout History")
+                Text("Complete Your First Workout")
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
 
-                Text("Complete a workout with Apple Watch\nand it will be saved here automatically.")
+                Text("Start a workout on Apple Watch and your history will appear here")
                     .font(PulseTheme.bodyFont)
                     .foregroundStyle(PulseTheme.textSecondary)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
             }
+            
+            // 支持的训练类型提示
+            VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
+                Text("Supported workout types:")
+                    .font(PulseTheme.captionFont.weight(.medium))
+                    .foregroundStyle(PulseTheme.textTertiary)
+                
+                LazyVGrid(columns: [
+                    GridItem(.flexible()),
+                    GridItem(.flexible())
+                ], spacing: PulseTheme.spacingXS) {
+                    workoutTypeItem(icon: "dumbbell.fill", name: "Strength Training")
+                    workoutTypeItem(icon: "figure.run", name: "Running")
+                    workoutTypeItem(icon: "figure.walk", name: "Walking")
+                    workoutTypeItem(icon: "figure.cycling", name: "Cycling")
+                    workoutTypeItem(icon: "figure.mixed.cardio", name: "HIIT")
+                    workoutTypeItem(icon: "heart.fill", name: "Other")
+                }
+            }
+            .padding(PulseTheme.spacingM)
+            .background(
+                RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                    .fill(PulseTheme.surface)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                    .stroke(PulseTheme.border.opacity(0.3), lineWidth: 0.5)
+            )
 
             Spacer()
             Spacer()
         }
         .padding(.horizontal, PulseTheme.spacingL)
+    }
+    
+    private func workoutTypeItem(icon: String, name: String) -> some View {
+        HStack(spacing: PulseTheme.spacingXS) {
+            Image(systemName: icon)
+                .font(.system(size: 10))
+                .foregroundStyle(PulseTheme.accent)
+                .frame(width: 16)
+            
+            Text(name)
+                .font(.system(size: 10))
+                .foregroundStyle(PulseTheme.textTertiary)
+            
+            Spacer()
+        }
     }
 
     // MARK: - 按月分组

@@ -1,5 +1,6 @@
 import Foundation
 import HealthKit
+import SwiftUI
 
 /// Central manager for all HealthKit data access
 @Observable
@@ -10,6 +11,9 @@ final class HealthKitManager {
     private let store = HKHealthStore()
     
     var isAuthorized = false
+    var hasHealthData = false
+    var authorizationStatus: AuthorizationStatus = .notDetermined
+    
     var latestHeartRate: Double?
     var latestHRV: Double?
     var latestRestingHR: Double?
@@ -17,6 +21,38 @@ final class HealthKitManager {
     var todaySteps: Int = 0
     var todayActiveCalories: Double = 0
     var lastNightSleepMinutes: Int = 0
+    
+    enum AuthorizationStatus {
+        case notDetermined
+        case denied
+        case partiallyAuthorized
+        case authorized
+        
+        var icon: String {
+            switch self {
+            case .authorized: return "checkmark.circle.fill"
+            case .partiallyAuthorized: return "exclamationmark.circle"
+            case .denied, .notDetermined: return "xmark.circle"
+            }
+        }
+        
+        var color: Color {
+            switch self {
+            case .authorized: return PulseTheme.statusGood
+            case .partiallyAuthorized: return PulseTheme.statusModerate
+            case .denied, .notDetermined: return PulseTheme.statusPoor
+            }
+        }
+        
+        var description: String {
+            switch self {
+            case .authorized: return String(localized: "Authorized")
+            case .partiallyAuthorized: return String(localized: "Partially Authorized")
+            case .denied: return String(localized: "Not Authorized")
+            case .notDetermined: return String(localized: "Not Determined")
+            }
+        }
+    }
     
     // MARK: - Authorization
     
@@ -47,6 +83,47 @@ final class HealthKitManager {
         
         try await store.requestAuthorization(toShare: writeTypes, read: readTypes)
         isAuthorized = true
+        checkAuthorizationStatus()
+    }
+    
+    func checkAuthorizationStatus() {
+        let keyTypes: [HKObjectType] = [
+            HKQuantityType(.heartRate),
+            HKQuantityType(.heartRateVariabilitySDNN),
+            HKQuantityType(.stepCount),
+            HKCategoryType(.sleepAnalysis)
+        ].compactMap { $0 }
+        
+        var authorizedCount = 0
+        var deniedCount = 0
+        
+        for type in keyTypes {
+            let status = store.authorizationStatus(for: type)
+            switch status {
+            case .sharingAuthorized:
+                authorizedCount += 1
+            case .sharingDenied:
+                deniedCount += 1
+            case .notDetermined:
+                break
+            @unknown default:
+                break
+            }
+        }
+        
+        if authorizedCount == keyTypes.count {
+            authorizationStatus = .authorized
+        } else if authorizedCount > 0 {
+            authorizationStatus = .partiallyAuthorized
+        } else if deniedCount > 0 {
+            authorizationStatus = .denied
+        } else {
+            authorizationStatus = .notDetermined
+        }
+    }
+    
+    var isFullyAuthorized: Bool {
+        return authorizationStatus == .authorized
     }
     
     // MARK: - Heart Rate
@@ -163,9 +240,25 @@ final class HealthKitManager {
             _ = try await fetchTodaySteps()
             _ = try await fetchTodayCalories()
             _ = try await fetchLastNightSleep()
+            
+            // Check if we have any meaningful health data
+            updateHealthDataAvailability()
         } catch {
             print("HealthKit refresh error: \(error)")
+            hasHealthData = false
         }
+    }
+    
+    private func updateHealthDataAvailability() {
+        let hasAnyData = latestHeartRate != nil ||
+                        latestHRV != nil ||
+                        latestRestingHR != nil ||
+                        latestBloodOxygen != nil ||
+                        todaySteps > 0 ||
+                        todayActiveCalories > 0 ||
+                        lastNightSleepMinutes > 0
+        
+        hasHealthData = hasAnyData
     }
     
     // MARK: - Daily Score Calculation

@@ -131,6 +131,15 @@ final class OpenClawBridge {
         let weekTrend: WeekTrendPayload
         let recoveryScore: Int
         let trainingAdvice: String
+        let recentWorkouts: [RecentWorkoutPayload]?
+    }
+
+    struct RecentWorkoutPayload: Codable {
+        let activityType: String
+        let date: String
+        let durationMinutes: Int
+        let calories: Double?
+        let averageHeartRate: Double?
     }
 
     struct TodaySummaryPayload: Codable {
@@ -291,7 +300,7 @@ final class OpenClawBridge {
         \(statusJSON)
         [/HEALTH_DATA]
 
-        请根据以上健康数据，给出今日健康摘要和训练建议。用 JSON 格式回复，包含 morningBrief、trainingAdvice、alerts、recoveryScore、summary 字段。
+        Analyze the health data above. Provide a daily health summary and training advice. Reply in JSON with fields: morningBrief, trainingAdvice, alerts, recoveryScore, summary.
         """
 
         let body: [String: Any] = [
@@ -420,6 +429,17 @@ final class OpenClawBridge {
             dailyScores: dailyScores
         )
 
+        // Recent workouts (last 7 days)
+        let recentWorkouts = dataService.fetchRecentWorkouts(days: 7).map { entry in
+            RecentWorkoutPayload(
+                activityType: entry.activityName,
+                date: DailySummary.dateFormatter.string(from: entry.startDate),
+                durationMinutes: Int(entry.durationSeconds / 60),
+                calories: entry.totalCalories,
+                averageHeartRate: entry.averageHeartRate
+            )
+        }
+
         return HealthStatus(
             timestamp: Date(),
             lastSyncTime: Date(),
@@ -427,7 +447,8 @@ final class OpenClawBridge {
             latestVitals: vitalsPayload,
             weekTrend: weekTrend,
             recoveryScore: insight.recoveryScore,
-            trainingAdvice: insight.trainingAdvice.rawValue
+            trainingAdvice: insight.trainingAdvice.rawValue,
+            recentWorkouts: recentWorkouts.isEmpty ? nil : recentWorkouts
         )
     }
 

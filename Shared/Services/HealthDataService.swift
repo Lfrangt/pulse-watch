@@ -142,6 +142,42 @@ final class HealthDataService {
         return anomalies
     }
 
+    // MARK: - Workout History
+
+    /// Fetch recent workout entries (last N days)
+    @MainActor
+    func fetchRecentWorkouts(days: Int = 7) -> [WorkoutHistoryEntry] {
+        guard let container = modelContainer else { return [] }
+
+        let context = container.mainContext
+        let startDate = Calendar.current.date(byAdding: .day, value: -days, to: Date())!
+
+        let predicate = #Predicate<WorkoutHistoryEntry> { $0.startDate >= startDate }
+        var descriptor = FetchDescriptor<WorkoutHistoryEntry>(predicate: predicate)
+        descriptor.sortBy = [SortDescriptor(\.startDate, order: .reverse)]
+        descriptor.fetchLimit = 20
+
+        return (try? context.fetch(descriptor)) ?? []
+    }
+
+    // MARK: - 训练记录
+
+    /// 获取过去 N 天的训练记录
+    @MainActor
+    func fetchRecentWorkouts(days: Int = 7) -> [WorkoutHistoryEntry] {
+        guard let container = modelContainer else { return [] }
+
+        let context = container.mainContext
+        let startDate = Calendar.current.date(byAdding: .day, value: -days, to: Date())!
+        let startOfDay = Calendar.current.startOfDay(for: startDate)
+
+        let predicate = #Predicate<WorkoutHistoryEntry> { $0.startDate >= startOfDay }
+        var descriptor = FetchDescriptor<WorkoutHistoryEntry>(predicate: predicate)
+        descriptor.sortBy = [SortDescriptor(\.startDate, order: .reverse)]
+
+        return (try? context.fetch(descriptor)) ?? []
+    }
+
     // MARK: - Private Helpers
 
     /// 获取指定类型的最新一条记录

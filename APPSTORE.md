@@ -27,6 +27,7 @@ Pulse collects your HealthKit data — heart rate, HRV, sleep, steps, blood oxyg
 - Gym arrival detection with automatic training suggestions (PPL rotation)
 - Home Screen & Lock Screen widgets
 - Apple Watch complications
+- Social share cards — generate shareable workout achievement images
 
 **Privacy First:**
 All data stays on your device. No accounts. No cloud uploads. No subscriptions. Buy once, use forever.
@@ -56,6 +57,7 @@ Pulse 采集你的 HealthKit 数据 — 心率、HRV、睡眠、步数、血氧 
 - 到达健身房自动检测，智能推荐训练计划 (PPL 轮换)
 - 主屏幕 & 锁屏小组件
 - Apple Watch 表盘复杂功能
+- 社交分享卡片 — 生成可分享的训练成就图片
 
 **隐私优先：**
 所有数据留在设备上。无需账号。不上传云端。无订阅。一次购买，永久使用。

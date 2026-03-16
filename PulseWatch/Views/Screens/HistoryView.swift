@@ -22,21 +22,31 @@ struct HistoryView: View {
                     rangePicker
                         .staggered(index: 0)
 
+                    // 时段摘要对比
+                    periodSummaryCard
+                        .staggered(index: 1)
+
+                    // 数据不足提示
+                    if dataInsufficient {
+                        insufficientDataHint
+                            .staggered(index: 1)
+                    }
+
                     // 评分趋势
                     scoreTrendChart
-                        .staggered(index: 1)
+                        .staggered(index: 2)
 
                     // 心率趋势
                     heartRateTrendChart
-                        .staggered(index: 2)
+                        .staggered(index: 3)
 
                     // HRV 趋势
                     hrvTrendChart
-                        .staggered(index: 3)
+                        .staggered(index: 4)
 
                     // 睡眠趋势
                     sleepTrendChart
-                        .staggered(index: 4)
+                        .staggered(index: 5)
 
                     // 周报对比
                     weeklyReportCard
@@ -78,13 +88,28 @@ struct HistoryView: View {
     // MARK: - 时间范围
 
     enum TimeRange: String, CaseIterable {
-        case week = "7d"
-        case month = "30d"
+        case week = "7D"
+        case month = "30D"
+        case quarter = "90D"
 
         var days: Int {
             switch self {
             case .week: return 7
             case .month: return 30
+            case .quarter: return 90
+            }
+        }
+
+        /// 是否需要按周聚合（避免图表过密）
+        var shouldAggregate: Bool {
+            self == .quarter
+        }
+
+        var xAxisStride: Int {
+            switch self {
+            case .week: return 1
+            case .month: return 5
+            case .quarter: return 14
             }
         }
     }
@@ -104,7 +129,119 @@ struct HistoryView: View {
     private var filteredSummaries: [DailySummary] {
         let startDate = Calendar.current.date(byAdding: .day, value: -selectedRange.days, to: .now)!
         let startOfDay = Calendar.current.startOfDay(for: startDate)
-        return allSummaries.filter { $0.date >= startOfDay }
+        let raw = allSummaries.filter { $0.date >= startOfDay }
+        return raw
+    }
+
+    /// 上一个同等时段的数据（用于对比）
+    private var previousPeriodSummaries: [DailySummary] {
+        let days = selectedRange.days
+        let periodEnd = Calendar.current.date(byAdding: .day, value: -days, to: .now)!
+        let periodStart = Calendar.current.date(byAdding: .day, value: -days * 2, to: .now)!
+        return allSummaries.filter { $0.date >= periodStart && $0.date < periodEnd }
+    }
+
+    /// 数据不足提示
+    private var dataInsufficient: Bool {
+        filteredSummaries.count < selectedRange.days / 2
+    }
+
+    // MARK: - 时段摘要对比
+
+    private var periodSummaryCard: some View {
+        let current = filteredSummaries
+        let previous = previousPeriodSummaries
+
+        func avgScore(_ summaries: [DailySummary]) -> Int? {
+            let scores = summaries.compactMap(\.dailyScore)
+            guard !scores.isEmpty else { return nil }
+            return scores.reduce(0, +) / scores.count
+        }
+
+        func avgHRV(_ summaries: [DailySummary]) -> Double? {
+            let vals = summaries.compactMap(\.averageHRV)
+            guard !vals.isEmpty else { return nil }
+            return vals.reduce(0, +) / Double(vals.count)
+        }
+
+        func avgSleep(_ summaries: [DailySummary]) -> Double? {
+            let vals = summaries.compactMap(\.sleepDurationMinutes).map { Double($0) / 60.0 }
+            guard !vals.isEmpty else { return nil }
+            return vals.reduce(0, +) / Double(vals.count)
+        }
+
+        let curScore = avgScore(current)
+        let prevScore = avgScore(previous)
+        let curHRV = avgHRV(current)
+        let prevHRV = avgHRV(previous)
+        let curSleep = avgSleep(current)
+        let prevSleep = avgSleep(previous)
+
+        return HStack(spacing: 0) {
+            periodMetric(
+                label: String(localized: "Avg Score"),
+                value: curScore.map { "\($0)" } ?? "—",
+                delta: delta(cur: curScore.map(Double.init), prev: prevScore.map(Double.init)),
+                icon: "heart.fill"
+            )
+            periodMetric(
+                label: "HRV",
+                value: curHRV.map { String(format: "%.0f", $0) } ?? "—",
+                delta: delta(cur: curHRV, prev: prevHRV),
+                icon: "waveform.path.ecg"
+            )
+            periodMetric(
+                label: String(localized: "Sleep"),
+                value: curSleep.map { String(format: "%.1fh", $0) } ?? "—",
+                delta: delta(cur: curSleep, prev: prevSleep),
+                icon: "moon.fill"
+            )
+        }
+        .pulseCard()
+    }
+
+    private func periodMetric(label: String, value: String, delta: (String, Bool)?, icon: String) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 12))
+                .foregroundStyle(PulseTheme.textTertiary)
+            Text(value)
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(PulseTheme.textPrimary)
+            Text(label)
+                .font(.system(size: 10))
+                .foregroundStyle(PulseTheme.textTertiary)
+            if let (text, positive) = delta {
+                Text(text)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(positive ? Color(hex: "7FC75C") : Color(hex: "C75C5C"))
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func delta(cur: Double?, prev: Double?) -> (String, Bool)? {
+        guard let c = cur, let p = prev, p > 0 else { return nil }
+        let diff = c - p
+        guard abs(diff) > 0.5 else { return nil }
+        let sign = diff > 0 ? "+" : ""
+        return ("\(sign)\(String(format: "%.0f", diff)) 📈", diff > 0)
+    }
+
+    private var insufficientDataHint: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "chart.line.uptrend.xyaxis")
+                .font(.system(size: 13))
+                .foregroundStyle(PulseTheme.accent)
+            Text("Keep wearing your Watch — more data unlocks better trends")
+                .font(PulseTheme.captionFont)
+                .foregroundStyle(PulseTheme.textTertiary)
+        }
+        .padding(PulseTheme.spacingM)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                .fill(PulseTheme.accent.opacity(0.06))
+        )
     }
 
     // MARK: - 评分趋势图
@@ -162,7 +299,7 @@ struct HistoryView: View {
                     }
                 }
                 .chartXAxis {
-                    AxisMarks(values: .stride(by: .day, count: selectedRange == .week ? 1 : 5)) { _ in
+                    AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
                         AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4]))
                             .foregroundStyle(PulseTheme.border.opacity(0.5))
                         AxisValueLabel(format: .dateTime.month(.abbreviated).day())
@@ -226,7 +363,7 @@ struct HistoryView: View {
                     }
                 }
                 .chartXAxis {
-                    AxisMarks(values: .stride(by: .day, count: selectedRange == .week ? 1 : 5)) { _ in
+                    AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
                         AxisValueLabel(format: .dateTime.month(.abbreviated).day())
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -298,7 +435,7 @@ struct HistoryView: View {
                     }
                 }
                 .chartXAxis {
-                    AxisMarks(values: .stride(by: .day, count: selectedRange == .week ? 1 : 5)) { _ in
+                    AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
                         AxisValueLabel(format: .dateTime.month(.abbreviated).day())
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -362,7 +499,7 @@ struct HistoryView: View {
                     }
                 }
                 .chartXAxis {
-                    AxisMarks(values: .stride(by: .day, count: selectedRange == .week ? 1 : 5)) { _ in
+                    AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
                         AxisValueLabel(format: .dateTime.month(.abbreviated).day())
                             .foregroundStyle(PulseTheme.textTertiary)
                     }

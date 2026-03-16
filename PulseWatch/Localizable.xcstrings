@@ -5775,6 +5775,17 @@
           }
         }
       }
+    },
+    "Keep wearing your Watch — more data unlocks better trends": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续佩戴手表，更多数据解锁更准趋势"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

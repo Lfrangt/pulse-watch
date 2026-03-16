@@ -44,7 +44,7 @@ final class MorningBriefService: NSObject {
             let key = "pulse.brief.hour"
             return UserDefaults.standard.object(forKey: key) != nil
                 ? UserDefaults.standard.integer(forKey: key)
-                : 7
+                : 8
         }
         set {
             UserDefaults.standard.set(newValue, forKey: "pulse.brief.hour")
@@ -57,7 +57,7 @@ final class MorningBriefService: NSObject {
             let key = "pulse.brief.minute"
             return UserDefaults.standard.object(forKey: key) != nil
                 ? UserDefaults.standard.integer(forKey: key)
-                : 30
+                : 0
         }
         set {
             UserDefaults.standard.set(newValue, forKey: "pulse.brief.minute")
@@ -328,31 +328,56 @@ final class MorningBriefService: NSObject {
 
     // MARK: - 生成 Morning Brief 内容
 
-    /// 从 HealthAnalyzer 生成通知内容（使用 AI 分析引擎）
+    /// 从 HealthAnalyzer 生成通知内容 — 标题含评分，正文含睡眠+streak+训练建议
     @MainActor
     func generateBriefContent() -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
         content.categoryIdentifier = CategoryID.morningBrief
         content.sound = .default
         content.interruptionLevel = .timeSensitive
+        content.userInfo = ["destination": "dashboard"]
 
         // 使用 HealthAnalyzer 引擎生成洞察
         let insight = HealthAnalyzer.shared.generateInsight()
+        let score = insight.dailyScore
 
+        // 标题：Good Morning · Score 78
+        content.title = String(format: String(localized: "Good Morning · Score %d"), score)
+
+        // 睡眠显示（昨晚）
         let summary = HealthDataService.shared.fetchTodaySummary()
         let sleepMinutes = summary?.sleepDurationMinutes ?? 0
-
-        // 睡眠显示
         let sleepDisplay: String
         if sleepMinutes > 0 {
-            sleepDisplay = "\(sleepMinutes / 60)h\(sleepMinutes % 60)m"
+            let h = sleepMinutes / 60
+            let m = sleepMinutes % 60
+            sleepDisplay = m > 0
+                ? String(format: String(localized: "Sleep %dh%dm"), h, m)
+                : String(format: String(localized: "Sleep %dh"), h)
         } else {
-            sleepDisplay = String(localized: "No Data")
+            sleepDisplay = String(localized: "Sleep —")
         }
 
-        content.title = "☀️ Morning · Score \(insight.dailyScore)"
-        content.subtitle = "Sleep \(sleepDisplay) · Recovery \(insight.recoveryScore)"
-        content.body = insight.insights.first ?? insight.trainingAdvice.label
+        // Streak
+        let streak = StreakService.shared.currentStreak
+        let streakDisplay = streak > 0
+            ? String(format: String(localized: "🔥 %d days"), streak)
+            : ""
+
+        // 训练建议
+        let trainingAdvice: String
+        switch score {
+        case 70...:
+            trainingAdvice = String(localized: "✅ Ready to train")
+        case 50..<70:
+            trainingAdvice = String(localized: "⚡ Light exercise")
+        default:
+            trainingAdvice = String(localized: "⚠️ Rest today")
+        }
+
+        // 正文组合
+        let parts = [sleepDisplay, streakDisplay, trainingAdvice].filter { !$0.isEmpty }
+        content.body = parts.joined(separator: "  ·  ")
 
         return content
     }

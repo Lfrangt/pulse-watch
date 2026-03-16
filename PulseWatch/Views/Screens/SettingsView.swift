@@ -112,6 +112,35 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             sectionHeader(icon: "sun.horizon.fill", title: "Morning Brief")
 
+            // 权限未授权提示
+            if !MorningBriefService.shared.isAuthorized {
+                settingRow {
+                    HStack(spacing: PulseTheme.spacingM) {
+                        Image(systemName: "bell.slash.fill")
+                            .foregroundStyle(PulseTheme.statusPoor)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Notifications Disabled")
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text("Enable in Settings → Notifications → Pulse")
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        Button {
+                            if let url = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(url)
+                            }
+                        } label: {
+                            Text("Open")
+                                .font(PulseTheme.captionFont.weight(.semibold))
+                                .foregroundStyle(PulseTheme.accent)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+
             // 开关
             settingRow {
                 Toggle(isOn: $morningBriefEnabled) {

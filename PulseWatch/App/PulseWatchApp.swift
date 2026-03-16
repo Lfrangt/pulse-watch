@@ -186,5 +186,9 @@ struct MainTabView: View {
                 Analytics.trackSettingsOpened()
             }
         }
+        // Morning Brief deep link → Dashboard (tab 0)
+        .onReceive(NotificationCenter.default.publisher(for: .morningBriefTapped)) { _ in
+            selectedTab = 0
+        }
     }
 }

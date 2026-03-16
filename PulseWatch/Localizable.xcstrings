@@ -141,6 +141,28 @@
     },
     "%@kg": {},
     "%@ms": {},
+    "%d days": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d 天"
+          }
+        }
+      }
+    },
+    "%d-Day Streak": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连续 %d 天"
+          }
+        }
+      }
+    },
     "☀️ Good Morning, Pulse": {
       "extractionState": "stale",
       "localizations": {
@@ -202,6 +224,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "📊 本周健康周报已生成"
+          }
+        }
+      }
+    },
+    "🔥": {},
+    "🔥 %d-Day Streak!": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🔥 连续 %d 天！"
           }
         }
       }
@@ -482,6 +516,17 @@
         }
       }
     },
+    "All-Time Best Streak": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "历史最长连续天数"
+          }
+        }
+      }
+    },
     "Anaerobic": {
       "extractionState": "stale",
       "localizations": {
@@ -726,6 +771,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "卧推"
+          }
+        }
+      }
+    },
+    "Best": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最佳"
           }
         }
       }
@@ -1435,6 +1491,17 @@
         }
       }
     },
+    "Every Sunday 9:00 AM — score, workouts & trends": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每周日早上 9:00 · 评分、训练次数和趋势"
+          }
+        }
+      }
+    },
     "Excellent — push harder or try something new": {
       "extractionState": "stale",
       "localizations": {
@@ -2125,6 +2192,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "继续加油"
+          }
+        }
+      }
+    },
+    "Keep going — don't break the chain!": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保持住，别断链！"
           }
         }
       }
@@ -3316,6 +3394,28 @@
         }
       }
     },
+    "Resting HR: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率：%@"
+          }
+        }
+      }
+    },
+    "Resting HR: %@%@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率：%@%@"
+          }
+        }
+      }
+    },
     "Romanian Deadlift": {
       "extractionState": "stale",
       "localizations": {
@@ -4444,6 +4544,17 @@
         }
       }
     },
+    "Weekly Health Summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每周健康总结"
+          }
+        }
+      }
+    },
     "Weekly Report": {
       "extractionState": "stale",
       "localizations": {
@@ -4451,6 +4562,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "周报"
+          }
+        }
+      }
+    },
+    "Weekly Score: %d%@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周评分：%d%@"
           }
         }
       }
@@ -4473,6 +4595,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "训练完成"
+          }
+        }
+      }
+    },
+    "Workouts: %d sessions%@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练：%d 次%@"
           }
         }
       }
@@ -4532,6 +4665,17 @@
         }
       }
     },
+    "You've tracked your health for %d days straight. Keep it up!": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你已经连续记录健康数据 %d 天了，继续加油！"
+          }
+        }
+      }
+    },
     "Your body needs rest — don't push it": {
       "extractionState": "stale",
       "localizations": {
@@ -4572,6 +4716,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的数据仅存储在设备上\\n我们不会上传任何信息"
+          }
+        }
+      }
+    },
+    "Your longest consecutive health tracking streak": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你历史上最长的连续健康记录"
           }
         }
       }
@@ -4642,156 +4797,112 @@
         }
       }
     },
-    "Weekly Health Summary": {
+    "Good Morning · Score %d": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "每周健康总结"
+            "value": "早安 · 评分 %d"
           }
         }
       }
     },
-    "Every Sunday 9:00 AM — score, workouts & trends": {
+    "Sleep %dh%dm": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "每周日早上 9:00 · 评分、训练次数和趋势"
+            "value": "睡眠 %dh%dm"
           }
         }
       }
     },
-    "Weekly Score: %d%@": {
+    "Sleep %dh": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "本周评分：%d%@"
+            "value": "睡眠 %dh"
           }
         }
       }
     },
-    "Workouts: %d sessions%@": {
+    "Sleep —": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "训练：%d 次%@"
+            "value": "睡眠 —"
           }
         }
       }
     },
-    "Resting HR: %@%@": {
+    "✅ Ready to train": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "静息心率：%@%@"
+            "value": "✅ 可以训练"
           }
         }
       }
     },
-    "Resting HR: %@": {
+    "⚡ Light exercise": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "静息心率：%@"
+            "value": "⚡ 轻度运动"
           }
         }
       }
     },
-    "%d-Day Streak": {
+    "⚠️ Rest today": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "连续 %d 天"
+            "value": "⚠️ 今天休息"
           }
         }
       }
     },
-    "Keep going — don't break the chain!": {
+    "Notifications Disabled": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "保持住，别断链！"
+            "value": "通知未开启"
           }
         }
       }
     },
-    "Best": {
+    "Enable in Settings → Notifications → Pulse": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "最佳"
+            "value": "请前往 设置 → 通知 → Pulse 开启"
           }
         }
       }
     },
-    "All-Time Best Streak": {
+    "Open": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "历史最长连续天数"
-          }
-        }
-      }
-    },
-    "Your longest consecutive health tracking streak": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你历史上最长的连续健康记录"
-          }
-        }
-      }
-    },
-    "%d days": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%d 天"
-          }
-        }
-      }
-    },
-    "🔥 %d-Day Streak!": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🔥 连续 %d 天！"
-          }
-        }
-      }
-    },
-    "You've tracked your health for %d days straight. Keep it up!": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你已经连续记录健康数据 %d 天了，继续加油！"
+            "value": "前往开启"
           }
         }
       }

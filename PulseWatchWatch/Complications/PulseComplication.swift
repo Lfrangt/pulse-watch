@@ -47,7 +47,7 @@ struct PulseComplicationProvider: TimelineProvider {
     private func currentEntry() -> PulseEntry {
         let defaults = PulseSharedData.defaults
         let score = defaults?.integer(forKey: PulseSharedData.scoreKey) ?? 0
-        let headline = defaults?.string(forKey: PulseSharedData.headlineKey) ?? "等待同步"
+        let headline = defaults?.string(forKey: PulseSharedData.headlineKey) ?? String(localized: "Waiting to sync")
         let heartRate = defaults?.integer(forKey: PulseSharedData.heartRateKey) ?? 0
         let steps = defaults?.integer(forKey: PulseSharedData.stepsKey) ?? 0
         return PulseEntry(

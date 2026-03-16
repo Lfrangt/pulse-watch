@@ -591,7 +591,7 @@ final class OpenClawBridge {
             return "\(Int(interval / 3600))h ago"
         } else {
             let fmt = DateFormatter()
-            fmt.dateFormat = "M月d日 HH:mm"
+            fmt.dateFormat = "MMM d HH:mm"
             return fmt.string(from: time)
         }
     }

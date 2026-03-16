@@ -84,7 +84,8 @@ struct WeeklyReportView: View {
 
         let fmt = DateFormatter()
         fmt.locale = Locale(identifier: "zh_CN")
-        fmt.dateFormat = "M月d日"
+        fmt.dateStyle = .medium
+        fmt.locale = Locale.current
 
         return "\(fmt.string(from: monday)) - \(fmt.string(from: sunday))"
     }

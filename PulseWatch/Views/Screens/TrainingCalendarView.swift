@@ -147,7 +147,7 @@ struct TrainingCalendarView: View {
     private var monthYearString: String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "yyyy年M月"
+        formatter.dateFormat = "yyyy MMM"
         return formatter.string(from: currentMonth)
     }
 
@@ -391,7 +391,7 @@ struct TrainingCalendarView: View {
     private func dayDetailTitle(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "M月d日 EEEE"
+        formatter.dateFormat = "MMM d, EEEE"
         return formatter.string(from: date)
     }
 

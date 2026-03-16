@@ -125,15 +125,15 @@
     "%@ kg" : {
 
     },
-    "%@ 分钟" : {
+    "%@ min" : {
 
     },
-    "%@ 组 x %@ 次" : {
+    "%@ sets x %@ reps" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@ 组 x %2$@ 次"
+            "value" : "%1$@ sets x %2$@ reps"
           }
         }
       }
@@ -2893,6 +2893,9 @@
         }
       }
     },
+    "Recovery %@" : {
+
+    },
     "Recovery +\\(min(20, insight.sleepScore / 5))" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4346,12 +4349,6 @@
           }
         }
       }
-    },
-    "建议今天练%@，已通知手表" : {
-
-    },
-    "恢复 %@" : {
-
     }
   },
   "version" : "1.0"

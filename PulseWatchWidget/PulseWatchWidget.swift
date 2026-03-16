@@ -39,11 +39,11 @@ enum WidgetDataProvider {
 
     private static func headlineForScore(_ score: Int) -> String {
         switch score {
-        case 0..<30: return "需要休息"
-        case 30..<50: return "状态一般"
-        case 50..<70: return "还不错"
-        case 70..<85: return "状态良好"
-        default: return "巅峰状态"
+        case 0..<30: return String(localized: "Rest")
+        case 30..<50: return String(localized: "Average")
+        case 50..<70: return String(localized: "Fair")
+        case 70..<85: return String(localized: "Good")
+        default: return String(localized: "Peak")
         }
     }
 }
@@ -104,12 +104,12 @@ struct WidgetHealthData {
 
     static let placeholder = WidgetHealthData(
         score: 72,
-        headline: "状态良好",
+        headline: "Good",
         heartRate: 68,
         hrv: 45,
         sleepHours: 7.5,
         steps: 6500,
-        insight: "适合中高强度训练",
+        insight: "Ready for moderate-high intensity",
         lastUpdated: .now
     )
 }
@@ -219,7 +219,7 @@ struct PulseWidgetSmall: View {
                             .font(.system(size: 28, weight: .bold, design: .rounded))
                             .foregroundStyle(WidgetColors.textPrimary)
 
-                        Text("分")
+                        Text("pts")
                             .font(.system(size: 10, weight: .medium, design: .rounded))
                             .foregroundStyle(WidgetColors.textTertiary)
                     }
@@ -281,7 +281,7 @@ struct PulseWidgetMedium: View {
                 HStack(spacing: 6) {
                     WidgetMetricTile(
                         icon: "heart.fill",
-                        label: "心率",
+                        label: "HR",
                         value: data.heartRate > 0 ? "\(data.heartRate)" : "--",
                         unit: "bpm",
                         color: WidgetColors.statusPoor
@@ -297,14 +297,14 @@ struct PulseWidgetMedium: View {
                 HStack(spacing: 6) {
                     WidgetMetricTile(
                         icon: "moon.fill",
-                        label: "睡眠",
+                        label: "Sleep",
                         value: formatSleep(data.sleepHours),
                         unit: "",
                         color: WidgetColors.sleepPurple
                     )
                     WidgetMetricTile(
                         icon: "figure.walk",
-                        label: "步数",
+                        label: "Steps",
                         value: formatSteps(data.steps),
                         unit: "",
                         color: WidgetColors.statusGood
@@ -408,7 +408,7 @@ struct PulseWidgetLarge: View {
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("今日状态")
+                    Text("Today")
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(WidgetColors.textTertiary)
 
@@ -416,7 +416,7 @@ struct PulseWidgetLarge: View {
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .foregroundStyle(statusColor)
 
-                    Text("更新于 \(timeAgoString(data.lastUpdated))")
+                    Text("Updated \(timeAgoString(data.lastUpdated))")
                         .font(.system(size: 10, weight: .regular, design: .rounded))
                         .foregroundStyle(WidgetColors.textTertiary)
                 }
@@ -428,7 +428,7 @@ struct PulseWidgetLarge: View {
             HStack(spacing: 8) {
                 LargeWidgetMetric(
                     icon: "heart.fill",
-                    label: "心率",
+                    label: "HR",
                     value: data.heartRate > 0 ? "\(data.heartRate)" : "--",
                     unit: "bpm",
                     color: WidgetColors.statusPoor
@@ -442,14 +442,14 @@ struct PulseWidgetLarge: View {
                 )
                 LargeWidgetMetric(
                     icon: "moon.fill",
-                    label: "睡眠",
+                    label: "Sleep",
                     value: formatSleep(data.sleepHours),
                     unit: "",
                     color: WidgetColors.sleepPurple
                 )
                 LargeWidgetMetric(
                     icon: "figure.walk",
-                    label: "步数",
+                    label: "Steps",
                     value: formatSteps(data.steps),
                     unit: "",
                     color: WidgetColors.statusGood
@@ -462,7 +462,7 @@ struct PulseWidgetLarge: View {
                     Image(systemName: "sparkles")
                         .font(.system(size: 11))
                         .foregroundStyle(WidgetColors.accent)
-                    Text("今日洞察")
+                    Text("Insights")
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                         .foregroundStyle(WidgetColors.accent)
                 }
@@ -491,33 +491,33 @@ struct PulseWidgetLarge: View {
         let advice = translateAdvice(data.insight)
 
         if data.sleepHours > 0 && data.sleepHours < 6 {
-            return "昨晚睡眠不足 6 小时，建议今天以恢复性训练为主。\(advice)"
+            return "Under 6h sleep — focus on recovery today. \(advice)"
         } else if data.score >= 80 {
-            return "状态极佳！\(advice)，抓住今天的训练窗口。"
+            return "Great shape! \(advice) — seize the window."
         } else if data.score >= 60 {
-            return "\(advice)。注意训练后补充水分和蛋白质。"
+            return "\(advice). Stay hydrated and refuel with protein."
         } else {
-            return "身体需要恢复，\(advice)。充足睡眠是最好的恢复方式。"
+            return "Recovery needed. \(advice). Sleep is the best recovery."
         }
     }
 
     /// 将英文训练建议翻译为中文
     private func translateAdvice(_ advice: String) -> String {
         switch advice.lowercased() {
-        case "intense": return "适合高强度训练"
-        case "moderate": return "适合中等强度训练"
-        case "light": return "建议轻度活动"
-        case "rest": return "建议休息"
+        case "intense": return "High intensity"
+        case "moderate": return "Moderate intensity"
+        case "light": return "Light activity"
+        case "rest": return "Rest recommended"
         default: return advice
         }
     }
 
     private func timeAgoString(_ date: Date) -> String {
         let interval = Date().timeIntervalSince(date)
-        if interval < 60 { return "刚刚" }
-        if interval < 3600 { return "\(Int(interval / 60))分钟前" }
-        if interval < 86400 { return "\(Int(interval / 3600))小时前" }
-        return "超过一天前"
+        if interval < 60 { return "Just now" }
+        if interval < 3600 { return "\(Int(interval / 60))m ago" }
+        if interval < 86400 { return "\(Int(interval / 3600))h ago" }
+        return ">1 day ago"
     }
 
     private func formatSleep(_ hours: Double) -> String {
@@ -608,8 +608,8 @@ struct PulseHomeWidget: Widget {
         StaticConfiguration(kind: kind, provider: PulseWidgetProvider()) { entry in
             PulseWidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("Pulse 状态")
-        .description("查看今日健康评分、心率、HRV、睡眠和步数")
+        .configurationDisplayName("Pulse Status")
+        .description("Today's health score, heart rate, HRV, sleep and steps")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         .contentMarginsDisabled()
     }

@@ -4707,6 +4707,94 @@
           }
         }
       }
+    },
+    "%d-Day Streak": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连续 %d 天"
+          }
+        }
+      }
+    },
+    "Keep going — don't break the chain!": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保持住，别断链！"
+          }
+        }
+      }
+    },
+    "Best": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最佳"
+          }
+        }
+      }
+    },
+    "All-Time Best Streak": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "历史最长连续天数"
+          }
+        }
+      }
+    },
+    "Your longest consecutive health tracking streak": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你历史上最长的连续健康记录"
+          }
+        }
+      }
+    },
+    "%d days": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d 天"
+          }
+        }
+      }
+    },
+    "🔥 %d-Day Streak!": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🔥 连续 %d 天！"
+          }
+        }
+      }
+    },
+    "You've tracked your health for %d days straight. Keep it up!": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你已经连续记录健康数据 %d 天了，继续加油！"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

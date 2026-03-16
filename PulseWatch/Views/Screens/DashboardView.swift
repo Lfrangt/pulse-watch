@@ -24,6 +24,9 @@ struct DashboardView: View {
     // 演示模式时间线事件
     @State private var demoTimelineEvents: [TimelineEvent] = []
 
+    // Streak
+    @State private var currentStreak: Int = 0
+
     @Query(sort: \WorkoutRecord.date, order: .reverse) private var recentWorkouts: [WorkoutRecord]
     @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
     @Query private var savedLocations: [SavedLocation]
@@ -60,6 +63,12 @@ struct DashboardView: View {
                         // 空数据状态 — 温暖邀请
                         emptyStateCard
                             .staggered(index: 1)
+                    }
+
+                    // 🔥 Streak badge
+                    if currentStreak > 0 {
+                        streakBadge(streak: currentStreak)
+                            .staggered(index: 2)
                     }
 
                     // 今日洞察卡片
@@ -666,6 +675,56 @@ struct DashboardView: View {
         }
     }
 
+    // MARK: - 🔥 Streak Badge
+
+    private func streakBadge(streak: Int) -> some View {
+        HStack(spacing: PulseTheme.spacingS) {
+            // 火焰图标
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Color(hex: "FF6B35").opacity(0.15))
+                    .frame(width: 40, height: 40)
+                Text("🔥")
+                    .font(.system(size: 20))
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(String(format: String(localized: "%d-Day Streak"), streak))
+                    .font(PulseTheme.headlineFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                Text(String(localized: "Keep going — don't break the chain!"))
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+
+            Spacer()
+
+            // Best streak badge (if current is best)
+            if streak >= StreakService.shared.bestStreak && streak > 1 {
+                Text(String(localized: "Best"))
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color(hex: "FF6B35"))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(Color(hex: "FF6B35").opacity(0.15))
+                    )
+            }
+        }
+        .pulseCard()
+        .overlay(alignment: .leading) {
+            UnevenRoundedRectangle(
+                topLeadingRadius: PulseTheme.radiusL,
+                bottomLeadingRadius: PulseTheme.radiusL
+            )
+            .fill(Color(hex: "FF6B35").opacity(0.5))
+            .frame(width: 3)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(format: String(localized: "%d-Day Streak"), streak))
+    }
+
     // MARK: - 最近训练
 
     private var recentWorkoutsSection: some View {
@@ -875,6 +934,8 @@ struct DashboardView: View {
             brief = DemoDataProvider.makeBrief()
             insight = DemoDataProvider.makeInsight()
             demoTimelineEvents = DemoDataProvider.makeTimelineEvents()
+            StreakService.shared.setDemoStreak(12)
+            currentStreak = StreakService.shared.currentStreak
             ringAnimated = false
             isLoading = false
             return
@@ -927,6 +988,10 @@ struct DashboardView: View {
             print("Dashboard load error: \(error)")
             #endif
         }
+
+        // Streak 计算
+        StreakService.shared.refresh(modelContext: modelContext)
+        currentStreak = StreakService.shared.currentStreak
 
         isLoading = false
     }

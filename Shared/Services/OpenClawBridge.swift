@@ -1,6 +1,9 @@
 import Foundation
 import SwiftData
 import os
+#if os(iOS)
+import BackgroundTasks
+#endif
 
 // MARK: - 配置
 
@@ -655,6 +658,50 @@ final class OpenClawBridge {
             connectionStatus = .disconnected
         }
     }
+
+    // MARK: - Background Sync (BGAppRefreshTask)
+
+    #if os(iOS)
+    static let bgTaskID = "com.abundra.pulse.health-sync"
+
+    /// Register background sync task — call once at app launch
+    func registerBackgroundSync() {
+        BGTaskScheduler.shared.register(
+            forTaskWithIdentifier: Self.bgTaskID,
+            using: nil
+        ) { task in
+            guard let task = task as? BGAppRefreshTask else { return }
+            self.handleBGSync(task: task)
+        }
+        scheduleBackgroundSync()
+    }
+
+    /// Schedule next background sync (30 min from now)
+    func scheduleBackgroundSync() {
+        let request = BGAppRefreshTaskRequest(identifier: Self.bgTaskID)
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 30 * 60)
+        do {
+            try BGTaskScheduler.shared.submit(request)
+            logger.info("Background health sync scheduled")
+        } catch {
+            logger.error("Failed to schedule BG sync: \(error.localizedDescription)")
+        }
+    }
+
+    private func handleBGSync(task: BGAppRefreshTask) {
+        // Schedule next
+        scheduleBackgroundSync()
+
+        task.expirationHandler = {
+            task.setTaskCompleted(success: false)
+        }
+
+        Task { @MainActor in
+            await pushHealthStatus()
+            task.setTaskCompleted(success: true)
+        }
+    }
+    #endif
 
     // MARK: - 格式化
 

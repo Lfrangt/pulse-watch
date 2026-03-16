@@ -56,6 +56,7 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.abundra.pulse.morning-brief-refresh</string>
+		<string>com.abundra.pulse.health-sync</string>
 	</array>
 	<key>UILaunchScreen</key>
 	<dict>

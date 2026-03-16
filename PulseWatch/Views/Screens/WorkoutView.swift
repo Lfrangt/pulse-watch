@@ -50,13 +50,25 @@ struct WorkoutView: View {
                         .foregroundStyle(PulseTheme.textPrimary)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink {
-                        WorkoutHistoryListView()
-                            .preferredColorScheme(.dark)
-                    } label: {
-                        Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
-                            .font(.system(size: 16))
-                            .foregroundStyle(PulseTheme.accent)
+                    HStack(spacing: 16) {
+                        NavigationLink {
+                            StrengthView()
+                                .preferredColorScheme(.dark)
+                        } label: {
+                            Image(systemName: "dumbbell.fill")
+                                .font(.system(size: 14))
+                                .foregroundStyle(PulseTheme.accent)
+                        }
+                        .accessibilityLabel(String(localized: "Strength"))
+
+                        NavigationLink {
+                            WorkoutHistoryListView()
+                                .preferredColorScheme(.dark)
+                        } label: {
+                            Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
+                                .font(.system(size: 16))
+                                .foregroundStyle(PulseTheme.accent)
+                        }
                     }
                 }
             }

@@ -16,6 +16,7 @@ struct PulseWatchApp: App {
             DailySummary.self,
             WorkoutHistoryEntry.self,
             HeartRateAlertEvent.self,
+            StrengthRecord.self,
         ])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

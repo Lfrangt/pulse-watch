@@ -22,6 +22,9 @@ struct SettingsView: View {
     @AppStorage("pulse.units") private var unitSystem = "metric" // "metric" or "imperial"
     @AppStorage("pulse.onboarding.completed") private var onboardingCompleted = false
     @AppStorage("pulse.user.birthYear") private var birthYear = 0
+    @AppStorage("pulse.user.heightCm") private var heightCm: Double = 0
+    @AppStorage("pulse.user.weightKg") private var weightKg: Double = 0
+    @AppStorage("pulse.user.gender") private var gender = "unset"  // "male" "female" "unset"
 
     // MARK: - 状态
 
@@ -1196,6 +1199,61 @@ struct SettingsView: View {
                     .onChange(of: birthYear) {
                         HealthAgeService.shared.birthYear = birthYear
                     }
+                }
+            }
+
+            // 性别
+            settingRow {
+                HStack {
+                    Text("Gender")
+                        .font(PulseTheme.bodyFont)
+                        .foregroundStyle(PulseTheme.textPrimary)
+                    Spacer()
+                    Picker("", selection: $gender) {
+                        Text("—").tag("unset")
+                        Text(String(localized: "Male")).tag("male")
+                        Text(String(localized: "Female")).tag("female")
+                    }
+                    .pickerStyle(.menu)
+                    .tint(PulseTheme.accent)
+                }
+            }
+
+            // 身高
+            settingRow {
+                HStack {
+                    Text("Height")
+                        .font(PulseTheme.bodyFont)
+                        .foregroundStyle(PulseTheme.textPrimary)
+                    Spacer()
+                    TextField("cm", value: $heightCm, format: .number)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .font(PulseTheme.bodyFont.weight(.semibold))
+                        .foregroundStyle(PulseTheme.textPrimary)
+                        .frame(width: 80)
+                    Text("cm")
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+            }
+
+            // 体重
+            settingRow {
+                HStack {
+                    Text("Weight")
+                        .font(PulseTheme.bodyFont)
+                        .foregroundStyle(PulseTheme.textPrimary)
+                    Spacer()
+                    TextField("kg", value: $weightKg, format: .number)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .font(PulseTheme.bodyFont.weight(.semibold))
+                        .foregroundStyle(PulseTheme.textPrimary)
+                        .frame(width: 80)
+                    Text("kg")
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
                 }
             }
         }

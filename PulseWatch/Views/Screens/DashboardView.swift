@@ -30,6 +30,11 @@ struct DashboardView: View {
     // Strain
     @State private var todayStrain: Int = 0
 
+    // Health Age
+    @State private var healthAgeResult: HealthAgeService.HealthAgeResult?
+    @State private var healthAgeDaysLeft: Int?
+    @State private var healthAgeExpanded = false
+
     @Query(sort: \WorkoutRecord.date, order: .reverse) private var recentWorkouts: [WorkoutRecord]
     @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
     @Query private var savedLocations: [SavedLocation]
@@ -81,6 +86,15 @@ struct DashboardView: View {
                             recovery: insight?.recoveryScore ?? brief?.score ?? 0
                         )
                         .staggered(index: 3)
+                    }
+
+                    // Health Age 卡片
+                    if let result = healthAgeResult {
+                        healthAgeCard(result: result)
+                            .staggered(index: 3)
+                    } else if let daysLeft = healthAgeDaysLeft, daysLeft > 0 {
+                        healthAgeLockedCard(daysLeft: daysLeft)
+                            .staggered(index: 3)
                     }
 
                     // 今日洞察卡片
@@ -825,6 +839,149 @@ struct DashboardView: View {
         .accessibilityLabel(String(format: String(localized: "Strain %d, Recovery %d"), strain, recovery))
     }
 
+    // MARK: - Health Age 卡片
+
+    private func healthAgeCard(result: HealthAgeService.HealthAgeResult) -> some View {
+        let diff = result.difference
+        let isYounger = diff < -0.5
+        let accentColor = isYounger ? Color(hex: "7FC75C") : Color(hex: "C75C5C")
+        let ageInt = Int(result.healthAge.rounded())
+
+        return VStack(spacing: PulseTheme.spacingM) {
+            // 主展示
+            Button {
+                withAnimation(.spring(response: 0.4)) { healthAgeExpanded.toggle() }
+            } label: {
+                HStack(spacing: PulseTheme.spacingM) {
+                    // 年龄大数字
+                    VStack(spacing: 2) {
+                        Text("\(ageInt)")
+                            .font(.system(size: 44, weight: .bold, design: .rounded))
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text("Health Age")
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+
+                    Spacer()
+
+                    // 差值标签
+                    VStack(alignment: .trailing, spacing: 4) {
+                        if abs(diff) > 0.5 {
+                            HStack(spacing: 4) {
+                                Image(systemName: isYounger ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
+                                    .font(.system(size: 16))
+                                Text(String(format: String(localized: "%d years %@"), Int(abs(diff).rounded()),
+                                            isYounger ? String(localized: "younger") : String(localized: "older")))
+                                    .font(PulseTheme.bodyFont.weight(.semibold))
+                            }
+                            .foregroundStyle(accentColor)
+                        }
+
+                        Text(String(format: String(localized: "Actual age: %d"), result.chronologicalAge))
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.textTertiary)
+
+                        Text(String(format: String(localized: "Based on %d days of data"), result.daysOfData))
+                            .font(.system(size: 10))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+
+                    Image(systemName: healthAgeExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+            }
+            .buttonStyle(.plain)
+
+            // 展开详情
+            if healthAgeExpanded {
+                Divider().background(PulseTheme.border)
+
+                VStack(spacing: PulseTheme.spacingS) {
+                    ForEach(result.metrics, id: \.metric) { metric in
+                        healthAgeMetricRow(metric)
+                    }
+                }
+            }
+        }
+        .pulseCard()
+        .overlay(alignment: .leading) {
+            UnevenRoundedRectangle(
+                topLeadingRadius: PulseTheme.radiusL,
+                bottomLeadingRadius: PulseTheme.radiusL
+            )
+            .fill(accentColor.opacity(0.4))
+            .frame(width: 3)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(format: String(localized: "Health Age %d"), ageInt))
+    }
+
+    private func healthAgeMetricRow(_ metric: HealthAgeService.MetricScore) -> some View {
+        let isGood = metric.ageImpact < -0.3
+        let isBad = metric.ageImpact > 0.3
+        let color: Color = isGood ? Color(hex: "7FC75C") : (isBad ? Color(hex: "C75C5C") : PulseTheme.textSecondary)
+
+        return HStack(alignment: .top, spacing: PulseTheme.spacingS) {
+            Image(systemName: metric.metric.icon)
+                .font(.system(size: 14))
+                .foregroundStyle(color)
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 2) {
+                HStack {
+                    Text(metric.metric.label)
+                        .font(PulseTheme.captionFont.weight(.medium))
+                        .foregroundStyle(PulseTheme.textPrimary)
+                    Spacer()
+                    Text(formatMetricValue(metric))
+                        .font(PulseTheme.captionFont.weight(.semibold))
+                        .foregroundStyle(color)
+                }
+                Text(metric.advice)
+                    .font(.system(size: 11))
+                    .foregroundStyle(PulseTheme.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private func formatMetricValue(_ m: HealthAgeService.MetricScore) -> String {
+        switch m.metric {
+        case .restingHR:      return String(format: "%.0f bpm", m.value)
+        case .hrv:            return String(format: "%.0f ms", m.value)
+        case .sleep:          return String(format: "%.1fh", m.value)
+        case .steps:          return String(format: "%.0f", m.value)
+        case .activeMinutes:  return String(format: "%.0f min", m.value)
+        }
+    }
+
+    private func healthAgeLockedCard(daysLeft: Int) -> some View {
+        HStack(spacing: PulseTheme.spacingM) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(PulseTheme.accent.opacity(0.12))
+                    .frame(width: 44, height: 44)
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 18))
+                    .foregroundStyle(PulseTheme.accent)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Health Age")
+                    .font(PulseTheme.headlineFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                Text(String(format: String(localized: "Wear your watch for %d more days to unlock"), daysLeft))
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+
+            Spacer()
+        }
+        .pulseCard()
+    }
+
     // MARK: - 最近训练
 
     private var recentWorkoutsSection: some View {
@@ -1037,6 +1194,7 @@ struct DashboardView: View {
             StreakService.shared.setDemoStreak(12)
             currentStreak = StreakService.shared.currentStreak
             todayStrain = StrainScoreService.demoStrain
+            healthAgeResult = HealthAgeService.demoResult
             ringAnimated = false
             isLoading = false
             return
@@ -1096,6 +1254,10 @@ struct DashboardView: View {
 
         // Strain Score
         todayStrain = StrainScoreService.shared.todayStrain(modelContext: modelContext)
+
+        // Health Age
+        healthAgeResult = HealthAgeService.shared.compute(modelContext: modelContext)
+        healthAgeDaysLeft = HealthAgeService.shared.daysUntilReady(modelContext: modelContext)
 
         isLoading = false
     }

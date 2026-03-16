@@ -21,6 +21,7 @@ struct SettingsView: View {
     @AppStorage("pulse.demo.enabled") private var demoModeEnabled = false
     @AppStorage("pulse.units") private var unitSystem = "metric" // "metric" or "imperial"
     @AppStorage("pulse.onboarding.completed") private var onboardingCompleted = false
+    @AppStorage("pulse.user.birthYear") private var birthYear = 0
 
     // MARK: - 状态
 
@@ -86,9 +87,13 @@ struct SettingsView: View {
                         .staggered(index: 9)
                     #endif
 
+                    // 个人信息
+                    profileSection
+                        .staggered(index: 10)
+
                     // 关于
                     aboutSection
-                        .staggered(index: 10)
+                        .staggered(index: 11)
 
                     Spacer(minLength: 40)
                 }
@@ -1131,6 +1136,40 @@ struct SettingsView: View {
                     }
                 }
                 .tint(PulseTheme.accent)
+            }
+        }
+        .pulseCard()
+    }
+
+    // MARK: - 个人信息 (Profile)
+
+    private var profileSection: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            sectionHeader(icon: "person.fill", title: String(localized: "Profile"))
+
+            settingRow {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Birth Year")
+                            .font(PulseTheme.bodyFont)
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text("Used to calculate your Health Age")
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                    Spacer()
+                    Picker("", selection: $birthYear) {
+                        Text("—").tag(0)
+                        ForEach((1940...2010).reversed(), id: \.self) { year in
+                            Text(String(year)).tag(year)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .tint(PulseTheme.accent)
+                    .onChange(of: birthYear) {
+                        HealthAgeService.shared.birthYear = birthYear
+                    }
+                }
             }
         }
         .pulseCard()

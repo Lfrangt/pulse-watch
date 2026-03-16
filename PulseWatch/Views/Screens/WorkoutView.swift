@@ -49,6 +49,16 @@ struct WorkoutView: View {
                         .font(PulseTheme.headlineFont)
                         .foregroundStyle(PulseTheme.textPrimary)
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        WorkoutHistoryListView()
+                            .preferredColorScheme(.dark)
+                    } label: {
+                        Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
+                            .font(.system(size: 16))
+                            .foregroundStyle(PulseTheme.accent)
+                    }
+                }
             }
             .task {
                 await loadWorkouts()

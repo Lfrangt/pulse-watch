@@ -530,21 +530,32 @@ struct HistoryView: View {
     // MARK: - 快捷入口
 
     private var shortcutButtons: some View {
-        HStack(spacing: PulseTheme.spacingS) {
-            // 训练日历
+        VStack(spacing: PulseTheme.spacingS) {
+            HStack(spacing: PulseTheme.spacingS) {
+                // 训练日历
+                NavigationLink {
+                    TrainingCalendarView()
+                        .preferredColorScheme(.dark)
+                } label: {
+                    shortcutButton(icon: "calendar", title: String(localized: "Training Calendar"))
+                }
+                .buttonStyle(.plain)
+
+                // 周报
+                Button {
+                    showWeeklyReport = true
+                } label: {
+                    shortcutButton(icon: "doc.richtext", title: String(localized: "Weekly Report"))
+                }
+                .buttonStyle(.plain)
+            }
+
+            // 训练历史
             NavigationLink {
-                TrainingCalendarView()
+                WorkoutHistoryListView()
                     .preferredColorScheme(.dark)
             } label: {
-                shortcutButton(icon: "calendar", title: String(localized: "Training Calendar"))
-            }
-            .buttonStyle(.plain)
-
-            // 周报
-            Button {
-                showWeeklyReport = true
-            } label: {
-                shortcutButton(icon: "doc.richtext", title: String(localized: "Weekly Report"))
+                shortcutButton(icon: "clock.arrow.trianglehead.counterclockwise.rotate.90", title: String(localized: "Workout History"))
             }
             .buttonStyle(.plain)
         }

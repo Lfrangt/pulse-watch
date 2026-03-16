@@ -11,6 +11,7 @@ struct PulseWatchApp: App {
             SavedLocation.self,
             HealthRecord.self,
             DailySummary.self,
+            WorkoutHistoryEntry.self,
         ])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -35,6 +36,7 @@ struct PulseWatchApp: App {
         let container = sharedModelContainer
         HealthKitService.shared.modelContainer = container
         HealthDataService.shared.modelContainer = container
+        WorkoutHistoryService.shared.modelContainer = container
 
         // HealthKit 后台采集
         HealthKitService.shared.enableBackgroundDelivery()
@@ -51,6 +53,8 @@ struct PulseWatchApp: App {
         Task {
             try? await HealthKitService.shared.requestAuthorization()
             await HealthKitService.shared.performInitialFetch()
+            // 训练历史同步 — 每次启动时增量同步
+            await WorkoutHistoryService.shared.syncWorkouts()
         }
     }
 

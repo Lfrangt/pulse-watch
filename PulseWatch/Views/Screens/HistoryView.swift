@@ -228,6 +228,15 @@ struct HistoryView: View {
         return ("\(sign)\(String(format: "%.0f", diff)) 📈", diff > 0)
     }
 
+    private func deltaPct(cur: Double?, prev: Double?) -> (String, Bool)? {
+        guard let c = cur, let p = prev, p > 0 else { return nil }
+        let pct = ((c - p) / p) * 100
+        guard abs(pct) > 1 else { return nil }
+        let sign = pct > 0 ? "+" : ""
+        let emoji = pct > 0 ? "📈" : "📉"
+        return ("\(sign)\(String(format: "%.0f%%", pct)) \(emoji)", pct > 0)
+    }
+
     private var insufficientDataHint: some View {
         HStack(spacing: 8) {
             Image(systemName: "chart.line.uptrend.xyaxis")
@@ -252,10 +261,19 @@ struct HistoryView: View {
             return (s.date, score)
         }
 
+        let latestScore = data.last?.score
+        let prevAvg = previousPeriodSummaries.compactMap(\.dailyScore)
+        let prevAvgVal = prevAvg.isEmpty ? nil : prevAvg.reduce(0,+) / prevAvg.count
+        let curAvg = data.isEmpty ? nil : data.map(\.score).reduce(0,+) / data.count
+        let scoreDelta = deltaPct(cur: curAvg.map(Double.init), prev: prevAvgVal.map(Double.init))
+
         return chartCard(
             icon: "chart.line.uptrend.xyaxis",
             title: String(localized: "Daily Score"),
-            color: PulseTheme.accent
+            color: PulseTheme.accent,
+            currentValue: latestScore.map { "\($0)" },
+            changeText: scoreDelta?.0,
+            changePositive: scoreDelta?.1 ?? true
         ) {
             if data.isEmpty {
                 emptyChartPlaceholder
@@ -325,10 +343,21 @@ struct HistoryView: View {
             return (s.date, avg, s.restingHeartRate ?? avg)
         }
 
+        let latestHR = data.last.map { "\(Int($0.resting)) bpm" }
+        let curAvgHR = data.isEmpty ? nil : data.map(\.resting).reduce(0,+) / Double(data.count)
+        let prevHR = previousPeriodSummaries.compactMap(\.restingHeartRate)
+        let prevAvgHR = prevHR.isEmpty ? nil : prevHR.reduce(0,+) / Double(prevHR.count)
+        // For HR, lower is better, so invert
+        let hrDelta = deltaPct(cur: curAvgHR, prev: prevAvgHR)
+        let hrPositive = hrDelta.map { $0.0.contains("-") } ?? true  // negative HR change = good
+
         return chartCard(
             icon: "heart.fill",
             title: String(localized: "Heart Rate"),
-            color: PulseTheme.statusPoor
+            color: Color(hex: "C75C5C"),
+            currentValue: latestHR,
+            changeText: hrDelta?.0,
+            changePositive: hrPositive
         ) {
             if data.isEmpty {
                 emptyChartPlaceholder
@@ -392,10 +421,20 @@ struct HistoryView: View {
             return (s.date, hrv)
         }
 
+        let latestHRV = data.last.map { "\(Int($0.value)) ms" }
+        let curAvgHRV = data.isEmpty ? nil : data.map(\.value).reduce(0,+) / Double(data.count)
+        let prevHRVs = previousPeriodSummaries.compactMap(\.averageHRV)
+        let prevAvgHRV2 = prevHRVs.isEmpty ? nil : prevHRVs.reduce(0,+) / Double(prevHRVs.count)
+        let hrvDelta = deltaPct(cur: curAvgHRV, prev: prevAvgHRV2)
+        let hrvColor = Color(hex: "5C7BC7")  // 蓝色系
+
         return chartCard(
             icon: "waveform.path.ecg",
             title: "HRV",
-            color: PulseTheme.accent
+            color: hrvColor,
+            currentValue: latestHRV,
+            changeText: hrvDelta?.0,
+            changePositive: hrvDelta?.1 ?? true
         ) {
             if data.isEmpty {
                 emptyChartPlaceholder
@@ -405,7 +444,7 @@ struct HistoryView: View {
                         x: .value(String(localized: "Date"), item.date),
                         y: .value("HRV", item.value)
                     )
-                    .foregroundStyle(PulseTheme.accent)
+                    .foregroundStyle(hrvColor)
                     .interpolationMethod(.catmullRom)
                     .lineStyle(StrokeStyle(lineWidth: 2.5))
 
@@ -415,7 +454,7 @@ struct HistoryView: View {
                     )
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [PulseTheme.accent.opacity(0.15), PulseTheme.accent.opacity(0.02)],
+                            colors: [hrvColor.opacity(0.15), hrvColor.opacity(0.02)],
                             startPoint: .top,
                             endPoint: .bottom
                         )
@@ -461,10 +500,19 @@ struct HistoryView: View {
             return (s.date, Double(total) / 60.0, deepH, remH)
         }
 
+        let latestSleep = data.last.map { String(format: "%.1fh", $0.hours) }
+        let curAvgSleep2 = data.isEmpty ? nil : data.map(\.hours).reduce(0,+) / Double(data.count)
+        let prevSleeps = previousPeriodSummaries.compactMap(\.sleepDurationMinutes).map { Double($0) / 60.0 }
+        let prevAvgSleep2 = prevSleeps.isEmpty ? nil : prevSleeps.reduce(0,+) / Double(prevSleeps.count)
+        let sleepDelta2 = deltaPct(cur: curAvgSleep2, prev: prevAvgSleep2)
+
         return chartCard(
             icon: "moon.fill",
             title: String(localized: "Sleep"),
-            color: Color(hex: "8B7EC8")
+            color: Color(hex: "4B3D8F"),
+            currentValue: latestSleep,
+            changeText: sleepDelta2?.0,
+            changePositive: sleepDelta2?.1 ?? true
         ) {
             if data.isEmpty {
                 emptyChartPlaceholder
@@ -672,6 +720,9 @@ struct HistoryView: View {
         icon: String,
         title: String,
         color: Color,
+        currentValue: String? = nil,
+        changeText: String? = nil,
+        changePositive: Bool = true,
         @ViewBuilder content: () -> Content
     ) -> some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
@@ -691,6 +742,21 @@ struct HistoryView: View {
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
                     .accessibilityAddTraits(.isHeader)
+
+                Spacer()
+
+                if let val = currentValue {
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(val)
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        if let change = changeText {
+                            Text(change)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(changePositive ? Color(hex: "7FC75C") : Color(hex: "C75C5C"))
+                        }
+                    }
+                }
             }
 
             content()

@@ -136,7 +136,9 @@ final class WatchConnectivityManager: NSObject {
 
         if session.isReachable {
             session.sendMessage(payload, replyHandler: nil) { error in
+                #if DEBUG
                 print("WC sendWorkoutCompleted error: \(error.localizedDescription)")
+                #endif
                 session.transferUserInfo(payload)
             }
         } else {

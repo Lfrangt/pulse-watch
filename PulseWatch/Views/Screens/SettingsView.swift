@@ -79,9 +79,11 @@ struct SettingsView: View {
                     openClawSection
                         .staggered(index: 8)
 
-                    // 开发者选项
+                    // 开发者选项（仅 Debug 构建）
+                    #if DEBUG
                     developerSection
                         .staggered(index: 9)
+                    #endif
 
                     // 关于
                     aboutSection

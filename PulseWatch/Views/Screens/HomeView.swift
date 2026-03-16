@@ -253,7 +253,9 @@ struct HomeView: View {
                 )
             }
         } catch {
+            #if DEBUG
             print("Load error: \(error)")
+            #endif
         }
 
         isLoading = false

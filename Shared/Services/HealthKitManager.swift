@@ -244,7 +244,9 @@ final class HealthKitManager {
             // Check if we have any meaningful health data
             updateHealthDataAvailability()
         } catch {
+            #if DEBUG
             print("HealthKit refresh error: \(error)")
+            #endif
             hasHealthData = false
         }
     }

@@ -924,7 +924,9 @@ struct DashboardView: View {
                 ringAnimated = false
             }
         } catch {
+            #if DEBUG
             print("Dashboard load error: \(error)")
+            #endif
         }
 
         isLoading = false

@@ -30,7 +30,9 @@ final class GymCoordinator {
             .receive(on: DispatchQueue.main)
             .sink { notification in
                 if let category = notification.userInfo?["category"] as? String {
+                    #if DEBUG
                     print("[GymCoordinator] Workout started from watch: \(category)")
+                    #endif
                 }
             }
             .store(in: &cancellables)

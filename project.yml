@@ -29,15 +29,16 @@ targets:
       - path: PulseWatch/Assets.xcassets
       - path: PulseWatch/App/PrivacyInfo.xcprivacy
       - path: PulseWatch/Localizable.xcstrings
+      - path: PulseWatch/App/InfoPlist.xcstrings
     info:
       path: PulseWatch/App/Info.plist
       properties:
         CFBundleDisplayName: "Pulse"
-        NSCameraUsageDescription: "Pulse 需要相机来扫描 OpenClaw 配对二维码。"
-        NSHealthShareUsageDescription: "Pulse 需要读取你的健康数据来生成每日状态评分和训练建议。所有数据仅存储在你的设备上。"
-        NSHealthUpdateUsageDescription: "Pulse 需要记录你的运动数据以追踪你的训练进度。"
-        NSLocationAlwaysAndWhenInUseUsageDescription: "Pulse 使用位置来检测你是否到达健身房，自动建议训练计划。位置数据不会上传到任何服务器。"
-        NSLocationWhenInUseUsageDescription: "Pulse 使用位置来保存你的常去地点，用于智能提醒。"
+        NSCameraUsageDescription: "Pulse needs access to the camera to scan OpenClaw pairing QR codes."
+        NSHealthShareUsageDescription: "Pulse needs to read your health data to generate daily readiness scores and training insights. All data is stored on your device only."
+        NSHealthUpdateUsageDescription: "Pulse needs to record your workout data to track your training progress."
+        NSLocationAlwaysAndWhenInUseUsageDescription: "Pulse uses your location to detect when you arrive at the gym and suggest training plans. Location data is never uploaded to any server."
+        NSLocationWhenInUseUsageDescription: "Pulse uses your location to save your frequent places for smart reminders."
         ITSAppUsesNonExemptEncryption: false
         LSRequiresIPhoneOS: true
         UILaunchScreen:

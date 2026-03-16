@@ -421,7 +421,9 @@ struct WorkoutView: View {
 
             heartRateZones[workout.uuid] = zones
         } catch {
+            #if DEBUG
             print("HR zone fetch error: \(error)")
+            #endif
         }
     }
 

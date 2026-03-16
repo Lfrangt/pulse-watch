@@ -11,6 +11,7 @@ struct SettingsView: View {
     @AppStorage("pulse.brief.enabled") private var morningBriefEnabled = true
     @AppStorage("pulse.brief.hour") private var briefHour = 7
     @AppStorage("pulse.brief.minute") private var briefMinute = 30
+    @AppStorage("pulse.weekly.summary.enabled") private var weeklySummaryEnabled = true
     @AppStorage("pulse.training.reminder.enabled") private var trainingReminderEnabled = true
     @AppStorage("pulse.hr.alert.enabled") private var hrAlertEnabled = true
     @AppStorage("pulse.hr.alert.high") private var hrAlertHigh = 120
@@ -175,6 +176,24 @@ struct SettingsView: View {
                             MorningBriefService.shared.scheduledMinute = briefMinute
                         }
                     }
+                }
+            }
+
+            // Weekly Summary
+            settingRow {
+                Toggle(isOn: $weeklySummaryEnabled) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Weekly Health Summary")
+                            .font(PulseTheme.bodyFont)
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text("Every Sunday 9:00 AM — score, workouts & trends")
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .tint(PulseTheme.accent)
+                .onChange(of: weeklySummaryEnabled) {
+                    WeeklySummaryService.shared.isEnabled = weeklySummaryEnabled
                 }
             }
 

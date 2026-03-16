@@ -113,9 +113,11 @@
         }
       }
     },
+    "%@ bpm": {},
     "%@ kcal": {},
     "%@ kg": {},
     "%@ min": {},
+    "%@ records stored": {},
     "%@ sets x %@ reps": {
       "localizations": {
         "en": {
@@ -167,6 +169,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "\\u{2600}\\u{FE0F} 戴上手表，开始记录你的一天"
+          }
+        }
+      }
+    },
+    "⚠️ High Heart Rate Alert": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ 心率过高警告"
+          }
+        }
+      }
+    },
+    "⚠️ Low Heart Rate Alert": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ 心率过低警告"
           }
         }
       }
@@ -237,6 +261,17 @@
         }
       }
     },
+    "7-day charts for heart rate, HRV, and sleep. Spot patterns, track improvement, and share your gains.": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "7 天心率、HRV、睡眠趋势图。发现规律，追踪进步，分享成果。"
+          }
+        }
+      }
+    },
     "7h": {},
     "8.4k steps · Active calories +320kcal": {
       "extractionState": "stale",
@@ -260,6 +295,7 @@
         }
       }
     },
+    "82": {},
     "About": {
       "extractionState": "stale",
       "localizations": {
@@ -371,7 +407,6 @@
       }
     },
     "Agent ID": {},
-    "AI analyzes your Apple Watch data\nDaily recovery scores and training advice": {},
     "AI analyzes your Apple Watch data\\nDaily recovery scores and training advice": {
       "extractionState": "stale",
       "localizations": {
@@ -379,6 +414,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "基于 Apple Watch 数据，用 AI 分析你的身体状态\\n每天给出个性化的恢复评分和训练建议"
+          }
+        }
+      }
+    },
+    "AI Coach": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 教练"
           }
         }
       }
@@ -404,7 +449,19 @@
         }
       }
     },
+    "Alert when resting heart rate is abnormal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率异常时推送通知提醒"
+          }
+        }
+      }
+    },
+    "All data stays on your device. We never collect personal information.": {},
     "All Pulse Watch data is stored on your device and never uploaded to any server. Health data is read only from Apple HealthKit for local analysis and training suggestions. We do not collect any personal information.": {
+      "extractionState": "stale",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -415,6 +472,7 @@
       }
     },
     "All Set": {
+      "extractionState": "stale",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -491,6 +549,7 @@
       }
     },
     "Authorized": {
+      "extractionState": "stale",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -536,6 +595,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "到达时自动提醒开始训练"
+          }
+        }
+      }
+    },
+    "Auto-syncs workouts from Apple Watch. Heart rate zones, calories, duration — all saved and shareable.": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动同步 Apple Watch 训练数据。心率区间、卡路里、时长，全部记录，支持分享。"
           }
         }
       }
@@ -823,6 +893,7 @@
         }
       }
     },
+    "Clear Workout History": {},
     "Close": {
       "extractionState": "stale",
       "localizations": {
@@ -844,6 +915,17 @@
         }
       }
     },
+    "Combines heart rate, HRV, and sleep quality into a single 0-100 score every morning. Green means go hard, red means rest.": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天早上综合心率、HRV 和睡眠质量，生成一个 0-100 分的恢复评分。绿色放心练，红色好好休息。"
+          }
+        }
+      }
+    },
     "Combines HRV, heart rate, sleep\\nGenerates 0-100 recovery score": {
       "extractionState": "stale",
       "localizations": {
@@ -855,7 +937,6 @@
         }
       }
     },
-    "Complete a workout with Apple Watch\nand it will be saved here automatically.": {},
     "Confirm": {
       "localizations": {
         "zh-Hans": {
@@ -1046,6 +1127,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "今日健康摘要已准备好，点击查看"
+          }
+        }
+      }
+    },
+    "Daily Recovery Score": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每日恢复评分"
           }
         }
       }
@@ -1332,6 +1424,17 @@
         }
       }
     },
+    "Every rep counts": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每一次训练都算数"
+          }
+        }
+      }
+    },
     "Excellent — push harder or try something new": {
       "extractionState": "stale",
       "localizations": {
@@ -1484,7 +1587,6 @@
       }
     },
     "Good": {
-      "extractionState": "stale",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -1658,6 +1760,16 @@
         }
       }
     },
+    "Heart Rate Alerts": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "心率异常提醒"
+          }
+        }
+      }
+    },
     "Heart Rate Variability": {
       "extractionState": "stale",
       "localizations": {
@@ -1717,6 +1829,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "高强度训练"
+          }
+        }
+      }
+    },
+    "High Threshold": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高心率阈值"
           }
         }
       }
@@ -1886,6 +2008,18 @@
         }
       }
     },
+    "HRV trending up 12%% this week. Keep it up.": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 本周上升 12%%，继续保持。"
+          }
+        }
+      }
+    },
+    "Imperial (mi, lb)": {},
     "Improving": {
       "extractionState": "stale",
       "localizations": {
@@ -2018,6 +2152,7 @@
       }
     },
     "Key Features": {
+      "extractionState": "stale",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -2033,6 +2168,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "关键指标 vs 上周"
+          }
+        }
+      }
+    },
+    "Know your body's readiness": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "了解身体的准备状态"
           }
         }
       }
@@ -2244,6 +2390,16 @@
         }
       }
     },
+    "Low Threshold": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "低心率阈值"
+          }
+        }
+      }
+    },
     "Maintain your pace, focus on recovery and nutrition": {
       "extractionState": "stale",
       "localizations": {
@@ -2287,6 +2443,8 @@
         }
       }
     },
+    "Measurement System": {},
+    "Metric (km, kg)": {},
     "Metrics": {
       "localizations": {
         "zh-Hans": {
@@ -2503,7 +2661,6 @@
         }
       }
     },
-    "No Workout History": {},
     "No workout records yet": {
       "localizations": {
         "zh-Hans": {
@@ -2580,6 +2737,7 @@
       }
     },
     "One-tap Authorize": {
+      "extractionState": "stale",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -2643,11 +2801,22 @@
       }
     },
     "Permissions Needed": {
+      "extractionState": "stale",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "需要一些权限"
+          }
+        }
+      }
+    },
+    "Personalized training advice based on your recovery. Push day or rest day? AI analyzes your data and tells you exactly what to do.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "基于恢复状态的个性化训练建议。今天该练还是该休息？AI 分析你的数据，告诉你答案。"
           }
         }
       }
@@ -2685,6 +2854,7 @@
       }
     },
     "Privacy": {
+      "extractionState": "stale",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -2694,6 +2864,7 @@
         }
       }
     },
+    "Privacy Policy": {},
     "Progressive Overload": {
       "extractionState": "stale",
       "localizations": {
@@ -2761,7 +2932,6 @@
     },
     "Pulse": {},
     "Pulse Watch": {},
-    "Pulse Watch is collecting health data\nYour first score will appear in a few hours": {},
     "Pulse Watch is collecting health data\\nYour first score will appear in a few hours": {
       "extractionState": "stale",
       "localizations": {
@@ -2925,6 +3095,17 @@
         }
       }
     },
+    "Recovery 82 — great day for strength training! 💪": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复 82 分 — 今天适合力量训练！💪"
+          }
+        }
+      }
+    },
     "Recovery Score": {
       "extractionState": "stale",
       "localizations": {
@@ -2947,6 +3128,7 @@
         }
       }
     },
+    "Remind you when arriving at gym": {},
     "Remove": {
       "localizations": {
         "zh-Hans": {
@@ -2957,6 +3139,7 @@
         }
       }
     },
+    "Reset Onboarding": {},
     "Rest": {
       "extractionState": "stale",
       "localizations": {
@@ -3176,6 +3359,16 @@
         }
       }
     },
+    "Same alert won't repeat within 1 hour": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同一异常 1 小时内不重复提醒"
+          }
+        }
+      }
+    },
     "Sat": {
       "extractionState": "stale",
       "localizations": {
@@ -3259,6 +3452,18 @@
         }
       }
     },
+    "See your progress over time": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "看见自己的进步轨迹"
+          }
+        }
+      }
+    },
+    "Send Feedback": {},
     "Set Frequent Location": {
       "localizations": {
         "zh-Hans": {
@@ -3387,6 +3592,7 @@
         }
       }
     },
+    "Show welcome guide again on next launch": {},
     "Skip": {
       "localizations": {
         "zh-Hans": {
@@ -3715,6 +3921,7 @@
         }
       }
     },
+    "The welcome guide will appear next time you open the app.": {},
     "This action cannot be undone. The original HealthKit data will not be affected.": {},
     "This Week": {
       "localizations": {
@@ -3736,6 +3943,7 @@
         }
       }
     },
+    "This will delete all saved workout history from the app. Health data in Apple Health will not be affected.": {},
     "Thu": {
       "extractionState": "stale",
       "localizations": {
@@ -3964,6 +4172,18 @@
         }
       }
     },
+    "Training Records": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练记录"
+          }
+        }
+      }
+    },
+    "Training Reminders": {},
     "Training Rotation": {
       "extractionState": "stale",
       "localizations": {
@@ -4235,6 +4455,17 @@
         }
       }
     },
+    "Weekly Trends": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一周趋势"
+          }
+        }
+      }
+    },
     "Workout Complete": {
       "extractionState": "stale",
       "localizations": {
@@ -4334,7 +4565,6 @@
         }
       }
     },
-    "Your data stays on your device\nWe never upload anything": {},
     "Your data stays on your device\\nWe never upload anything": {
       "extractionState": "stale",
       "localizations": {
@@ -4346,7 +4576,40 @@
         }
       }
     },
+    "Your personal fitness advisor": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的私人健身顾问"
+          }
+        }
+      }
+    },
+    "Your resting heart rate is %lld bpm, above your %lld bpm threshold. Consider resting and monitoring.": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您的静息心率为 %lld bpm，超过 %lld bpm 阈值。建议休息并持续关注。"
+          }
+        }
+      }
+    },
+    "Your resting heart rate is %lld bpm, below your %lld bpm threshold. If you feel dizzy, seek medical attention.": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您的静息心率为 %lld bpm，低于 %lld bpm 阈值。如感到头晕，请就医。"
+          }
+        }
+      }
+    },
     "Your Smart Health Companion": {
+      "extractionState": "stale",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -4379,232 +4642,68 @@
         }
       }
     },
-    "Daily Recovery Score": {
+    "Weekly Health Summary": {
+      "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "每日恢复评分"
+            "value": "每周健康总结"
           }
         }
       }
     },
-    "Know your body's readiness": {
+    "Every Sunday 9:00 AM — score, workouts & trends": {
+      "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "了解身体的准备状态"
+            "value": "每周日早上 9:00 · 评分、训练次数和趋势"
           }
         }
       }
     },
-    "Combines heart rate, HRV, and sleep quality into a single 0-100 score every morning. Green means go hard, red means rest.": {
+    "Weekly Score: %d%@": {
+      "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "每天早上综合心率、HRV 和睡眠质量，生成一个 0-100 分的恢复评分。绿色放心练，红色好好休息。"
+            "value": "本周评分：%d%@"
           }
         }
       }
     },
-    "Weekly Trends": {
+    "Workouts: %d sessions%@": {
+      "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "一周趋势"
+            "value": "训练：%d 次%@"
           }
         }
       }
     },
-    "See your progress over time": {
+    "Resting HR: %@%@": {
+      "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "看见自己的进步轨迹"
+            "value": "静息心率：%@%@"
           }
         }
       }
     },
-    "7-day charts for heart rate, HRV, and sleep. Spot patterns, track improvement, and share your gains.": {
+    "Resting HR: %@": {
+      "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "7 天心率、HRV、睡眠趋势图。发现规律，追踪进步，分享成果。"
-          }
-        }
-      }
-    },
-    "Training Records": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "训练记录"
-          }
-        }
-      }
-    },
-    "Every rep counts": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "每一次训练都算数"
-          }
-        }
-      }
-    },
-    "Auto-syncs workouts from Apple Watch. Heart rate zones, calories, duration — all saved and shareable.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自动同步 Apple Watch 训练数据。心率区间、卡路里、时长，全部记录，支持分享。"
-          }
-        }
-      }
-    },
-    "AI Coach": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AI 教练"
-          }
-        }
-      }
-    },
-    "Your personal fitness advisor": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的私人健身顾问"
-          }
-        }
-      }
-    },
-    "Personalized training advice based on your recovery. Push day or rest day? AI analyzes your data and tells you exactly what to do.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "基于恢复状态的个性化训练建议。今天该练还是该休息？AI 分析你的数据，告诉你答案。"
-          }
-        }
-      }
-    },
-    "Recovery 82 — great day for strength training! 💪": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "恢复 82 分 — 今天适合力量训练！💪"
-          }
-        }
-      }
-    },
-    "HRV trending up 12%% this week. Keep it up.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "HRV 本周上升 12%%，继续保持。"
-          }
-        }
-      }
-    },
-    "Heart Rate Alerts": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "心率异常提醒"
-          }
-        }
-      }
-    },
-    "Alert when resting heart rate is abnormal": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "静息心率异常时推送通知提醒"
-          }
-        }
-      }
-    },
-    "High Threshold": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "高心率阈值"
-          }
-        }
-      }
-    },
-    "Low Threshold": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "低心率阈值"
-          }
-        }
-      }
-    },
-    "Same alert won't repeat within 1 hour": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "同一异常 1 小时内不重复提醒"
-          }
-        }
-      }
-    },
-    "⚠️ High Heart Rate Alert": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "⚠️ 心率过高警告"
-          }
-        }
-      }
-    },
-    "⚠️ Low Heart Rate Alert": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "⚠️ 心率过低警告"
-          }
-        }
-      }
-    },
-    "Your resting heart rate is %lld bpm, above your %lld bpm threshold. Consider resting and monitoring.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "您的静息心率为 %lld bpm，超过 %lld bpm 阈值。建议休息并持续关注。"
-          }
-        }
-      }
-    },
-    "Your resting heart rate is %lld bpm, below your %lld bpm threshold. If you feel dizzy, seek medical attention.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "您的静息心率为 %lld bpm，低于 %lld bpm 阈值。如感到头晕，请就医。"
+            "value": "静息心率：%@"
           }
         }
       }

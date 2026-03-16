@@ -10,9 +10,12 @@ struct SettingsView: View {
     @AppStorage("pulse.brief.enabled") private var morningBriefEnabled = true
     @AppStorage("pulse.brief.hour") private var briefHour = 7
     @AppStorage("pulse.brief.minute") private var briefMinute = 30
+    @AppStorage("pulse.training.reminder.enabled") private var trainingReminderEnabled = true
     @AppStorage("pulse.collection.frequency") private var collectionFrequency = "normal"
     @AppStorage("pulse.openclaw.enabled") private var openClawEnabled = false
     @AppStorage("pulse.demo.enabled") private var demoModeEnabled = false
+    @AppStorage("pulse.units") private var unitSystem = "metric" // "metric" or "imperial"
+    @AppStorage("pulse.onboarding.completed") private var onboardingCompleted = false
 
     // MARK: - 状态
 
@@ -21,6 +24,9 @@ struct SettingsView: View {
     @State private var showAbout = false
     @State private var isSavingGym = false
     @State private var gymSaveSuccess = false
+    @State private var showClearHistoryAlert = false
+    @State private var showResetOnboardingAlert = false
+    @State private var historyClearSuccess = false
 
     @Query(filter: #Predicate<SavedLocation> { $0.locationType == "gym" && $0.isActive })
     private var gymLocations: [SavedLocation]
@@ -44,21 +50,29 @@ struct SettingsView: View {
                     notificationSection
                         .staggered(index: 2)
 
+                    // 单位设置
+                    unitSection
+                        .staggered(index: 3)
+
                     // 数据采集频率
                     collectionSection
-                        .staggered(index: 3)
+                        .staggered(index: 4)
+
+                    // 数据管理
+                    dataManagementSection
+                        .staggered(index: 5)
 
                     // OpenClaw（预留）
                     openClawSection
-                        .staggered(index: 4)
+                        .staggered(index: 6)
 
                     // 开发者选项
                     developerSection
-                        .staggered(index: 5)
+                        .staggered(index: 7)
 
                     // 关于
                     aboutSection
-                        .staggered(index: 6)
+                        .staggered(index: 8)
 
                     Spacer(minLength: 40)
                 }
@@ -146,6 +160,21 @@ struct SettingsView: View {
                         }
                     }
                 }
+            }
+
+            // 训练提醒
+            settingRow {
+                Toggle(isOn: $trainingReminderEnabled) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Training Reminders")
+                            .font(PulseTheme.bodyFont)
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text("Remind you when arriving at gym")
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .tint(PulseTheme.accent)
             }
         }
         .pulseCard()
@@ -702,6 +731,127 @@ struct SettingsView: View {
         .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
+    // MARK: - 单位设置
+
+    private var unitSection: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            sectionHeader(icon: "ruler.fill", title: String(localized: "Units"))
+
+            settingRow {
+                VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                    Text("Measurement System")
+                        .font(PulseTheme.bodyFont)
+                        .foregroundStyle(PulseTheme.textPrimary)
+
+                    Picker(String(localized: "Units"), selection: $unitSystem) {
+                        Text("Metric (km, kg)").tag("metric")
+                        Text("Imperial (mi, lb)").tag("imperial")
+                    }
+                    .pickerStyle(.segmented)
+
+                    Text(unitSystem == "metric"
+                         ? String(localized: "Distances in kilometers, weight in kilograms")
+                         : String(localized: "Distances in miles, weight in pounds"))
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+            }
+        }
+        .pulseCard()
+    }
+
+    // MARK: - 数据管理
+
+    @Query private var allWorkoutHistory: [WorkoutHistoryEntry]
+
+    private var dataManagementSection: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            sectionHeader(icon: "externaldrive.fill", title: String(localized: "Data Management"))
+
+            // 清除训练历史
+            settingRow {
+                Button {
+                    showClearHistoryAlert = true
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Clear Workout History")
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text("\(allWorkoutHistory.count) records stored")
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        if historyClearSuccess {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(PulseTheme.statusGood)
+                                .transition(.scale.combined(with: .opacity))
+                        } else {
+                            Image(systemName: "trash")
+                                .font(.system(size: 14))
+                                .foregroundStyle(PulseTheme.statusPoor)
+                        }
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+
+            // 重置 Onboarding
+            settingRow {
+                Button {
+                    showResetOnboardingAlert = true
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Reset Onboarding")
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text("Show welcome guide again on next launch")
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 14))
+                            .foregroundStyle(PulseTheme.textSecondary)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .pulseCard()
+        .alert("Clear Workout History?", isPresented: $showClearHistoryAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Clear All", role: .destructive) {
+                clearWorkoutHistory()
+            }
+        } message: {
+            Text("This will delete all saved workout history from the app. Health data in Apple Health will not be affected.")
+        }
+        .alert("Reset Onboarding?", isPresented: $showResetOnboardingAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Reset", role: .destructive) {
+                onboardingCompleted = false
+            }
+        } message: {
+            Text("The welcome guide will appear next time you open the app.")
+        }
+    }
+
+    private func clearWorkoutHistory() {
+        for entry in allWorkoutHistory {
+            modelContext.delete(entry)
+        }
+        try? modelContext.save()
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+            historyClearSuccess = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            historyClearSuccess = false
+        }
+    }
+
     // MARK: - 开发者选项
 
     private var developerSection: some View {
@@ -739,24 +889,71 @@ struct SettingsView: View {
                 }
             }
 
-            // 隐私说明
+            // 隐私政策链接
             settingRow {
-                VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                    HStack(spacing: PulseTheme.spacingS) {
-                        Image(systemName: "lock.shield.fill")
-                            .font(.system(size: 14))
-                            .foregroundStyle(PulseTheme.statusGood)
-                        Text("Privacy")
-                            .font(PulseTheme.bodyFont)
-                            .foregroundStyle(PulseTheme.textPrimary)
+                Button {
+                    if let url = URL(string: "https://pulsewatch.app/privacy") {
+                        #if os(iOS)
+                        UIApplication.shared.open(url)
+                        #endif
                     }
-
-                    Text("All Pulse Watch data is stored on your device and never uploaded to any server. Health data is read only from Apple HealthKit for local analysis and training suggestions. We do not collect any personal information.")
-                        .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textSecondary)
-                        .lineSpacing(3)
+                } label: {
+                    HStack {
+                        HStack(spacing: PulseTheme.spacingS) {
+                            Image(systemName: "lock.shield.fill")
+                                .font(.system(size: 14))
+                                .foregroundStyle(PulseTheme.statusGood)
+                            Text("Privacy Policy")
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.system(size: 12))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
                 }
+                .buttonStyle(.plain)
             }
+
+            // 反馈邮件
+            settingRow {
+                Button {
+                    if let url = URL(string: "mailto:feedback@pulsewatch.app?subject=Pulse%20Watch%20Feedback%20v\(appVersion)") {
+                        #if os(iOS)
+                        UIApplication.shared.open(url)
+                        #endif
+                    }
+                } label: {
+                    HStack {
+                        HStack(spacing: PulseTheme.spacingS) {
+                            Image(systemName: "envelope.fill")
+                                .font(.system(size: 14))
+                                .foregroundStyle(PulseTheme.accent)
+                            Text("Send Feedback")
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.system(size: 12))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+
+            // 隐私说明
+            HStack(spacing: PulseTheme.spacingS) {
+                Image(systemName: "hand.raised.fill")
+                    .font(.system(size: 11))
+                    .foregroundStyle(PulseTheme.textTertiary)
+                Text("All data stays on your device. We never collect personal information.")
+                    .font(.system(size: 11, weight: .regular, design: .rounded))
+                    .foregroundStyle(PulseTheme.textTertiary)
+                    .lineSpacing(2)
+            }
+            .padding(.horizontal, PulseTheme.spacingXS)
         }
         .pulseCard()
     }

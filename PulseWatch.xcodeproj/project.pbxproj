@@ -73,6 +73,7 @@
 		DE88A3060BF319B28E9B836E /* LaunchScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8AF5335F8330E76B283777 /* LaunchScreenView.swift */; };
 		DF3945F898AB21F858475D0D /* GymSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0BDF3A5D302AEE99BC17EF /* GymSearchView.swift */; };
 		E2AE16CA3B2D05EE03747012 /* WorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36ED27B3D9E0F37CE264F67B /* WorkoutView.swift */; };
+		EB9CD2247B65117026C53DA3 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 78B0FE266AD58AB16E415164 /* Localizable.xcstrings */; };
 		F080EB92336B15BFD06A027C /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7EAB8DD243A4A5F0B782B0 /* OnboardingView.swift */; };
 		F4B3BFD8FCB29275EBFC3C6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 691CF6519E17F0083CE8A11B /* Assets.xcassets */; };
 		F8177CBBA3F13228F6789DC2 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24D4B80B8A0AE76ECAF39C6 /* HealthKitManager.swift */; };
@@ -150,6 +151,7 @@
 		69563E71C80C1C903EAB9E81 /* PulseWatchWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = PulseWatchWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		6EBB0A83EEF4206DAC83C1C3 /* TrainingPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanView.swift; sourceTree = "<group>"; };
 		749A187F075B3040BC72947E /* HealthAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthAnalyzer.swift; sourceTree = "<group>"; };
+		78B0FE266AD58AB16E415164 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		7C1C0D07C1855FDE1FE7E6D5 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		7D9EF7F9A71B5B0CB3D007D8 /* WatchConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityManager.swift; sourceTree = "<group>"; };
 		7DE41B5DD16B2F31475F9460 /* PulseWatchWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PulseWatchWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -287,6 +289,7 @@
 				041CCDE03DE697130B91048B /* Services */,
 				72A0E4DF5C4D646CB62568EC /* Views */,
 				691CF6519E17F0083CE8A11B /* Assets.xcassets */,
+				78B0FE266AD58AB16E415164 /* Localizable.xcstrings */,
 			);
 			path = PulseWatch;
 			sourceTree = "<group>";
@@ -537,6 +540,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
+				en,
 				"zh-Hans",
 			);
 			mainGroup = 49ED658B5A0F2AEA389F6D01;
@@ -571,6 +575,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4B3BFD8FCB29275EBFC3C6B /* Assets.xcassets in Resources */,
+				EB9CD2247B65117026C53DA3 /* Localizable.xcstrings in Resources */,
 				89D3213346978EB8C194FF49 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

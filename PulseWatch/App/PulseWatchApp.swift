@@ -43,6 +43,11 @@ struct PulseWatchApp: App {
         // Morning Brief 通知系统
         MorningBriefService.shared.setup()
 
+        // App Store 评价引导 — 记录活跃天数
+        Task { @MainActor in
+            ReviewManager.shared.recordAppActive()
+        }
+
         Task {
             try? await HealthKitService.shared.requestAuthorization()
             await HealthKitService.shared.performInitialFetch()

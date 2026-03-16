@@ -23,6 +23,7 @@
 		2C424EF36C7A4E94C959B5D6 /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9EF7F9A71B5B0CB3D007D8 /* WatchConnectivityManager.swift */; };
 		31A491D76C596E6E0B4B6E30 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8E10979DD142ECAABA4B87 /* SummaryView.swift */; };
 		36478F738E60554AC42348D9 /* MorningBriefService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04762B973BF706C0FCA20C34 /* MorningBriefService.swift */; };
+		88B1F8DB6A1DB56372936B4B /* ReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DF9EEE980EA620198941995 /* ReviewManager.swift */; };
 		37074888E891812BA49B1FE3 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78EF6591F143A435A280533 /* KeychainHelper.swift */; };
 		37C0AE89CC67FAE5F629520F /* AppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DB44D514AD89CA6515F60D4 /* AppIconView.swift */; };
 		3AEFD5E19F28DE9AF225F34C /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9EF7F9A71B5B0CB3D007D8 /* WatchConnectivityManager.swift */; };
@@ -123,6 +124,7 @@
 
 /* Begin PBXFileReference section */
 		04762B973BF706C0FCA20C34 /* MorningBriefService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorningBriefService.swift; sourceTree = "<group>"; };
+		2DF9EEE980EA620198941995 /* ReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewManager.swift; sourceTree = "<group>"; };
 		0B0BDF3A5D302AEE99BC17EF /* GymSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymSearchView.swift; sourceTree = "<group>"; };
 		137D4F7F2B9141C04B4C6D30 /* ShareCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCardView.swift; sourceTree = "<group>"; };
 		1C93FB5DBBD7437C3C0479A6 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
@@ -223,6 +225,7 @@
 			isa = PBXGroup;
 			children = (
 				04762B973BF706C0FCA20C34 /* MorningBriefService.swift */,
+				2DF9EEE980EA620198941995 /* ReviewManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -648,6 +651,7 @@
 				DE88A3060BF319B28E9B836E /* LaunchScreenView.swift in Sources */,
 				B12CC726298E718F0B1E05E6 /* LocationManager.swift in Sources */,
 				36478F738E60554AC42348D9 /* MorningBriefService.swift in Sources */,
+				88B1F8DB6A1DB56372936B4B /* ReviewManager.swift in Sources */,
 				F080EB92336B15BFD06A027C /* OnboardingView.swift in Sources */,
 				214BA964157D8EAE4C312067 /* OpenClawBridge.swift in Sources */,
 				12558EC881A90A97E59B9616 /* PulseTheme.swift in Sources */,

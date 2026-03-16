@@ -87,38 +87,45 @@ final class HealthKitManager {
     }
     
     func checkAuthorizationStatus() {
-        let keyTypes: [HKObjectType] = [
-            HKQuantityType(.heartRate),
-            HKQuantityType(.heartRateVariabilitySDNN),
-            HKQuantityType(.stepCount),
-            HKCategoryType(.sleepAnalysis)
-        ].compactMap { $0 }
-        
-        var authorizedCount = 0
-        var deniedCount = 0
-        
-        for type in keyTypes {
-            let status = store.authorizationStatus(for: type)
-            switch status {
-            case .sharingAuthorized:
-                authorizedCount += 1
-            case .sharingDenied:
-                deniedCount += 1
-            case .notDetermined:
-                break
-            @unknown default:
-                break
+        // HealthKit authorizationStatus(for:) only works for WRITE types.
+        // For read-only apps, we check if we can actually query data.
+        // After requestAuthorization succeeds, assume authorized.
+        // Will be updated to .authorized once hasHealthData == true.
+        Task {
+            do {
+                // If requestAuthorization was called successfully before, the system
+                // shows it as authorized even though we can't check read status directly.
+                let status = try await store.statusForAuthorizationRequest(
+                    toShare: [],
+                    read: Set([
+                        HKQuantityType(.heartRate),
+                        HKQuantityType(.heartRateVariabilitySDNN),
+                        HKQuantityType(.stepCount),
+                        HKCategoryType(.sleepAnalysis),
+                    ] as [HKObjectType])
+                )
+
+                await MainActor.run {
+                    switch status {
+                    case .unnecessary:
+                        // Already requested — user saw the permission sheet
+                        authorizationStatus = .authorized
+                    case .shouldRequest:
+                        authorizationStatus = .notDetermined
+                    @unknown default:
+                        if hasHealthData {
+                            authorizationStatus = .authorized
+                        }
+                    }
+                }
+            } catch {
+                // Fallback: if we have data, we're authorized
+                await MainActor.run {
+                    if hasHealthData {
+                        authorizationStatus = .authorized
+                    }
+                }
             }
-        }
-        
-        if authorizedCount == keyTypes.count {
-            authorizationStatus = .authorized
-        } else if authorizedCount > 0 {
-            authorizationStatus = .partiallyAuthorized
-        } else if deniedCount > 0 {
-            authorizationStatus = .denied
-        } else {
-            authorizationStatus = .notDetermined
         }
     }
     

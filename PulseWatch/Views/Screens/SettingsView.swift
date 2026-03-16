@@ -616,8 +616,11 @@ struct SettingsView: View {
     }
 
     private func checkDataTypeAuthorization(_ type: HKObjectType) -> Bool {
-        let status = HKHealthStore().authorizationStatus(for: type)
-        return status == .sharingAuthorized
+        // authorizationStatus(for:) only works for write/share types.
+        // For read-only, we treat as authorized if the overall status is authorized
+        // (user has been through the permission flow).
+        return healthManager.authorizationStatus == .authorized ||
+               healthManager.authorizationStatus == .partiallyAuthorized
     }
 
     // MARK: - 数据采集频率

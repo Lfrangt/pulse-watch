@@ -83,7 +83,7 @@ final class HealthAgeService {
             s.restingHeartRate != nil || s.averageHRV != nil
         }.count
 
-        guard validDays >= Self.minDays else { return nil }
+        guard validDays > 0 else { return nil }
 
         // 计算各指标 7-30 天均值
         let avgRHR = avg(summaries.compactMap(\.restingHeartRate))

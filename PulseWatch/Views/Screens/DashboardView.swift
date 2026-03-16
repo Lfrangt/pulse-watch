@@ -32,7 +32,6 @@ struct DashboardView: View {
 
     // Health Age
     @State private var healthAgeResult: HealthAgeService.HealthAgeResult?
-    @State private var healthAgeDaysLeft: Int?
     @State private var healthAgeExpanded = false
 
     @Query(sort: \WorkoutRecord.date, order: .reverse) private var recentWorkouts: [WorkoutRecord]
@@ -91,9 +90,6 @@ struct DashboardView: View {
                     // Health Age 卡片
                     if let result = healthAgeResult {
                         healthAgeCard(result: result)
-                            .staggered(index: 3)
-                    } else if let daysLeft = healthAgeDaysLeft, daysLeft > 0 {
-                        healthAgeLockedCard(daysLeft: daysLeft)
                             .staggered(index: 3)
                     }
 
@@ -894,6 +890,18 @@ struct DashboardView: View {
             }
             .buttonStyle(.plain)
 
+            // 置信度提示
+            if result.daysOfData < 7 {
+                HStack(spacing: 6) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.system(size: 11))
+                        .foregroundStyle(PulseTheme.accent)
+                    Text("More data = better accuracy. Keep wearing your Watch 📈")
+                        .font(.system(size: 11))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+            }
+
             // 展开详情
             if healthAgeExpanded {
                 Divider().background(PulseTheme.border)
@@ -955,31 +963,6 @@ struct DashboardView: View {
         case .steps:          return String(format: "%.0f", m.value)
         case .activeMinutes:  return String(format: "%.0f min", m.value)
         }
-    }
-
-    private func healthAgeLockedCard(daysLeft: Int) -> some View {
-        HStack(spacing: PulseTheme.spacingM) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(PulseTheme.accent.opacity(0.12))
-                    .frame(width: 44, height: 44)
-                Image(systemName: "lock.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(PulseTheme.accent)
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Health Age")
-                    .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
-                Text(String(format: String(localized: "Wear your watch for %d more days to unlock"), daysLeft))
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
-            }
-
-            Spacer()
-        }
-        .pulseCard()
     }
 
     // MARK: - 最近训练
@@ -1257,7 +1240,6 @@ struct DashboardView: View {
 
         // Health Age
         healthAgeResult = HealthAgeService.shared.compute(modelContext: modelContext)
-        healthAgeDaysLeft = HealthAgeService.shared.daysUntilReady(modelContext: modelContext)
 
         isLoading = false
     }

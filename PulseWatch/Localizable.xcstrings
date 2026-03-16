@@ -2,6 +2,7 @@
   "sourceLanguage": "en",
   "strings": {
     "--": {},
+    "—": {},
     ", ": {
       "extractionState": "stale",
       "localizations": {
@@ -170,6 +171,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "已选 %d 个"
+          }
+        }
+      }
+    },
+    "%d years %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d 岁%@"
           }
         }
       }
@@ -459,6 +471,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "活跃千卡"
+          }
+        }
+      }
+    },
+    "Active Minutes": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "活跃分钟"
+          }
+        }
+      }
+    },
+    "Activity level meets WHO guidelines": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "活动量达到 WHO 建议标准"
+          }
+        }
+      }
+    },
+    "Actual age: %d": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "实际年龄：%d"
           }
         }
       }
@@ -842,6 +887,17 @@
         }
       }
     },
+    "Based on %d days of data": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "基于 %d 天数据"
+          }
+        }
+      }
+    },
     "Based on %d sessions": {
       "extractionState": "manual",
       "localizations": {
@@ -904,6 +960,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "二头弯举"
+          }
+        }
+      }
+    },
+    "Birth Year": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出生年份"
           }
         }
       }
@@ -1347,6 +1414,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "每日评分"
+          }
+        }
+      }
+    },
+    "Daily Steps": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日均步数"
           }
         }
       }
@@ -1982,6 +2060,28 @@
         }
       }
     },
+    "Health Age": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "生理年龄"
+          }
+        }
+      }
+    },
+    "Health Age %d": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "生理年龄 %d"
+          }
+        }
+      }
+    },
     "Health data unavailable": {
       "extractionState": "stale",
       "localizations": {
@@ -2182,6 +2282,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "HRV 骤降：当前 \\(Int(current))ms，基线 \\(Int(baseline))ms"
+          }
+        }
+      }
+    },
+    "HRV indicates good autonomic health": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 显示自主神经功能良好"
+          }
+        }
+      }
+    },
+    "HRV is below average — prioritize sleep and stress management": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HRV 低于平均水平，建议优先关注睡眠和压力管理"
           }
         }
       }
@@ -2689,6 +2811,17 @@
         }
       }
     },
+    "Low activity — WHO recommends 150 min/week of moderate exercise": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "活动量不足，WHO 建议每周 150 分钟中等强度运动"
+          }
+        }
+      }
+    },
     "Low Threshold": {
       "localizations": {
         "zh-Hans": {
@@ -3079,6 +3212,17 @@
         }
       }
     },
+    "older": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更老"
+          }
+        }
+      }
+    },
     "One-tap Authorize": {
       "extractionState": "stale",
       "localizations": {
@@ -3140,6 +3284,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "整体状态较上周提升，保持当前的生活节奏"
+          }
+        }
+      }
+    },
+    "Oversleeping may indicate underlying issues": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠过长可能存在潜在问题"
           }
         }
       }
@@ -3230,6 +3385,17 @@
       }
     },
     "Privacy Policy": {},
+    "Profile": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "个人信息"
+          }
+        }
+      }
+    },
     "Progressive Overload": {
       "extractionState": "stale",
       "localizations": {
@@ -3581,6 +3747,17 @@
         }
       }
     },
+    "Resting Heart Rate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率"
+          }
+        }
+      }
+    },
     "Resting HR": {
       "extractionState": "stale",
       "localizations": {
@@ -3676,6 +3853,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "静息心率偏高：当前 \\(Int(current))bpm，基线 \\(Int(baseline))bpm"
+          }
+        }
+      }
+    },
+    "Resting HR is elevated — more aerobic exercise can help": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率偏高，建议增加有氧运动"
+          }
+        }
+      }
+    },
+    "Resting HR is in a healthy range": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率在健康范围内"
           }
         }
       }
@@ -4077,6 +4276,39 @@
         }
       }
     },
+    "Sleep Duration": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠时长"
+          }
+        }
+      }
+    },
+    "Sleep duration is in the optimal range": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠时长在最佳范围内"
+          }
+        }
+      }
+    },
+    "Sleep is too short — aim for 7-9 hours": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠不足，建议保证 7-9 小时"
+          }
+        }
+      }
+    },
     "Slight decline this week — adjust rest and training": {
       "extractionState": "stale",
       "localizations": {
@@ -4196,6 +4428,17 @@
         }
       }
     },
+    "Step count is solid — keep it up": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "步数达标，继续保持"
+          }
+        }
+      }
+    },
     "steps": {
       "extractionState": "stale",
       "localizations": {
@@ -4214,6 +4457,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "步数"
+          }
+        }
+      }
+    },
+    "Steps are below average — try walking 30 min daily": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "步数偏低，建议每天步行 30 分钟"
           }
         }
       }
@@ -4734,6 +4988,17 @@
         }
       }
     },
+    "Used to calculate your Health Age": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用于计算你的生理年龄"
+          }
+        }
+      }
+    },
     "Verify & Connect": {
       "extractionState": "stale",
       "localizations": {
@@ -4871,6 +5136,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "恢复偏弱"
+          }
+        }
+      }
+    },
+    "Wear your watch for %d more days to unlock": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再佩戴手表 %d 天即可解锁"
           }
         }
       }
@@ -5028,6 +5304,17 @@
         }
       }
     },
+    "younger": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更年轻"
+          }
+        }
+      }
+    },
     "Your body needs rest — don't push it": {
       "extractionState": "stale",
       "localizations": {
@@ -5149,288 +5436,13 @@
         }
       }
     },
-    "Health Age": {
+    "More data = better accuracy. Keep wearing your Watch 📈": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "生理年龄"
-          }
-        }
-      }
-    },
-    "%d years %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%d 岁%@"
-          }
-        }
-      }
-    },
-    "younger": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "更年轻"
-          }
-        }
-      }
-    },
-    "older": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "更老"
-          }
-        }
-      }
-    },
-    "Actual age: %d": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "实际年龄：%d"
-          }
-        }
-      }
-    },
-    "Based on %d days of data": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "基于 %d 天数据"
-          }
-        }
-      }
-    },
-    "Health Age %d": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "生理年龄 %d"
-          }
-        }
-      }
-    },
-    "Wear your watch for %d more days to unlock": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "再佩戴手表 %d 天即可解锁"
-          }
-        }
-      }
-    },
-    "Resting Heart Rate": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "静息心率"
-          }
-        }
-      }
-    },
-    "Sleep Duration": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "睡眠时长"
-          }
-        }
-      }
-    },
-    "Daily Steps": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "日均步数"
-          }
-        }
-      }
-    },
-    "Active Minutes": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "活跃分钟"
-          }
-        }
-      }
-    },
-    "Resting HR is elevated — more aerobic exercise can help": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "静息心率偏高，建议增加有氧运动"
-          }
-        }
-      }
-    },
-    "Resting HR is in a healthy range": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "静息心率在健康范围内"
-          }
-        }
-      }
-    },
-    "HRV is below average — prioritize sleep and stress management": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "HRV 低于平均水平，建议优先关注睡眠和压力管理"
-          }
-        }
-      }
-    },
-    "HRV indicates good autonomic health": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "HRV 显示自主神经功能良好"
-          }
-        }
-      }
-    },
-    "Sleep is too short — aim for 7-9 hours": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "睡眠不足，建议保证 7-9 小时"
-          }
-        }
-      }
-    },
-    "Oversleeping may indicate underlying issues": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "睡眠过长可能存在潜在问题"
-          }
-        }
-      }
-    },
-    "Sleep duration is in the optimal range": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "睡眠时长在最佳范围内"
-          }
-        }
-      }
-    },
-    "Steps are below average — try walking 30 min daily": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "步数偏低，建议每天步行 30 分钟"
-          }
-        }
-      }
-    },
-    "Step count is solid — keep it up": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "步数达标，继续保持"
-          }
-        }
-      }
-    },
-    "Low activity — WHO recommends 150 min/week of moderate exercise": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "活动量不足，WHO 建议每周 150 分钟中等强度运动"
-          }
-        }
-      }
-    },
-    "Activity level meets WHO guidelines": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "活动量达到 WHO 建议标准"
-          }
-        }
-      }
-    },
-    "Profile": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "个人信息"
-          }
-        }
-      }
-    },
-    "Birth Year": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "出生年份"
-          }
-        }
-      }
-    },
-    "Used to calculate your Health Age": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "用于计算你的生理年龄"
+            "value": "数据越多越准确，继续佩戴让结果更精准 📈"
           }
         }
       }

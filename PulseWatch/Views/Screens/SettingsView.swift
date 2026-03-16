@@ -275,11 +275,35 @@ struct SettingsView: View {
 
     // MARK: - 健身房位置设置
 
+    @AppStorage("pulse.gym.detection.enabled") private var gymDetectionEnabled = true
+
     private var gymSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             sectionHeader(icon: "dumbbell.fill", title: String(localized: "Gym Location"))
 
-            if let gym = gymLocations.first {
+            // 总开关
+            settingRow {
+                Toggle(isOn: $gymDetectionEnabled) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Gym Location Detection")
+                            .font(PulseTheme.bodyFont)
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text("Remind you when arriving at gym")
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .tint(PulseTheme.accent)
+                .onChange(of: gymDetectionEnabled) {
+                    if !gymDetectionEnabled {
+                        LocationManager.shared.removeAllGeofences()
+                    } else if let gym = gymLocations.first {
+                        LocationManager.shared.registerGeofence(for: gym)
+                    }
+                }
+            }
+
+            if gymDetectionEnabled, let gym = gymLocations.first {
                 // 已保存 — 显示地点信息
                 settingRow {
                     HStack {
@@ -319,7 +343,7 @@ struct SettingsView: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
-            } else {
+            } else if gymDetectionEnabled {
                 // 未设置 — 搜索按钮
                 Button {
                     showGymSearch = true

@@ -46,9 +46,9 @@
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Pulse needs to record your workout data to track your training progress.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Pulse uses your location to detect when you arrive at the gym and suggest training plans. Location data is never uploaded to any server.</string>
+	<string>Pulse Watch detects when you arrive at your configured gym locations to remind you to start your workout. Location data stays on your device and is never uploaded.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Pulse uses your location to save your frequent places for smart reminders.</string>
+	<string>Pulse Watch detects when you arrive at your configured gym locations to remind you to start your workout.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>

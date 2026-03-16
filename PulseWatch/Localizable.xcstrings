@@ -5764,6 +5764,17 @@
           }
         }
       }
+    },
+    "Gym Location Detection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "健身房位置检测"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -27,6 +27,9 @@ struct DashboardView: View {
     // Streak
     @State private var currentStreak: Int = 0
 
+    // Strain
+    @State private var todayStrain: Int = 0
+
     @Query(sort: \WorkoutRecord.date, order: .reverse) private var recentWorkouts: [WorkoutRecord]
     @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
     @Query private var savedLocations: [SavedLocation]
@@ -69,6 +72,15 @@ struct DashboardView: View {
                     if currentStreak > 0 {
                         streakBadge(streak: currentStreak)
                             .staggered(index: 2)
+                    }
+
+                    // Strain vs Recovery
+                    if todayStrain > 0 || (brief != nil && demoMode) {
+                        strainRecoveryCard(
+                            strain: todayStrain,
+                            recovery: insight?.recoveryScore ?? brief?.score ?? 0
+                        )
+                        .staggered(index: 3)
                     }
 
                     // 今日洞察卡片
@@ -725,6 +737,94 @@ struct DashboardView: View {
         .accessibilityLabel(String(format: String(localized: "%d-Day Streak"), streak))
     }
 
+    // MARK: - Strain vs Recovery Card
+
+    private func strainRecoveryCard(strain: Int, recovery: Int) -> some View {
+        let strainLevel = StrainScoreService.StrainLevel(score: strain)
+        let strainColor = Color(hex: strainLevel.color)
+        let recoveryColor = PulseTheme.statusColor(for: recovery)
+        let warning = StrainScoreService.overtrainWarning(strain: strain, recovery: recovery)
+
+        return VStack(spacing: PulseTheme.spacingM) {
+            // 双指标并排
+            HStack(spacing: PulseTheme.spacingL) {
+                // Strain
+                VStack(spacing: 6) {
+                    ZStack {
+                        Circle()
+                            .stroke(PulseTheme.border, lineWidth: 6)
+                            .frame(width: 72, height: 72)
+                        Circle()
+                            .trim(from: 0, to: CGFloat(strain) / 100)
+                            .stroke(strainColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                            .frame(width: 72, height: 72)
+                            .rotationEffect(.degrees(-90))
+                        Text("\(strain)")
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .foregroundStyle(PulseTheme.textPrimary)
+                    }
+                    Text("Strain Score")
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
+                    Text(strainLevel.label)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(strainColor)
+                }
+                .frame(maxWidth: .infinity)
+
+                // Divider
+                Rectangle()
+                    .fill(PulseTheme.border)
+                    .frame(width: 1, height: 60)
+
+                // Recovery
+                VStack(spacing: 6) {
+                    ZStack {
+                        Circle()
+                            .stroke(PulseTheme.border, lineWidth: 6)
+                            .frame(width: 72, height: 72)
+                        Circle()
+                            .trim(from: 0, to: CGFloat(recovery) / 100)
+                            .stroke(recoveryColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                            .frame(width: 72, height: 72)
+                            .rotationEffect(.degrees(-90))
+                        Text("\(recovery)")
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .foregroundStyle(PulseTheme.textPrimary)
+                    }
+                    Text("Recovery")
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
+                    Text(PulseTheme.statusLabel(for: recovery))
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(recoveryColor)
+                }
+                .frame(maxWidth: .infinity)
+            }
+
+            // Overtrain warning
+            if let warning {
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color(hex: "C75C5C"))
+                    Text(warning)
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.textSecondary)
+                }
+                .padding(.horizontal, PulseTheme.spacingS)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color(hex: "C75C5C").opacity(0.1))
+                )
+            }
+        }
+        .pulseCard()
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(format: String(localized: "Strain %d, Recovery %d"), strain, recovery))
+    }
+
     // MARK: - 最近训练
 
     private var recentWorkoutsSection: some View {
@@ -936,6 +1036,7 @@ struct DashboardView: View {
             demoTimelineEvents = DemoDataProvider.makeTimelineEvents()
             StreakService.shared.setDemoStreak(12)
             currentStreak = StreakService.shared.currentStreak
+            todayStrain = StrainScoreService.demoStrain
             ringAnimated = false
             isLoading = false
             return
@@ -992,6 +1093,9 @@ struct DashboardView: View {
         // Streak 计算
         StreakService.shared.refresh(modelContext: modelContext)
         currentStreak = StreakService.shared.currentStreak
+
+        // Strain Score
+        todayStrain = StrainScoreService.shared.todayStrain(modelContext: modelContext)
 
         isLoading = false
     }

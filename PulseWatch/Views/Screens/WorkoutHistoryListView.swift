@@ -210,8 +210,20 @@ struct WorkoutHistoryListView: View {
 
             Spacer()
 
-            // 时长 + 卡路里
+            // 时长 + 卡路里 + strain
             VStack(alignment: .trailing, spacing: 2) {
+                // Strain badge
+                let strain = StrainScoreService.computeForWorkout(entry)
+                if strain > 0 {
+                    let level = StrainScoreService.StrainLevel(score: strain)
+                    Text("\(strain)")
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color(hex: level.color))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Capsule().fill(Color(hex: level.color).opacity(0.15)))
+                }
+
                 Text(formatDuration(entry.durationMinutes))
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)

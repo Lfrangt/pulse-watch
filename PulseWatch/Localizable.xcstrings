@@ -5093,6 +5093,61 @@
           }
         }
       }
+    },
+    "Strain Score": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "运动负荷"
+          }
+        }
+      }
+    },
+    "Moderate Strain": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "中等负荷"
+          }
+        }
+      }
+    },
+    "High Strain": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高负荷"
+          }
+        }
+      }
+    },
+    "High strain vs low recovery — consider resting tomorrow": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "负荷偏高恢复偏低，建议明天休息"
+          }
+        }
+      }
+    },
+    "Strain %d, Recovery %d": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "负荷 %d，恢复 %d"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

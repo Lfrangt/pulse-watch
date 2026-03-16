@@ -89,12 +89,92 @@ final class MorningBriefService: NSObject {
 
     // MARK: - 初始化通知系统
 
-    /// 在 App 启动时调用，注册 categories 并请求权限
+    /// Call at app launch: register categories, request permission, schedule tasks
     func setup() {
         registerCategories()
         requestAuthorization()
         rescheduleMorningBrief()
         scheduleWeeklyReportReminder()
+        registerBackgroundTask()
+        scheduleBGRefresh()
+    }
+
+    // MARK: - Background Task (refresh notification content before delivery)
+
+    /// Register BGAppRefreshTask handler — call once at app launch
+    private func registerBackgroundTask() {
+        BGTaskScheduler.shared.register(
+            forTaskWithIdentifier: Self.bgTaskID,
+            using: nil
+        ) { [weak self] task in
+            guard let task = task as? BGAppRefreshTask else { return }
+            self?.handleBGRefresh(task: task)
+        }
+    }
+
+    /// Schedule the next background refresh ~30 min before morning brief time
+    func scheduleBGRefresh() {
+        guard isEnabled else { return }
+
+        let request = BGAppRefreshTaskRequest(identifier: Self.bgTaskID)
+
+        // Schedule 30 min before the notification time
+        var components = DateComponents()
+        components.hour = scheduledHour
+        components.minute = max(0, scheduledMinute - 30)
+
+        if let nextDate = Calendar.current.nextDate(
+            after: Date(),
+            matching: components,
+            matchingPolicy: .nextTime
+        ) {
+            request.earliestBeginDate = nextDate
+        }
+
+        do {
+            try BGTaskScheduler.shared.submit(request)
+            logger.info("BG refresh scheduled for ~\(self.scheduledHour):\(String(format: "%02d", max(0, self.scheduledMinute - 30)))")
+        } catch {
+            logger.error("BG refresh scheduling failed: \(error.localizedDescription)")
+        }
+    }
+
+    /// Handle background refresh: update pending notification with fresh health data
+    private func handleBGRefresh(task: BGAppRefreshTask) {
+        // Schedule next refresh
+        scheduleBGRefresh()
+
+        task.expirationHandler = {
+            task.setTaskCompleted(success: false)
+        }
+
+        Task { @MainActor in
+            // Remove the old static notification and replace with fresh content
+            let center = UNUserNotificationCenter.current()
+            center.removePendingNotificationRequests(withIdentifiers: [NotificationID.morningBrief])
+
+            let content = generateBriefContent()
+
+            // Schedule to fire at the configured time today
+            var dateComponents = DateComponents()
+            dateComponents.hour = scheduledHour
+            dateComponents.minute = scheduledMinute
+
+            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+
+            let request = UNNotificationRequest(
+                identifier: NotificationID.morningBrief,
+                content: content,
+                trigger: trigger
+            )
+
+            center.add(request) { _ in }
+
+            // Re-schedule the repeating fallback
+            self.rescheduleMorningBrief()
+
+            task.setTaskCompleted(success: true)
+        }
     }
 
     /// 请求通知权限

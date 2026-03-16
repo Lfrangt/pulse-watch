@@ -176,6 +176,36 @@ struct PulseComplicationInline: View {
     }
 }
 
+// MARK: - Corner Complication
+
+struct PulseComplicationCorner: View {
+    let entry: PulseEntry
+
+    var body: some View {
+        ZStack {
+            Text("\(entry.score)")
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .foregroundStyle(scoreColor)
+                .widgetLabel {
+                    Gauge(value: Double(entry.score), in: 0...100) {
+                        Text("Pulse")
+                    }
+                    .gaugeStyle(.accessoryLinearCapacity)
+                    .tint(scoreColor)
+                }
+        }
+        .widgetURL(URL(string: "pulse://summary"))
+    }
+
+    private var scoreColor: Color {
+        switch entry.score {
+        case 0..<40: return Color(hex: "C75C5C")
+        case 40..<70: return Color(hex: "D4A056")
+        default: return Color(hex: "7FB069")
+        }
+    }
+}
+
 // MARK: - Widget Bundle
 
 @main
@@ -194,7 +224,12 @@ struct PulseComplicationWidget: Widget {
         }
         .configurationDisplayName("Pulse")
         .description("Today's Score · Tap for details")
-        .supportedFamilies([.accessoryCircular, .accessoryRectangular, .accessoryInline])
+        .supportedFamilies([
+            .accessoryCircular,
+            .accessoryRectangular,
+            .accessoryInline,
+            .accessoryCorner,
+        ])
     }
 }
 
@@ -208,6 +243,8 @@ struct PulseComplicationEntryView: View {
             PulseComplicationRectangular(entry: entry)
         case .accessoryInline:
             PulseComplicationInline(entry: entry)
+        case .accessoryCorner:
+            PulseComplicationCorner(entry: entry)
         default:
             PulseComplicationCircular(entry: entry)
         }

@@ -1,32 +1,32 @@
 import SwiftUI
 
-/// 首次启动引导流程 — 欢迎 → 功能介绍 → 权限请求 → 开始使用
+/// 首次启动引导流程 — 4 页，每页一个核心功能
+/// Page 1: 每日评分 (Recovery Score)
+/// Page 2: 趋势图 (Weekly Trends)
+/// Page 3: 训练记录 (Workout History)
+/// Page 4: AI 教练 (AI Coach) + 开始按钮
 struct OnboardingView: View {
 
     @AppStorage("pulse.onboarding.completed") private var onboardingCompleted = false
     @State private var currentPage = 0
-    @State private var isRequestingPermissions = false
-    @State private var permissionsGranted = false
 
     private let totalPages = 4
 
     var body: some View {
         ZStack {
-            // 暖色调渐变背景
-            backgroundGradient
+            backgroundGradient(for: currentPage)
+                .animation(.easeInOut(duration: 0.5), value: currentPage)
 
             VStack(spacing: 0) {
-                // 页面内容
                 TabView(selection: $currentPage) {
-                    welcomePage.tag(0)
-                    featuresPage.tag(1)
-                    permissionsPage.tag(2)
-                    completionPage.tag(3)
+                    scorePage.tag(0)
+                    trendsPage.tag(1)
+                    workoutPage.tag(2)
+                    coachPage.tag(3)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .animation(.spring(response: 0.5, dampingFraction: 0.85), value: currentPage)
 
-                // 底部控制区
                 bottomControls
                     .padding(.horizontal, PulseTheme.spacingL)
                     .padding(.bottom, 50)
@@ -35,19 +35,22 @@ struct OnboardingView: View {
         .preferredColorScheme(.dark)
     }
 
-    // MARK: - 渐变背景
+    // MARK: - Dynamic Background
 
-    private var backgroundGradient: some View {
-        ZStack {
-            PulseTheme.background
+    private func backgroundGradient(for page: Int) -> some View {
+        let colors: [(top: Color, bottom: Color)] = [
+            (PulseTheme.accent, PulseTheme.statusGood),       // Score: gold → green
+            (Color(hex: "5B8DEF"), PulseTheme.accent),         // Trends: blue → gold
+            (PulseTheme.statusModerate, PulseTheme.statusPoor),// Workout: amber → terracotta
+            (PulseTheme.statusGood, Color(hex: "5B8DEF")),     // Coach: green → blue
+        ]
+        let pair = colors[min(page, colors.count - 1)]
 
-            // 暖色光晕
+        return ZStack {
+            PulseTheme.background.ignoresSafeArea()
+
             RadialGradient(
-                colors: [
-                    PulseTheme.accent.opacity(0.12),
-                    PulseTheme.accent.opacity(0.04),
-                    Color.clear,
-                ],
+                colors: [pair.top.opacity(0.12), pair.top.opacity(0.03), Color.clear],
                 center: .topTrailing,
                 startRadius: 50,
                 endRadius: 500
@@ -55,10 +58,7 @@ struct OnboardingView: View {
             .ignoresSafeArea()
 
             RadialGradient(
-                colors: [
-                    PulseTheme.statusGood.opacity(0.06),
-                    Color.clear,
-                ],
+                colors: [pair.bottom.opacity(0.06), Color.clear],
                 center: .bottomLeading,
                 startRadius: 100,
                 endRadius: 400
@@ -67,279 +67,187 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Page 1: 欢迎
+    // MARK: - Page 1: 每日评分
 
-    @State private var pulseAnimation = false
+    private var scorePage: some View {
+        OnboardingPageView(
+            icon: "gauge.open.with.lines.needle.33percent.and.arrowtriangle",
+            iconColors: [PulseTheme.accent, PulseTheme.statusGood],
+            title: String(localized: "Daily Recovery Score"),
+            subtitle: String(localized: "Know your body's readiness"),
+            description: String(localized: "Combines heart rate, HRV, and sleep quality into a single 0-100 score every morning. Green means go hard, red means rest."),
+            illustration: { scoreIllustration }
+        )
+    }
 
-    private var welcomePage: some View {
-        VStack(spacing: PulseTheme.spacingL) {
-            Spacer()
+    private var scoreIllustration: some View {
+        ZStack {
+            // Score ring
+            Circle()
+                .stroke(PulseTheme.border.opacity(0.3), lineWidth: 8)
+                .frame(width: 140, height: 140)
 
-            // App 图标 + 脉冲动画
-            ZStack {
-                // 呼吸脉冲环
-                Circle()
-                    .stroke(PulseTheme.accent.opacity(0.15), lineWidth: 2)
-                    .frame(width: 140, height: 140)
-                    .scaleEffect(pulseAnimation ? 1.3 : 1.0)
-                    .opacity(pulseAnimation ? 0 : 0.6)
+            Circle()
+                .trim(from: 0, to: 0.82)
+                .stroke(
+                    LinearGradient(
+                        colors: [PulseTheme.statusGood, PulseTheme.accent],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                )
+                .frame(width: 140, height: 140)
+                .rotationEffect(.degrees(-90))
 
-                Circle()
-                    .stroke(PulseTheme.accent.opacity(0.1), lineWidth: 1.5)
-                    .frame(width: 140, height: 140)
-                    .scaleEffect(pulseAnimation ? 1.6 : 1.0)
-                    .opacity(pulseAnimation ? 0 : 0.3)
-
-                Circle()
-                    .fill(PulseTheme.accent.opacity(0.08))
-                    .frame(width: 120, height: 120)
-                    .blur(radius: 20)
-
-                Circle()
-                    .fill(PulseTheme.cardBackground)
-                    .frame(width: 100, height: 100)
-                    .shadow(color: PulseTheme.accent.opacity(0.2), radius: 20)
-
-                Image(systemName: "heart.text.clipboard.fill")
-                    .font(.system(size: 44))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [PulseTheme.accent, PulseTheme.statusGood],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-            }
-            .onAppear {
-                withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: false)) {
-                    pulseAnimation = true
-                }
-            }
-
-            VStack(spacing: PulseTheme.spacingS) {
-                Text("Pulse")
-                    .font(.system(size: 42, weight: .bold, design: .rounded))
+            VStack(spacing: 2) {
+                Text("82")
+                    .font(.system(size: 44, weight: .bold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
 
-                Text("Your Smart Health Companion")
-                    .font(.system(size: 18, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.accent)
-            }
-
-            Text("AI analyzes your Apple Watch data\nDaily recovery scores and training advice")
-                .font(PulseTheme.bodyFont)
-                .foregroundStyle(PulseTheme.textSecondary)
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
-                .padding(.horizontal, PulseTheme.spacingL)
-
-            // 差异化卖点
-            HStack(spacing: 20) {
-                sellingPoint(icon: "lock.fill", text: "On-device")
-                sellingPoint(icon: "dollarsign.circle.fill", text: "Buy once")
-                sellingPoint(icon: "xmark.circle.fill", text: "No ads")
-            }
-            .padding(.top, PulseTheme.spacingS)
-
-            Spacer()
-            Spacer()
-        }
-    }
-
-    private func sellingPoint(icon: String, text: String) -> some View {
-        VStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundStyle(PulseTheme.textTertiary)
-            Text(text)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(PulseTheme.textTertiary)
-        }
-    }
-
-    // MARK: - Page 2: 功能介绍
-
-    private var featuresPage: some View {
-        VStack(spacing: PulseTheme.spacingXL) {
-            Spacer()
-
-            Text("Key Features")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
-
-            VStack(spacing: PulseTheme.spacingL) {
-                featureRow(
-                    icon: "gauge.open.with.lines.needle.33percent.and.arrowtriangle",
-                    color: PulseTheme.accent,
-                    title: String(localized: "Daily Score"),
-                    description: String(localized: "Combines HRV, heart rate, sleep\nGenerates 0-100 recovery score")
-                )
-
-                featureRow(
-                    icon: "brain.head.profile.fill",
-                    color: PulseTheme.statusGood,
-                    title: String(localized: "AI Health Insights"),
-                    description: String(localized: "Smart trend & anomaly detection\nAll processing done on-device")
-                )
-
-                featureRow(
-                    icon: "dumbbell.fill",
-                    color: PulseTheme.statusModerate,
-                    title: String(localized: "Training Advice"),
-                    description: String(localized: "Training intensity based on recovery\nAuto-remind at the gym")
-                )
-
-                featureRow(
-                    icon: "applewatch",
-                    color: PulseTheme.statusPoor,
-                    title: String(localized: "Watch Sync"),
-                    description: String(localized: "Watch face complication\nGlance at your status anytime")
-                )
-            }
-            .padding(.horizontal, PulseTheme.spacingM)
-
-            Spacer()
-            Spacer()
-        }
-    }
-
-    private func featureRow(icon: String, color: Color, title: String, description: String) -> some View {
-        HStack(alignment: .top, spacing: PulseTheme.spacingM) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(color.opacity(0.12))
-                    .frame(width: 44, height: 44)
-
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundStyle(color)
-            }
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
-
-                Text(description)
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textSecondary)
-                    .lineSpacing(2)
-            }
-
-            Spacer()
-        }
-    }
-
-    // MARK: - Page 3: 权限请求
-
-    private var permissionsPage: some View {
-        VStack(spacing: PulseTheme.spacingXL) {
-            Spacer()
-
-            // 盾牌图标
-            ZStack {
-                Circle()
-                    .fill(PulseTheme.statusGood.opacity(0.08))
-                    .frame(width: 100, height: 100)
-                    .blur(radius: 15)
-
-                Image(systemName: "lock.shield.fill")
-                    .font(.system(size: 50))
+                Text("Good")
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
                     .foregroundStyle(PulseTheme.statusGood)
             }
-
-            VStack(spacing: PulseTheme.spacingS) {
-                Text("Permissions Needed")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
-
-                Text("Your data stays on your device\nWe never upload anything")
-                    .font(PulseTheme.bodyFont)
-                    .foregroundStyle(PulseTheme.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(3)
-            }
-
-            // 权限列表
-            VStack(spacing: PulseTheme.spacingM) {
-                permissionRow(
-                    icon: "heart.fill",
-                    title: "HealthKit",
-                    description: String(localized: "Read heart rate, HRV, sleep data"),
-                    granted: permissionsGranted
-                )
-
-                permissionRow(
-                    icon: "bell.fill",
-                    title: String(localized: "Notifications"),
-                    description: String(localized: "Daily health summaries and anomaly alerts"),
-                    granted: permissionsGranted
-                )
-
-                permissionRow(
-                    icon: "location.fill",
-                    title: String(localized: "Location"),
-                    description: String(localized: "Smart reminders when you arrive at the gym"),
-                    granted: permissionsGranted
-                )
-            }
-            .padding(.horizontal, PulseTheme.spacingM)
-
-            // 一键授权按钮
-            Button {
-                requestAllPermissions()
-            } label: {
-                HStack(spacing: PulseTheme.spacingS) {
-                    if isRequestingPermissions {
-                        ProgressView()
-                            .tint(PulseTheme.background)
-                    } else if permissionsGranted {
-                        Image(systemName: "checkmark.circle.fill")
-                        Text("Authorized")
-                    } else {
-                        Image(systemName: "hand.raised.fill")
-                        Text("One-tap Authorize")
-                    }
-                }
-            }
-            .buttonStyle(PulseButtonStyle())
-            .disabled(isRequestingPermissions || permissionsGranted)
-            .padding(.horizontal, PulseTheme.spacingL)
-
-            Spacer()
         }
     }
 
-    private func permissionRow(icon: String, title: String, description: String, granted: Bool) -> some View {
+    // MARK: - Page 2: 趋势图
+
+    private var trendsPage: some View {
+        OnboardingPageView(
+            icon: "chart.xyaxis.line",
+            iconColors: [Color(hex: "5B8DEF"), PulseTheme.accent],
+            title: String(localized: "Weekly Trends"),
+            subtitle: String(localized: "See your progress over time"),
+            description: String(localized: "7-day charts for heart rate, HRV, and sleep. Spot patterns, track improvement, and share your gains."),
+            illustration: { trendIllustration }
+        )
+    }
+
+    private var trendIllustration: some View {
+        // Mini sparkline chart
+        let points: [CGFloat] = [0.4, 0.5, 0.35, 0.6, 0.55, 0.75, 0.82]
+        let days = ["M", "T", "W", "T", "F", "S", "S"]
+
+        return VStack(spacing: PulseTheme.spacingS) {
+            GeometryReader { geo in
+                let w = geo.size.width
+                let h = geo.size.height
+                let step = w / CGFloat(points.count - 1)
+
+                // Gradient fill under line
+                Path { path in
+                    for (i, pt) in points.enumerated() {
+                        let x = step * CGFloat(i)
+                        let y = h * (1 - pt)
+                        if i == 0 { path.move(to: CGPoint(x: x, y: y)) }
+                        else { path.addLine(to: CGPoint(x: x, y: y)) }
+                    }
+                    path.addLine(to: CGPoint(x: w, y: h))
+                    path.addLine(to: CGPoint(x: 0, y: h))
+                    path.closeSubpath()
+                }
+                .fill(
+                    LinearGradient(
+                        colors: [Color(hex: "5B8DEF").opacity(0.3), Color.clear],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+
+                // Line
+                Path { path in
+                    for (i, pt) in points.enumerated() {
+                        let x = step * CGFloat(i)
+                        let y = h * (1 - pt)
+                        if i == 0 { path.move(to: CGPoint(x: x, y: y)) }
+                        else { path.addLine(to: CGPoint(x: x, y: y)) }
+                    }
+                }
+                .stroke(
+                    LinearGradient(
+                        colors: [Color(hex: "5B8DEF"), PulseTheme.accent],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ),
+                    style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
+                )
+
+                // Dots
+                ForEach(0..<points.count, id: \.self) { i in
+                    Circle()
+                        .fill(i == points.count - 1 ? PulseTheme.accent : Color(hex: "5B8DEF"))
+                        .frame(width: 8, height: 8)
+                        .position(x: step * CGFloat(i), y: h * (1 - points[i]))
+                }
+            }
+            .frame(height: 100)
+            .padding(.horizontal, PulseTheme.spacingM)
+
+            // Day labels
+            HStack {
+                ForEach(days, id: \.self) { day in
+                    Text(day)
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            .padding(.horizontal, PulseTheme.spacingM)
+        }
+        .frame(width: 260)
+    }
+
+    // MARK: - Page 3: 训练记录
+
+    private var workoutPage: some View {
+        OnboardingPageView(
+            icon: "dumbbell.fill",
+            iconColors: [PulseTheme.statusModerate, PulseTheme.statusPoor],
+            title: String(localized: "Training Records"),
+            subtitle: String(localized: "Every rep counts"),
+            description: String(localized: "Auto-syncs workouts from Apple Watch. Heart rate zones, calories, duration — all saved and shareable."),
+            illustration: { workoutIllustration }
+        )
+    }
+
+    private var workoutIllustration: some View {
+        VStack(spacing: PulseTheme.spacingS) {
+            workoutRow(icon: "figure.run", name: String(localized: "Running"), duration: "32 min", cal: "320 kcal", color: PulseTheme.statusPoor)
+            workoutRow(icon: "figure.strengthtraining.traditional", name: String(localized: "Strength"), duration: "48 min", cal: "280 kcal", color: PulseTheme.statusModerate)
+            workoutRow(icon: "figure.outdoor.cycle", name: String(localized: "Cycling"), duration: "25 min", cal: "210 kcal", color: PulseTheme.statusGood)
+        }
+        .frame(width: 260)
+    }
+
+    private func workoutRow(icon: String, name: String, duration: String, cal: String, color: Color) -> some View {
         HStack(spacing: PulseTheme.spacingM) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(PulseTheme.accent.opacity(0.1))
+                    .fill(color.opacity(0.12))
                     .frame(width: 40, height: 40)
 
                 Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(PulseTheme.accent)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(color)
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                Text(name)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
 
-                Text(description)
+                Text(duration)
                     .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(PulseTheme.textSecondary)
             }
 
             Spacer()
 
-            if granted {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(PulseTheme.statusGood)
-                    .transition(.scale.combined(with: .opacity))
-            }
+            Text(cal)
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .foregroundStyle(color)
         }
         .padding(PulseTheme.spacingM)
         .background(
@@ -348,66 +256,60 @@ struct OnboardingView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .stroke(granted ? PulseTheme.statusGood.opacity(0.2) : PulseTheme.border.opacity(0.5), lineWidth: 0.5)
+                .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
         )
     }
 
-    // MARK: - Page 4: 完成
+    // MARK: - Page 4: AI 教练 + 开始按钮
 
-    private var completionPage: some View {
+    private var coachPage: some View {
         VStack(spacing: PulseTheme.spacingL) {
             Spacer()
 
-            // 庆祝图标
+            // Icon
             ZStack {
                 Circle()
-                    .fill(PulseTheme.accent.opacity(0.1))
-                    .frame(width: 120, height: 120)
-                    .blur(radius: 25)
+                    .fill(PulseTheme.statusGood.opacity(0.08))
+                    .frame(width: 100, height: 100)
+                    .blur(radius: 20)
 
-                Image(systemName: "sparkles")
-                    .font(.system(size: 56))
+                Image(systemName: "brain.head.profile.fill")
+                    .font(.system(size: 48))
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [PulseTheme.accent, PulseTheme.statusGood],
+                            colors: [PulseTheme.statusGood, Color(hex: "5B8DEF")],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
             }
 
+            // Title area
             VStack(spacing: PulseTheme.spacingS) {
-                Text("All Set")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                Text("AI Coach")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
 
-                Text("Pulse Watch is collecting health data\nYour first score will appear in a few hours")
-                    .font(PulseTheme.bodyFont)
-                    .foregroundStyle(PulseTheme.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(4)
-                    .padding(.horizontal, PulseTheme.spacingM)
+                Text("Your personal fitness advisor")
+                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .foregroundStyle(PulseTheme.statusGood)
             }
 
-            // 小提示
-            HStack(spacing: PulseTheme.spacingS) {
-                Image(systemName: "applewatch")
-                    .font(.system(size: 14))
-                    .foregroundStyle(PulseTheme.textTertiary)
-                Text("Keep wearing your watch to build your baseline")
-                    .font(.system(size: 13, weight: .regular, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
-            }
-            .padding(.horizontal, PulseTheme.spacingL)
+            Text("Personalized training advice based on your recovery. Push day or rest day? AI analyzes your data and tells you exactly what to do.")
+                .font(PulseTheme.bodyFont)
+                .foregroundStyle(PulseTheme.textSecondary)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+                .padding(.horizontal, PulseTheme.spacingXL)
+
+            // Coach bubble illustration
+            coachIllustration
 
             Spacer()
 
-            // 开始使用
+            // Get Started button
             Button {
-                withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
-                    onboardingCompleted = true
-                    Analytics.trackOnboardingCompleted()
-                }
+                requestPermissionsAndStart()
             } label: {
                 Text("Get Started")
             }
@@ -418,17 +320,51 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - 底部控制
+    private var coachIllustration: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+            chatBubble(
+                text: String(localized: "Recovery 82 — great day for strength training! 💪"),
+                isAI: true
+            )
+            chatBubble(
+                text: String(localized: "HRV trending up 12% this week. Keep it up."),
+                isAI: true
+            )
+        }
+        .padding(.horizontal, PulseTheme.spacingXL)
+    }
+
+    private func chatBubble(text: String, isAI: Bool) -> some View {
+        HStack(spacing: PulseTheme.spacingS) {
+            if isAI {
+                Image(systemName: "brain.head.profile.fill")
+                    .font(.system(size: 14))
+                    .foregroundStyle(PulseTheme.statusGood)
+            }
+
+            Text(text)
+                .font(.system(size: 13, weight: .regular, design: .rounded))
+                .foregroundStyle(PulseTheme.textPrimary)
+        }
+        .padding(PulseTheme.spacingM)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(PulseTheme.cardBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(PulseTheme.statusGood.opacity(0.15), lineWidth: 0.5)
+        )
+    }
+
+    // MARK: - Bottom Controls
 
     private var bottomControls: some View {
         HStack {
-            // 跳过按钮（最后一页不显示）
+            // Skip (hidden on last page)
             if currentPage < totalPages - 1 {
                 Button {
-                    withAnimation {
-                        onboardingCompleted = true
-                        Analytics.trackOnboardingCompleted()
-                    }
+                    completeOnboarding()
                 } label: {
                     Text("Skip")
                         .font(PulseTheme.bodyFont)
@@ -440,7 +376,7 @@ struct OnboardingView: View {
 
             Spacer()
 
-            // 页面指示器
+            // Page indicator
             HStack(spacing: 8) {
                 ForEach(0..<totalPages, id: \.self) { index in
                     Capsule()
@@ -452,7 +388,7 @@ struct OnboardingView: View {
 
             Spacer()
 
-            // 下一步按钮（最后一页不显示）
+            // Next arrow (hidden on last page)
             if currentPage < totalPages - 1 {
                 Button {
                     withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) {
@@ -469,34 +405,89 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - 权限请求
+    // MARK: - Actions
 
-    private func requestAllPermissions() {
-        isRequestingPermissions = true
-
+    private func requestPermissionsAndStart() {
         Task {
             // HealthKit
             try? await HealthKitService.shared.requestAuthorization()
 
-            // 通知
+            // Notifications
             let _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
 
-            // 位置（先请求 whenInUse，再升级到 always 用于地理围栏）
+            // Location (for gym geo-fence)
             LocationManager.shared.requestAlwaysAuthorization()
 
             await MainActor.run {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
-                    isRequestingPermissions = false
-                    permissionsGranted = true
-                }
-
-                // 自动翻到下一页
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) {
-                        currentPage = 3
-                    }
-                }
+                completeOnboarding()
             }
+        }
+    }
+
+    private func completeOnboarding() {
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+            onboardingCompleted = true
+            Analytics.trackOnboardingCompleted()
+        }
+    }
+}
+
+// MARK: - Reusable Page Template
+
+private struct OnboardingPageView<Illustration: View>: View {
+    let icon: String
+    let iconColors: [Color]
+    let title: String
+    let subtitle: String
+    let description: String
+    @ViewBuilder let illustration: () -> Illustration
+
+    var body: some View {
+        VStack(spacing: PulseTheme.spacingL) {
+            Spacer()
+
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(iconColors.first?.opacity(0.08) ?? Color.clear)
+                    .frame(width: 100, height: 100)
+                    .blur(radius: 20)
+
+                Image(systemName: icon)
+                    .font(.system(size: 48))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: iconColors,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            }
+
+            // Title area
+            VStack(spacing: PulseTheme.spacingS) {
+                Text(title)
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundStyle(PulseTheme.textPrimary)
+
+                Text(subtitle)
+                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .foregroundStyle(iconColors.first ?? PulseTheme.accent)
+            }
+
+            Text(description)
+                .font(PulseTheme.bodyFont)
+                .foregroundStyle(PulseTheme.textSecondary)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+                .padding(.horizontal, PulseTheme.spacingXL)
+
+            // Illustration
+            illustration()
+                .padding(.top, PulseTheme.spacingM)
+
+            Spacer()
+            Spacer()
         }
     }
 }

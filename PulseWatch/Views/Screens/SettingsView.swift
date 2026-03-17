@@ -13,6 +13,7 @@ struct SettingsView: View {
     @AppStorage("pulse.brief.minute") private var briefMinute = 30
     @AppStorage("pulse.weekly.summary.enabled") private var weeklySummaryEnabled = true
     @AppStorage("pulse.training.reminder.enabled") private var trainingReminderEnabled = true
+    @AppStorage("pulse.pb.reminder.enabled") private var pbReminderEnabled = true
     @AppStorage("pulse.hr.alert.enabled") private var hrAlertEnabled = true
     @AppStorage("pulse.hr.alert.high") private var hrAlertHigh = 120
     @AppStorage("pulse.hr.alert.low") private var hrAlertLow = 40
@@ -269,6 +270,28 @@ struct SettingsView: View {
                     }
                 }
                 .tint(PulseTheme.accent)
+            }
+
+            // PB 打卡提醒
+            settingRow {
+                Toggle(isOn: $pbReminderEnabled) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Weekly PB Reminder")
+                            .font(PulseTheme.bodyFont)
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text("Sunday 8 PM — record your new PRs")
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .tint(PulseTheme.accent)
+                .onChange(of: pbReminderEnabled) {
+                    if pbReminderEnabled {
+                        AchievementService.shared.scheduleWeeklyPBReminder()
+                    } else {
+                        AchievementService.shared.cancelWeeklyPBReminder()
+                    }
+                }
             }
         }
         .pulseCard()

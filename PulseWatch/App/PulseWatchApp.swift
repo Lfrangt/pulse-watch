@@ -53,6 +53,9 @@ struct PulseWatchApp: App {
         // Weekly Health Summary 通知
         WeeklySummaryService.shared.scheduleWeeklySummary()
 
+        // Weekly PB Reminder
+        AchievementService.shared.scheduleWeeklyPBReminder()
+
         // 心率异常提醒
         HeartRateAlertService.shared.modelContainer = container
         HeartRateAlertService.shared.registerCategory()

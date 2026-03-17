@@ -29,6 +29,7 @@
 		36478F738E60554AC42348D9 /* MorningBriefService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04762B973BF706C0FCA20C34 /* MorningBriefService.swift */; };
 		E6385DA1812C4F078B9B2CF5 /* StreakService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91911CF247324DD783081981 /* StreakService.swift */; };
 		9ED0528F914344E9853C4023 /* WeeklySummaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0109C488D14FA4AF3A69E9 /* WeeklySummaryService.swift */; };
+		0CE7B007E547479CA0031680 /* AchievementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB9AD7D3D1E426A84F1A35C /* AchievementService.swift */; };
 		79F5D266301D45D59FC05FCF /* StrengthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49D45AF346DB47359829963B /* StrengthService.swift */; };
 		BF0DEA3ECF0C4F8390A9A599 /* TriScoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E26E3986394A50AB04B1C4 /* TriScoreService.swift */; };
 		DBC95FC6695D468BAA538BD5 /* HealthAgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC999B449C584CDAA8322963 /* HealthAgeService.swift */; };
@@ -162,6 +163,7 @@
 		04762B973BF706C0FCA20C34 /* MorningBriefService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorningBriefService.swift; sourceTree = "<group>"; };
 		91911CF247324DD783081981 /* StreakService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakService.swift; sourceTree = "<group>"; };
 		FB0109C488D14FA4AF3A69E9 /* WeeklySummaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklySummaryService.swift; sourceTree = "<group>"; };
+		5CB9AD7D3D1E426A84F1A35C /* AchievementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementService.swift; sourceTree = "<group>"; };
 		49D45AF346DB47359829963B /* StrengthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthService.swift; sourceTree = "<group>"; };
 		56E26E3986394A50AB04B1C4 /* TriScoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriScoreService.swift; sourceTree = "<group>"; };
 		FC999B449C584CDAA8322963 /* HealthAgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthAgeService.swift; sourceTree = "<group>"; };
@@ -288,6 +290,7 @@
 				04762B973BF706C0FCA20C34 /* MorningBriefService.swift */,
 				91911CF247324DD783081981 /* StreakService.swift */,
 				FB0109C488D14FA4AF3A69E9 /* WeeklySummaryService.swift */,
+				5CB9AD7D3D1E426A84F1A35C /* AchievementService.swift */,
 				49D45AF346DB47359829963B /* StrengthService.swift */,
 				56E26E3986394A50AB04B1C4 /* TriScoreService.swift */,
 				FC999B449C584CDAA8322963 /* HealthAgeService.swift */,
@@ -782,6 +785,7 @@
 				36478F738E60554AC42348D9 /* MorningBriefService.swift in Sources */,
 				E6385DA1812C4F078B9B2CF5 /* StreakService.swift in Sources */,
 				9ED0528F914344E9853C4023 /* WeeklySummaryService.swift in Sources */,
+				0CE7B007E547479CA0031680 /* AchievementService.swift in Sources */,
 				79F5D266301D45D59FC05FCF /* StrengthService.swift in Sources */,
 				BF0DEA3ECF0C4F8390A9A599 /* TriScoreService.swift in Sources */,
 				DBC95FC6695D468BAA538BD5 /* HealthAgeService.swift in Sources */,

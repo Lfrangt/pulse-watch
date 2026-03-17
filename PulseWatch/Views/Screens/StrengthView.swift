@@ -11,6 +11,14 @@ struct StrengthView: View {
 
     @State private var showAddSheet = false
     @State private var selectedLift: StrengthService.LiftType = .squat
+    @State private var showAchievements = false
+    @State private var showShareSheet = false
+    @State private var shareImage: UIImage?
+    @State private var celebrationAchievement: AchievementService.Achievement?
+    @State private var showCelebration = false
+    @State private var pbTimelineRange: PBRange = .all
+
+    enum PBRange: String, CaseIterable { case week = "7D", month = "30D", quarter = "90D", all = "All" }
 
     private var assessment: StrengthService.StrengthAssessment? {
         StrengthService.shared.assess(records: allRecords, bodyweightKg: bodyweight)
@@ -33,7 +41,12 @@ struct StrengthView: View {
                     }
                 }
 
-                // 趋势图
+                // PB 成长时间线（合并三线）
+                if allRecords.count >= 2 {
+                    pbTimelineCard
+                }
+
+                // 趋势图（单项）
                 ForEach(StrengthService.LiftType.allCases) { type in
                     let records = allRecords.filter { $0.liftType == type.rawValue }
                     if records.count >= 2 {
@@ -41,9 +54,17 @@ struct StrengthView: View {
                     }
                 }
 
+                // 成就系统
+                achievementsCard
+
                 // 历史记录
                 if !allRecords.isEmpty {
                     historySection
+                }
+
+                // 分享按钮
+                if !allRecords.isEmpty {
+                    shareProgressButton
                 }
 
                 Spacer(minLength: 80)
@@ -57,16 +78,38 @@ struct StrengthView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button { showAddSheet = true } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 18))
-                        .foregroundStyle(PulseTheme.accent)
+                HStack(spacing: 12) {
+                    Button { showAddSheet = true } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 18))
+                            .foregroundStyle(PulseTheme.accent)
+                    }
                 }
             }
         }
         .sheet(isPresented: $showAddSheet) {
             AddStrengthRecordView()
                 .preferredColorScheme(.dark)
+        }
+        .sheet(isPresented: $showShareSheet) {
+            if let img = shareImage {
+                ShareSheet(items: [img])
+            }
+        }
+        .overlay {
+            if showCelebration, let ach = celebrationAchievement {
+                celebrationOverlay(ach)
+            }
+        }
+        .onAppear {
+            let result = AchievementService.shared.checkAll(records: allRecords, bodyweightKg: bodyweight)
+            if let first = result.newlyUnlocked.first {
+                celebrationAchievement = first
+                withAnimation { showCelebration = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    withAnimation { showCelebration = false }
+                }
+            }
         }
     }
 
@@ -297,6 +340,277 @@ struct StrengthView: View {
             }
         }
         .pulseCard()
+    }
+
+    // MARK: - PB 成长时间线（三线合一）
+
+    private var pbTimelineCard: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            HStack {
+                Image(systemName: "chart.line.uptrend.xyaxis")
+                    .font(.system(size: 13))
+                    .foregroundStyle(PulseTheme.accent)
+                Text("PB Timeline")
+                    .font(PulseTheme.headlineFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                Spacer()
+                Picker("", selection: $pbTimelineRange) {
+                    ForEach(PBRange.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 180)
+            }
+
+            let filteredRecords = filterByRange(allRecords)
+
+            Chart {
+                ForEach(StrengthService.LiftType.allCases) { type in
+                    let recs = filteredRecords.filter { $0.liftType == type.rawValue }
+                        .sorted { $0.date < $1.date }
+                    let color = Color(hex: type.color)
+
+                    ForEach(recs, id: \.id) { r in
+                        LineMark(
+                            x: .value("Date", r.date),
+                            y: .value("1RM", r.estimated1RM),
+                            series: .value("Lift", type.label)
+                        )
+                        .foregroundStyle(color)
+                        .interpolationMethod(.catmullRom)
+                        .lineStyle(StrokeStyle(lineWidth: 2.5))
+
+                        if r.isPersonalRecord {
+                            PointMark(x: .value("Date", r.date), y: .value("1RM", r.estimated1RM))
+                                .foregroundStyle(Color(hex: "D4A056"))
+                                .symbolSize(40)
+                                .annotation(position: .top, spacing: 4) {
+                                    Text("⭐")
+                                        .font(.system(size: 10))
+                                }
+                        }
+                    }
+                }
+            }
+            .chartYAxis {
+                AxisMarks(position: .leading) { _ in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
+                        .foregroundStyle(PulseTheme.border.opacity(0.4))
+                    AxisValueLabel()
+                        .font(.system(size: 10))
+                        .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
+                }
+            }
+            .chartXAxis {
+                AxisMarks { _ in
+                    AxisValueLabel(format: .dateTime.month(.abbreviated).day())
+                        .font(.system(size: 9))
+                        .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
+                }
+            }
+            .chartForegroundStyleScale([
+                StrengthService.LiftType.squat.label: Color(hex: "7FC75C"),
+                StrengthService.LiftType.bench.label: Color(hex: "FF6B35"),
+                StrengthService.LiftType.deadlift.label: Color(hex: "5C7BC7"),
+            ])
+            .chartLegend(.visible)
+            .frame(height: 200)
+        }
+        .pulseCard()
+    }
+
+    private func filterByRange(_ records: [StrengthRecord]) -> [StrengthRecord] {
+        let days: Int? = {
+            switch pbTimelineRange {
+            case .week: return 7
+            case .month: return 30
+            case .quarter: return 90
+            case .all: return nil
+            }
+        }()
+        guard let days else { return records }
+        let cutoff = Calendar.current.date(byAdding: .day, value: -days, to: .now)!
+        return records.filter { $0.date >= cutoff }
+    }
+
+    // MARK: - 成就系统
+
+    private var achievementsCard: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            HStack {
+                Image(systemName: "trophy.fill")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color(hex: "D4A056"))
+                Text("Achievements")
+                    .font(PulseTheme.headlineFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                Spacer()
+                let unlocked = AchievementService.shared.allAchievements().filter { $0.1 }.count
+                Text("\(unlocked)/\(AchievementService.Achievement.allCases.count)")
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 12) {
+                ForEach(AchievementService.shared.allAchievements(), id: \.0) { ach, unlocked, date in
+                    VStack(spacing: 6) {
+                        Text(ach.medal)
+                            .font(.system(size: 28))
+                            .opacity(unlocked ? 1 : 0.3)
+                            .grayscale(unlocked ? 0 : 1)
+                        Text(ach.title)
+                            .font(.system(size: 10, weight: unlocked ? .semibold : .regular))
+                            .foregroundStyle(unlocked ? PulseTheme.textPrimary : PulseTheme.textTertiary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                        if let date {
+                            Text(date, format: .dateTime.month(.abbreviated).day())
+                                .font(.system(size: 8))
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(unlocked ? Color(hex: "D4A056").opacity(0.08) : PulseTheme.surface)
+                    )
+                }
+            }
+        }
+        .pulseCard()
+    }
+
+    // MARK: - 庆祝动画
+
+    private func celebrationOverlay(_ achievement: AchievementService.Achievement) -> some View {
+        ZStack {
+            Color.black.opacity(0.7).ignoresSafeArea()
+
+            VStack(spacing: PulseTheme.spacingL) {
+                Text(achievement.medal)
+                    .font(.system(size: 80))
+                    .scaleEffect(showCelebration ? 1 : 0.3)
+                    .animation(.spring(response: 0.5, dampingFraction: 0.6), value: showCelebration)
+
+                Text("Achievement Unlocked!")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(Color(hex: "D4A056"))
+
+                Text(achievement.title)
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundStyle(PulseTheme.textPrimary)
+
+                Text(achievement.description)
+                    .font(PulseTheme.bodyFont)
+                    .foregroundStyle(PulseTheme.textSecondary)
+            }
+        }
+        .onTapGesture {
+            withAnimation { showCelebration = false }
+        }
+        .transition(.opacity)
+    }
+
+    // MARK: - 分享进步
+
+    private var shareProgressButton: some View {
+        Button {
+            generateShareImage()
+        } label: {
+            HStack {
+                Image(systemName: "square.and.arrow.up")
+                    .font(.system(size: 14))
+                Text("Share Progress")
+                    .font(PulseTheme.bodyFont.weight(.medium))
+            }
+            .foregroundStyle(PulseTheme.accent)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(
+                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                    .fill(PulseTheme.accent.opacity(0.1))
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    @MainActor
+    private func generateShareImage() {
+        let a = assessment
+        let card = ShareStrengthCard(
+            squat: a?.lifts.first(where: { $0.liftType == .squat })?.best1RM ?? 0,
+            bench: a?.lifts.first(where: { $0.liftType == .bench })?.best1RM ?? 0,
+            deadlift: a?.lifts.first(where: { $0.liftType == .deadlift })?.best1RM ?? 0,
+            total: a?.total1RM ?? 0,
+            level: a?.totalLevel.label ?? ""
+        )
+        let renderer = ImageRenderer(content: card.frame(width: 390, height: 520))
+        renderer.scale = 3
+        if let image = renderer.uiImage {
+            shareImage = image
+            showShareSheet = true
+        }
+    }
+}
+
+// MARK: - 分享卡片
+
+private struct ShareStrengthCard: View {
+    let squat: Double
+    let bench: Double
+    let deadlift: Double
+    let total: Double
+    let level: String
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Text("My Strength Progress")
+                .font(.system(size: 22, weight: .bold))
+                .foregroundStyle(.white)
+
+            HStack(spacing: 20) {
+                liftStat("SQ", squat, Color(hex: "7FC75C"))
+                liftStat("BP", bench, Color(hex: "FF6B35"))
+                liftStat("DL", deadlift, Color(hex: "5C7BC7"))
+            }
+
+            VStack(spacing: 4) {
+                Text("Total")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.white.opacity(0.7))
+                Text(String(format: "%.0f kg", total))
+                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                if !level.isEmpty {
+                    Text(level)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(Color(hex: "D4A056"))
+                }
+            }
+
+            Text("Tracked with Pulse Watch")
+                .font(.system(size: 11))
+                .foregroundStyle(.white.opacity(0.4))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            LinearGradient(colors: [Color(hex: "1A1715"), Color(hex: "0D0C0B")],
+                           startPoint: .top, endPoint: .bottom)
+        )
+    }
+
+    private func liftStat(_ label: String, _ value: Double, _ color: Color) -> some View {
+        VStack(spacing: 8) {
+            Text(label)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(color)
+            Text(String(format: "%.0f", value))
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+            Text("kg")
+                .font(.system(size: 12))
+                .foregroundStyle(.white.opacity(0.5))
+        }
     }
 }
 

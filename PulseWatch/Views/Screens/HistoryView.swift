@@ -360,21 +360,22 @@ struct HistoryView: View {
         }
     }
 
-    // MARK: - 心率趋势图
+    // MARK: - 心率趋势图 (Apple Health 风格 — 竖条范围图)
 
     private var heartRateTrendChart: some View {
-        let data = filteredSummaries.compactMap { s -> (date: Date, avg: Double, resting: Double)? in
+        let data = filteredSummaries.compactMap { s -> (date: Date, min: Double, max: Double, avg: Double, resting: Double)? in
             guard let avg = s.averageHeartRate else { return nil }
-            return (s.date, avg, s.restingHeartRate ?? avg)
+            let lo = s.minHeartRate ?? (s.restingHeartRate ?? avg)
+            let hi = s.maxHeartRate ?? avg
+            return (s.date, lo, hi, avg, s.restingHeartRate ?? avg)
         }
 
-        let latestHR = data.last.map { "\(Int($0.resting)) bpm" }
+        let latestRHR = data.last.map { "\(Int($0.resting)) bpm" }
         let curAvgHR = data.isEmpty ? nil : data.map(\.resting).reduce(0,+) / Double(data.count)
         let prevHR = previousPeriodSummaries.compactMap(\.restingHeartRate)
         let prevAvgHR = prevHR.isEmpty ? nil : prevHR.reduce(0,+) / Double(prevHR.count)
-        // For HR, lower is better, so invert
         let hrDelta = deltaPct(cur: curAvgHR, prev: prevAvgHR)
-        let hrPositive = hrDelta.map { $0.0.contains("-") } ?? true  // negative HR change = good
+        let hrPositive = hrDelta.map { $0.0.contains("-") } ?? true
 
         let hrInsight: String? = {
             guard let cur = curAvgHR else { return nil }
@@ -392,43 +393,60 @@ struct HistoryView: View {
             icon: "heart.fill",
             title: String(localized: "Heart Rate"),
             color: Color(hex: "C75C5C"),
-            currentValue: latestHR,
+            currentValue: latestRHR,
             changeText: hrDelta?.0,
             changePositive: hrPositive,
             insight: hrInsight
         ) {
             if data.isEmpty {
-                emptyChartPlaceholder
+                VStack(spacing: 8) {
+                    Image(systemName: "applewatch")
+                        .font(.system(size: 24))
+                        .foregroundStyle(PulseTheme.textTertiary.opacity(0.5))
+                    Text("No heart rate data — wear your Apple Watch")
+                        .font(.system(size: 12))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 120)
             } else {
+                let avgResting = data.map(\.resting).reduce(0,+) / Double(data.count)
+
                 Chart {
                     ForEach(data, id: \.date) { item in
-                        LineMark(
-                            x: .value(String(localized: "Date"), item.date),
-                            y: .value(String(localized: "Avg Heart Rate"), item.avg),
-                            series: .value(String(localized: "Type"), String(localized: "Average"))
+                        // 竖条：min → max 范围
+                        BarMark(
+                            x: .value("Date", item.date, unit: .day),
+                            yStart: .value("Min", item.min),
+                            yEnd: .value("Max", item.max),
+                            width: .ratio(0.35)
                         )
-                        .foregroundStyle(PulseTheme.statusPoor)
-                        .interpolationMethod(.catmullRom)
-                        .lineStyle(StrokeStyle(lineWidth: 2))
-
-                        LineMark(
-                            x: .value(String(localized: "Date"), item.date),
-                            y: .value(String(localized: "Resting HR"), item.resting),
-                            series: .value(String(localized: "Type"), String(localized: "Resting"))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Color(hex: "C75C5C").opacity(0.8), Color(hex: "E88B8B").opacity(0.4)],
+                                startPoint: .top, endPoint: .bottom
+                            )
                         )
-                        .foregroundStyle(PulseTheme.statusPoor.opacity(0.5))
-                        .interpolationMethod(.catmullRom)
-                        .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [5, 3]))
+                        .cornerRadius(2)
                     }
+
+                    // 平均静息心率基准线
+                    RuleMark(y: .value("Avg RHR", avgResting))
+                        .foregroundStyle(PulseTheme.accent.opacity(0.6))
+                        .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                        .annotation(position: .trailing, alignment: .leading) {
+                            Text(String(format: "RHR %.0f", avgResting))
+                                .font(.system(size: 9))
+                                .foregroundStyle(PulseTheme.accent.opacity(0.8))
+                        }
                 }
                 .chartYScale(domain: {
-                    let allVals = data.flatMap { [$0.avg, $0.resting] }
-                    let lo = max(30, (allVals.min() ?? 40) - 10)
-                    let hi = min(200, (allVals.max() ?? 100) + 15)
+                    let lo = max(30, (data.map(\.min).min() ?? 40) - 5)
+                    let hi = min(220, (data.map(\.max).max() ?? 100) + 10)
                     return lo...hi
                 }())
                 .chartYAxis {
-                    AxisMarks(position: .leading) { value in
+                    AxisMarks(position: .leading) { _ in
                         AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
                             .foregroundStyle(PulseTheme.border.opacity(0.4))
                         AxisValueLabel()
@@ -443,11 +461,6 @@ struct HistoryView: View {
                             .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
                     }
                 }
-                .chartForegroundStyleScale([
-                    String(localized: "Average"): Color(hex: "C75C5C"),
-                    String(localized: "Resting"): Color(hex: "C75C5C").opacity(0.5),
-                ])
-                .chartLegend(.visible)
                 .frame(height: 180)
                 .opacity(chartAnimated ? 1 : 0)
                 .animation(.easeOut(duration: 1.0), value: chartAnimated)

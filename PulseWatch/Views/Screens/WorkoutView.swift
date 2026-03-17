@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import HealthKit
 
 /// Tab: 运动记录 — 从 HealthKit 读取 HKWorkout，展示心率区间分布
@@ -9,6 +10,10 @@ struct WorkoutView: View {
     @State private var expandedId: UUID?
     @State private var isLoading = true
     @State private var weekStats: WeekWorkoutStats?
+    @State private var strengthExpanded = false
+
+    @Query(sort: \StrengthRecord.date, order: .reverse) private var strengthRecords: [StrengthRecord]
+    @AppStorage("pulse.user.weightKg") private var bodyweight: Double = 0
 
     private let store = HKHealthStore()
 
@@ -16,6 +21,7 @@ struct WorkoutView: View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: PulseTheme.spacingM) {
+                    // ── 模块一：训练记录 ──
                     // 本周统计
                     if let stats = weekStats, stats.totalCount > 0 {
                         weekStatsCard(stats)
@@ -36,6 +42,10 @@ struct WorkoutView: View {
                         loadingView
                     }
 
+                    // ── 模块二：力量训练 ──
+                    strengthSection
+                        .staggered(index: workouts.count + 2)
+
                     Spacer(minLength: 60)
                 }
                 .padding(.horizontal, PulseTheme.spacingM)
@@ -50,26 +60,15 @@ struct WorkoutView: View {
                         .foregroundStyle(PulseTheme.textPrimary)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    HStack(spacing: 16) {
-                        NavigationLink {
-                            StrengthView()
-                                .preferredColorScheme(.dark)
-                        } label: {
-                            Image(systemName: "dumbbell.fill")
-                                .font(.system(size: 14))
-                                .foregroundStyle(PulseTheme.accent)
-                        }
-                        .accessibilityLabel(String(localized: "Strength"))
-
-                        NavigationLink {
-                            WorkoutHistoryListView()
-                                .preferredColorScheme(.dark)
-                        } label: {
-                            Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
-                                .font(.system(size: 16))
-                                .foregroundStyle(PulseTheme.accent)
-                        }
+                    NavigationLink {
+                        WorkoutHistoryListView()
+                            .preferredColorScheme(.dark)
+                    } label: {
+                        Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
+                            .font(.system(size: 16))
+                            .foregroundStyle(PulseTheme.accent)
                     }
+                    .accessibilityLabel(String(localized: "History"))
                 }
             }
             .task {
@@ -439,6 +438,140 @@ struct WorkoutView: View {
         }
     }
 
+    // MARK: - 力量训练模块（内嵌）
+
+    private var strengthAssessment: StrengthService.StrengthAssessment? {
+        StrengthService.shared.assess(records: strengthRecords, bodyweightKg: bodyweight)
+    }
+
+    @State private var showAddStrength = false
+
+    private var strengthSection: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            // Section header (tap to expand)
+            Button {
+                withAnimation(.spring(response: 0.3)) { strengthExpanded.toggle() }
+            } label: {
+                HStack(spacing: PulseTheme.spacingS) {
+                    Image(systemName: "dumbbell.fill")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(PulseTheme.accent)
+                    Text("Strength")
+                        .font(PulseTheme.headlineFont)
+                        .foregroundStyle(PulseTheme.textPrimary)
+                    Spacer()
+
+                    // 评分 mini badge
+                    if let a = strengthAssessment, a.totalScore > 0 {
+                        Text("\(a.totalScore)")
+                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color(hex: a.totalLevel.color))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(Capsule().fill(Color(hex: a.totalLevel.color).opacity(0.15)))
+                    }
+
+                    Button {
+                        showAddStrength = true
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 18))
+                            .foregroundStyle(PulseTheme.accent)
+                    }
+
+                    Image(systemName: strengthExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+            }
+            .buttonStyle(.plain)
+
+            // 三项最佳成绩（始终显示）
+            if let a = strengthAssessment {
+                HStack(spacing: 0) {
+                    ForEach(a.lifts, id: \.liftType) { lift in
+                        VStack(spacing: 4) {
+                            Text(String(format: "%.0f", lift.best1RM))
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(lift.liftType.label)
+                                .font(.system(size: 10))
+                                .foregroundStyle(PulseTheme.textTertiary)
+                            Text(lift.level.label)
+                                .font(.system(size: 9, weight: .medium))
+                                .foregroundStyle(Color(hex: lift.level.color))
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                }
+            } else if bodyweight <= 0 {
+                Text("Set body weight in Settings → Profile")
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+            } else if strengthRecords.isEmpty {
+                Text("No lifts recorded yet — tap + to add")
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+
+            // 展开详情
+            if strengthExpanded {
+                // 最近记录
+                if !strengthRecords.isEmpty {
+                    Divider().background(PulseTheme.border)
+                    ForEach(strengthRecords.prefix(8)) { record in
+                        let type = StrengthService.LiftType(rawValue: record.liftType) ?? .squat
+                        HStack(spacing: PulseTheme.spacingS) {
+                            Circle()
+                                .fill(Color(hex: type.color))
+                                .frame(width: 6, height: 6)
+                            Text(type.label)
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                                .frame(width: 70, alignment: .leading)
+                            Text(String(format: "%.0f kg × %d × %d", record.weightKg, record.sets, record.reps))
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textSecondary)
+                            Spacer()
+                            Text(record.date, format: .dateTime.month(.abbreviated).day())
+                                .font(.system(size: 10))
+                                .foregroundStyle(PulseTheme.textTertiary)
+                            if record.isPersonalRecord {
+                                Text("PR")
+                                    .font(.system(size: 8, weight: .bold))
+                                    .foregroundStyle(Color(hex: "D4A056"))
+                                    .padding(.horizontal, 3)
+                                    .padding(.vertical, 1)
+                                    .background(Capsule().fill(Color(hex: "D4A056").opacity(0.15)))
+                            }
+                        }
+                    }
+                }
+
+                // 进入完整力量页面
+                NavigationLink {
+                    StrengthView()
+                        .preferredColorScheme(.dark)
+                } label: {
+                    HStack {
+                        Text("View Full Strength Details")
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.accent)
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 10))
+                            .foregroundStyle(PulseTheme.accent)
+                    }
+                }
+                .padding(.top, PulseTheme.spacingXS)
+            }
+        }
+        .pulseCard()
+        .sheet(isPresented: $showAddStrength) {
+            AddStrengthRecordView()
+                .preferredColorScheme(.dark)
+        }
+    }
+
     // MARK: - 辅助
 
     private func workoutIcon(_ workout: HKWorkout) -> String {
@@ -483,25 +616,25 @@ struct WorkoutView: View {
 
     private func workoutName(_ workout: HKWorkout) -> String {
         switch workout.workoutActivityType {
-        case .running:              return "Running"
-        case .cycling:              return "Cycling"
-        case .swimming:             return "Swimming"
-        case .walking:              return "Walking"
-        case .hiking:               return "Hiking"
-        case .yoga:                 return "Yoga"
-        case .functionalStrengthTraining: return "Functional Strength"
-        case .traditionalStrengthTraining: return "Strength"
-        case .highIntensityIntervalTraining: return "HIIT"
-        case .dance:                return "Dance"
-        case .elliptical:           return "Elliptical"
-        case .rowing:               return "Row"
-        case .stairClimbing:        return "Stair Climbing"
-        case .basketball:           return "Basketball"
-        case .soccer:               return "Soccer"
-        case .tennis:               return "Tennis"
-        case .tableTennis:          return "Table Tennis"
-        case .badminton:            return "Badminton"
-        case .cooldown:             return "Recovery"
+        case .running:              return String(localized: "Running")
+        case .cycling:              return String(localized: "Cycling")
+        case .swimming:             return String(localized: "Swimming")
+        case .walking:              return String(localized: "Walking")
+        case .hiking:               return String(localized: "Hiking")
+        case .yoga:                 return String(localized: "Yoga")
+        case .functionalStrengthTraining: return String(localized: "Functional Strength")
+        case .traditionalStrengthTraining: return String(localized: "Strength Training")
+        case .highIntensityIntervalTraining: return String(localized: "HIIT")
+        case .dance:                return String(localized: "Dance")
+        case .elliptical:           return String(localized: "Elliptical")
+        case .rowing:               return String(localized: "Rowing")
+        case .stairClimbing:        return String(localized: "Stair Climbing")
+        case .basketball:           return String(localized: "Basketball")
+        case .soccer:               return String(localized: "Soccer")
+        case .tennis:               return String(localized: "Tennis")
+        case .tableTennis:          return String(localized: "Table Tennis")
+        case .badminton:            return String(localized: "Badminton")
+        case .cooldown:             return String(localized: "Cooldown")
         default:                    return String(localized: "Exercise")
         }
     }

@@ -84,8 +84,8 @@ struct DashboardView: View {
                             .staggered(index: 2)
                     }
 
-                    // 🔥 Streak badge
-                    if currentStreak > 0 {
+                    // 🔥 Streak badge — only show when streak ≥ 3 days (meaningful)
+                    if currentStreak >= 3 {
                         streakBadge(streak: currentStreak)
                             .staggered(index: 2)
                     }

@@ -94,6 +94,7 @@
 		DC31D0174C58F53029C3A511 /* WorkoutHistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099EE8366CE5793521928846 /* WorkoutHistoryListView.swift */; };
 		FA5C4A512A144A46865B9909 /* StrengthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576F3261E39C46ED8FED7115 /* StrengthView.swift */; };
 		B76A68EEED4844889D0F012C /* ManualWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45F0E438D3E54B0EAD295912 /* ManualWorkoutView.swift */; };
+		6A8B81556DB04B8599BD5F2D /* GymArrivalFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D27506BF181433E909735E2 /* GymArrivalFlowView.swift */; };
 		DE88A3060BF319B28E9B836E /* LaunchScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8AF5335F8330E76B283777 /* LaunchScreenView.swift */; };
 		DF3945F898AB21F858475D0D /* GymSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0BDF3A5D302AEE99BC17EF /* GymSearchView.swift */; };
 		E2AE16CA3B2D05EE03747012 /* WorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36ED27B3D9E0F37CE264F67B /* WorkoutView.swift */; };
@@ -170,6 +171,7 @@
 		099EE8366CE5793521928846 /* WorkoutHistoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutHistoryListView.swift; sourceTree = "<group>"; };
 		576F3261E39C46ED8FED7115 /* StrengthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthView.swift; sourceTree = "<group>"; };
 		45F0E438D3E54B0EAD295912 /* ManualWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualWorkoutView.swift; sourceTree = "<group>"; };
+		6D27506BF181433E909735E2 /* GymArrivalFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymArrivalFlowView.swift; sourceTree = "<group>"; };
 		0B0BDF3A5D302AEE99BC17EF /* GymSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymSearchView.swift; sourceTree = "<group>"; };
 		0C521170390A021DB84BD702 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		137D4F7F2B9141C04B4C6D30 /* ShareCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCardView.swift; sourceTree = "<group>"; };
@@ -432,6 +434,7 @@
 				099EE8366CE5793521928846 /* WorkoutHistoryListView.swift */,
 				576F3261E39C46ED8FED7115 /* StrengthView.swift */,
 				45F0E438D3E54B0EAD295912 /* ManualWorkoutView.swift */,
+				6D27506BF181433E909735E2 /* GymArrivalFlowView.swift */,
 				9B6300CB232E8B273FA41B61 /* WorkoutShareScreen.swift */,
 				36ED27B3D9E0F37CE264F67B /* WorkoutView.swift */,
 			);
@@ -806,6 +809,7 @@
 				DC31D0174C58F53029C3A511 /* WorkoutHistoryListView.swift in Sources */,
 				FA5C4A512A144A46865B9909 /* StrengthView.swift in Sources */,
 				B76A68EEED4844889D0F012C /* ManualWorkoutView.swift in Sources */,
+				6A8B81556DB04B8599BD5F2D /* GymArrivalFlowView.swift in Sources */,
 				31991C37A467B5DDCAAA6B4D /* WorkoutHistoryService.swift in Sources */,
 				2D484B63CFD0BF676FC8A8C2 /* WorkoutShareScreen.swift in Sources */,
 				E2AE16CA3B2D05EE03747012 /* WorkoutView.swift in Sources */,

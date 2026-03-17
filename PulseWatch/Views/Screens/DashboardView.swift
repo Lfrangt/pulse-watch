@@ -212,14 +212,12 @@ struct DashboardView: View {
             .sheet(isPresented: $showLocationSetup) {
                 LocationSetupView()
             }
-            .alert(String(localized: "Arrived at Gym"), isPresented: $showGymPrompt) {
-                Button("OK") {}
-            } message: {
-                if let plan = brief?.trainingPlan {
-                    Text("Suggested: \(localizedGroup(plan.targetMuscleGroup)) — Watch notified")
-                } else {
-                    Text("Watch notified")
-                }
+            .fullScreenCover(isPresented: $showGymPrompt) {
+                GymArrivalFlowView(
+                    readinessScore: insight?.recoveryScore ?? brief?.score ?? 50,
+                    strainScore: todayStrain
+                )
+                .preferredColorScheme(.dark)
             }
             .task {
                 await loadData()

@@ -208,6 +208,17 @@
         }
       }
     },
+    "+%.0f kg to %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "距 %2$@ 还差 %1$.0f kg"
+          }
+        }
+      }
+    },
     "+%@": {},
     "☀️ Good Morning, Pulse": {
       "extractionState": "stale",
@@ -497,6 +508,17 @@
         }
       }
     },
+    "Activity": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "活动"
+          }
+        }
+      }
+    },
     "Activity level meets WHO guidelines": {
       "extractionState": "manual",
       "localizations": {
@@ -552,6 +574,17 @@
         }
       }
     },
+    "Add Lift": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加记录"
+          }
+        }
+      }
+    },
     "Add Workout": {
       "extractionState": "manual",
       "localizations": {
@@ -559,6 +592,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "添加训练"
+          }
+        }
+      }
+    },
+    "Advanced": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高级"
           }
         }
       }
@@ -942,6 +986,28 @@
         }
       }
     },
+    "Beginner": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "初级"
+          }
+        }
+      }
+    },
+    "Below target — get moving!": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "低于目标，动起来！"
+          }
+        }
+      }
+    },
     "Bench Press": {
       "extractionState": "stale",
       "localizations": {
@@ -971,6 +1037,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "本周最佳日：\\(bestLabel) \\(bestDay.dailyScore ?? 0)分\\(bestReason)"
+          }
+        }
+      }
+    },
+    "Best: %.0f kg": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最佳：%.0f kg"
           }
         }
       }
@@ -1183,6 +1260,7 @@
         }
       }
     },
+    "cm": {},
     "Collection Frequency": {
       "localizations": {
         "zh-Hans": {
@@ -1549,6 +1627,17 @@
         }
       }
     },
+    "Decent sleep — room to improve": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠尚可，还有提升空间"
+          }
+        }
+      }
+    },
     "Declining": {
       "extractionState": "stale",
       "localizations": {
@@ -1573,6 +1662,17 @@
     },
     "Deep": {
       "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深睡"
+          }
+        }
+      }
+    },
+    "Deep Sleep": {
+      "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -1675,6 +1775,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "凌晨 \\(timeStr)"
+          }
+        }
+      }
+    },
+    "Elite": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "精英"
           }
         }
       }
@@ -1789,6 +1900,17 @@
         }
       }
     },
+    "Excellent sleep — well rested": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠优秀，精力充沛"
+          }
+        }
+      }
+    },
     "Exercise": {
       "localizations": {
         "zh-Hans": {
@@ -1843,6 +1965,17 @@
         }
       }
     },
+    "Female": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "女"
+          }
+        }
+      }
+    },
     "Flat Bench Press": {
       "extractionState": "stale",
       "localizations": {
@@ -1887,6 +2020,17 @@
         }
       }
     },
+    "Fully recovered — ready for anything": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完全恢复，状态拉满"
+          }
+        }
+      }
+    },
     "Functional Strength": {
       "extractionState": "stale",
       "localizations": {
@@ -1909,6 +2053,17 @@
       }
     },
     "Gateway URL": {},
+    "Gender": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "性别"
+          }
+        }
+      }
+    },
     "Generating share image...": {
       "localizations": {
         "zh-Hans": {
@@ -1994,6 +2149,17 @@
         }
       }
     },
+    "Good movement — try adding a walk": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "运动不错，再加个散步"
+          }
+        }
+      }
+    },
     "Good Recovery": {
       "extractionState": "stale",
       "localizations": {
@@ -2034,6 +2200,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "知道了"
+          }
+        }
+      }
+    },
+    "Great activity day — you crushed it": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天运动量很棒"
           }
         }
       }
@@ -2089,6 +2266,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "健身房位置"
+          }
+        }
+      }
+    },
+    "Gym Location Detection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "健身房位置检测"
           }
         }
       }
@@ -2184,6 +2372,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "心率区间"
+          }
+        }
+      }
+    },
+    "Height": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "身高"
           }
         }
       }
@@ -2538,6 +2737,17 @@
         }
       }
     },
+    "Intermediate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "中级"
+          }
+        }
+      }
+    },
     "Invalid pairing QR code": {
       "extractionState": "stale",
       "localizations": {
@@ -2626,6 +2836,17 @@
         }
       }
     },
+    "Keep wearing your Watch — more data unlocks better trends": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续佩戴手表，更多数据解锁更准趋势"
+          }
+        }
+      }
+    },
     "Key Features": {
       "extractionState": "stale",
       "localizations": {
@@ -2647,6 +2868,7 @@
         }
       }
     },
+    "kg": {},
     "Know your body's readiness": {
       "extractionState": "stale",
       "localizations": {
@@ -2777,6 +2999,17 @@
         }
       }
     },
+    "Lift": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "动作"
+          }
+        }
+      }
+    },
     "Light": {
       "extractionState": "stale",
       "localizations": {
@@ -2876,6 +3109,17 @@
         }
       }
     },
+    "Low readiness — rest is recommended": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "准备度低，建议休息"
+          }
+        }
+      }
+    },
     "Low Threshold": {
       "localizations": {
         "zh-Hans": {
@@ -2893,6 +3137,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "保持当前训练节奏，注意恢复和营养补充"
+          }
+        }
+      }
+    },
+    "Male": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "男"
           }
         }
       }
@@ -3051,6 +3306,17 @@
         }
       }
     },
+    "Moderately recovered — train smart": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复良好，聪明训练"
+          }
+        }
+      }
+    },
     "Mon": {
       "extractionState": "stale",
       "localizations": {
@@ -3112,6 +3378,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "肌群部位"
+          }
+        }
+      }
+    },
+    "Needed for strength level assessment": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "力量评级需要体重数据"
           }
         }
       }
@@ -3461,6 +3738,17 @@
         }
       }
     },
+    "Poor sleep — prioritize rest tonight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠较差，今晚优先休息"
+          }
+        }
+      }
+    },
     "Power Saving": {
       "localizations": {
         "zh-Hans": {
@@ -3471,6 +3759,7 @@
         }
       }
     },
+    "PR": {},
     "Privacy": {
       "extractionState": "stale",
       "localizations": {
@@ -3625,6 +3914,17 @@
         }
       }
     },
+    "Readiness": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "准备度"
+          }
+        }
+      }
+    },
     "Ready for high intensity today 💪": {
       "extractionState": "stale",
       "localizations": {
@@ -3643,6 +3943,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "适合训练"
+          }
+        }
+      }
+    },
+    "Recent Records": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近记录"
           }
         }
       }
@@ -3778,6 +4089,7 @@
         }
       }
     },
+    "Reps": {},
     "Reset Onboarding": {},
     "Rest": {
       "extractionState": "stale",
@@ -3988,6 +4300,17 @@
         }
       }
     },
+    "Resting HR vs Baseline": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静息心率 vs 基线"
+          }
+        }
+      }
+    },
     "Resting HR: %@": {
       "extractionState": "manual",
       "localizations": {
@@ -4070,6 +4393,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "六"
+          }
+        }
+      }
+    },
+    "Save Record": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存记录"
           }
         }
       }
@@ -4200,6 +4534,18 @@
         }
       }
     },
+    "Set your body weight in Settings → Profile": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先在设置 → 个人信息中填写体重"
+          }
+        }
+      }
+    },
+    "Sets": {},
     "Settings": {
       "extractionState": "stale",
       "localizations": {
@@ -4352,6 +4698,17 @@
         }
       }
     },
+    "Sleep %d · Activity %d · Readiness %d": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠 %d · 活动 %d · 准备度 %d"
+          }
+        }
+      }
+    },
     "Sleep %dh": {
       "extractionState": "manual",
       "localizations": {
@@ -4370,6 +4727,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "睡眠 %dh%dm"
+          }
+        }
+      }
+    },
+    "Sleep could be better — try earlier bedtime": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠不佳，试试早点上床"
           }
         }
       }
@@ -4414,6 +4782,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "睡眠不足，建议保证 7-9 小时"
+          }
+        }
+      }
+    },
+    "Sleep Quality": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "睡眠质量"
           }
         }
       }
@@ -4592,6 +4971,17 @@
         }
       }
     },
+    "Still recovering — go easy today": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仍在恢复，今天轻松点"
+          }
+        }
+      }
+    },
     "Still recovering — light activity like walking or yoga": {
       "extractionState": "stale",
       "localizations": {
@@ -4632,6 +5022,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "力量训练"
+          }
+        }
+      }
+    },
+    "Strength Score": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "力量评分"
           }
         }
       }
@@ -4846,6 +5247,7 @@
       }
     },
     "Token": {},
+    "Total": {},
     "Total \\(sleepHours)h\\(sleepMins)m · Deep ~\\(String(format: ": {
       "extractionState": "stale",
       "localizations": {
@@ -5141,6 +5543,17 @@
         }
       }
     },
+    "Very low activity — any movement helps": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "活动量很低，任何运动都有帮助"
+          }
+        }
+      }
+    },
     "View Details": {
       "extractionState": "stale",
       "localizations": {
@@ -5325,6 +5738,28 @@
         }
       }
     },
+    "Weight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "体重"
+          }
+        }
+      }
+    },
+    "Weight (kg)": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重量 (kg)"
+          }
+        }
+      }
+    },
     "Workout Complete": {
       "extractionState": "stale",
       "localizations": {
@@ -5332,6 +5767,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "训练完成"
+          }
+        }
+      }
+    },
+    "Workout Completed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成训练"
           }
         }
       }
@@ -5556,442 +6002,244 @@
         }
       }
     },
-    "Activity": {
+    "You're at the Gym 💪": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "活动"
+            "value": "你到健身房了 💪"
           }
         }
       }
     },
-    "Readiness": {
+    "Ready to start training?": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "准备度"
+            "value": "准备开始训练？"
           }
         }
       }
     },
-    "Deep Sleep": {
+    "Start Training": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "深睡"
+            "value": "开始训练"
           }
         }
       }
     },
-    "Sleep Quality": {
+    "Maybe Later": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "睡眠质量"
+            "value": "稍后再说"
           }
         }
       }
     },
-    "Resting HR vs Baseline": {
+    "What are you training today?": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "静息心率 vs 基线"
+            "value": "今天练哪里？"
           }
         }
       }
     },
-    "Workout Completed": {
+    "Continue (%d selected)": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "完成训练"
+            "value": "继续（已选 %d 个）"
           }
         }
       }
     },
-    "Excellent sleep — well rested": {
+    "Your Training Plan": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "睡眠优秀，精力充沛"
+            "value": "你的训练计划"
           }
         }
       }
     },
-    "Decent sleep — room to improve": {
+    "~%d min": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "睡眠尚可，还有提升空间"
+            "value": "约 %d 分钟"
           }
         }
       }
     },
-    "Sleep could be better — try earlier bedtime": {
+    "Start Timer": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "睡眠不佳，试试早点上床"
+            "value": "开始计时"
           }
         }
       }
     },
-    "Poor sleep — prioritize rest tonight": {
+    "Save Plan & Close": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "睡眠较差，今晚优先休息"
+            "value": "保存计划并关闭"
           }
         }
       }
     },
-    "Great activity day — you crushed it": {
+    "Training in progress": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "今天运动量很棒"
+            "value": "训练进行中"
           }
         }
       }
     },
-    "Good movement — try adding a walk": {
+    "End Workout": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "运动不错，再加个散步"
+            "value": "结束训练"
           }
         }
       }
     },
-    "Below target — get moving!": {
+    "Workout Complete! 🎉": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "低于目标，动起来！"
+            "value": "训练完成！🎉"
           }
         }
       }
     },
-    "Very low activity — any movement helps": {
+    "Did you hit any PRs today?": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "活动量很低，任何运动都有帮助"
+            "value": "今天破了 PR 吗？"
           }
         }
       }
     },
-    "Fully recovered — ready for anything": {
+    "Record your lifts in Strength tracking": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "完全恢复，状态拉满"
+            "value": "去力量追踪里记录你的成绩"
           }
         }
       }
     },
-    "Moderately recovered — train smart": {
+    "Last %@ was %d days ago": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "恢复良好，聪明训练"
+            "value": "上次%@是 %d 天前"
           }
         }
       }
     },
-    "Still recovering — go easy today": {
+    "Readiness %d — %@ intensity recommended": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "仍在恢复，今天轻松点"
+            "value": "准备度 %d — 建议%@强度"
           }
         }
       }
     },
-    "Low readiness — rest is recommended": {
+    "Gym Session": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "准备度低，建议休息"
+            "value": "健身房训练"
           }
         }
       }
     },
-    "Sleep %d · Activity %d · Readiness %d": {
+    "Barbell Curl": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "睡眠 %d · 活动 %d · 准备度 %d"
+            "value": "杠铃弯举"
           }
         }
       }
     },
-    "Gym Location Detection": {
+    "Plank": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "健身房位置检测"
+            "value": "平板支撑"
           }
         }
       }
     },
-    "Keep wearing your Watch — more data unlocks better trends": {
+    "Cable Crunch": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "继续佩戴手表，更多数据解锁更准趋势"
+            "value": "绳索卷腹"
           }
         }
       }
     },
-    "Beginner": {
+    "Treadmill Run": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "初级"
-          }
-        }
-      }
-    },
-    "Intermediate": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "中级"
-          }
-        }
-      }
-    },
-    "Advanced": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "高级"
-          }
-        }
-      }
-    },
-    "Elite": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "精英"
-          }
-        }
-      }
-    },
-    "Strength Score": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "力量评分"
-          }
-        }
-      }
-    },
-    "Best: %.0f kg": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最佳：%.0f kg"
-          }
-        }
-      }
-    },
-    "+%.0f kg to %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "距 %2$@ 还差 %1$.0f kg"
-          }
-        }
-      }
-    },
-    "Recent Records": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最近记录"
-          }
-        }
-      }
-    },
-    "Set your body weight in Settings → Profile": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "请先在设置 → 个人信息中填写体重"
-          }
-        }
-      }
-    },
-    "Needed for strength level assessment": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "力量评级需要体重数据"
-          }
-        }
-      }
-    },
-    "Weight (kg)": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重量 (kg)"
-          }
-        }
-      }
-    },
-    "Add Lift": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "添加记录"
-          }
-        }
-      }
-    },
-    "Save Record": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存记录"
-          }
-        }
-      }
-    },
-    "Lift": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "动作"
-          }
-        }
-      }
-    },
-    "Male": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "男"
-          }
-        }
-      }
-    },
-    "Female": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "女"
-          }
-        }
-      }
-    },
-    "Gender": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "性别"
-          }
-        }
-      }
-    },
-    "Height": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "身高"
-          }
-        }
-      }
-    },
-    "Weight": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "体重"
+            "value": "跑步机"
           }
         }
       }

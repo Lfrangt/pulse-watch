@@ -1,126 +1,126 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "CFBundleDisplayName": {
-      "comment": "Bundle display name",
-      "extractionState": "extracted_with_value",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Pulse"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pulse"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Pulse"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pulse"
           }
         }
       }
     },
-    "CFBundleName": {
-      "comment": "Bundle name",
-      "extractionState": "extracted_with_value",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "PulseWatch"
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "PulseWatch"
           }
         }
       }
     },
-    "NSCameraUsageDescription": {
-      "comment": "Privacy - Camera Usage Description",
-      "extractionState": "extracted_with_value",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Pulse needs access to the camera to scan OpenClaw pairing QR codes."
+    "NSCameraUsageDescription" : {
+      "comment" : "Privacy - Camera Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pulse needs access to the camera to scan OpenClaw pairing QR codes."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Pulse 需要相机来扫描 OpenClaw 配对二维码。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pulse 需要相机来扫描 OpenClaw 配对二维码。"
           }
         }
       }
     },
-    "NSHealthShareUsageDescription": {
-      "comment": "Privacy - Health Share Usage Description",
-      "extractionState": "extracted_with_value",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Pulse needs to read your health data to generate daily readiness scores and training insights. All data is stored on your device only."
+    "NSHealthShareUsageDescription" : {
+      "comment" : "Privacy - Health Share Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pulse needs to read your health data to generate daily readiness scores and training insights. All data is stored on your device only."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Pulse 需要读取你的健康数据来生成每日状态评分和训练建议。所有数据仅存储在你的设备上。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pulse 需要读取你的健康数据来生成每日状态评分和训练建议。所有数据仅存储在你的设备上。"
           }
         }
       }
     },
-    "NSHealthUpdateUsageDescription": {
-      "comment": "Privacy - Health Update Usage Description",
-      "extractionState": "extracted_with_value",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Pulse needs to record your workout data to track your training progress."
+    "NSHealthUpdateUsageDescription" : {
+      "comment" : "Privacy - Health Update Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pulse needs to record your workout data to track your training progress."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Pulse 需要记录你的运动数据以追踪你的训练进度。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pulse 需要记录你的运动数据以追踪你的训练进度。"
           }
         }
       }
     },
-    "NSLocationAlwaysAndWhenInUseUsageDescription": {
-      "comment": "Privacy - Location Always and When In Use Usage Description",
-      "extractionState": "extracted_with_value",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Pulse uses your location to detect when you arrive at the gym and suggest training plans. Location data is never uploaded to any server."
+    "NSLocationAlwaysAndWhenInUseUsageDescription" : {
+      "comment" : "Privacy - Location Always and When In Use Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pulse Watch detects when you arrive at your configured gym locations to remind you to start your workout. Location data stays on your device and is never uploaded."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pulse Watch 在你到达设定的健身房位置时提醒你开始训练。位置数据保存在设备本地，不会上传到任何服务器。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pulse Watch 在你到达设定的健身房位置时提醒你开始训练。位置数据保存在设备本地，不会上传到任何服务器。"
           }
         }
       }
     },
-    "NSLocationWhenInUseUsageDescription": {
-      "comment": "Privacy - Location When In Use Usage Description",
-      "extractionState": "extracted_with_value",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Pulse uses your location to save your frequent places for smart reminders."
+    "NSLocationWhenInUseUsageDescription" : {
+      "comment" : "Privacy - Location When In Use Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pulse Watch detects when you arrive at your configured gym locations to remind you to start your workout."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pulse Watch 在你到达设定的健身房位置时提醒你开始训练。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pulse Watch 在你到达设定的健身房位置时提醒你开始训练。"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }

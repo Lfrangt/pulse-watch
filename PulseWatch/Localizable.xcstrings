@@ -140,6 +140,16 @@
         }
       }
     },
+    "%@/%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@/%2$@"
+          }
+        }
+      }
+    },
     "%@%%": {},
     "%@×%@": {
       "localizations": {
@@ -329,6 +339,7 @@
         }
       }
     },
+    "⭐": {},
     "📊 Weekly health report ready": {
       "extractionState": "stale",
       "localizations": {
@@ -348,6 +359,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "🔥 连续 %d 天！"
+          }
+        }
+      }
+    },
+    "1 Plate Club": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一片杠铃"
+          }
+        }
+      }
+    },
+    "2 Plate Club": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "两片杠铃"
           }
         }
       }
@@ -460,6 +493,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "数据积累中："
+          }
+        }
+      }
+    },
+    "Achievement Unlocked!": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "成就解锁！"
+          }
+        }
+      }
+    },
+    "Achievements": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "成就"
           }
         }
       }
@@ -756,6 +811,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "无氧"
+          }
+        }
+      }
+    },
+    "Any new PRs this week? 💪": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这周有新 PR 吗？💪"
           }
         }
       }
@@ -1118,6 +1184,17 @@
         }
       }
     },
+    "Big Three 300": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "三大项 300"
+          }
+        }
+      }
+    },
     "Birth Year": {
       "extractionState": "manual",
       "localizations": {
@@ -1146,6 +1223,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "身体时间线"
+          }
+        }
+      }
+    },
+    "Body Weight Squat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自重深蹲"
           }
         }
       }
@@ -2085,6 +2173,17 @@
         }
       }
     },
+    "First Rep": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第一次"
+          }
+        }
+      }
+    },
     "Flat Bench Press": {
       "extractionState": "stale",
       "localizations": {
@@ -2600,6 +2699,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "历史"
+          }
+        }
+      }
+    },
+    "Hit 60kg on any Big 3 lift": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "任一大项达到 60kg"
+          }
+        }
+      }
+    },
+    "Hit 100kg on any Big 3 lift": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "任一大项达到 100kg"
           }
         }
       }
@@ -3613,6 +3734,17 @@
         }
       }
     },
+    "My Strength Progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我的力量成长"
+          }
+        }
+      }
+    },
     "Needed for strength level assessment": {
       "extractionState": "manual",
       "localizations": {
@@ -3926,6 +4058,17 @@
         }
       }
     },
+    "PB Timeline": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PB 成长曲线"
+          }
+        }
+      }
+    },
     "Peak": {
       "extractionState": "stale",
       "localizations": {
@@ -4013,6 +4156,17 @@
       }
     },
     "PR": {},
+    "PR Streak": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PR 连击"
+          }
+        }
+      }
+    },
     "Privacy": {
       "extractionState": "stale",
       "localizations": {
@@ -4261,6 +4415,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "重新配置"
+          }
+        }
+      }
+    },
+    "Record your first lift": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记录你的第一次训练"
+          }
+        }
+      }
+    },
+    "Record your lifts and track your progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记录你的成绩，追踪你的进步"
           }
         }
       }
@@ -4844,6 +5020,17 @@
       }
     },
     "Send Feedback": {},
+    "Set a new PR 4 weeks in a row": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连续 4 周有新 PR"
+          }
+        }
+      }
+    },
     "Set body weight in Settings → Profile": {
       "extractionState": "manual",
       "localizations": {
@@ -4927,6 +5114,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "分享"
+          }
+        }
+      }
+    },
+    "Share Progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享进步"
           }
         }
       }
@@ -5204,6 +5402,17 @@
         }
       }
     },
+    "Squat your body weight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深蹲突破自身体重"
+          }
+        }
+      }
+    },
     "Stable": {
       "extractionState": "stale",
       "localizations": {
@@ -5466,6 +5675,17 @@
         }
       }
     },
+    "Sunday 8 PM — record your new PRs": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每周日 20:00 提醒记录新 PR"
+          }
+        }
+      }
+    },
     "Swimming": {
       "extractionState": "stale",
       "localizations": {
@@ -5661,6 +5881,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "总计 7h35m · 深睡约 2.1h"
+          }
+        }
+      }
+    },
+    "Total 300kg across all three lifts": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "三大项总和突破 300kg"
           }
         }
       }
@@ -6122,6 +6353,17 @@
         }
       }
     },
+    "Weekly PB Reminder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每周 PB 提醒"
+          }
+        }
+      }
+    },
     "Weekly Report": {
       "extractionState": "stale",
       "localizations": {
@@ -6496,233 +6738,46 @@
         }
       }
     },
-    "First Rep": {
+    "Morning Brief": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "第一次"
+            "value": "早安简报"
           }
         }
       }
     },
-    "Body Weight Squat": {
+    "Units": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "自重深蹲"
+            "value": "单位"
           }
         }
       }
     },
-    "1 Plate Club": {
+    "Data Management": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "一片杠铃"
+            "value": "数据管理"
           }
         }
       }
     },
-    "2 Plate Club": {
+    "Health Data": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "两片杠铃"
-          }
-        }
-      }
-    },
-    "Big Three 300": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "三大项 300"
-          }
-        }
-      }
-    },
-    "PR Streak": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PR 连击"
-          }
-        }
-      }
-    },
-    "Record your first lift": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "记录你的第一次训练"
-          }
-        }
-      }
-    },
-    "Squat your body weight": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "深蹲突破自身体重"
-          }
-        }
-      }
-    },
-    "Hit 60kg on any Big 3 lift": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "任一大项达到 60kg"
-          }
-        }
-      }
-    },
-    "Hit 100kg on any Big 3 lift": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "任一大项达到 100kg"
-          }
-        }
-      }
-    },
-    "Total 300kg across all three lifts": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "三大项总和突破 300kg"
-          }
-        }
-      }
-    },
-    "Set a new PR 4 weeks in a row": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "连续 4 周有新 PR"
-          }
-        }
-      }
-    },
-    "Achievements": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "成就"
-          }
-        }
-      }
-    },
-    "Achievement Unlocked!": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "成就解锁！"
-          }
-        }
-      }
-    },
-    "PB Timeline": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PB 成长曲线"
-          }
-        }
-      }
-    },
-    "Share Progress": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "分享进步"
-          }
-        }
-      }
-    },
-    "My Strength Progress": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "我的力量成长"
-          }
-        }
-      }
-    },
-    "Any new PRs this week? 💪": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这周有新 PR 吗？💪"
-          }
-        }
-      }
-    },
-    "Record your lifts and track your progress": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "记录你的成绩，追踪你的进步"
-          }
-        }
-      }
-    },
-    "Weekly PB Reminder": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "每周 PB 提醒"
-          }
-        }
-      }
-    },
-    "Sunday 8 PM — record your new PRs": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "每周日 20:00 提醒记录新 PR"
+            "value": "健康数据"
           }
         }
       }

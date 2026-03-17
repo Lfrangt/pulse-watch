@@ -73,9 +73,7 @@ struct SettingsView: View {
                     unitSection
                         .staggered(index: 5)
 
-                    // 数据采集频率
-                    collectionSection
-                        .staggered(index: 6)
+                    // (采集频率已移除 — Apple Watch 心率采集由系统控制)
 
                     // 数据管理
                     dataManagementSection
@@ -119,7 +117,7 @@ struct SettingsView: View {
 
     private var morningBriefSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            sectionHeader(icon: "sun.horizon.fill", title: "Morning Brief")
+            sectionHeader(icon: "sun.horizon.fill", title: String(localized: "Morning Brief"))
 
             // 权限未授权提示
             if !MorningBriefService.shared.isAuthorized {

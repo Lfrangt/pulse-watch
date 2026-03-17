@@ -424,7 +424,6 @@ struct DashboardView: View {
 
     /// 是否有任何有效指标数据
     private var hasAnyMetric: Bool {
-        demoMode ||
         healthManager.latestHeartRate != nil ||
         healthManager.latestHRV != nil ||
         brief?.sleepSummary != nil ||
@@ -437,22 +436,22 @@ struct DashboardView: View {
 
     /// 当前心率（演示或真实）
     private var currentHeartRate: Double? {
-        demoMode ? DemoDataProvider.heartRate : healthManager.latestHeartRate
+        healthManager.latestHeartRate
     }
     private var currentHRV: Double? {
-        demoMode ? DemoDataProvider.hrv : healthManager.latestHRV
+        healthManager.latestHRV
     }
     private var currentSleep: String? {
-        demoMode ? "7h12m" : brief?.sleepSummary
+        brief?.sleepSummary
     }
     private var currentSteps: Int {
-        demoMode ? DemoDataProvider.steps : healthManager.todaySteps
+        healthManager.todaySteps
     }
     private var currentCalories: Double {
-        demoMode ? DemoDataProvider.activeCalories : healthManager.todayActiveCalories
+        healthManager.todayActiveCalories
     }
     private var currentBloodOxygen: Double? {
-        demoMode ? DemoDataProvider.bloodOxygen : healthManager.latestBloodOxygen
+        healthManager.latestBloodOxygen
     }
 
     private var metricsGrid: some View {
@@ -1260,8 +1259,9 @@ struct DashboardView: View {
     private func loadData() async {
         isLoading = true
 
+        #if DEBUG
         if demoMode {
-            // 演示模式 — 使用模拟数据
+            // 演示模式 — 仅 DEBUG 构建 + 明确开启时
             brief = DemoDataProvider.makeBrief()
             insight = DemoDataProvider.makeInsight()
             demoTimelineEvents = DemoDataProvider.makeTimelineEvents()
@@ -1274,6 +1274,7 @@ struct DashboardView: View {
             isLoading = false
             return
         }
+        #endif
 
         do {
             try await healthManager.requestAuthorization()

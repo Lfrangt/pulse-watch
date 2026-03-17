@@ -330,7 +330,7 @@ struct HistoryView: View {
                 }
                 .chartYScale(domain: 0...100)
                 .chartYAxis {
-                    AxisMarks(values: [0, 25, 50, 75, 100]) { value in
+                    AxisMarks(position: .leading, values: [0, 50, 100]) { value in
                         AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
                             .foregroundStyle(PulseTheme.border.opacity(0.4))
                         AxisValueLabel()
@@ -421,6 +421,12 @@ struct HistoryView: View {
                         .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [5, 3]))
                     }
                 }
+                .chartYScale(domain: {
+                    let allVals = data.flatMap { [$0.avg, $0.resting] }
+                    let lo = max(30, (allVals.min() ?? 40) - 10)
+                    let hi = min(200, (allVals.max() ?? 100) + 15)
+                    return lo...hi
+                }())
                 .chartYAxis {
                     AxisMarks(position: .leading) { value in
                         AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
@@ -438,8 +444,8 @@ struct HistoryView: View {
                     }
                 }
                 .chartForegroundStyleScale([
-                    String(localized: "Average"): PulseTheme.statusPoor,
-                    String(localized: "Resting"): PulseTheme.statusPoor.opacity(0.5),
+                    String(localized: "Average"): Color(hex: "C75C5C"),
+                    String(localized: "Resting"): Color(hex: "C75C5C").opacity(0.5),
                 ])
                 .chartLegend(.visible)
                 .frame(height: 180)

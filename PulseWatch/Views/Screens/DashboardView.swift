@@ -48,7 +48,7 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: PulseTheme.spacingM) {
+                VStack(spacing: PulseTheme.spacingS) {
                     // 问候语
                     greetingSection
                         .staggered(index: 0)
@@ -238,7 +238,7 @@ struct DashboardView: View {
                 .accessibilityAddTraits(.isHeader)
             Spacer()
         }
-        .padding(.top, PulseTheme.spacingM)
+        .padding(.top, 4)
     }
 
     // MARK: - 状态评分大圆环 (Gauge)
@@ -252,13 +252,13 @@ struct DashboardView: View {
                 // 底部光晕
                 Circle()
                     .fill(statusColor.opacity(0.1))
-                    .frame(width: 260, height: 260)
-                    .blur(radius: 40)
+                    .frame(width: 200, height: 200)
+                    .blur(radius: 30)
 
                 // 背景轨道
                 Circle()
-                    .stroke(PulseTheme.border, lineWidth: 12)
-                    .frame(width: 220, height: 220)
+                    .stroke(PulseTheme.border, lineWidth: 10)
+                    .frame(width: 170, height: 170)
 
                 // 进度弧（弹簧动画）
                 Circle()
@@ -270,15 +270,15 @@ struct DashboardView: View {
                             startAngle: .degrees(-90),
                             endAngle: .degrees(270)
                         ),
-                        style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                        style: StrokeStyle(lineWidth: 10, lineCap: .round)
                     )
-                    .frame(width: 220, height: 220)
+                    .frame(width: 170, height: 170)
                     .rotationEffect(.degrees(-90))
 
                 // 分数 + 标签
                 VStack(spacing: 2) {
                     Text("\(animatedScore)")
-                        .font(.system(size: 64, weight: .bold, design: .rounded))
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
                         .foregroundStyle(PulseTheme.textPrimary)
                         .contentTransition(.numericText())
                         .minimumScaleFactor(0.6)
@@ -315,7 +315,7 @@ struct DashboardView: View {
                     .padding(.horizontal, PulseTheme.spacingM)
             }
         }
-        .padding(.vertical, PulseTheme.spacingXL)
+        .padding(.vertical, PulseTheme.spacingM)
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)

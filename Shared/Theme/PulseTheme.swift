@@ -9,8 +9,8 @@ enum PulseTheme {
     // MARK: - Colors
     // Earthy palette — browns, ambers, sage. No tech-blue.
 
-    /// Deep warm charcoal — not pure black
-    static let background = Color(hex: "0D0C0B")
+    /// Deep warm charcoal — not pure black, warm enough to blend with cards
+    static let background = Color(hex: "121110")
 
     /// Slightly elevated warm surface
     static let surface = Color(hex: "1A1715")

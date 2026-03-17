@@ -162,6 +162,7 @@ struct DashboardView: View {
             .background(
                 ZStack {
                     PulseTheme.background
+                        .ignoresSafeArea()
                     if let brief {
                         PulseTheme.ambientGradient(for: brief.score)
                             .scaleEffect(breathe ? 1.05 : 1.0)
@@ -171,6 +172,7 @@ struct DashboardView: View {
             )
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 12) {

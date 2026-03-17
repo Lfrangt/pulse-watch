@@ -159,17 +159,8 @@ struct DashboardView: View {
                 }
                 .padding(.horizontal, PulseTheme.spacingM)
             }
-            .background(
-                ZStack {
-                    PulseTheme.background
-                        .ignoresSafeArea()
-                    if let brief {
-                        PulseTheme.ambientGradient(for: brief.score)
-                            .scaleEffect(breathe ? 1.05 : 1.0)
-                            .ignoresSafeArea()
-                    }
-                }
-            )
+            .background(PulseTheme.background.ignoresSafeArea())
+            .scrollContentBackground(.hidden)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -722,7 +713,7 @@ struct DashboardView: View {
                     score: tri.activity.score,
                     label: String(localized: "Activity"),
                     icon: "flame.fill",
-                    color: Color(hex: "D4A056"),
+                    color: Color(hex: "FF6B35"),
                     type: .activity
                 )
                 triScoreRing(

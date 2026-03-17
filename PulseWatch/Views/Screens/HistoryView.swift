@@ -310,18 +310,20 @@ struct HistoryView: View {
                 .chartYScale(domain: 0...100)
                 .chartYAxis {
                     AxisMarks(values: [0, 25, 50, 75, 100]) { value in
-                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4]))
-                            .foregroundStyle(PulseTheme.border)
+                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
+                            .foregroundStyle(PulseTheme.border.opacity(0.4))
                         AxisValueLabel()
-                            .foregroundStyle(PulseTheme.textTertiary)
+                            .font(.system(size: 10))
+                            .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
                     }
                 }
                 .chartXAxis {
                     AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
-                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4]))
+                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
                             .foregroundStyle(PulseTheme.border.opacity(0.5))
                         AxisValueLabel(format: .dateTime.month(.abbreviated).day())
-                            .foregroundStyle(PulseTheme.textTertiary)
+                            .font(.system(size: 9))
+                            .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
                     }
                 }
                 .frame(height: 180)
@@ -385,16 +387,18 @@ struct HistoryView: View {
                 }
                 .chartYAxis {
                     AxisMarks(position: .leading) { value in
-                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4]))
-                            .foregroundStyle(PulseTheme.border)
+                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
+                            .foregroundStyle(PulseTheme.border.opacity(0.4))
                         AxisValueLabel()
-                            .foregroundStyle(PulseTheme.textTertiary)
+                            .font(.system(size: 10))
+                            .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
                     }
                 }
                 .chartXAxis {
                     AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
                         AxisValueLabel(format: .dateTime.month(.abbreviated).day())
-                            .foregroundStyle(PulseTheme.textTertiary)
+                            .font(.system(size: 9))
+                            .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
                     }
                 }
                 .chartForegroundStyleScale([
@@ -463,8 +467,8 @@ struct HistoryView: View {
                 }
                 .chartYAxis {
                     AxisMarks(position: .leading) { value in
-                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4]))
-                            .foregroundStyle(PulseTheme.border)
+                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
+                            .foregroundStyle(PulseTheme.border.opacity(0.4))
                         AxisValueLabel {
                             if let v = value.as(Double.self) {
                                 Text("\(Int(v))ms")
@@ -476,7 +480,8 @@ struct HistoryView: View {
                 .chartXAxis {
                     AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
                         AxisValueLabel(format: .dateTime.month(.abbreviated).day())
-                            .foregroundStyle(PulseTheme.textTertiary)
+                            .font(.system(size: 9))
+                            .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
                     }
                 }
                 .frame(height: 180)
@@ -536,8 +541,8 @@ struct HistoryView: View {
                 }
                 .chartYAxis {
                     AxisMarks(position: .leading) { value in
-                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4]))
-                            .foregroundStyle(PulseTheme.border)
+                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
+                            .foregroundStyle(PulseTheme.border.opacity(0.4))
                         AxisValueLabel {
                             if let v = value.as(Double.self) {
                                 Text(String(format: "%.0fh", v))
@@ -549,7 +554,8 @@ struct HistoryView: View {
                 .chartXAxis {
                     AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
                         AxisValueLabel(format: .dateTime.month(.abbreviated).day())
-                            .foregroundStyle(PulseTheme.textTertiary)
+                            .font(.system(size: 9))
+                            .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
                     }
                 }
                 .frame(height: 180)

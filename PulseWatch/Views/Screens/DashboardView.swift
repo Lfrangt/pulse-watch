@@ -326,12 +326,7 @@ struct DashboardView: View {
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
                 .fill(PulseTheme.cardBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                        .fill(PulseTheme.statusGradient(for: score))
-                )
-                .shadow(color: PulseTheme.cardShadow, radius: 20, y: 8)
-                .shadow(color: statusColor.opacity(0.08), radius: 30, y: 0)
+                .shadow(color: PulseTheme.cardShadow, radius: 16, y: 6)
         )
         .overlay(
             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
@@ -731,7 +726,7 @@ struct DashboardView: View {
                     score: tri.readiness.score,
                     label: String(localized: "Readiness"),
                     icon: "bolt.heart.fill",
-                    color: PulseTheme.accent,
+                    color: Color(hex: "5CC7C1"),
                     type: .readiness
                 )
             }
@@ -853,14 +848,6 @@ struct DashboardView: View {
             }
         }
         .pulseCard()
-        .overlay(alignment: .leading) {
-            UnevenRoundedRectangle(
-                topLeadingRadius: PulseTheme.radiusL,
-                bottomLeadingRadius: PulseTheme.radiusL
-            )
-            .fill(Color(hex: "FF6B35").opacity(0.5))
-            .frame(width: 3)
-        }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(format: String(localized: "%d-Day Streak"), streak))
     }
@@ -1032,14 +1019,6 @@ struct DashboardView: View {
             }
         }
         .pulseCard()
-        .overlay(alignment: .leading) {
-            UnevenRoundedRectangle(
-                topLeadingRadius: PulseTheme.radiusL,
-                bottomLeadingRadius: PulseTheme.radiusL
-            )
-            .fill(accentColor.opacity(0.4))
-            .frame(width: 3)
-        }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(format: String(localized: "Health Age %d"), ageInt))
     }

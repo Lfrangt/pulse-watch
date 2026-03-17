@@ -360,14 +360,12 @@ struct HistoryView: View {
         }
     }
 
-    // MARK: - 心率趋势图 (Apple Health 风格 — 竖条范围图)
+    // MARK: - 心率趋势图 (静息心率折线)
 
     private var heartRateTrendChart: some View {
-        let data = filteredSummaries.compactMap { s -> (date: Date, min: Double, max: Double, avg: Double, resting: Double)? in
-            guard let avg = s.averageHeartRate else { return nil }
-            let lo = s.minHeartRate ?? (s.restingHeartRate ?? avg)
-            let hi = s.maxHeartRate ?? avg
-            return (s.date, lo, hi, avg, s.restingHeartRate ?? avg)
+        let data = filteredSummaries.compactMap { s -> (date: Date, resting: Double)? in
+            guard let rhr = s.restingHeartRate else { return nil }
+            return (s.date, rhr)
         }
 
         let latestRHR = data.last.map { "\(Int($0.resting)) bpm" }
@@ -389,10 +387,12 @@ struct HistoryView: View {
             return String(format: String(localized: "Average resting HR: %.0f bpm"), cur)
         }()
 
+        let hrColor = Color(hex: "C75C5C")
+
         return chartCard(
             icon: "heart.fill",
-            title: String(localized: "Heart Rate"),
-            color: Color(hex: "C75C5C"),
+            title: String(localized: "Resting Heart Rate"),
+            color: hrColor,
             currentValue: latestRHR,
             changeText: hrDelta?.0,
             changePositive: hrPositive,
@@ -410,39 +410,35 @@ struct HistoryView: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: 120)
             } else {
-                let avgResting = data.map(\.resting).reduce(0,+) / Double(data.count)
+                Chart(data, id: \.date) { item in
+                    LineMark(
+                        x: .value("Date", item.date),
+                        y: .value("RHR", item.resting)
+                    )
+                    .foregroundStyle(hrColor)
+                    .interpolationMethod(.catmullRom)
+                    .lineStyle(StrokeStyle(lineWidth: 2.5))
 
-                Chart {
-                    ForEach(data, id: \.date) { item in
-                        // 竖条：min → max 范围
-                        BarMark(
-                            x: .value("Date", item.date, unit: .day),
-                            yStart: .value("Min", item.min),
-                            yEnd: .value("Max", item.max),
-                            width: .ratio(0.35)
-                        )
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [Color(hex: "C75C5C").opacity(0.8), Color(hex: "E88B8B").opacity(0.4)],
-                                startPoint: .top, endPoint: .bottom
-                            )
-                        )
-                        .cornerRadius(2)
-                    }
+                    AreaMark(
+                        x: .value("Date", item.date),
+                        y: .value("RHR", item.resting)
+                    )
+                    .foregroundStyle(
+                        LinearGradient(colors: [hrColor.opacity(0.15), hrColor.opacity(0.02)],
+                                       startPoint: .top, endPoint: .bottom)
+                    )
+                    .interpolationMethod(.catmullRom)
 
-                    // 平均静息心率基准线
-                    RuleMark(y: .value("Avg RHR", avgResting))
-                        .foregroundStyle(PulseTheme.accent.opacity(0.6))
-                        .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
-                        .annotation(position: .trailing, alignment: .leading) {
-                            Text(String(format: "RHR %.0f", avgResting))
-                                .font(.system(size: 9))
-                                .foregroundStyle(PulseTheme.accent.opacity(0.8))
-                        }
+                    PointMark(
+                        x: .value("Date", item.date),
+                        y: .value("RHR", item.resting)
+                    )
+                    .foregroundStyle(hrColor)
+                    .symbolSize(20)
                 }
                 .chartYScale(domain: {
-                    let lo = max(30, (data.map(\.min).min() ?? 40) - 5)
-                    let hi = min(220, (data.map(\.max).max() ?? 100) + 10)
+                    let lo = max(30, (data.map(\.resting).min() ?? 40) - 5)
+                    let hi = (data.map(\.resting).max() ?? 80) + 5
                     return lo...hi
                 }())
                 .chartYAxis {
@@ -465,9 +461,9 @@ struct HistoryView: View {
                 .opacity(chartAnimated ? 1 : 0)
                 .animation(.easeOut(duration: 1.0), value: chartAnimated)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(String(localized: "Heart rate trend"))
+                .accessibilityLabel(String(localized: "Resting heart rate trend"))
                 .accessibilityValue({
-                    let avg = Int(data.map(\.avg).reduce(0, +) / max(Double(data.count), 1))
+                    let avg = Int(data.map(\.resting).reduce(0, +) / max(Double(data.count), 1))
                     return String(localized: "Average \(avg) bpm over \(data.count) days")
                 }())
             }

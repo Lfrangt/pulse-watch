@@ -1,1 +1,1 @@
-heart rate,HRV,health score,workout,sleep,Apple Watch,fitness,recovery,training,whoop alternative
+powerlifting,strength tracker,squat bench deadlift,HRV,recovery,workout log,health score,buy once

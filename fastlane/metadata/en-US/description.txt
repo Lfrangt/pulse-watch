@@ -1,31 +1,35 @@
-Stop deciphering dashboards. Pulse reads your Apple Watch health data and gives you one number: your daily health score.
+Track your squat, bench, and deadlift PRs — and finally understand how your training affects your sleep, HRV, and recovery.
 
-Heart rate, HRV, sleep, steps, blood oxygen — collected automatically, scored from 0 to 100. Open the app, see your score, know how your body is doing. That's it.
+Pulse Watch is the fitness tracker built for people who actually lift. No subscription. No cloud. Just your data, on your device, working for you.
 
-WHAT YOU GET:
+◆ STRENGTH TRACKING
+Record squat, bench press, and deadlift — weight, sets, reps. Pulse Watch estimates your 1RM, tracks PRs automatically, and rates your strength level (Beginner → Intermediate → Advanced → Elite) based on your bodyweight ratio. See exactly how many kg you need to reach the next level.
 
-• Daily Health Score — sleep, HRV, resting heart rate, and activity distilled into a single actionable number
-• Morning Brief — wake up to a personalized health summary notification
-• Real-time workout tracking — heart rate zones on your Apple Watch, live during every session
-• 7-day trend charts — heart rate, HRV, and sleep trends so you can spot patterns
-• Training history — every workout saved with duration, heart rate zones, and calories
-• Heart rate alerts — get notified when your resting heart rate is unusually high or low
-• Gym detection — arrive at the gym and get automatic PPL training suggestions
-• Widgets everywhere — Home Screen, Lock Screen, and Apple Watch complications
-• Share your wins — generate workout achievement cards for Instagram, Twitter, or group chats
+◆ HEALTH AGE
+Your biological age, estimated from 5 real metrics: resting heart rate, HRV, sleep, steps, and activity. Are you aging faster or slower than your birth certificate says? Most people are surprised by the answer.
 
-WHY PULSE:
+◆ THREE CORE SCORES
+Sleep Score · Activity Score · Readiness Score — inspired by Oura, powered by Apple Watch. Tap any score to see what's dragging it down and what to fix.
 
-No subscription. Buy once, own forever. Your health data never leaves your device — no accounts, no cloud uploads, no tracking. Just you and your data.
+◆ STRAIN vs RECOVERY
+Know when you're pushing too hard. Pulse Watch calculates daily Strain from your heart rate zones and compares it to your Recovery score. When strain outpaces recovery, you get a clear warning.
 
-Most health apps bury you in charts. Pulse gives you one score and tells you what it means. Less time analyzing, more time living.
+◆ SMART NOTIFICATIONS
+Morning Brief at 8 AM with your scores, sleep summary, and training advice. Weekly summary every Sunday. Milestone celebrations for your streak.
 
-OPTIONAL AI COACHING:
+◆ MUSCLE GROUP INSIGHTS
+Tag your workouts by muscle group. After 5+ sessions, Pulse Watch reveals your personal patterns: "After leg day, your HRV drops 8% the next day" or "Cardio nights improve your sleep by 20 minutes."
 
-Connect your own OpenClaw instance for AI-powered training advice, anomaly alerts, and conversational health coaching. Your data stays on your server, not ours.
+◆ 7-DAY / 30-DAY / 90-DAY TRENDS
+Watch your progress over time. Every chart shows your current average vs the previous period, so you always know if you're improving.
 
-REQUIREMENTS:
+◆ STREAK & MOTIVATION
+Don't break the chain. Your daily health streak keeps you coming back. Hit 7-day and 30-day milestones for celebration notifications.
 
-• iPhone with iOS 17.0+
-• Apple Watch with watchOS 10.0+ (recommended for full features)
-• HealthKit data from Apple Watch or compatible sensors
+◆ PRIVACY FIRST
+All data stays on your device. No account required. No servers. No tracking. Period.
+
+◆ ONE-TIME PURCHASE
+No subscription. No monthly fees. Pay once, own forever. While WHOOP charges $30/month and Oura charges $6/month, Pulse Watch is yours for life.
+
+Works with Apple Watch. Requires iPhone with iOS 17+ and Apple Watch for health data collection.

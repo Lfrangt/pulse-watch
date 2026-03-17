@@ -7,6 +7,7 @@ struct HistoryView: View {
 
     @State private var selectedRange: TimeRange = .week
     @State private var showWeeklyReport = false
+    @State private var chartAnimated = false
     @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
     @Query(sort: \WorkoutHistoryEntry.startDate, order: .reverse) private var allWorkouts: [WorkoutHistoryEntry]
 
@@ -75,12 +76,22 @@ struct HistoryView: View {
                     .onAppear { Analytics.trackWeeklyReportViewed() }
             }
             .onAppear {
+                // Chart animation trigger
+                withAnimation(.easeOut(duration: 1.0).delay(0.3)) {
+                    chartAnimated = true
+                }
                 // In-App Review: 查看趋势图时检查是否有 7 天完整数据
                 let calendar = Calendar.current
                 let sevenDaysAgo = calendar.startOfDay(for: calendar.date(byAdding: .day, value: -7, to: .now)!)
                 let recentWithScores = allSummaries.filter { $0.date >= sevenDaysAgo && $0.dailyScore != nil }
                 let hasSevenDayData = recentWithScores.count >= 7
                 ReviewRequestManager.shared.recordTrendsViewed(hasSevenDayData: hasSevenDayData)
+            }
+            .onChange(of: selectedRange) {
+                chartAnimated = false
+                withAnimation(.easeOut(duration: 1.0).delay(0.2)) {
+                    chartAnimated = true
+                }
             }
         }
     }
@@ -267,13 +278,23 @@ struct HistoryView: View {
         let curAvg = data.isEmpty ? nil : data.map(\.score).reduce(0,+) / data.count
         let scoreDelta = deltaPct(cur: curAvg.map(Double.init), prev: prevAvgVal.map(Double.init))
 
+        let scoreInsight: String? = {
+            guard let cur = curAvg, let prev = prevAvgVal else { return nil }
+            let diff = cur - prev
+            if abs(diff) < 2 { return String(localized: "Your score has been steady this period") }
+            return diff > 0
+                ? String(format: String(localized: "Your score is up %d points vs last period"), abs(diff))
+                : String(format: String(localized: "Your score is down %d points vs last period"), abs(diff))
+        }()
+
         return chartCard(
             icon: "chart.line.uptrend.xyaxis",
             title: String(localized: "Daily Score"),
             color: PulseTheme.accent,
             currentValue: latestScore.map { "\($0)" },
             changeText: scoreDelta?.0,
-            changePositive: scoreDelta?.1 ?? true
+            changePositive: scoreDelta?.1 ?? true,
+            insight: scoreInsight
         ) {
             if data.isEmpty {
                 emptyChartPlaceholder
@@ -327,6 +348,8 @@ struct HistoryView: View {
                     }
                 }
                 .frame(height: 180)
+                .opacity(chartAnimated ? 1 : 0)
+                .animation(.easeOut(duration: 1.0), value: chartAnimated)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(String(localized: "Daily score trend"))
                 .accessibilityValue({
@@ -353,13 +376,26 @@ struct HistoryView: View {
         let hrDelta = deltaPct(cur: curAvgHR, prev: prevAvgHR)
         let hrPositive = hrDelta.map { $0.0.contains("-") } ?? true  // negative HR change = good
 
+        let hrInsight: String? = {
+            guard let cur = curAvgHR else { return nil }
+            if let prev = prevAvgHR {
+                let diff = cur - prev
+                if abs(diff) < 1 { return String(localized: "Resting heart rate has been stable") }
+                return diff < 0
+                    ? String(format: String(localized: "Resting HR dropped %.0f bpm — good sign"), abs(diff))
+                    : String(format: String(localized: "Resting HR up %.0f bpm — watch recovery"), diff)
+            }
+            return String(format: String(localized: "Average resting HR: %.0f bpm"), cur)
+        }()
+
         return chartCard(
             icon: "heart.fill",
             title: String(localized: "Heart Rate"),
             color: Color(hex: "C75C5C"),
             currentValue: latestHR,
             changeText: hrDelta?.0,
-            changePositive: hrPositive
+            changePositive: hrPositive,
+            insight: hrInsight
         ) {
             if data.isEmpty {
                 emptyChartPlaceholder
@@ -407,6 +443,8 @@ struct HistoryView: View {
                 ])
                 .chartLegend(.visible)
                 .frame(height: 180)
+                .opacity(chartAnimated ? 1 : 0)
+                .animation(.easeOut(duration: 1.0), value: chartAnimated)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(String(localized: "Heart rate trend"))
                 .accessibilityValue({
@@ -432,13 +470,26 @@ struct HistoryView: View {
         let hrvDelta = deltaPct(cur: curAvgHRV, prev: prevAvgHRV2)
         let hrvColor = Color(hex: "5C7BC7")  // 蓝色系
 
+        let hrvInsight: String? = {
+            guard let cur = curAvgHRV else { return nil }
+            if let prev = prevAvgHRV2 {
+                let pct = ((cur - prev) / prev) * 100
+                if abs(pct) < 3 { return String(localized: "HRV has been stable this period") }
+                return pct > 0
+                    ? String(format: String(localized: "HRV is up %.0f%% — your body is adapting well"), pct)
+                    : String(format: String(localized: "HRV dropped %.0f%% — prioritize recovery"), abs(pct))
+            }
+            return String(format: String(localized: "Average HRV: %.0f ms"), cur)
+        }()
+
         return chartCard(
             icon: "waveform.path.ecg",
             title: "HRV",
             color: hrvColor,
             currentValue: latestHRV,
             changeText: hrvDelta?.0,
-            changePositive: hrvDelta?.1 ?? true
+            changePositive: hrvDelta?.1 ?? true,
+            insight: hrvInsight
         ) {
             if data.isEmpty {
                 emptyChartPlaceholder
@@ -485,6 +536,8 @@ struct HistoryView: View {
                     }
                 }
                 .frame(height: 180)
+                .opacity(chartAnimated ? 1 : 0)
+                .animation(.easeOut(duration: 1.0), value: chartAnimated)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(String(localized: "HRV trend"))
                 .accessibilityValue({
@@ -511,33 +564,60 @@ struct HistoryView: View {
         let prevAvgSleep2 = prevSleeps.isEmpty ? nil : prevSleeps.reduce(0,+) / Double(prevSleeps.count)
         let sleepDelta2 = deltaPct(cur: curAvgSleep2, prev: prevAvgSleep2)
 
+        let sleepInsight: String? = {
+            guard let latest = data.last else { return nil }
+            if let avg = curAvgSleep2 {
+                let diff = latest.hours - avg
+                if abs(diff) < 0.3 { return String(localized: "Last night was about average for you") }
+                return diff > 0
+                    ? String(format: String(localized: "Last night you slept %.1fh — above your average"), latest.hours)
+                    : String(format: String(localized: "Last night was %.1fh — below your average"), latest.hours)
+            }
+            return nil
+        }()
+
         return chartCard(
             icon: "moon.fill",
             title: String(localized: "Sleep"),
             color: Color(hex: "4B3D8F"),
             currentValue: latestSleep,
             changeText: sleepDelta2?.0,
-            changePositive: sleepDelta2?.1 ?? true
+            changePositive: sleepDelta2?.1 ?? true,
+            insight: sleepInsight
         ) {
             if data.isEmpty {
                 emptyChartPlaceholder
             } else {
+                let avgHours = data.map(\.hours).reduce(0, +) / Double(data.count)
+
                 Chart {
                     ForEach(data, id: \.date) { item in
                         BarMark(
                             x: .value(String(localized: "Date"), item.date, unit: .day),
-                            y: .value(String(localized: "Total Duration"), item.hours)
+                            y: .value(String(localized: "Total Duration"), item.hours),
+                            width: .ratio(0.4)
                         )
                         .foregroundStyle(Color(hex: "8B7EC8").opacity(0.3))
                         .cornerRadius(4)
 
                         BarMark(
                             x: .value(String(localized: "Date"), item.date, unit: .day),
-                            y: .value(String(localized: "Deep"), item.deep)
+                            y: .value(String(localized: "Deep"), item.deep),
+                            width: .ratio(0.4)
                         )
                         .foregroundStyle(Color(hex: "8B7EC8"))
                         .cornerRadius(4)
                     }
+
+                    // Average baseline
+                    RuleMark(y: .value("Avg", avgHours))
+                        .foregroundStyle(PulseTheme.accent.opacity(0.6))
+                        .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                        .annotation(position: .trailing, alignment: .leading) {
+                            Text(String(format: "avg %.1fh", avgHours))
+                                .font(.system(size: 9))
+                                .foregroundStyle(PulseTheme.accent.opacity(0.8))
+                        }
                 }
                 .chartYAxis {
                     AxisMarks(position: .leading) { value in
@@ -559,6 +639,8 @@ struct HistoryView: View {
                     }
                 }
                 .frame(height: 180)
+                .opacity(chartAnimated ? 1 : 0)
+                .animation(.easeOut(duration: 1.0), value: chartAnimated)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(String(localized: "Sleep trend"))
                 .accessibilityValue({
@@ -729,15 +811,16 @@ struct HistoryView: View {
         currentValue: String? = nil,
         changeText: String? = nil,
         changePositive: Bool = true,
+        insight: String? = nil,
         @ViewBuilder content: () -> Content
     ) -> some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            // Title row
             HStack(spacing: PulseTheme.spacingS) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6, style: .continuous)
                         .fill(color.opacity(0.12))
                         .frame(width: 24, height: 24)
-
                     Image(systemName: icon)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(color)
@@ -745,24 +828,32 @@ struct HistoryView: View {
                 .accessibilityHidden(true)
 
                 Text(title)
-                    .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
                     .accessibilityAddTraits(.isHeader)
 
                 Spacer()
 
-                if let val = currentValue {
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text(val)
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundStyle(PulseTheme.textPrimary)
-                        if let change = changeText {
-                            Text(change)
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundStyle(changePositive ? Color(hex: "7FC75C") : Color(hex: "C75C5C"))
-                        }
-                    }
+                if let change = changeText {
+                    Text(change)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(changePositive ? Color(hex: "7FC75C") : Color(hex: "C75C5C"))
                 }
+            }
+
+            // Big value + unit
+            if let val = currentValue {
+                Text(val)
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundStyle(PulseTheme.textPrimary)
+                    .contentTransition(.numericText())
+            }
+
+            // Natural language insight
+            if let insight {
+                Text(insight)
+                    .font(.system(size: 13))
+                    .foregroundStyle(PulseTheme.textSecondary)
             }
 
             content()
@@ -771,13 +862,33 @@ struct HistoryView: View {
     }
 
     private var emptyChartPlaceholder: some View {
-        VStack(spacing: PulseTheme.spacingS) {
-            Image(systemName: "chart.line.downtrend.xyaxis")
-                .font(.system(size: 32))
-                .foregroundStyle(PulseTheme.textTertiary)
-            Text("Insufficient data")
-                .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textTertiary)
+        ZStack {
+            // Dashed outline chart skeleton
+            Path { path in
+                let w: CGFloat = 300
+                let h: CGFloat = 120
+                let points: [(CGFloat, CGFloat)] = [
+                    (0, 0.6), (0.15, 0.4), (0.3, 0.55), (0.45, 0.35),
+                    (0.6, 0.5), (0.75, 0.3), (0.9, 0.45), (1.0, 0.25)
+                ]
+                for (i, p) in points.enumerated() {
+                    let pt = CGPoint(x: p.0 * w, y: p.1 * h)
+                    if i == 0 { path.move(to: pt) }
+                    else { path.addLine(to: pt) }
+                }
+            }
+            .stroke(style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+            .foregroundStyle(PulseTheme.border.opacity(0.4))
+            .frame(height: 120)
+
+            VStack(spacing: 6) {
+                Image(systemName: "chart.line.uptrend.xyaxis")
+                    .font(.system(size: 24))
+                    .foregroundStyle(PulseTheme.textTertiary.opacity(0.5))
+                Text("Keep wearing your Watch to see trends")
+                    .font(.system(size: 12))
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
         }
         .frame(maxWidth: .infinity)
         .frame(height: 140)

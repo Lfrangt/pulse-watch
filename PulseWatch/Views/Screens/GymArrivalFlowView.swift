@@ -343,7 +343,7 @@ struct GymArrivalFlowView: View {
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(Color(hex: "C75C5C")))
+                .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(PulseTheme.activityAccent))
             }
             .buttonStyle(.plain)
             .padding(.horizontal, PulseTheme.spacingL)
@@ -359,7 +359,7 @@ struct GymArrivalFlowView: View {
 
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 60))
-                .foregroundStyle(Color(hex: "7FC75C"))
+                .foregroundStyle(PulseTheme.statusGood)
 
             VStack(spacing: PulseTheme.spacingS) {
                 Text("Workout Complete! 🎉")
@@ -530,9 +530,9 @@ struct GymArrivalFlowView: View {
 
     private func intensityColor(_ intensity: TrainingPlan.Intensity) -> Color {
         switch intensity {
-        case .heavy:    return Color(hex: "C75C5C")
-        case .moderate: return Color(hex: "D4A056")
-        case .light:    return Color(hex: "7FC75C")
+        case .heavy:    return PulseTheme.activityAccent
+        case .moderate: return PulseTheme.statusModerate
+        case .light:    return PulseTheme.statusGood
         }
     }
 }

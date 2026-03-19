@@ -43,7 +43,7 @@ struct TimelineEvent: Identifiable {
 enum TimelineEventBuilder {
 
     /// 睡眠事件专用颜色 — 柔和紫
-    static let sleepColor = Color(hex: "8B7EC8")
+    static let sleepColor = PulseTheme.sleepAccent
 
     /// 从 HealthKitManager 和 HealthAnalyzer 数据构建事件列表
     @MainActor
@@ -509,7 +509,7 @@ private var previewEvents: [TimelineEvent] {
             detail: String(localized: "Total 7h35m · Deep ~2.1h"),
             impact: String(localized: "Recovery +15"),
             impactPositive: true,
-            color: Color(hex: "8B7EC8")
+            color: PulseTheme.sleepAccent
         ),
         TimelineEvent(
             time: wakeTime,

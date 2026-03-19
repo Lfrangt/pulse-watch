@@ -54,12 +54,12 @@ struct WatchHomeView: View {
                         WatchMetric(
                             icon: "heart.fill",
                             value: heartRate > 0 ? "\(heartRate)" : "--",
-                            color: Color(hex: "C75C5C")
+                            color: PulseTheme.activityAccent
                         )
                         WatchMetric(
                             icon: "figure.walk",
                             value: stepsDisplay,
-                            color: Color(hex: "7FB069")
+                            color: PulseTheme.statusGood
                         )
                     }
                     .padding(.top, 4)

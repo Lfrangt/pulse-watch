@@ -249,7 +249,7 @@ struct WorkoutTrackingView: View {
                     .foregroundStyle(Color(hex: "0D0C0B"))
                     .frame(width: 48, height: 48)
                     .background(
-                        Circle().fill(Color(hex: "C75C5C"))
+                        Circle().fill(PulseTheme.activityAccent)
                     )
             }
             .buttonStyle(.plain)

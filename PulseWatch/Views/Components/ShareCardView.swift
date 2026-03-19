@@ -186,7 +186,7 @@ struct ShareCardView: View {
                 metricPill(
                     icon: "flame.fill",
                     value: "\(cal) kcal",
-                    color: PulseTheme.statusModerate
+                    color: PulseTheme.activityAccent
                 )
             }
 
@@ -292,7 +292,7 @@ struct ShareCardView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "heart.fill")
                         .font(.system(size: 12))
-                        .foregroundStyle(PulseTheme.statusPoor.opacity(0.8))
+                        .foregroundStyle(PulseTheme.activityAccent.opacity(0.8))
                     Text(String(localized: "Avg") + " \(avg) bpm")
                         .font(.system(size: 13, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.6))
@@ -303,7 +303,7 @@ struct ShareCardView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "heart.fill")
                         .font(.system(size: 12))
-                        .foregroundStyle(PulseTheme.statusPoor)
+                        .foregroundStyle(PulseTheme.activityAccent)
                     Text(String(localized: "Max") + " \(max) bpm")
                         .font(.system(size: 13, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.6))

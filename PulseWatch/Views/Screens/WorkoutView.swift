@@ -423,11 +423,11 @@ struct WorkoutView: View {
             }
 
             let zones: [HeartRateZone] = [
-                HeartRateZone(name: String(localized: "Warm-up"), percentage: Double(zoneCounts[0]) / total, color: Color(hex: "7FB069")),
+                HeartRateZone(name: String(localized: "Warm-up"), percentage: Double(zoneCounts[0]) / total, color: PulseTheme.statusGood),
                 HeartRateZone(name: String(localized: "Fat Burn"), percentage: Double(zoneCounts[1]) / total, color: Color(hex: "A8C256")),
-                HeartRateZone(name: String(localized: "Cardio"), percentage: Double(zoneCounts[2]) / total, color: Color(hex: "D4A056")),
+                HeartRateZone(name: String(localized: "Cardio"), percentage: Double(zoneCounts[2]) / total, color: PulseTheme.statusModerate),
                 HeartRateZone(name: String(localized: "Anaerobic"), percentage: Double(zoneCounts[3]) / total, color: Color(hex: "D47456")),
-                HeartRateZone(name: String(localized: "Peak"), percentage: Double(zoneCounts[4]) / total, color: Color(hex: "C75C5C")),
+                HeartRateZone(name: String(localized: "Peak"), percentage: Double(zoneCounts[4]) / total, color: PulseTheme.activityAccent),
             ]
 
             heartRateZones[workout.uuid] = zones
@@ -539,10 +539,10 @@ struct WorkoutView: View {
                             if record.isPersonalRecord {
                                 Text("PR")
                                     .font(.system(size: 8, weight: .bold))
-                                    .foregroundStyle(Color(hex: "D4A056"))
+                                    .foregroundStyle(PulseTheme.statusModerate)
                                     .padding(.horizontal, 3)
                                     .padding(.vertical, 1)
-                                    .background(Capsule().fill(Color(hex: "D4A056").opacity(0.15)))
+                                    .background(Capsule().fill(PulseTheme.statusModerate.opacity(0.15)))
                             }
                         }
                     }

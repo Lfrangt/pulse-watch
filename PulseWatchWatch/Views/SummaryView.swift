@@ -101,11 +101,11 @@ struct SummaryView: View {
     private var gaugeGradient: Gradient {
         switch score {
         case 0..<40:
-            return Gradient(colors: [Color(hex: "C75C5C"), Color(hex: "A04040")])
+            return Gradient(colors: [PulseTheme.activityAccent, PulseTheme.activityAccent.opacity(0.6)])
         case 40..<70:
-            return Gradient(colors: [Color(hex: "D4A056"), Color(hex: "B88A40")])
+            return Gradient(colors: [PulseTheme.statusModerate, PulseTheme.statusModerate.opacity(0.6)])
         default:
-            return Gradient(colors: [Color(hex: "7FB069"), Color(hex: "5A9044")])
+            return Gradient(colors: [PulseTheme.statusGood, PulseTheme.statusGood.opacity(0.6)])
         }
     }
 
@@ -137,7 +137,7 @@ struct SummaryView: View {
                     label: String(localized: "Sleep"),
                     value: sleepMinutes > 0 ? formatSleep(sleepMinutes) : "--",
                     unit: "",
-                    color: Color(hex: "8B7EC8")
+                    color: PulseTheme.sleepAccent
                 )
                 MetricCard(
                     icon: "figure.walk",

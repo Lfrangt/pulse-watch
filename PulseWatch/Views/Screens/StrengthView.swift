@@ -331,10 +331,10 @@ struct StrengthView: View {
                     if record.isPersonalRecord {
                         Text("PR")
                             .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(Color(hex: "D4A056"))
+                            .foregroundStyle(PulseTheme.statusModerate)
                             .padding(.horizontal, 4)
                             .padding(.vertical, 1)
-                            .background(Capsule().fill(Color(hex: "D4A056").opacity(0.15)))
+                            .background(Capsule().fill(PulseTheme.statusModerate.opacity(0.15)))
                     }
                 }
             }
@@ -381,7 +381,7 @@ struct StrengthView: View {
 
                         if r.isPersonalRecord {
                             PointMark(x: .value("Date", r.date), y: .value("1RM", r.estimated1RM))
-                                .foregroundStyle(Color(hex: "D4A056"))
+                                .foregroundStyle(PulseTheme.statusModerate)
                                 .symbolSize(40)
                                 .annotation(position: .top, spacing: 4) {
                                     Text("⭐")
@@ -408,8 +408,8 @@ struct StrengthView: View {
                 }
             }
             .chartForegroundStyleScale([
-                StrengthService.LiftType.squat.label: Color(hex: "7FC75C"),
-                StrengthService.LiftType.bench.label: Color(hex: "FF6B35"),
+                StrengthService.LiftType.squat.label: PulseTheme.statusGood,
+                StrengthService.LiftType.bench.label: PulseTheme.activityAccent,
                 StrengthService.LiftType.deadlift.label: Color(hex: "5C7BC7"),
             ])
             .chartLegend(.visible)
@@ -439,7 +439,7 @@ struct StrengthView: View {
             HStack {
                 Image(systemName: "trophy.fill")
                     .font(.system(size: 13))
-                    .foregroundStyle(Color(hex: "D4A056"))
+                    .foregroundStyle(PulseTheme.statusModerate)
                 Text("Achievements")
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
@@ -472,7 +472,7 @@ struct StrengthView: View {
                     .padding(.vertical, 10)
                     .background(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(unlocked ? Color(hex: "D4A056").opacity(0.08) : PulseTheme.surface)
+                            .fill(unlocked ? PulseTheme.statusModerate.opacity(0.08) : PulseTheme.surface)
                     )
                 }
             }
@@ -494,7 +494,7 @@ struct StrengthView: View {
 
                 Text("Achievement Unlocked!")
                     .font(.system(size: 22, weight: .bold))
-                    .foregroundStyle(Color(hex: "D4A056"))
+                    .foregroundStyle(PulseTheme.statusModerate)
 
                 Text(achievement.title)
                     .font(.system(size: 28, weight: .bold))
@@ -569,8 +569,8 @@ private struct ShareStrengthCard: View {
                 .foregroundStyle(.white)
 
             HStack(spacing: 20) {
-                liftStat("SQ", squat, Color(hex: "7FC75C"))
-                liftStat("BP", bench, Color(hex: "FF6B35"))
+                liftStat("SQ", squat, PulseTheme.statusGood)
+                liftStat("BP", bench, PulseTheme.activityAccent)
                 liftStat("DL", deadlift, Color(hex: "5C7BC7"))
             }
 
@@ -584,7 +584,7 @@ private struct ShareStrengthCard: View {
                 if !level.isEmpty {
                     Text(level)
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(Color(hex: "D4A056"))
+                        .foregroundStyle(PulseTheme.statusModerate)
                 }
             }
 

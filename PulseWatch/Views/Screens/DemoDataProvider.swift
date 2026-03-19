@@ -82,7 +82,7 @@ enum DemoDataProvider {
                 detail: String(localized: "Total 7h12m · Deep ~1.8h"),
                 impact: String(localized: "Recovery +15"),
                 impactPositive: true,
-                color: Color(hex: "8B7EC8")
+                color: PulseTheme.sleepAccent
             ),
             TimelineEvent(
                 time: wakeTime,

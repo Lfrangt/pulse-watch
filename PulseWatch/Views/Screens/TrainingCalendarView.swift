@@ -31,13 +31,13 @@ struct TrainingCalendarView: View {
         case "chest", "shoulders":
             return Color(hex: "5B8DEF")   // Push — 蓝色
         case "back":
-            return Color(hex: "7FB069")   // Pull — 绿色
+            return PulseTheme.statusGood   // Pull — 绿色
         case "legs":
-            return Color(hex: "D4A056")   // 腿 — 琥珀色
+            return PulseTheme.statusModerate   // 腿 — 琥珀色
         case "arms":
             return Color(hex: "C9A96E")   // 手臂 — 金色
         case "cardio":
-            return Color(hex: "C75C5C")   // 有氧 — 红色
+            return PulseTheme.activityAccent   // 有氧 — 红色
         default:
             return PulseTheme.textTertiary
         }
@@ -481,10 +481,10 @@ struct TrainingCalendarView: View {
     private var categoryLegend: some View {
         let legends: [(String, String, Color)] = [
             (String(localized: "Push (Chest/Shoulders)"), "chest",   Color(hex: "5B8DEF")),
-            (String(localized: "Pull (Back)"),   "back",    Color(hex: "7FB069")),
-            (String(localized: "Legs"),        "legs",    Color(hex: "D4A056")),
+            (String(localized: "Pull (Back)"),   "back",    PulseTheme.statusGood),
+            (String(localized: "Legs"),        "legs",    PulseTheme.statusModerate),
             (String(localized: "Arms"),      "arms",    Color(hex: "C9A96E")),
-            (String(localized: "Cardio"),      "cardio",  Color(hex: "C75C5C")),
+            (String(localized: "Cardio"),      "cardio",  PulseTheme.activityAccent),
         ]
 
         return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {

@@ -503,7 +503,7 @@ struct DashboardView: View {
                     label: String(localized: "Sleep"),
                     value: sleep,
                     unit: "",
-                    color: Color(hex: "8B7EC8"),
+                    color: PulseTheme.sleepAccent,
                     trend: .good,
                     animated: false
                 )
@@ -714,21 +714,21 @@ struct DashboardView: View {
                     score: tri.sleep.score,
                     label: String(localized: "Sleep"),
                     icon: "moon.fill",
-                    color: Color(hex: "8B7EC8"),
+                    color: PulseTheme.sleepAccent,
                     type: .sleep
                 )
                 triScoreRing(
                     score: tri.activity.score,
                     label: String(localized: "Activity"),
                     icon: "flame.fill",
-                    color: Color(hex: "FF6B35"),
+                    color: PulseTheme.activityAccent,
                     type: .activity
                 )
                 triScoreRing(
                     score: tri.readiness.score,
                     label: String(localized: "Readiness"),
                     icon: "bolt.heart.fill",
-                    color: Color(hex: "5CC7C1"),
+                    color: PulseTheme.accent,
                     type: .readiness
                 )
             }
@@ -819,7 +819,7 @@ struct DashboardView: View {
             // 火焰图标
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color(hex: "FF6B35").opacity(0.15))
+                    .fill(PulseTheme.activityAccent.opacity(0.15))
                     .frame(width: 40, height: 40)
                 Text("🔥")
                     .font(.system(size: 20))
@@ -840,12 +840,12 @@ struct DashboardView: View {
             if streak >= StreakService.shared.bestStreak && streak > 1 {
                 Text(String(localized: "Best"))
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(Color(hex: "FF6B35"))
+                    .foregroundStyle(PulseTheme.activityAccent)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(
                         Capsule()
-                            .fill(Color(hex: "FF6B35").opacity(0.15))
+                            .fill(PulseTheme.activityAccent.opacity(0.15))
                     )
             }
         }
@@ -924,7 +924,7 @@ struct DashboardView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.system(size: 13))
-                        .foregroundStyle(Color(hex: "C75C5C"))
+                        .foregroundStyle(PulseTheme.activityAccent)
                     Text(warning)
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textSecondary)
@@ -933,7 +933,7 @@ struct DashboardView: View {
                 .padding(.vertical, 8)
                 .background(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color(hex: "C75C5C").opacity(0.1))
+                        .fill(PulseTheme.activityAccent.opacity(0.1))
                 )
             }
         }
@@ -947,7 +947,7 @@ struct DashboardView: View {
     private func healthAgeCard(result: HealthAgeService.HealthAgeResult) -> some View {
         let diff = result.difference
         let isYounger = diff < -0.5
-        let accentColor = isYounger ? Color(hex: "7FC75C") : Color(hex: "C75C5C")
+        let accentColor = isYounger ? PulseTheme.statusGood : PulseTheme.activityAccent
         let ageInt = Int(result.healthAge.rounded())
 
         return VStack(spacing: PulseTheme.spacingM) {
@@ -1034,7 +1034,7 @@ struct DashboardView: View {
     private func healthAgeMetricRow(_ metric: HealthAgeService.MetricScore) -> some View {
         let isGood = metric.ageImpact < -0.3
         let isBad = metric.ageImpact > 0.3
-        let color: Color = isGood ? Color(hex: "7FC75C") : (isBad ? Color(hex: "C75C5C") : PulseTheme.textSecondary)
+        let color: Color = isGood ? PulseTheme.statusGood : (isBad ? PulseTheme.activityAccent : PulseTheme.textSecondary)
 
         return HStack(alignment: .top, spacing: PulseTheme.spacingS) {
             Image(systemName: metric.metric.icon)

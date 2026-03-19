@@ -117,7 +117,7 @@ struct MetricsCard: View {
     var body: some View {
         VStack(spacing: 0) {
             if let hr = heartRate {
-                MetricRow(icon: "heart.fill", label: String(localized: "Heart Rate"), value: "\(Int(hr))", unit: "bpm", color: PulseTheme.statusPoor)
+                MetricRow(icon: "heart.fill", label: String(localized: "Heart Rate"), value: "\(Int(hr))", unit: "bpm", color: PulseTheme.activityAccent)
                 metricDivider
             }
 
@@ -134,11 +134,11 @@ struct MetricsCard: View {
             MetricRow(icon: "figure.walk", label: String(localized: "Steps"), value: formatSteps(steps), color: PulseTheme.statusGood)
             metricDivider
 
-            MetricRow(icon: "flame.fill", label: String(localized: "Active Calories"), value: "\(Int(calories))", unit: "kcal", color: PulseTheme.statusModerate)
+            MetricRow(icon: "flame.fill", label: String(localized: "Active Calories"), value: "\(Int(calories))", unit: "kcal", color: PulseTheme.sleepAccent)
 
             if let sleep = sleepSummary {
                 metricDivider
-                MetricRow(icon: "moon.fill", label: String(localized: "Sleep"), value: sleep, color: Color(hex: "8B7EC8"))
+                MetricRow(icon: "moon.fill", label: String(localized: "Sleep"), value: sleep, color: PulseTheme.sleepAccent)
             }
         }
         .pulseCard(padding: PulseTheme.spacingM)
@@ -310,8 +310,8 @@ struct TrainingCard: View {
     private var intensityColor: Color {
         switch plan.intensity {
         case .light: return PulseTheme.statusGood
-        case .moderate: return PulseTheme.statusModerate
-        case .heavy: return PulseTheme.statusPoor
+        case .moderate: return PulseTheme.sleepAccent
+        case .heavy: return PulseTheme.activityAccent
         }
     }
 }
@@ -325,12 +325,12 @@ struct RecoveryCard: View {
         HStack(spacing: PulseTheme.spacingM) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(PulseTheme.statusModerate.opacity(0.12))
+                    .fill(PulseTheme.sleepAccent.opacity(0.12))
                     .frame(width: 32, height: 32)
 
                 Image(systemName: "exclamationmark.triangle")
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(PulseTheme.statusModerate)
+                    .foregroundStyle(PulseTheme.sleepAccent)
             }
 
             Text(note)
@@ -342,12 +342,12 @@ struct RecoveryCard: View {
         .padding(PulseTheme.spacingM)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(PulseTheme.statusModerate.opacity(0.06))
+                .fill(PulseTheme.sleepAccent.opacity(0.06))
                 .shadow(color: PulseTheme.cardShadow.opacity(0.3), radius: 8, y: 4)
         )
         .overlay(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .stroke(PulseTheme.statusModerate.opacity(0.12), lineWidth: 0.5)
+                .stroke(PulseTheme.sleepAccent.opacity(0.12), lineWidth: 0.5)
         )
     }
 }

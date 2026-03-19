@@ -225,7 +225,7 @@ struct HistoryView: View {
             if let (text, positive) = delta {
                 Text(text)
                     .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(positive ? Color(hex: "7FC75C") : Color(hex: "C75C5C"))
+                    .foregroundStyle(positive ? PulseTheme.statusGood : PulseTheme.activityAccent)
             }
         }
         .frame(maxWidth: .infinity)
@@ -387,7 +387,7 @@ struct HistoryView: View {
             return String(format: String(localized: "Average resting HR: %.0f bpm"), cur)
         }()
 
-        let hrColor = Color(hex: "C75C5C")
+        let hrColor = PulseTheme.activityAccent
 
         return chartCard(
             icon: "heart.fill",
@@ -612,7 +612,7 @@ struct HistoryView: View {
                             y: .value(String(localized: "Total Duration"), item.hours),
                             width: .ratio(0.4)
                         )
-                        .foregroundStyle(Color(hex: "8B7EC8").opacity(0.3))
+                        .foregroundStyle(PulseTheme.sleepAccent.opacity(0.3))
                         .cornerRadius(4)
 
                         BarMark(
@@ -620,7 +620,7 @@ struct HistoryView: View {
                             y: .value(String(localized: "Deep"), item.deep),
                             width: .ratio(0.4)
                         )
-                        .foregroundStyle(Color(hex: "8B7EC8"))
+                        .foregroundStyle(PulseTheme.sleepAccent)
                         .cornerRadius(4)
                     }
 
@@ -852,7 +852,7 @@ struct HistoryView: View {
                 if let change = changeText {
                     Text(change)
                         .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(changePositive ? Color(hex: "7FC75C") : Color(hex: "C75C5C"))
+                        .foregroundStyle(changePositive ? PulseTheme.statusGood : PulseTheme.activityAccent)
                 }
             }
 

@@ -52,9 +52,9 @@ struct PulseComplicationProvider: TimelineProvider {
         let steps = defaults?.integer(forKey: PulseSharedData.stepsKey) ?? 0
         return PulseEntry(
             date: .now,
-            score: score > 0 ? score : 72,
+            score: score,           // 无数据时保持 0，不伪造假值
             headline: headline,
-            heartRate: heartRate > 0 ? heartRate : 68,
+            heartRate: heartRate,   // 无数据时保持 0，显示 "--"
             steps: steps
         )
     }
@@ -73,8 +73,8 @@ struct PulseComplicationCircular: View {
                 Text("P")
                     .font(.system(size: 10, weight: .bold, design: .rounded))
             } currentValueLabel: {
-                Text("\(entry.score)")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                Text(entry.score > 0 ? "\(entry.score)" : "--")
+                    .font(.system(size: entry.score > 0 ? 16 : 12, weight: .bold, design: .rounded))
                     .foregroundStyle(scoreColor)
             }
             .gaugeStyle(.accessoryCircular)
@@ -131,7 +131,7 @@ struct PulseComplicationRectangular: View {
                         Image(systemName: "heart.fill")
                             .font(.system(size: 8))
                             .foregroundStyle(Color(hex: "C75C5C"))
-                        Text("\(entry.heartRate)")
+                        Text(entry.heartRate > 0 ? "\(entry.heartRate)" : "--")
                             .font(.system(size: 10, design: .rounded))
                     }
 

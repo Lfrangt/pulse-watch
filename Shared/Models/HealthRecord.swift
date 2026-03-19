@@ -11,6 +11,7 @@ enum HealthMetricType: String, Codable, CaseIterable {
     case activeCalories = "activeCalories"       // kcal
     case restingCalories = "restingCalories"     // kcal
     case sleepAnalysis = "sleep"                 // 分钟
+    case exerciseTime = "exerciseTime"           // 分钟（Apple Watch appleExerciseTime）
 
     var displayName: String {
         switch self {
@@ -22,6 +23,7 @@ enum HealthMetricType: String, Codable, CaseIterable {
         case .activeCalories: return String(localized: "Active Calories")
         case .restingCalories: return String(localized: "Resting Calories")
         case .sleepAnalysis: return String(localized: "Sleep")
+        case .exerciseTime: return String(localized: "Exercise Time")
         }
     }
 
@@ -33,6 +35,7 @@ enum HealthMetricType: String, Codable, CaseIterable {
         case .stepCount: return "steps"
         case .activeCalories, .restingCalories: return "kcal"
         case .sleepAnalysis: return "min"
+        case .exerciseTime: return "min"
         }
     }
 }

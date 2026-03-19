@@ -52,8 +52,8 @@ final class GymCoordinator {
             restingHR: hm.latestRestingHR,
             bloodOxygen: hm.latestBloodOxygen,
             sleepMinutes: hm.lastNightSleepMinutes,
-            deepSleepMinutes: 0,
-            remSleepMinutes: 0,
+            deepSleepMinutes: hm.lastNightDeepSleepMinutes,
+            remSleepMinutes: hm.lastNightREMSleepMinutes,
             steps: hm.todaySteps,
             recentWorkouts: []
         )
@@ -90,8 +90,8 @@ final class GymCoordinator {
             restingHR: hm.latestRestingHR,
             bloodOxygen: hm.latestBloodOxygen,
             sleepMinutes: hm.lastNightSleepMinutes,
-            deepSleepMinutes: 0,
-            remSleepMinutes: 0,
+            deepSleepMinutes: hm.lastNightDeepSleepMinutes,
+            remSleepMinutes: hm.lastNightREMSleepMinutes,
             steps: hm.todaySteps,
             recentWorkouts: []
         )

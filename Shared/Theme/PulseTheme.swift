@@ -135,6 +135,7 @@ struct PulseCardStyle: ViewModifier {
                     .fill(PulseTheme.cardBackground)
                     .shadow(color: PulseTheme.cardShadow, radius: 16, y: 6)
             )
+            .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
                     .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)

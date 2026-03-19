@@ -20,9 +20,25 @@ final class HealthAgeService {
 
     var hasBirthYear: Bool { birthYear > 1900 && birthYear <= Calendar.current.component(.year, from: .now) }
 
+    /// 出生月份（1-12），用于精确年龄计算
+    var birthMonth: Int {
+        get { UserDefaults.standard.integer(forKey: "pulse.user.birthMonth") }
+        set { UserDefaults.standard.set(newValue, forKey: "pulse.user.birthMonth") }
+    }
+
     var chronologicalAge: Int? {
         guard hasBirthYear else { return nil }
-        return Calendar.current.component(.year, from: .now) - birthYear
+        let cal = Calendar.current
+        let now = Date()
+        let currentYear = cal.component(.year, from: now)
+        let currentMonth = cal.component(.month, from: now)
+        var age = currentYear - birthYear
+        // 今年生日还没到，减一岁
+        let bMonth = birthMonth > 0 ? birthMonth : 1
+        if currentMonth < bMonth {
+            age -= 1
+        }
+        return max(0, age)
     }
 
     // MARK: - 结果
@@ -92,8 +108,14 @@ final class HealthAgeService {
         let avgSteps = avg(summaries.compactMap(\.totalSteps).map(Double.init))
         let avgActiveCal = avg(summaries.compactMap(\.activeCalories))
 
-        // 估算每日活跃分钟数（活跃卡路里 / 5 ≈ 活跃分钟，粗略估算）
-        let avgActiveMin = avgActiveCal.map { $0 / 5.0 } ?? 0
+        // 优先使用真实 appleExerciseTime，无数据时降级到 cal/5 估算
+        let avgExerciseMin = avg(summaries.compactMap(\.exerciseMinutes))
+        let avgActiveMin: Double
+        if let real = avgExerciseMin, real > 0 {
+            avgActiveMin = real
+        } else {
+            avgActiveMin = avgActiveCal.map { $0 / 5.0 } ?? 0
+        }
 
         var totalImpact: Double = 0
         var metrics: [MetricScore] = []

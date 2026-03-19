@@ -157,20 +157,21 @@ struct WeeklyTrendChartsView: View {
         .accessibilityHidden(true)
     }
 
-    // MARK: - 心率折线图
+    // MARK: - 静息心率折线图
 
     private var heartRateChart: some View {
-        let hrData = displayData.compactMap { d -> (Date, Double, Double)? in
-            guard let hr = d.heartRate else { return nil }
-            return (d.date, hr, d.restingHR ?? hr)
+        // 只用静息心率，排除运动期间的高心率干扰
+        let hrData = displayData.compactMap { d -> (Date, Double)? in
+            guard let rhr = d.restingHR else { return nil }
+            return (d.date, rhr)
         }
 
         return VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
             chartHeader(
                 icon: "heart.fill",
-                title: String(localized: "Heart Rate"),
+                title: String(localized: "Resting HR"),
                 color: PulseTheme.statusPoor,
-                summary: hrData.isEmpty ? nil : heartRateSummary(hrData)
+                summary: hrData.isEmpty ? nil : restingHRSummary(hrData)
             )
 
             if hrData.isEmpty {
@@ -180,7 +181,7 @@ struct WeeklyTrendChartsView: View {
                     ForEach(hrData, id: \.0) { item in
                         LineMark(
                             x: .value("Date", item.0),
-                            y: .value("HR", item.1)
+                            y: .value("Resting HR", item.1)
                         )
                         .foregroundStyle(PulseTheme.statusPoor)
                         .interpolationMethod(.catmullRom)
@@ -193,7 +194,7 @@ struct WeeklyTrendChartsView: View {
 
                         AreaMark(
                             x: .value("Date", item.0),
-                            y: .value("HR", item.1)
+                            y: .value("Resting HR", item.1)
                         )
                         .foregroundStyle(
                             LinearGradient(
@@ -203,16 +204,6 @@ struct WeeklyTrendChartsView: View {
                             )
                         )
                         .interpolationMethod(.catmullRom)
-
-                        // 静息心率虚线
-                        LineMark(
-                            x: .value("Date", item.0),
-                            y: .value("Resting", item.2),
-                            series: .value("Type", "resting")
-                        )
-                        .foregroundStyle(PulseTheme.statusPoor.opacity(0.4))
-                        .interpolationMethod(.catmullRom)
-                        .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
                     }
                 }
                 .chartYAxis {
@@ -233,8 +224,8 @@ struct WeeklyTrendChartsView: View {
                 }
                 .frame(height: 120)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(String(localized: "Heart Rate trend chart"))
-                .accessibilityValue(hrData.isEmpty ? String(localized: "No data") : heartRateSummary(hrData))
+                .accessibilityLabel(String(localized: "Resting Heart Rate trend chart"))
+                .accessibilityValue(hrData.isEmpty ? String(localized: "No data") : restingHRSummary(hrData))
             }
         }
     }
@@ -428,7 +419,7 @@ struct WeeklyTrendChartsView: View {
 
     // MARK: - Summary 计算
 
-    private func heartRateSummary(_ data: [(Date, Double, Double)]) -> String {
+    private func restingHRSummary(_ data: [(Date, Double)]) -> String {
         let avg = data.map(\.1).reduce(0, +) / Double(data.count)
         return String(localized: "Avg \(Int(avg)) bpm")
     }

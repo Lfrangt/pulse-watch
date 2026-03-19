@@ -57,30 +57,29 @@ enum TimelineEventBuilder {
 
         // ── 1. 睡眠事件 ──
         let sleepMinutes = hk.lastNightSleepMinutes
-        if sleepMinutes > 0 {
+        if sleepMinutes > 0, let sleepStart = hk.lastNightSleepStart, let sleepEnd = hk.lastNightSleepEnd {
             let sleepHours = sleepMinutes / 60
             let sleepMins = sleepMinutes % 60
-            let deepHours = Double(sleepMinutes) * 0.2 // 估算深睡（约 20%）
-
-            // 入睡时间（倒推）
-            let bedtime = calendar.date(byAdding: .minute, value: -sleepMinutes, to:
-                calendar.date(bySettingHour: 7, minute: 0, second: 0, of: now) ?? now
-            ) ?? now
+            // 使用 HealthKit 真实深睡数据，有数据才显示
+            let deepMinutes = hk.lastNightDeepSleepMinutes
+            let deepDetail: String
+            if deepMinutes > 0 {
+                deepDetail = " · \(String(localized: "Deep")) \(String(format: "%.1f", Double(deepMinutes) / 60.0))h"
+            } else {
+                deepDetail = ""
+            }
 
             events.append(TimelineEvent(
-                time: bedtime,
+                time: sleepStart,
                 icon: "moon.fill",
                 title: String(localized: "Asleep"),
-                detail: "\(sleepHours)h\(sleepMins)m · \(String(localized: "Deep")) ~\(String(format: "%.1f", deepHours / 60))h",
+                detail: "\(sleepHours)h\(sleepMins)m\(deepDetail)",
                 impact: insight.sleepScore >= 70 ? "Recovery +\(min(20, insight.sleepScore / 5))" : String(localized: "Fair Recovery"),
                 impactPositive: insight.sleepScore >= 50,
                 color: sleepColor
             ))
 
-            // 醒来时间
-            let wakeTime = calendar.date(bySettingHour: 7, minute: 0, second: 0, of: now) ?? now
-
-            // 醒来事件 — 结合静息心率
+            // 醒来时间 — 使用 HealthKit 真实数据
             let rhrText: String
             let rhrGood: Bool
             if let rhr = hk.latestRestingHR {
@@ -92,7 +91,7 @@ enum TimelineEventBuilder {
             }
 
             events.append(TimelineEvent(
-                time: wakeTime,
+                time: sleepEnd,
                 icon: "sunrise.fill",
                 title: String(localized: "Awake"),
                 detail: rhrText,
@@ -101,30 +100,15 @@ enum TimelineEventBuilder {
                 color: rhrGood ? PulseTheme.statusGood : PulseTheme.statusModerate
             ))
         } else {
-            // 无睡眠数据 — 占位
-            let placeholderBedtime = calendar.date(bySettingHour: 23, minute: 30, second: 0, of:
-                calendar.date(byAdding: .day, value: -1, to: now) ?? now
-            ) ?? now
-
+            // 无睡眠数据 — 只显示一个占位，不显示假的醒来时间
             events.append(TimelineEvent(
-                time: placeholderBedtime,
+                time: calendar.date(byAdding: .hour, value: -8, to: now) ?? now,
                 icon: "moon.fill",
                 title: String(localized: "Sleep"),
                 detail: String(localized: "No sleep data"),
                 impact: String(localized: "Waiting to sync"),
                 impactPositive: true,
                 color: sleepColor
-            ))
-
-            let placeholderWake = calendar.date(bySettingHour: 7, minute: 0, second: 0, of: now) ?? now
-            events.append(TimelineEvent(
-                time: placeholderWake,
-                icon: "sunrise.fill",
-                title: String(localized: "Awake"),
-                detail: String(localized: "Resting HR --"),
-                impact: "--",
-                impactPositive: true,
-                color: PulseTheme.textTertiary
             ))
         }
 
@@ -133,9 +117,8 @@ enum TimelineEventBuilder {
         let calories = hk.todayActiveCalories
 
         if steps > 0 || calories > 0 {
-            // 根据当前时间估算活动发生的大致时段
-            let activityHour = min(calendar.component(.hour, from: now), 14)
-            let activityTime = calendar.date(bySettingHour: max(activityHour, 9), minute: 0, second: 0, of: now) ?? now
+            // 优先使用今日最近一次 workout 的真实开始时间，没有则不显示精确时间（用 now）
+            let activityTime = hk.todayLastWorkoutStart ?? now
 
             let stepsText: String
             if steps >= 10000 {

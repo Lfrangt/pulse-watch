@@ -20,7 +20,13 @@ final class HealthKitManager {
     var latestBloodOxygen: Double?
     var todaySteps: Int = 0
     var todayActiveCalories: Double = 0
+    var todayExerciseMinutes: Double = 0  // Apple Watch appleExerciseTime（真实运动分钟）
     var lastNightSleepMinutes: Int = 0
+    var lastNightDeepSleepMinutes: Int = 0  // HealthKit .asleepDeep 真实深睡时长
+    var lastNightREMSleepMinutes: Int = 0   // HealthKit .asleepREM 真实 REM 时长
+    var lastNightSleepStart: Date? = nil    // 真实入睡时间（第一个睡眠 sample 的 startDate）
+    var lastNightSleepEnd: Date? = nil      // 真实醒来时间（最后一个睡眠 sample 的 endDate）
+    var todayLastWorkoutStart: Date? = nil  // 今日最近一次 workout 的真实开始时间
     
     enum AuthorizationStatus {
         case notDetermined
@@ -190,6 +196,15 @@ final class HealthKitManager {
         todayActiveCalories = sum
         return sum
     }
+
+    // MARK: - Exercise Time (today) — Apple Watch appleExerciseTime
+    
+    func fetchTodayExerciseTime() async throws -> Double {
+        let type = HKQuantityType(.appleExerciseTime)
+        let minutes = try await fetchTodaySum(for: type, unit: .minute())
+        todayExerciseMinutes = minutes
+        return minutes
+    }
     
     // MARK: - Sleep (last night)
     
@@ -211,11 +226,13 @@ final class HealthKitManager {
         var totalMinutes = 0
         var deepMinutes = 0
         var remMinutes = 0
-        
+        var earliestStart: Date? = nil
+        var latestEnd: Date? = nil
+
         for sample in samples {
             let duration = Int(sample.endDate.timeIntervalSince(sample.startDate) / 60)
             let value = HKCategoryValueSleepAnalysis(rawValue: sample.value)
-            
+
             switch value {
             case .asleepDeep:
                 deepMinutes += duration
@@ -228,14 +245,42 @@ final class HealthKitManager {
             case .asleepUnspecified:
                 totalMinutes += duration
             default:
-                break // inBed, awake
+                break // inBed, awake — 不计入睡眠时长，但可以作为入睡/起床边界
+            }
+
+            // 用所有 sample（包括 inBed）来确定整体睡眠窗口的起止
+            if earliestStart == nil || sample.startDate < earliestStart! {
+                earliestStart = sample.startDate
+            }
+            if latestEnd == nil || sample.endDate > latestEnd! {
+                latestEnd = sample.endDate
             }
         }
-        
+
         lastNightSleepMinutes = totalMinutes
+        lastNightDeepSleepMinutes = deepMinutes
+        lastNightREMSleepMinutes = remMinutes
+        lastNightSleepStart = earliestStart
+        lastNightSleepEnd = latestEnd
         return (totalMinutes, deepMinutes, remMinutes)
     }
     
+    // MARK: - Today's Last Workout
+
+    func fetchTodayLastWorkout() async {
+        let workoutType = HKObjectType.workoutType()
+        let startOfDay = Calendar.current.startOfDay(for: Date())
+        let predicate = HKQuery.predicateForSamples(withStart: startOfDay, end: Date())
+        let descriptor = HKSampleQueryDescriptor(
+            predicates: [.workout(predicate)],
+            sortDescriptors: [SortDescriptor(\.startDate, order: .reverse)],
+            limit: 1
+        )
+        if let sample = try? await descriptor.result(for: store).first {
+            todayLastWorkoutStart = sample.startDate
+        }
+    }
+
     // MARK: - Refresh All
     
     func refreshAll() async {
@@ -246,7 +291,9 @@ final class HealthKitManager {
             _ = try await fetchBloodOxygen()
             _ = try await fetchTodaySteps()
             _ = try await fetchTodayCalories()
+            _ = try await fetchTodayExerciseTime()
             _ = try await fetchLastNightSleep()
+            await fetchTodayLastWorkout()
             
             // Check if we have any meaningful health data
             updateHealthDataAvailability()

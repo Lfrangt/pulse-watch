@@ -194,12 +194,11 @@ final class HealthAnalyzer {
             remScore = 4
         }
 
-        // === 规律性评分 (0-15) ===
-        let regularityScore: Double
+        // === 规律性评分 (0-15) — 数据不足时排除，其余维度等比例缩放 ===
+        let regularityScore: Double?
         let recentDurations = recentSummaries.compactMap(\.sleepDurationMinutes).filter { $0 > 0 }
         if recentDurations.count >= 3 {
             let stdDev = standardDeviation(recentDurations.map(Double.init))
-            // 标准差越小越规律。stdDev < 30min → 满分，> 90min → 最低
             if stdDev < 30 {
                 regularityScore = 15
             } else if stdDev < 45 {
@@ -212,10 +211,19 @@ final class HealthAnalyzer {
                 regularityScore = 2
             }
         } else {
-            regularityScore = 8  // 数据不足给中等分
+            regularityScore = nil  // 数据不足：排除此维度
         }
 
-        return clamp(Int((durationScore + deepScore + remScore + regularityScore).rounded()), min: 0, max: 100)
+        // 无规律性数据时：前三项 (40+30+15=85) 等比例缩放到 100
+        let baseScore = durationScore + deepScore + remScore
+        let finalScore: Double
+        if let reg = regularityScore {
+            finalScore = baseScore + reg  // 全量数据：最高 100
+        } else {
+            finalScore = baseScore / 85.0 * 100.0  // 等比例缩放
+        }
+
+        return clamp(Int(finalScore.rounded()), min: 0, max: 100)
     }
 
     // MARK: - 训练建议

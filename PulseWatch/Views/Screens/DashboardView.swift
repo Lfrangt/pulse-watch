@@ -105,9 +105,18 @@ struct DashboardView: View {
                             .staggered(index: 3)
                     }
 
-                    // 今日洞察卡片
+                    // 今日洞察卡片 — 第一条用 TriScore advice，避免与主评分矛盾
                     if let insight, !insight.insights.isEmpty {
-                        insightCards(insight.insights)
+                        let mergedInsights: [String] = {
+                            var list = insight.insights
+                            // 用 TriScore readiness advice 替换第一条恢复建议（保持一致）
+                            if let tri = triScore {
+                                let triAdvice = tri.readiness.advice
+                                list[0] = triAdvice
+                            }
+                            return list
+                        }()
+                        insightCards(mergedInsights)
                             .staggered(index: 2)
                     }
 
@@ -1011,6 +1020,12 @@ struct DashboardView: View {
                 }
             }
         }
+        // 免责声明
+        Text("Estimated using population-average baselines. Not a medical assessment.")
+            .font(.system(size: 10))
+            .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, PulseTheme.spacingS)
         .pulseCard()
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(format: String(localized: "Health Age %d"), ageInt))

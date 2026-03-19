@@ -31,6 +31,7 @@ final class HealthKitService {
             HKQuantityType(.stepCount),
             HKQuantityType(.activeEnergyBurned),
             HKQuantityType(.basalEnergyBurned),
+            HKQuantityType(.appleExerciseTime),
             HKCategoryType(.sleepAnalysis),
         ].compactMap { $0 })
     }
@@ -51,6 +52,7 @@ final class HealthKitService {
             HKQuantityType(.stepCount),
             HKQuantityType(.activeEnergyBurned),
             HKQuantityType(.basalEnergyBurned),
+            HKQuantityType(.appleExerciseTime),
         ]
     }
 
@@ -319,6 +321,7 @@ final class HealthKitService {
         let stepRecords = records.filter { $0.metricType == HealthMetricType.stepCount.rawValue }
         let activeCalRecords = records.filter { $0.metricType == HealthMetricType.activeCalories.rawValue }
         let restingCalRecords = records.filter { $0.metricType == HealthMetricType.restingCalories.rawValue }
+        let exerciseTimeRecords = records.filter { $0.metricType == HealthMetricType.exerciseTime.rawValue }
         let sleepRecords = records.filter { $0.metricType == HealthMetricType.sleepAnalysis.rawValue }
 
         // 心率聚合
@@ -358,6 +361,10 @@ final class HealthKitService {
         }
         if !restingCalRecords.isEmpty {
             summary.restingCalories = restingCalRecords.map(\.value).reduce(0, +)
+        }
+        // 运动分钟（Apple Watch appleExerciseTime，真实值）
+        if !exerciseTimeRecords.isEmpty {
+            summary.exerciseMinutes = exerciseTimeRecords.map(\.value).reduce(0, +)
         }
 
         // 睡眠（总分钟数）
@@ -438,6 +445,8 @@ final class HealthKitService {
             return .activeCalories
         case HKQuantityTypeIdentifier.basalEnergyBurned.rawValue:
             return .restingCalories
+        case HKQuantityTypeIdentifier.appleExerciseTime.rawValue:
+            return .exerciseTime
         default:
             return .heartRate // 不应到达
         }
@@ -458,6 +467,8 @@ final class HealthKitService {
         case HKQuantityTypeIdentifier.activeEnergyBurned.rawValue,
              HKQuantityTypeIdentifier.basalEnergyBurned.rawValue:
             return sample.quantity.doubleValue(for: .kilocalorie())
+        case HKQuantityTypeIdentifier.appleExerciseTime.rawValue:
+            return sample.quantity.doubleValue(for: .minute())
         default:
             return 0
         }

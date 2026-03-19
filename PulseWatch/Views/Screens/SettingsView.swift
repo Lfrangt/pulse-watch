@@ -23,6 +23,7 @@ struct SettingsView: View {
     @AppStorage("pulse.units") private var unitSystem = "metric" // "metric" or "imperial"
     @AppStorage("pulse.onboarding.completed") private var onboardingCompleted = false
     @AppStorage("pulse.user.birthYear") private var birthYear = 0
+    @AppStorage("pulse.user.birthMonth") private var birthMonth = 0
     @AppStorage("pulse.user.heightCm") private var heightCm: Double = 0
     @AppStorage("pulse.user.weightKg") private var weightKg: Double = 0
     @AppStorage("pulse.user.gender") private var gender = "unset"  // "male" "female" "unset"
@@ -1211,7 +1212,7 @@ struct SettingsView: View {
                     Spacer()
                     Picker("", selection: $birthYear) {
                         Text("—").tag(0)
-                        ForEach((1940...2010).reversed(), id: \.self) { year in
+                        ForEach((1940...2015).reversed(), id: \.self) { year in
                             Text(String(year)).tag(year)
                         }
                     }
@@ -1219,6 +1220,31 @@ struct SettingsView: View {
                     .tint(PulseTheme.accent)
                     .onChange(of: birthYear) {
                         HealthAgeService.shared.birthYear = birthYear
+                    }
+                }
+            }
+
+            settingRow {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Birth Month")
+                            .font(PulseTheme.bodyFont)
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text("For accurate age calculation")
+                            .font(PulseTheme.captionFont)
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                    Spacer()
+                    Picker("", selection: $birthMonth) {
+                        Text("—").tag(0)
+                        ForEach(1...12, id: \.self) { month in
+                            Text(DateFormatter().monthSymbols[month - 1]).tag(month)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .tint(PulseTheme.accent)
+                    .onChange(of: birthMonth) {
+                        HealthAgeService.shared.birthMonth = birthMonth
                     }
                 }
             }

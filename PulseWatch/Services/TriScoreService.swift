@@ -124,10 +124,10 @@ final class TriScoreService {
             weight: "30%"
         ))
 
-        // 3. 静息心率 (30%)
+        // 3. 静息心率 (30%) — 无数据时排除该维度，其余两项等比例放大
         let rhr = current.restingHeartRate
-        let rhrScore: Double
         if let rhr {
+            let rhrScore: Double
             switch rhr {
             case ..<55:     rhrScore = 30
             case 55..<60:   rhrScore = 26
@@ -135,16 +135,23 @@ final class TriScoreService {
             case 65..<70:   rhrScore = 14
             default:        rhrScore = 6
             }
+            total += rhrScore
+            factors.append(.init(
+                name: String(localized: "Resting Heart Rate"),
+                value: String(format: "%.0f bpm", rhr),
+                contribution: Int(rhrScore - 15),
+                weight: "30%"
+            ))
         } else {
-            rhrScore = 15  // 无数据给中间值
+            // 无 RHR 数据：把已有的 70% 分数等比例缩放到 100
+            total = total / 0.7
+            factors.append(.init(
+                name: String(localized: "Resting Heart Rate"),
+                value: "—",
+                contribution: 0,
+                weight: "—"
+            ))
         }
-        total += rhrScore
-        factors.append(.init(
-            name: String(localized: "Resting Heart Rate"),
-            value: rhr.map { String(format: "%.0f bpm", $0) } ?? "—",
-            contribution: Int(rhrScore - 15),
-            weight: "30%"
-        ))
 
         let score = max(0, min(100, Int(total)))
         let advice: String
@@ -177,15 +184,24 @@ final class TriScoreService {
             weight: "40%"
         ))
 
-        // 2. 活跃卡路里 → 估算活跃分钟 (40%)
+        // 2. 活跃分钟 (40%) — 优先用 appleExerciseTime，无数据时用 cal/5 估算并标注
         let activeCal = current.activeCalories ?? 0
-        let activeMin = activeCal / 5.0  // 粗算
+        let realExerciseMin = current.exerciseMinutes
+        let activeMin: Double
+        let activeMinLabel: String
+        if let real = realExerciseMin, real > 0 {
+            activeMin = real
+            activeMinLabel = String(format: "%.0f min", activeMin)
+        } else {
+            activeMin = activeCal / 5.0
+            activeMinLabel = activeCal > 0 ? String(format: "~%.0f min", activeMin) : "— min"
+        }
         let activeRate = min(1.0, activeMin / 30.0)  // 30 min/day 目标
         let activeScore = activeRate * 40
         total += activeScore
         factors.append(.init(
             name: String(localized: "Active Minutes"),
-            value: String(format: "%.0f min", activeMin),
+            value: activeMinLabel,
             contribution: Int(activeScore - 20),
             weight: "40%"
         ))
@@ -220,62 +236,73 @@ final class TriScoreService {
         var total: Double = 0
         var factors: [ScoreDetail.Factor] = []
 
-        // 1. HRV vs 基线 (35%)
+        // 追踪有数据的维度权重，最终等比例缩放到 100
+        var availableWeight: Double = 0
+
+        // 1. HRV vs 基线 (35%) — 无数据时排除
         let hrv = current.averageHRV
-        let hrvScore: Double
-        if let hrv, let baseline = baselineHRV, baseline > 0 {
-            let ratio = hrv / baseline
-            switch ratio {
-            case 1.1...:   hrvScore = 35   // 高于基线 10%+
-            case 0.95...:  hrvScore = 28   // 基线附近
-            case 0.85...:  hrvScore = 18   // 低于基线 5-15%
-            default:       hrvScore = 8    // 明显低于基线
-            }
-        } else {
-            hrvScore = 17  // 无数据中间值
-        }
-        total += hrvScore
         let hrvDisplay = hrv.map { String(format: "%.0f ms", $0) } ?? "—"
         let baselineDisplay = baselineHRV.map { String(format: "(avg %.0f)", $0) } ?? ""
-        factors.append(.init(
-            name: "HRV",
-            value: "\(hrvDisplay) \(baselineDisplay)",
-            contribution: Int(hrvScore - 17),
-            weight: "35%"
-        ))
+        if let hrv, let baseline = baselineHRV, baseline > 0 {
+            let ratio = hrv / baseline
+            let hrvScore: Double
+            switch ratio {
+            case 1.1...:   hrvScore = 35
+            case 0.95...:  hrvScore = 28
+            case 0.85...:  hrvScore = 18
+            default:       hrvScore = 8
+            }
+            total += hrvScore
+            availableWeight += 35
+            factors.append(.init(
+                name: "HRV",
+                value: "\(hrvDisplay) \(baselineDisplay)",
+                contribution: Int(hrvScore - 17),
+                weight: "35%"
+            ))
+        } else {
+            factors.append(.init(name: "HRV", value: "—", contribution: 0, weight: "—"))
+        }
 
-        // 2. RHR vs 基线 (30%)
+        // 2. RHR vs 基线 (30%) — 无数据时排除
         let rhr = current.restingHeartRate
-        let rhrScore: Double
+        let rhrDisplay = rhr.map { String(format: "%.0f bpm", $0) } ?? "—"
         if let rhr, let baseline = baselineRHR, baseline > 0 {
             let diff = rhr - baseline
+            let rhrScore: Double
             switch diff {
-            case ..<(-3):  rhrScore = 30   // 低于基线 3+ bpm (好)
-            case (-3)...2: rhrScore = 24   // 基线附近
-            case 2...5:    rhrScore = 14   // 高于基线 (差)
-            default:       rhrScore = 6    // 明显偏高
+            case ..<(-3):  rhrScore = 30
+            case (-3)...2: rhrScore = 24
+            case 2...5:    rhrScore = 14
+            default:       rhrScore = 6
             }
+            total += rhrScore
+            availableWeight += 30
+            factors.append(.init(
+                name: String(localized: "Resting HR vs Baseline"),
+                value: rhrDisplay,
+                contribution: Int(rhrScore - 15),
+                weight: "30%"
+            ))
         } else {
-            rhrScore = 15
+            factors.append(.init(name: String(localized: "Resting HR vs Baseline"), value: "—", contribution: 0, weight: "—"))
         }
-        total += rhrScore
-        let rhrDisplay = rhr.map { String(format: "%.0f bpm", $0) } ?? "—"
-        factors.append(.init(
-            name: String(localized: "Resting HR vs Baseline"),
-            value: rhrDisplay,
-            contribution: Int(rhrScore - 15),
-            weight: "30%"
-        ))
 
         // 3. Sleep Score 加权 (35%)
         let sleepContrib = Double(sleepScore) / 100.0 * 35.0
         total += sleepContrib
+        availableWeight += 35
         factors.append(.init(
             name: String(localized: "Sleep Quality"),
             value: "\(sleepScore)/100",
             contribution: Int(sleepContrib - 17),
             weight: "35%"
         ))
+
+        // 等比例缩放：只用有数据的维度占比计算 0-100
+        if availableWeight > 0 && availableWeight < 100 {
+            total = total / availableWeight * 100
+        }
 
         let score = max(0, min(100, Int(total)))
         let advice: String

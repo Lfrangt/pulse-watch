@@ -25,6 +25,7 @@ final class DailySummary {
     // 活动
     var totalSteps: Int?
     var activeCalories: Double?         // kcal
+    var exerciseMinutes: Double?        // Apple Watch appleExerciseTime（真实运动分钟，非估算）
     var restingCalories: Double?        // kcal
     var totalCalories: Double? {        // 活跃 + 静息
         guard let active = activeCalories else { return restingCalories }

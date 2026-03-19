@@ -48,7 +48,7 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: PulseTheme.spacingS) {
+                VStack(spacing: PulseTheme.spacingM) {
                     // 问候语
                     greetingSection
                         .staggered(index: 0)
@@ -253,50 +253,51 @@ struct DashboardView: View {
     // MARK: - 状态评分大圆环 (Gauge)
 
     private func scoreGaugeCard(score: Int, headline: String) -> some View {
-        let statusColor = PulseTheme.statusColor(for: score)
+        let ringColor = PulseTheme.accent
 
-        return VStack(spacing: PulseTheme.spacingM) {
+        return VStack(spacing: PulseTheme.spacingL) {
             // 大圆环
             ZStack {
-                // 底部光晕
+                // 底部光晕 — subtle teal glow
                 Circle()
-                    .fill(statusColor.opacity(0.1))
-                    .frame(width: 200, height: 200)
-                    .blur(radius: 30)
+                    .fill(ringColor.opacity(0.08))
+                    .frame(width: 240, height: 240)
+                    .blur(radius: 40)
 
                 // 背景轨道
                 Circle()
-                    .stroke(PulseTheme.border, lineWidth: 10)
-                    .frame(width: 170, height: 170)
+                    .stroke(PulseTheme.surface, lineWidth: 12)
+                    .frame(width: 200, height: 200)
 
-                // 进度弧（弹簧动画）
+                // 进度弧（弹簧动画）— teal gradient
                 Circle()
                     .trim(from: 0, to: ringProgress)
                     .stroke(
                         AngularGradient(
-                            colors: [statusColor.opacity(0.6), statusColor],
+                            colors: [ringColor.opacity(0.5), ringColor],
                             center: .center,
                             startAngle: .degrees(-90),
                             endAngle: .degrees(270)
                         ),
-                        style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                        style: StrokeStyle(lineWidth: 12, lineCap: .round)
                     )
-                    .frame(width: 170, height: 170)
+                    .frame(width: 200, height: 200)
                     .rotationEffect(.degrees(-90))
 
-                // 分数 + 标签
-                VStack(spacing: 2) {
+                // 分数 + 标签 — large bold center number
+                VStack(spacing: 4) {
                     Text("\(animatedScore)")
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .font(.system(size: 64, weight: .bold, design: .rounded))
                         .foregroundStyle(PulseTheme.textPrimary)
                         .contentTransition(.numericText())
                         .minimumScaleFactor(0.6)
                         .lineLimit(1)
                         .accessibilityHidden(true)
 
-                    Text(headline)
-                        .font(.system(size: 14, weight: .medium, design: .rounded))
-                        .foregroundStyle(statusColor)
+                    Text(headline.uppercased())
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .tracking(2)
+                        .foregroundStyle(ringColor)
                         .accessibilityHidden(true)
                 }
             }
@@ -306,34 +307,32 @@ struct DashboardView: View {
             .onAppear {
                 guard !ringAnimated else { return }
                 ringAnimated = true
-                // 弹簧动画：圆环从0展开到实际值
                 withAnimation(.spring(response: 1.0, dampingFraction: 0.7).delay(0.3)) {
                     ringProgress = CGFloat(score) / 100.0
                 }
-                // 数字计数动画
                 animateScoreCounter(to: score)
             }
 
-            // 一行洞察副标题
+            // 洞察副标题
             if let brief {
                 Text(brief.insight)
                     .font(PulseTheme.bodyFont)
                     .foregroundStyle(PulseTheme.textSecondary)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
-                    .padding(.horizontal, PulseTheme.spacingM)
+                    .padding(.horizontal, PulseTheme.spacingL)
             }
         }
-        .padding(.vertical, PulseTheme.spacingM)
+        .padding(.vertical, PulseTheme.spacingL)
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .fill(PulseTheme.cardBackground)
-                .shadow(color: PulseTheme.cardShadow, radius: 16, y: 6)
+                .fill(PulseTheme.surface)
+                .shadow(color: PulseTheme.cardShadow, radius: 20, y: 8)
         )
         .overlay(
             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .stroke(statusColor.opacity(0.1), lineWidth: 0.5)
+                .stroke(PulseTheme.border.opacity(0.3), lineWidth: 0.5)
         )
     }
 
@@ -465,11 +464,11 @@ struct DashboardView: View {
 
     private var metricsGrid: some View {
         let columns = [
-            GridItem(.flexible(), spacing: PulseTheme.spacingS),
-            GridItem(.flexible(), spacing: PulseTheme.spacingS),
+            GridItem(.flexible(), spacing: PulseTheme.spacingM),
+            GridItem(.flexible(), spacing: PulseTheme.spacingM),
         ]
 
-        return LazyVGrid(columns: columns, spacing: PulseTheme.spacingS) {
+        return LazyVGrid(columns: columns, spacing: PulseTheme.spacingM) {
             // 心率
             if let hr = currentHeartRate {
                 metricTile(
@@ -580,34 +579,26 @@ struct DashboardView: View {
     }
 
     private func metricTile(icon: String, label: String, value: String, unit: String, color: Color, trend: MetricStatus, animated: Bool) -> some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            // Top row: icon + label
             HStack(spacing: PulseTheme.spacingS) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(color.opacity(0.12))
-                        .frame(width: 28, height: 28)
-
-                    Image(systemName: icon)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(color)
-                        .symbolEffect(.pulse, options: .repeating, isActive: animated)
-                }
-
-                Text(label)
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(color)
+                    .symbolEffect(.pulse, options: .repeating, isActive: animated)
 
                 Spacer()
 
-                // 趋势箭头
-                Image(systemName: trend.arrow)
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(trend.color)
+                Text(label.uppercased())
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .tracking(1)
+                    .foregroundStyle(PulseTheme.textTertiary)
             }
 
-            HStack(alignment: .firstTextBaseline, spacing: 3) {
+            // Value row
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(value)
-                    .font(.system(size: 24, weight: .semibold, design: .rounded))
+                    .font(PulseTheme.metricFont)
                     .foregroundStyle(PulseTheme.textPrimary)
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
@@ -618,18 +609,24 @@ struct DashboardView: View {
                         .foregroundStyle(PulseTheme.textTertiary)
                         .minimumScaleFactor(0.7)
                 }
+
+                Spacer()
+
+                // Trend arrow
+                Image(systemName: trend.arrow)
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(trend.color)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(PulseTheme.spacingM)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(PulseTheme.cardBackground)
-                .shadow(color: PulseTheme.cardShadow.opacity(0.3), radius: 8, y: 4)
+                .fill(PulseTheme.cardElevated)
         )
         .overlay(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
+                .stroke(PulseTheme.border.opacity(0.4), lineWidth: 1)
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
@@ -707,9 +704,19 @@ struct DashboardView: View {
     // MARK: - 三大评分卡片
 
     private func triScoreCard(_ tri: TriScoreService.TriScore) -> some View {
-        VStack(spacing: PulseTheme.spacingM) {
+        VStack(spacing: PulseTheme.spacingL) {
+            // Section label
+            HStack {
+                Text("Biometrics")
+                    .font(PulseTheme.metricLabelFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+                    .tracking(1.5)
+                    .textCase(.uppercase)
+                Spacer()
+            }
+
             // 三圆环并排
-            HStack(spacing: 0) {
+            HStack(spacing: PulseTheme.spacingM) {
                 triScoreRing(
                     score: tri.sleep.score,
                     label: String(localized: "Sleep"),
@@ -781,32 +788,50 @@ struct DashboardView: View {
                 expandedScoreType = expandedScoreType == type ? nil : type
             }
         } label: {
-            VStack(spacing: 6) {
+            VStack(spacing: PulseTheme.spacingS) {
                 ZStack {
+                    // Subtle glow behind ring
                     Circle()
-                        .stroke(PulseTheme.border, lineWidth: 5)
-                        .frame(width: 64, height: 64)
+                        .fill(color.opacity(0.06))
+                        .frame(width: 80, height: 80)
+                        .blur(radius: 12)
+
+                    Circle()
+                        .stroke(PulseTheme.surface, lineWidth: 6)
+                        .frame(width: 72, height: 72)
                     Circle()
                         .trim(from: 0, to: CGFloat(score) / 100)
-                        .stroke(color, style: StrokeStyle(lineWidth: 5, lineCap: .round))
-                        .frame(width: 64, height: 64)
+                        .stroke(
+                            AngularGradient(
+                                colors: [color.opacity(0.4), color],
+                                center: .center,
+                                startAngle: .degrees(-90),
+                                endAngle: .degrees(270)
+                            ),
+                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                        )
+                        .frame(width: 72, height: 72)
                         .rotationEffect(.degrees(-90))
-                    VStack(spacing: 0) {
-                        Text("\(score)")
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
-                            .foregroundStyle(PulseTheme.textPrimary)
-                    }
+                    Text("\(score)")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundStyle(PulseTheme.textPrimary)
                 }
-                HStack(spacing: 3) {
+                VStack(spacing: 2) {
                     Image(systemName: icon)
-                        .font(.system(size: 9))
+                        .font(.system(size: 10))
                         .foregroundStyle(color)
-                    Text(label)
-                        .font(.system(size: 11, weight: .medium))
+                    Text(label.uppercased())
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .tracking(0.8)
                         .foregroundStyle(PulseTheme.textTertiary)
                 }
             }
             .frame(maxWidth: .infinity)
+            .padding(.vertical, PulseTheme.spacingS)
+            .background(
+                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                    .fill(expandedScoreType == type ? PulseTheme.cardElevated : Color.clear)
+            )
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(label) \(score)")

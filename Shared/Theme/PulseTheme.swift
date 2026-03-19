@@ -1,54 +1,60 @@
 import SwiftUI
 
 // MARK: - Pulse Design System
-// Warm, organic, minimal. Oura's calm meets Apple Weather's depth.
-// 暖色调，有质感，不要AI味
+// ui2.0: Biometric Minimalism — deep charcoal + electric teal/violet/coral
+// Stitch AI generated, 2026-03-19
 
 enum PulseTheme {
 
     // MARK: - Colors
-    // Earthy palette — browns, ambers, sage. No tech-blue.
+    // Biometric Minimalism — cold precision, data-forward
 
-    /// Deep warm charcoal — not pure black, warm enough to blend with cards
-    static let background = Color(hex: "121110")
+    /// Deep charcoal background
+    static let background = Color(hex: "131313")
 
-    /// Slightly elevated warm surface
-    static let surface = Color(hex: "1A1715")
+    /// Slightly elevated surface
+    static let surface = Color(hex: "1C1B1B")
 
-    /// Card background with earthy warmth — 提高与背景区分度
-    static let cardBackground = Color(hex: "1E1B18")
+    /// Card background
+    static let cardBackground = Color(hex: "201F1F")
 
     /// Elevated card (active/pressed)
-    static let cardElevated = Color(hex: "252220")
+    static let cardElevated = Color(hex: "2A2A2A")
 
-    /// Subtle warm border — 加强可见性
-    static let border = Color(hex: "332E29")
+    /// Subtle cool border
+    static let border = Color(hex: "3A494A")
 
-    /// Primary text — warm parchment white
-    static let textPrimary = Color(hex: "F5F0EB")
+    /// Primary text — cool off-white
+    static let textPrimary = Color(hex: "E5E2E1")
 
-    /// Secondary text — warm stone gray
-    static let textSecondary = Color(hex: "9A938C")
+    /// Secondary text — muted teal-gray
+    static let textSecondary = Color(hex: "B9CACA")
 
-    /// Tertiary text — muted earth（提高对比度，确保可读）
-    static let textTertiary = Color(hex: "6E675F")
+    /// Tertiary text — dim
+    static let textTertiary = Color(hex: "849495")
 
     // MARK: - Status Colors
 
-    /// Good / recovered — soft sage green
-    static let statusGood = Color(hex: "7FB069")
+    /// Good / recovered — electric teal (TriScore primary)
+    static let statusGood = Color(hex: "00F5FF")
 
-    /// Moderate / okay — warm amber
-    static let statusModerate = Color(hex: "D4A056")
+    /// Moderate / okay — soft violet (sleep)
+    static let statusModerate = Color(hex: "BF94FF")
 
-    /// Poor / needs rest — muted terracotta
-    static let statusPoor = Color(hex: "C75C5C")
+    /// Poor / needs rest — coral red (activity/strain)
+    static let statusPoor = Color(hex: "FF6B6B")
 
-    /// Primary accent — warm antique gold（更明亮，CTA 更突出）
-    static let accent = Color(hex: "D4B478")
+    /// Primary accent — electric teal
+    static let accent = Color(hex: "00F5FF")
 
-    /// Subtle warm highlight for active states
-    static let warmHighlight = Color(hex: "2D2520")
+    /// Sleep accent — soft violet
+    static let sleepAccent = Color(hex: "BF94FF")
+
+    /// Activity accent — coral
+    static let activityAccent = Color(hex: "FF6B6B")
+
+    /// Subtle highlight for active states
+    static let warmHighlight = Color(hex: "1A2A2A")
 
     // MARK: - Gradients
 

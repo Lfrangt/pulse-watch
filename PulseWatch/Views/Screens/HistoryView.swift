@@ -212,20 +212,23 @@ struct HistoryView: View {
     }
 
     private func periodMetric(label: String, value: String, delta: (String, Bool)?, icon: String) -> some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.system(size: 12))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(.system(size: 13))
+                .foregroundStyle(PulseTheme.accentTeal)
             Text(value)
-                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .font(.system(size: 22, weight: .bold, design: .rounded))
                 .foregroundStyle(PulseTheme.textPrimary)
             Text(label)
-                .font(.system(size: 10))
+                .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(PulseTheme.textTertiary)
             if let (text, positive) = delta {
                 Text(text)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(positive ? PulseTheme.statusGood : PulseTheme.activityAccent)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(positive ? PulseTheme.accentTeal : PulseTheme.activityCoral)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill((positive ? PulseTheme.accentTeal : PulseTheme.activityCoral).opacity(0.12)))
             }
         }
         .frame(maxWidth: .infinity)
@@ -829,21 +832,22 @@ struct HistoryView: View {
         insight: String? = nil,
         @ViewBuilder content: () -> Content
     ) -> some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+        VStack(alignment: .leading, spacing: 14) {
             // Title row
-            HStack(spacing: PulseTheme.spacingS) {
+            HStack(spacing: 8) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .fill(color.opacity(0.12))
-                        .frame(width: 24, height: 24)
+                    Circle()
+                        .fill(color.opacity(0.15))
+                        .frame(width: 28, height: 28)
                     Image(systemName: icon)
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(color)
                 }
                 .accessibilityHidden(true)
 
-                Text(title)
-                    .font(PulseTheme.captionFont)
+                Text(title.uppercased())
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .tracking(1.2)
                     .foregroundStyle(PulseTheme.textTertiary)
                     .accessibilityAddTraits(.isHeader)
 
@@ -851,15 +855,18 @@ struct HistoryView: View {
 
                 if let change = changeText {
                     Text(change)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(changePositive ? PulseTheme.statusGood : PulseTheme.activityAccent)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(changePositive ? PulseTheme.accentTeal : PulseTheme.activityCoral)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Capsule().fill((changePositive ? PulseTheme.accentTeal : PulseTheme.activityCoral).opacity(0.12)))
                 }
             }
 
-            // Big value + unit
+            // Big value
             if let val = currentValue {
                 Text(val)
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .font(.system(size: 38, weight: .bold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
                     .contentTransition(.numericText())
             }
@@ -867,13 +874,22 @@ struct HistoryView: View {
             // Natural language insight
             if let insight {
                 Text(insight)
-                    .font(.system(size: 13))
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundStyle(.white.opacity(0.6))
+                    .lineSpacing(2)
             }
 
             content()
         }
-        .pulseCard()
+        .padding(PulseTheme.spacingM)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
+                .fill(Color.white.opacity(0.04))
+                .overlay(
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
+                        .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                )
+        )
     }
 
     private var emptyChartPlaceholder: some View {
@@ -912,75 +928,55 @@ struct HistoryView: View {
     // MARK: - 快捷入口
 
     private var shortcutButtons: some View {
-        VStack(spacing: PulseTheme.spacingS) {
-            HStack(spacing: PulseTheme.spacingS) {
-                // 训练日历
-                NavigationLink {
-                    TrainingCalendarView()
-                        .preferredColorScheme(.dark)
-                } label: {
-                    shortcutButton(icon: "calendar", title: String(localized: "Training Calendar"))
-                }
-                .buttonStyle(.plain)
-
-                // 周报
-                Button {
-                    showWeeklyReport = true
-                } label: {
-                    shortcutButton(icon: "doc.richtext", title: String(localized: "Weekly Report"))
-                }
-                .buttonStyle(.plain)
-            }
-
-            // 训练历史
+        HStack(spacing: PulseTheme.spacingS) {
             NavigationLink {
-                WorkoutHistoryListView()
-                    .preferredColorScheme(.dark)
+                TrainingCalendarView().preferredColorScheme(.dark)
             } label: {
-                shortcutButton(icon: "clock.arrow.trianglehead.counterclockwise.rotate.90", title: String(localized: "Workout History"))
+                shortcutTile(icon: "calendar", color: PulseTheme.accentTeal, title: String(localized: "Training Calendar"))
+            }
+            .buttonStyle(.plain)
+
+            Button { showWeeklyReport = true } label: {
+                shortcutTile(icon: "doc.richtext", color: PulseTheme.sleepViolet, title: String(localized: "Weekly Report"))
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                WorkoutHistoryListView().preferredColorScheme(.dark)
+            } label: {
+                shortcutTile(icon: "clock.fill", color: PulseTheme.activityCoral, title: String(localized: "Workout History"))
             }
             .buttonStyle(.plain)
         }
     }
 
-    private func shortcutButton(icon: String, title: String) -> some View {
-        HStack(spacing: PulseTheme.spacingS) {
+    private func shortcutTile(icon: String, color: Color, title: String) -> some View {
+        VStack(spacing: 10) {
             ZStack {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(PulseTheme.accent.opacity(0.12))
-                    .frame(width: 32, height: 32)
-
+                Circle()
+                    .fill(color.opacity(0.15))
+                    .frame(width: 44, height: 44)
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(PulseTheme.accent)
-                    .accessibilityHidden(true)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(color)
             }
-
             Text(title)
-                .font(PulseTheme.bodyFont.weight(.medium))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(PulseTheme.textSecondary)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
                 .minimumScaleFactor(0.8)
-                .lineLimit(1)
-
-            Spacer()
-
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(PulseTheme.textTertiary)
-                .accessibilityHidden(true)
         }
-        .padding(PulseTheme.spacingM)
         .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(PulseTheme.cardBackground)
-                .shadow(color: PulseTheme.cardShadow.opacity(0.3), radius: 8, y: 4)
+                .fill(Color.white.opacity(0.05))
+                .overlay(
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                        .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                )
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .stroke(PulseTheme.accent.opacity(0.15), lineWidth: 0.5)
-        )
-        .accessibilityElement(children: .ignore)
         .accessibilityLabel(title)
         .accessibilityAddTraits(.isButton)
     }

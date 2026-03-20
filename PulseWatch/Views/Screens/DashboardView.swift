@@ -322,14 +322,14 @@ struct DashboardView: View {
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .frame(height: 60)
+            .frame(height: 32)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(localized: "Recovery Score \(score), \(headline)"))
     }
 
     /// Height for the hero section — tall enough to feel immersive
-    private var heroHeight: CGFloat { 390 }
+    private var heroHeight: CGFloat { 460 }
 
     // MARK: - Oura Score Disc Row
 

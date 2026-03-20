@@ -68,10 +68,7 @@ struct DashboardView: View {
                     // BELOW HERO — cards with padding
                     VStack(spacing: PulseTheme.spacingS) {
                         // Vitals strip — HRV + Heart Rate front and centre
-                        if currentHeartRate != nil {
-                            vitalsStrip
-                                .staggered(index: 0)
-                        }
+
 
                         // Sleep & Activity summary cards
                         if let tri = triScore {
@@ -516,26 +513,24 @@ struct DashboardView: View {
     }
 
     private func ouraSummaryRow(icon: String, iconColor: Color, title: String, statusLabel: String, statusColor: Color, score: Int) -> some View {
-        VStack(spacing: 10) {
-            HStack(spacing: 12) {
-                // Icon container
-                ZStack {
-                    Circle()
-                        .fill(iconColor.opacity(0.15))
-                        .frame(width: 34, height: 34)
-                    Image(systemName: icon)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(iconColor)
-                }
+        HStack(spacing: 16) {
+            // Apple Activity Ring
+            ActivityRingView(progress: CGFloat(score) / 100.0, color: iconColor, size: 52)
 
-                // Title
+            // Text info
+            VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
+                Text("\(score) / 100")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.45))
+            }
 
-                Spacer()
+            Spacer()
 
-                // Status badge
+            // Status badge + chevron
+            VStack(alignment: .trailing, spacing: 6) {
                 Text(statusLabel)
                     .font(.system(size: 11, weight: .bold, design: .rounded))
                     .foregroundStyle(statusColor)
@@ -543,31 +538,10 @@ struct DashboardView: View {
                     .padding(.vertical, 4)
                     .background(Capsule().fill(statusColor.opacity(0.13)))
 
-                // Chevron
                 Image(systemName: "chevron.right")
                     .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.18))
+                    .foregroundStyle(.white.opacity(0.2))
             }
-
-            // Progress bar
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(Color.white.opacity(0.07))
-                        .frame(height: 4)
-                    Capsule()
-                        .fill(
-                            LinearGradient(
-                                colors: [iconColor.opacity(0.7), iconColor],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(width: geo.size.width * CGFloat(score) / 100, height: 4)
-                        .animation(.spring(response: 1.0, dampingFraction: 0.8).delay(0.3), value: score)
-                }
-            }
-            .frame(height: 4)
         }
         .padding(.horizontal, PulseTheme.spacingM)
         .padding(.vertical, 14)
@@ -1659,4 +1633,64 @@ struct Arc: Shape {
 #Preview {
     DashboardView()
         .preferredColorScheme(.dark)
+}
+
+// MARK: - Apple-style Activity Ring
+
+struct ActivityRingView: View {
+    let progress: CGFloat   // 0.0 – 1.0
+    let color: Color
+    let size: CGFloat
+
+    @State private var animated: CGFloat = 0
+
+    private let lineWidth: CGFloat = 6
+    private let shadowBlur: CGFloat = 6
+
+    var body: some View {
+        ZStack {
+            // Track ring
+            Circle()
+                .stroke(color.opacity(0.15), lineWidth: lineWidth)
+                .frame(width: size, height: size)
+
+            // Progress ring — clockwise from 12 o'clock
+            Circle()
+                .trim(from: 0, to: min(animated, 1.0))
+                .stroke(
+                    AngularGradient(
+                        gradient: Gradient(colors: [color.opacity(0.7), color]),
+                        center: .center,
+                        startAngle: .degrees(-90),
+                        endAngle: .degrees(270)
+                    ),
+                    style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
+                )
+                .frame(width: size, height: size)
+                .rotationEffect(.degrees(-90))
+                .shadow(color: color.opacity(0.5), radius: shadowBlur)
+
+            // Cap dot at progress end
+            if animated > 0.02 {
+                let angle = (animated * 360 - 90) * .pi / 180
+                let r = size / 2
+                Circle()
+                    .fill(color)
+                    .frame(width: lineWidth, height: lineWidth)
+                    .shadow(color: color.opacity(0.6), radius: 3)
+                    .offset(x: r * cos(angle), y: r * sin(angle))
+            }
+        }
+        .frame(width: size, height: size)
+        .onAppear {
+            withAnimation(.spring(response: 1.0, dampingFraction: 0.75).delay(0.2)) {
+                animated = progress
+            }
+        }
+        .onChange(of: progress) { _, newVal in
+            withAnimation(.spring(response: 0.8, dampingFraction: 0.75)) {
+                animated = newVal
+            }
+        }
+    }
 }

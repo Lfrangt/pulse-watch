@@ -32,10 +32,6 @@ struct DashboardView: View {
 
     // Tri-Score
     @State private var triScore: TriScoreService.TriScore?
-    @State private var expandedScoreType: ScoreType? = nil
-
-    enum ScoreType { case sleep, activity, readiness }
-
     // Health Age
     @State private var healthAgeResult: HealthAgeService.HealthAgeResult?
     @State private var healthAgeExpanded = false
@@ -48,127 +44,124 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: PulseTheme.spacingM) {
-                    // 问候语
-                    greetingSection
-                        .staggered(index: 0)
-
-                    // 状态评分大圆环
+                VStack(spacing: 0) {
+                    // HERO — full-bleed atmospheric section
                     if let brief {
-                        scoreGaugeCard(score: brief.score, headline: brief.headline)
-                            .staggered(index: 1)
+                        heroSection(score: brief.score, headline: brief.headline)
+                            .staggered(index: 0)
                     } else if isLoading {
                         loadingCard
+                            .padding(.horizontal, PulseTheme.spacingM)
                     } else if !healthManager.hasHealthData && !demoMode {
-                        // 未授权或无数据状态 — 引导用户开启权限
                         VStack(spacing: PulseTheme.spacingM) {
                             healthKitPermissionGuide
                                 .staggered(index: 1)
-                            
-                            // 温和提示：也可以戴上手表
                             Text(String(localized: "Or wear your Apple Watch to collect data"))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                                 .padding(.horizontal, PulseTheme.spacingM)
                                 .staggered(index: 2)
                         }
+                        .padding(.horizontal, PulseTheme.spacingM)
                     } else {
-                        // 空数据状态 — 温暖邀请
                         emptyStateCard
                             .staggered(index: 1)
+                            .padding(.horizontal, PulseTheme.spacingM)
                     }
 
-                    // 三大评分 (Sleep / Activity / Readiness)
-                    if let tri = triScore {
-                        triScoreCard(tri)
-                            .staggered(index: 2)
-                    }
+                    // BELOW HERO — cards with padding
+                    VStack(spacing: PulseTheme.spacingM) {
+                        // Sleep & Activity summary cards
+                        if let tri = triScore {
+                            ouraSleepActivityCards(tri)
+                                .staggered(index: 1)
+                        }
 
-                    // 🔥 Streak badge — only show when streak ≥ 3 days (meaningful)
-                    if currentStreak >= 3 {
-                        streakBadge(streak: currentStreak)
-                            .staggered(index: 2)
-                    }
+                        // Streak badge
+                        if currentStreak >= 3 {
+                            streakBadge(streak: currentStreak)
+                                .staggered(index: 2)
+                        }
 
-                    // Strain vs Recovery
-                    if todayStrain > 0 || (brief != nil && demoMode) {
-                        strainRecoveryCard(
-                            strain: todayStrain,
-                            recovery: insight?.recoveryScore ?? brief?.score ?? 0
+                        // Strain vs Recovery
+                        if todayStrain > 0 || (brief != nil && demoMode) {
+                            strainRecoveryCard(
+                                strain: todayStrain,
+                                recovery: insight?.recoveryScore ?? brief?.score ?? 0
+                            )
+                            .staggered(index: 3)
+                        }
+
+                        // Health Age
+                        if let result = healthAgeResult {
+                            healthAgeCard(result: result)
+                                .staggered(index: 3)
+                        }
+
+                        // Insights
+                        if let insight, !insight.insights.isEmpty {
+                            let mergedInsights: [String] = {
+                                var list = insight.insights
+                                if let tri = triScore {
+                                    list[0] = tri.readiness.advice
+                                }
+                                return list
+                            }()
+                            insightCards(mergedInsights)
+                                .staggered(index: 2)
+                        }
+
+                        // Metrics grid
+                        if hasAnyMetric {
+                            metricsGrid
+                                .staggered(index: 3)
+                        }
+
+                        // Weekly trends
+                        WeeklyTrendChartsView(
+                            summaries: allSummaries,
+                            demoMode: demoMode
                         )
-                        .staggered(index: 3)
+                        .staggered(index: 4)
+
+                        // Recovery timeline
+                        recoveryTimelineSection
+                            .staggered(index: 5)
+
+                        // Training advice
+                        if let advice = insight?.trainingAdvice {
+                            trainingAdviceCard(advice: advice)
+                                .staggered(index: 6)
+                        } else if let plan = brief?.trainingPlan, plan.targetMuscleGroup != "rest" {
+                            TrainingCard(plan: plan)
+                                .staggered(index: 6)
+                        }
+
+                        // Recovery note
+                        if let note = brief?.recoveryNote {
+                            RecoveryCard(note: note)
+                                .staggered(index: 7)
+                        }
+
+                        // Recent workouts
+                        if !recentWorkouts.isEmpty {
+                            recentWorkoutsSection
+                                .staggered(index: 8)
+                        }
+
+                        // Gym setup
+                        if !hasGymLocation {
+                            gymSetupPrompt
+                                .staggered(index: 9)
+                        }
+
+                        Spacer(minLength: 60)
                     }
-
-                    // Health Age 卡片
-                    if let result = healthAgeResult {
-                        healthAgeCard(result: result)
-                            .staggered(index: 3)
-                    }
-
-                    // 今日洞察卡片 — 第一条用 TriScore advice，避免与主评分矛盾
-                    if let insight, !insight.insights.isEmpty {
-                        let mergedInsights: [String] = {
-                            var list = insight.insights
-                            // 用 TriScore readiness advice 替换第一条恢复建议（保持一致）
-                            if let tri = triScore {
-                                let triAdvice = tri.readiness.advice
-                                list[0] = triAdvice
-                            }
-                            return list
-                        }()
-                        insightCards(mergedInsights)
-                            .staggered(index: 2)
-                    }
-
-                    // 关键指标网格（全部为空时隐藏）
-                    if hasAnyMetric {
-                        metricsGrid
-                            .staggered(index: 3)
-                    }
-
-                    // 7天健康趋势图
-                    WeeklyTrendChartsView(
-                        summaries: allSummaries,
-                        demoMode: demoMode
-                    )
-                    .staggered(index: 4)
-
-                    // 身体时间线（有数据时显示）
-                    recoveryTimelineSection
-                        .staggered(index: 5)
-
-                    // 训练建议卡片
-                    if let advice = insight?.trainingAdvice {
-                        trainingAdviceCard(advice: advice)
-                            .staggered(index: 6)
-                    } else if let plan = brief?.trainingPlan, plan.targetMuscleGroup != "rest" {
-                        TrainingCard(plan: plan)
-                            .staggered(index: 6)
-                    }
-
-                    // 恢复提醒
-                    if let note = brief?.recoveryNote {
-                        RecoveryCard(note: note)
-                            .staggered(index: 7)
-                    }
-
-                    // 最近训练
-                    if !recentWorkouts.isEmpty {
-                        recentWorkoutsSection
-                            .staggered(index: 8)
-                    }
-
-                    // 健身房设置提示
-                    if !hasGymLocation {
-                        gymSetupPrompt
-                            .staggered(index: 9)
-                    }
-
-                    Spacer(minLength: 60)
+                    .padding(.horizontal, PulseTheme.spacingM)
+                    .padding(.top, PulseTheme.spacingM)
                 }
-                .padding(.horizontal, PulseTheme.spacingM)
             }
-            .background(PulseTheme.background.ignoresSafeArea())
+            .background(Color.black.ignoresSafeArea())
             .scrollContentBackground(.hidden)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -237,103 +230,269 @@ struct DashboardView: View {
         }
     }
 
-    // MARK: - 问候语（仅时段问候，不显示日期）
+    // MARK: - Hero Section (Oura-style)
 
-    private var greetingSection: some View {
-        HStack {
-            Text(greeting)
-                .font(PulseTheme.titleFont)
-                .foregroundStyle(PulseTheme.textPrimary)
-                .accessibilityAddTraits(.isHeader)
-            Spacer()
+    private func heroSection(score: Int, headline: String) -> some View {
+        ZStack(alignment: .top) {
+            // Atmospheric gradient background — mountain/landscape feel
+            UnevenRoundedRectangle(
+                topLeadingRadius: 0,
+                bottomLeadingRadius: 32,
+                bottomTrailingRadius: 32,
+                topTrailingRadius: 0
+            )
+            .fill(
+                LinearGradient(
+                    stops: [
+                        .init(color: Color(hex: "0A1628"), location: 0),
+                        .init(color: Color(hex: "0F2A3D"), location: 0.25),
+                        .init(color: Color(hex: "134E5E"), location: 0.45),
+                        .init(color: Color(hex: "0D3B4A"), location: 0.65),
+                        .init(color: Color(hex: "0A1A24"), location: 0.85),
+                        .init(color: Color.black, location: 1.0),
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+
+            VStack(spacing: PulseTheme.spacingL) {
+                // Score pills row
+                if let tri = triScore {
+                    scorePillsRow(
+                        total: score,
+                        sleep: tri.sleep.score,
+                        activity: tri.activity.score,
+                        readiness: tri.readiness.score
+                    )
+                } else {
+                    scorePillsRow(total: score, sleep: nil, activity: nil, readiness: nil)
+                }
+
+                // Arc gauge + score
+                ZStack {
+                    // Arc track — 200° semicircle
+                    arcTrack()
+                        .stroke(Color.white.opacity(0.12), style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                        .frame(width: 220, height: 220)
+
+                    // Arc progress
+                    arcTrack()
+                        .trim(from: 0, to: ringProgress)
+                        .stroke(Color.white.opacity(0.8), style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                        .frame(width: 220, height: 220)
+
+                    // Marker dot at score position
+                    arcMarkerDot(progress: ringProgress, radius: 110)
+
+                    // Score number + label
+                    VStack(spacing: 6) {
+                        Text("\(animatedScore)")
+                            .font(.system(size: 72, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .contentTransition(.numericText())
+                            .minimumScaleFactor(0.6)
+                            .lineLimit(1)
+
+                        Text("READINESS")
+                            .font(.system(size: 11, weight: .semibold))
+                            .tracking(3)
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
+                    .offset(y: 10)
+                }
+                .frame(height: 200)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "Recovery Score"))
+                .accessibilityValue(String(localized: "\(score) out of 100, \(headline)"))
+                .onAppear {
+                    guard !ringAnimated else { return }
+                    ringAnimated = true
+                    withAnimation(.spring(response: 1.0, dampingFraction: 0.7).delay(0.3)) {
+                        ringProgress = CGFloat(score) / 100.0
+                    }
+                    animateScoreCounter(to: score)
+                }
+
+                // Headline
+                Text(heroHeadline(for: score))
+                    .font(.system(size: 32, weight: .bold, design: .serif))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+
+                // Insight text
+                if let brief {
+                    Text(brief.insight)
+                        .font(.system(size: 15, weight: .regular))
+                        .foregroundStyle(.white.opacity(0.55))
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                        .padding(.horizontal, PulseTheme.spacingXL)
+                }
+
+                // "Learn more" pill button
+                Button {} label: {
+                    Text("Learn more")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.8))
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(
+                            Capsule()
+                                .fill(Color.white.opacity(0.12))
+                        )
+                }
+                .buttonStyle(.plain)
+
+                Spacer().frame(height: PulseTheme.spacingM)
+            }
+            .padding(.top, PulseTheme.spacingM)
+            .padding(.horizontal, PulseTheme.spacingM)
         }
-        .padding(.top, 4)
     }
 
-    // MARK: - 状态评分大圆环 (Gauge)
+    // MARK: - Score Pills Row
 
-    private func scoreGaugeCard(score: Int, headline: String) -> some View {
-        let ringColor = PulseTheme.accent
-
-        return VStack(spacing: PulseTheme.spacingL) {
-            // 大圆环
-            ZStack {
-                // 底部光晕 — subtle teal glow
-                Circle()
-                    .fill(ringColor.opacity(0.08))
-                    .frame(width: 240, height: 240)
-                    .blur(radius: 40)
-
-                // 背景轨道
-                Circle()
-                    .stroke(PulseTheme.surface, lineWidth: 12)
-                    .frame(width: 200, height: 200)
-
-                // 进度弧（弹簧动画）— teal gradient
-                Circle()
-                    .trim(from: 0, to: ringProgress)
-                    .stroke(
-                        AngularGradient(
-                            colors: [ringColor.opacity(0.5), ringColor],
-                            center: .center,
-                            startAngle: .degrees(-90),
-                            endAngle: .degrees(270)
-                        ),
-                        style: StrokeStyle(lineWidth: 12, lineCap: .round)
-                    )
-                    .frame(width: 200, height: 200)
-                    .rotationEffect(.degrees(-90))
-
-                // 分数 + 标签 — large bold center number
-                VStack(spacing: 4) {
-                    Text("\(animatedScore)")
-                        .font(.system(size: 64, weight: .bold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
-                        .contentTransition(.numericText())
-                        .minimumScaleFactor(0.6)
-                        .lineLimit(1)
-                        .accessibilityHidden(true)
-
-                    Text(headline.uppercased())
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
-                        .tracking(2)
-                        .foregroundStyle(ringColor)
-                        .accessibilityHidden(true)
-                }
+    private func scorePillsRow(total: Int, sleep: Int?, activity: Int?, readiness: Int?) -> some View {
+        HStack(spacing: PulseTheme.spacingS) {
+            scorePill(icon: "heart.circle.fill", label: "TriScore", value: total, color: PulseTheme.accent)
+            if let sleep {
+                scorePill(icon: "moon.fill", label: "Sleep", value: sleep, color: PulseTheme.sleepAccent)
             }
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(String(localized: "Recovery Score"))
-            .accessibilityValue(String(localized: "\(score) out of 100, \(headline)"))
-            .onAppear {
-                guard !ringAnimated else { return }
-                ringAnimated = true
-                withAnimation(.spring(response: 1.0, dampingFraction: 0.7).delay(0.3)) {
-                    ringProgress = CGFloat(score) / 100.0
-                }
-                animateScoreCounter(to: score)
+            if let activity {
+                scorePill(icon: "flame.fill", label: "Activity", value: activity, color: PulseTheme.activityAccent)
             }
-
-            // 洞察副标题
-            if let brief {
-                Text(brief.insight)
-                    .font(PulseTheme.bodyFont)
-                    .foregroundStyle(PulseTheme.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .padding(.horizontal, PulseTheme.spacingL)
+            if let readiness {
+                scorePill(icon: "bolt.heart.fill", label: "Ready", value: readiness, color: PulseTheme.accent)
             }
         }
-        .padding(.vertical, PulseTheme.spacingL)
-        .frame(maxWidth: .infinity)
+    }
+
+    private func scorePill(icon: String, label: String, value: Int, color: Color) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 11))
+                .foregroundStyle(color)
+            Text("\(value)")
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .fill(PulseTheme.surface)
-                .shadow(color: PulseTheme.cardShadow, radius: 20, y: 8)
+            Capsule()
+                .fill(Color(hex: "1A1A1A").opacity(0.8))
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .stroke(PulseTheme.border.opacity(0.3), lineWidth: 0.5)
+        .accessibilityLabel("\(label) \(value)")
+    }
+
+    // MARK: - Arc Gauge Helpers
+
+    /// 200° arc shape, open at the bottom — from 170° to 370° (= 10°)
+    private func arcTrack() -> some Shape {
+        Arc(startAngle: .degrees(170), endAngle: .degrees(370), clockwise: false)
+    }
+
+    private func arcMarkerDot(progress: CGFloat, radius: CGFloat) -> some View {
+        let totalAngle: Double = 200
+        let startAngle: Double = 170
+        let angle = startAngle + totalAngle * Double(progress)
+        let radians = angle * .pi / 180
+        let x = cos(radians) * radius
+        let y = sin(radians) * radius
+
+        return Circle()
+            .fill(.white)
+            .frame(width: 8, height: 8)
+            .shadow(color: .white.opacity(0.6), radius: 4)
+            .offset(x: x, y: y)
+    }
+
+    private func heroHeadline(for score: Int) -> String {
+        switch score {
+        case 0..<30: return String(localized: "Take it easy today")
+        case 30..<50: return String(localized: "Listen to your body")
+        case 50..<70: return String(localized: "A balanced day ahead")
+        case 70..<85: return String(localized: "You're doing great!")
+        default: return String(localized: "Go get 'em!")
+        }
+    }
+
+    // MARK: - Sleep & Activity Summary Cards (Oura-style)
+
+    private func ouraSleepActivityCards(_ tri: TriScoreService.TriScore) -> some View {
+        VStack(spacing: PulseTheme.spacingS) {
+            ouraSummaryRow(
+                icon: "moon.fill",
+                iconColor: PulseTheme.sleepAccent,
+                title: String(localized: "Sleep"),
+                statusLabel: ouraStatusLabel(for: tri.sleep.score),
+                statusColor: ouraStatusColor(for: tri.sleep.score),
+                score: tri.sleep.score
+            )
+            ouraSummaryRow(
+                icon: "flame.fill",
+                iconColor: PulseTheme.activityAccent,
+                title: String(localized: "Activity"),
+                statusLabel: ouraStatusLabel(for: tri.activity.score),
+                statusColor: ouraStatusColor(for: tri.activity.score),
+                score: tri.activity.score
+            )
+        }
+    }
+
+    private func ouraSummaryRow(icon: String, iconColor: Color, title: String, statusLabel: String, statusColor: Color, score: Int) -> some View {
+        HStack(spacing: PulseTheme.spacingM) {
+            // Icon
+            Image(systemName: icon)
+                .font(.system(size: 18))
+                .foregroundStyle(iconColor)
+                .frame(width: 36)
+
+            // Title
+            Text(title)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(.white)
+
+            Spacer()
+
+            // Status badge
+            Text(statusLabel.uppercased())
+                .font(.system(size: 12, weight: .bold))
+                .tracking(0.5)
+                .foregroundStyle(statusColor)
+
+            // Chevron
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(.white.opacity(0.3))
+        }
+        .padding(.horizontal, PulseTheme.spacingM)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                .fill(Color(hex: "1A1A1A"))
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(title) \(statusLabel)")
+    }
+
+    private func ouraStatusLabel(for score: Int) -> String {
+        switch score {
+        case 0..<30: return String(localized: "Poor")
+        case 30..<50: return String(localized: "Fair")
+        case 50..<70: return String(localized: "Good")
+        case 70..<85: return String(localized: "Great")
+        default: return String(localized: "Optimal")
+        }
+    }
+
+    private func ouraStatusColor(for score: Int) -> Color {
+        switch score {
+        case 0..<40: return PulseTheme.activityAccent
+        case 40..<70: return Color(hex: "FFD700")
+        default: return PulseTheme.statusGood
+        }
     }
 
     /// 数字从0递增到目标值的计数动画
@@ -701,141 +860,7 @@ struct DashboardView: View {
         }
     }
 
-    // MARK: - 三大评分卡片
-
-    private func triScoreCard(_ tri: TriScoreService.TriScore) -> some View {
-        VStack(spacing: PulseTheme.spacingL) {
-            // Section label
-            HStack {
-                Text("Biometrics")
-                    .font(PulseTheme.metricLabelFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
-                    .tracking(1.5)
-                    .textCase(.uppercase)
-                Spacer()
-            }
-
-            // 三圆环并排
-            HStack(spacing: PulseTheme.spacingM) {
-                triScoreRing(
-                    score: tri.sleep.score,
-                    label: String(localized: "Sleep"),
-                    icon: "moon.fill",
-                    color: PulseTheme.sleepAccent,
-                    type: .sleep
-                )
-                triScoreRing(
-                    score: tri.activity.score,
-                    label: String(localized: "Activity"),
-                    icon: "flame.fill",
-                    color: PulseTheme.activityAccent,
-                    type: .activity
-                )
-                triScoreRing(
-                    score: tri.readiness.score,
-                    label: String(localized: "Readiness"),
-                    icon: "bolt.heart.fill",
-                    color: PulseTheme.accent,
-                    type: .readiness
-                )
-            }
-
-            // 展开详情
-            if let expanded = expandedScoreType {
-                let detail: TriScoreService.ScoreDetail = {
-                    switch expanded {
-                    case .sleep:     return tri.sleep
-                    case .activity:  return tri.activity
-                    case .readiness: return tri.readiness
-                    }
-                }()
-
-                Divider().background(PulseTheme.border)
-
-                VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                    // 建议
-                    Text(detail.advice)
-                        .font(PulseTheme.bodyFont)
-                        .foregroundStyle(PulseTheme.textSecondary)
-
-                    // 各因素
-                    ForEach(detail.factors.indices, id: \.self) { i in
-                        let f = detail.factors[i]
-                        HStack {
-                            Text(f.name)
-                                .font(PulseTheme.captionFont)
-                                .foregroundStyle(PulseTheme.textTertiary)
-                            Spacer()
-                            Text(f.value)
-                                .font(PulseTheme.captionFont.weight(.medium))
-                                .foregroundStyle(PulseTheme.textPrimary)
-                            Text(f.weight)
-                                .font(.system(size: 10))
-                                .foregroundStyle(PulseTheme.textTertiary)
-                                .frame(width: 30, alignment: .trailing)
-                        }
-                    }
-                }
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-        }
-        .pulseCard()
-    }
-
-    private func triScoreRing(score: Int, label: String, icon: String, color: Color, type: ScoreType) -> some View {
-        Button {
-            withAnimation(.spring(response: 0.3)) {
-                expandedScoreType = expandedScoreType == type ? nil : type
-            }
-        } label: {
-            VStack(spacing: PulseTheme.spacingS) {
-                ZStack {
-                    // Subtle glow behind ring
-                    Circle()
-                        .fill(color.opacity(0.06))
-                        .frame(width: 80, height: 80)
-                        .blur(radius: 12)
-
-                    Circle()
-                        .stroke(PulseTheme.surface, lineWidth: 6)
-                        .frame(width: 72, height: 72)
-                    Circle()
-                        .trim(from: 0, to: CGFloat(score) / 100)
-                        .stroke(
-                            AngularGradient(
-                                colors: [color.opacity(0.4), color],
-                                center: .center,
-                                startAngle: .degrees(-90),
-                                endAngle: .degrees(270)
-                            ),
-                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                        )
-                        .frame(width: 72, height: 72)
-                        .rotationEffect(.degrees(-90))
-                    Text("\(score)")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
-                }
-                VStack(spacing: 2) {
-                    Image(systemName: icon)
-                        .font(.system(size: 10))
-                        .foregroundStyle(color)
-                    Text(label.uppercased())
-                        .font(.system(size: 10, weight: .medium, design: .rounded))
-                        .tracking(0.8)
-                        .foregroundStyle(PulseTheme.textTertiary)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, PulseTheme.spacingS)
-            .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .fill(expandedScoreType == type ? PulseTheme.cardElevated : Color.clear)
-            )
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(label) \(score)")
-    }
+    // (triScoreCard and triScoreRing replaced by heroSection + ouraSleepActivityCards)
 
     // MARK: - 🔥 Streak Badge
 
@@ -1276,17 +1301,6 @@ struct DashboardView: View {
         savedLocations.contains { $0.locationType == "gym" && $0.isActive }
     }
 
-    private var greeting: String {
-        let hour = Calendar.current.component(.hour, from: .now)
-        switch hour {
-        case 5..<12: return String(localized: "Good Morning")
-        case 12..<14: return String(localized: "Good Afternoon")
-        case 14..<18: return String(localized: "Good Afternoon")
-        case 18..<22: return String(localized: "Good Evening")
-        default: return String(localized: "Late Night")
-        }
-    }
-
     private func formatSteps(_ steps: Int) -> String {
         if steps >= 1000 {
             return String(format: "%.1fk", Double(steps) / 1000)
@@ -1476,6 +1490,28 @@ struct DashboardView: View {
         case "shoulders": return String(localized: "Shoulders")
         default: return group
         }
+    }
+}
+
+// MARK: - Arc Shape (200° semicircle gauge)
+
+struct Arc: Shape {
+    var startAngle: Angle
+    var endAngle: Angle
+    var clockwise: Bool
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) / 2
+        path.addArc(
+            center: center,
+            radius: radius,
+            startAngle: startAngle,
+            endAngle: endAngle,
+            clockwise: clockwise
+        )
+        return path
     }
 }
 

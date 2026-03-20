@@ -184,9 +184,9 @@ struct DashboardView: View {
     // MARK: - Hero Section (Oura-style)
 
     private func heroSection(score: Int, headline: String) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 8) {
                 // Top padding to clear status bar (Dynamic Island ~59pt, notch ~47pt)
-                Spacer().frame(height: 8)
+                Spacer().frame(height: 4)
 
                 // Score pills row
                 if let tri = triScore {
@@ -283,17 +283,21 @@ struct DashboardView: View {
     private func scorePill(icon: String, label: String, value: Int, color: Color) -> some View {
         HStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 10))
+                .font(.system(size: 9, weight: .semibold))
                 .foregroundStyle(color)
             Text("\(value)")
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .font(.system(size: 12, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
         .background(
             Capsule()
-                .fill(PulseTheme.surface.opacity(0.8))
+                .fill(Color.white.opacity(0.06))
+                .overlay(
+                    Capsule()
+                        .stroke(color.opacity(0.3), lineWidth: 0.5)
+                )
         )
         .accessibilityLabel("\(label) \(value)")
     }
@@ -357,35 +361,54 @@ struct DashboardView: View {
     }
 
     private func ouraSummaryRow(icon: String, iconColor: Color, title: String, statusLabel: String, statusColor: Color, score: Int) -> some View {
-        HStack(spacing: PulseTheme.spacingM) {
-            // Icon
-            Image(systemName: icon)
-                .font(.system(size: 18))
-                .foregroundStyle(iconColor)
-                .frame(width: 36)
+        HStack(spacing: 12) {
+            // Icon container
+            ZStack {
+                Circle()
+                    .fill(iconColor.opacity(0.12))
+                    .frame(width: 36, height: 36)
+                Image(systemName: icon)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(iconColor)
+            }
 
-            // Title
-            Text(title)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(.white)
+            // Title + sub-label
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                Text("\(score)")
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
 
             Spacer()
 
-            // Status label
+            // Status badge
             Text(statusLabel)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(Color(hex: "00C896").opacity(0.8))
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundStyle(statusColor)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(
+                    Capsule()
+                        .fill(statusColor.opacity(0.12))
+                )
 
             // Chevron
             Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(.white.opacity(0.3))
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.2))
         }
         .padding(.horizontal, PulseTheme.spacingM)
-        .padding(.vertical, 14)
+        .padding(.vertical, 13)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color(hex: "111111"))
+                .fill(Color.white.opacity(0.04))
+                .overlay(
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                        .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                )
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(title) \(statusLabel)")
@@ -476,28 +499,52 @@ struct DashboardView: View {
     // MARK: - 今日洞察卡片（简化标题）
 
     private func insightCards(_ insights: [String]) -> some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-            Text("Today's Insights")
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
-                .accessibilityAddTraits(.isHeader)
+        VStack(alignment: .leading, spacing: 12) {
+            // Header
+            HStack {
+                Text("Today's Insights")
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .tracking(1.2)
+                    .foregroundStyle(PulseTheme.textTertiary)
+                    .textCase(.uppercase)
+                Spacer()
+            }
 
-            ForEach(Array(insights.prefix(3).enumerated()), id: \.offset) { _, text in
-                HStack(alignment: .top, spacing: PulseTheme.spacingS) {
-                    Circle()
-                        .fill(PulseTheme.accent.opacity(0.6))
-                        .frame(width: 6, height: 6)
-                        .padding(.top, 6)
-                        .accessibilityHidden(true)
+            // Insight rows
+            ForEach(Array(insights.prefix(3).enumerated()), id: \.offset) { idx, text in
+                HStack(alignment: .top, spacing: 12) {
+                    // Numbered badge
+                    ZStack {
+                        Circle()
+                            .fill(PulseTheme.accentTeal.opacity(0.12))
+                            .frame(width: 22, height: 22)
+                        Text("\(idx + 1)")
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .foregroundStyle(PulseTheme.accentTeal)
+                    }
+                    .padding(.top, 1)
 
                     Text(text)
-                        .font(PulseTheme.bodyFont)
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .font(.system(size: 14, weight: .regular, design: .rounded))
+                        .foregroundStyle(Color.white.opacity(0.75))
                         .fixedSize(horizontal: false, vertical: true)
+                        .lineSpacing(3)
+                }
+                if idx < min(insights.prefix(3).count, 3) - 1 {
+                    Divider()
+                        .background(Color.white.opacity(0.06))
                 }
             }
         }
-        .pulseCard()
+        .padding(PulseTheme.spacingM)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                .fill(Color.white.opacity(0.04))
+                .overlay(
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                        .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                )
+        )
         .accessibilityElement(children: .combine)
     }
 
@@ -652,54 +699,65 @@ struct DashboardView: View {
     }
 
     private func metricTile(icon: String, label: String, value: String, unit: String, color: Color, trend: MetricStatus, animated: Bool) -> some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            // Top row: icon + label
-            HStack(spacing: PulseTheme.spacingS) {
-                Image(systemName: icon)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(color)
-                    .symbolEffect(.pulse, options: .repeating, isActive: animated)
+        VStack(alignment: .leading, spacing: 10) {
+            // Top row: icon circle + label
+            HStack(spacing: 0) {
+                ZStack {
+                    Circle()
+                        .fill(color.opacity(0.12))
+                        .frame(width: 28, height: 28)
+                    Image(systemName: icon)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(color)
+                        .symbolEffect(.pulse, options: .repeating, isActive: animated)
+                }
 
                 Spacer()
 
-                Text(label.uppercased())
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
-                    .tracking(1)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                // Trend badge
+                HStack(spacing: 3) {
+                    Image(systemName: trend.arrow)
+                        .font(.system(size: 9, weight: .bold))
+                    // no text — just arrow
+                }
+                .foregroundStyle(trend.color)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(
+                    Capsule().fill(trend.color.opacity(0.12))
+                )
             }
 
-            // Value row
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
+            // Value
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
                 Text(value)
-                    .font(PulseTheme.metricFont)
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
 
                 if !unit.isEmpty {
                     Text(unit)
-                        .font(PulseTheme.metricLabelFont)
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(PulseTheme.textTertiary)
-                        .minimumScaleFactor(0.7)
+                        .offset(y: 1)
                 }
-
-                Spacer()
-
-                // Trend arrow
-                Image(systemName: trend.arrow)
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(trend.color)
             }
+
+            // Label
+            Text(label)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(PulseTheme.textTertiary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(PulseTheme.spacingM)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(PulseTheme.cardElevated)
+                .fill(Color.white.opacity(0.04))
         )
         .overlay(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .stroke(PulseTheme.border.opacity(0.4), lineWidth: 1)
+                .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)

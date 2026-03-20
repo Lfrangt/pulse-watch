@@ -421,7 +421,7 @@ struct GymArrivalFlowView: View {
         }
 
         // 天数分析
-        let groupLabels = selectedGroups.map(\.label).joined(separator: " + ")
+        _ = selectedGroups.map(\.label).joined(separator: " + ")
         var reasons: [String] = []
         for group in selectedGroups {
             let lastWorkout = recentWorkouts.first { $0.muscleGroupTags.contains(group) }

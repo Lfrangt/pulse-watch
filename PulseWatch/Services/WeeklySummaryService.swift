@@ -5,6 +5,7 @@ import os
 
 /// Weekly Health Summary — 每周日 9:00 推送本地通知
 /// 包含：本周平均评分 / 训练次数 / 平均静息心率 / 与上周对比
+@MainActor
 final class WeeklySummaryService {
 
     static let shared = WeeklySummaryService()

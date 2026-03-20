@@ -92,7 +92,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Pulse Watch detects when you arrive at your configured gym locations to remind you to start your workout. Location data stays on your device and is never uploaded."
+            "value" : "Pulse uses your location to detect when you arrive at the gym and suggest training plans. Location data is never uploaded to any server."
           }
         },
         "zh-Hans" : {
@@ -110,7 +110,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Pulse Watch detects when you arrive at your configured gym locations to remind you to start your workout."
+            "value" : "Pulse uses your location to save your frequent places for smart reminders."
           }
         },
         "zh-Hans" : {

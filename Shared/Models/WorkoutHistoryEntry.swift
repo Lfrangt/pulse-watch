@@ -121,7 +121,6 @@ enum WorkoutActivityHelper {
         case 24: return String(localized: "Hiking")
         case 50: return String(localized: "Yoga")
         case 20: return String(localized: "Functional Strength")
-        case 50: return String(localized: "Yoga")
         case 58: return String(localized: "Strength Training")
         case 63: return String(localized: "HIIT")
         case 14: return String(localized: "Dance")

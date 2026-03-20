@@ -114,14 +114,13 @@ final class HealthKitManager {
                 await MainActor.run {
                     switch status {
                     case .unnecessary:
-                        // Already requested — user saw the permission sheet
                         authorizationStatus = .authorized
                     case .shouldRequest:
                         authorizationStatus = .notDetermined
+                    case .unknown:
+                        authorizationStatus = hasHealthData ? .authorized : .notDetermined
                     @unknown default:
-                        if hasHealthData {
-                            authorizationStatus = .authorized
-                        }
+                        authorizationStatus = hasHealthData ? .authorized : .notDetermined
                     }
                 }
             } catch {
@@ -307,7 +306,7 @@ final class HealthKitManager {
     // MARK: - Today's Last Workout
 
     func fetchTodayLastWorkout() async {
-        let workoutType = HKObjectType.workoutType()
+        // workoutType not needed — using .workout() predicate directly
         let startOfDay = Calendar.current.startOfDay(for: Date())
         let predicate = HKQuery.predicateForSamples(withStart: startOfDay, end: Date())
         let descriptor = HKSampleQueryDescriptor(

@@ -1,5 +1,5 @@
 import Foundation
-import UserNotifications
+@preconcurrency import UserNotifications
 import BackgroundTasks
 import SwiftData
 import os
@@ -7,6 +7,7 @@ import os
 /// Morning Brief 通知系统
 /// 每日定时推送健康摘要 + 异常实时告警
 @Observable
+@MainActor
 final class MorningBriefService: NSObject {
 
     static let shared = MorningBriefService()

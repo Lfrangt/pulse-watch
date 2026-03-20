@@ -216,28 +216,6 @@ struct SettingsView: View {
                 }
             }
 
-            // Streak — best (read-only)
-            settingRow {
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("All-Time Best Streak")
-                            .font(PulseTheme.bodyFont)
-                            .foregroundStyle(PulseTheme.textPrimary)
-                        Text("Your longest consecutive health tracking streak")
-                            .font(PulseTheme.captionFont)
-                            .foregroundStyle(PulseTheme.textTertiary)
-                    }
-                    Spacer()
-                    HStack(spacing: 4) {
-                        Text("🔥")
-                            .font(.system(size: 14))
-                        Text(String(format: String(localized: "%d days"), StreakService.shared.bestStreak))
-                            .font(PulseTheme.bodyFont.weight(.semibold))
-                            .foregroundStyle(PulseTheme.textPrimary)
-                    }
-                }
-            }
-
             // Weekly Summary
             settingRow {
                 Toggle(isOn: $weeklySummaryEnabled) {

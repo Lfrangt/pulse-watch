@@ -381,9 +381,6 @@
         }
       }
     },
-    "🔥" : {
-
-    },
     "🔥 %d-Day Streak!" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5093,6 +5090,7 @@
       }
     },
     "Scan to Connect" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

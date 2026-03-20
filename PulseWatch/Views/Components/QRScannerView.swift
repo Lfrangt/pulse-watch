@@ -78,12 +78,16 @@ struct QRScannerView: View {
                             .foregroundStyle(.red)
                             .multilineTextAlignment(.center)
                     } else {
-                        Text("Scan OpenClaw pairing QR code")
+                        Text(scanned ? "Connected! ✓" : "Scan QR code to connect")
                             .font(.system(size: 16, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white)
-                        Text("Run openclaw pair --qr in terminal")
-                            .font(.system(size: 13, weight: .regular, design: .monospaced))
-                            .foregroundStyle(.white.opacity(0.6))
+                            .foregroundStyle(scanned ? .green : .white)
+                            .animation(.easeInOut, value: scanned)
+                        if !scanned {
+                            Text("Open PulseWatch Settings on your Mac to get the QR code")
+                                .font(.system(size: 13))
+                                .foregroundStyle(.white.opacity(0.5))
+                                .multilineTextAlignment(.center)
+                        }
                     }
                 }
                 .padding(.bottom, 60)

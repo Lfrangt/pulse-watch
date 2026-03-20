@@ -513,35 +513,50 @@ struct DashboardView: View {
     }
 
     private func ouraSummaryRow(icon: String, iconColor: Color, title: String, statusLabel: String, statusColor: Color, score: Int) -> some View {
-        HStack(spacing: 16) {
-            // Apple Activity Ring
-            ActivityRingView(progress: CGFloat(score) / 100.0, color: iconColor, size: 52)
+        HStack(spacing: 14) {
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(iconColor.opacity(0.15))
+                    .frame(width: 38, height: 38)
+                Image(systemName: icon)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(iconColor)
+            }
 
-            // Text info
-            VStack(alignment: .leading, spacing: 4) {
+            // Title + score
+            VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
+                // Mini bar
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(Color.white.opacity(0.08)).frame(height: 3)
+                        Capsule()
+                            .fill(LinearGradient(colors: [iconColor.opacity(0.6), iconColor], startPoint: .leading, endPoint: .trailing))
+                            .frame(width: geo.size.width * CGFloat(score) / 100, height: 3)
+                    }
+                }
+                .frame(height: 3)
                 Text("\(score) / 100")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.45))
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.4))
             }
 
             Spacer()
 
-            // Status badge + chevron
-            VStack(alignment: .trailing, spacing: 6) {
-                Text(statusLabel)
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                    .foregroundStyle(statusColor)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(Capsule().fill(statusColor.opacity(0.13)))
+            // Status badge
+            Text(statusLabel)
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .foregroundStyle(statusColor)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(Capsule().fill(statusColor.opacity(0.13)))
 
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.2))
-            }
+            Image(systemName: "chevron.right")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.2))
         }
         .padding(.horizontal, PulseTheme.spacingM)
         .padding(.vertical, 14)

@@ -160,7 +160,6 @@ struct DashboardView: View {
                     .padding(.top, PulseTheme.spacingM)
                 }
             }
-            .background(Color.black.ignoresSafeArea())
             .scrollContentBackground(.hidden)
             .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $showLocationSetup) {
@@ -186,12 +185,17 @@ struct DashboardView: View {
                 handleGeofenceEntry(notification)
             }
         }
+        .background(Color.black.ignoresSafeArea())
+        .ignoresSafeArea(.all, edges: .top)
     }
 
     // MARK: - Hero Section (Oura-style)
 
     private func heroSection(score: Int, headline: String) -> some View {
         VStack(spacing: PulseTheme.spacingL) {
+                // Top padding to clear status bar (Dynamic Island ~59pt, notch ~47pt)
+                Spacer().frame(height: 54)
+
                 // Score pills row
                 if let tri = triScore {
                     scorePillsRow(
@@ -296,8 +300,8 @@ struct DashboardView: View {
                     startPoint: .top,
                     endPoint: .bottom
                 )
+                .padding(.horizontal, -PulseTheme.spacingM)
             )
-            .ignoresSafeArea(.all, edges: .top)
     }
 
     // MARK: - Score Pills Row

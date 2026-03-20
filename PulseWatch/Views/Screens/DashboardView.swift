@@ -174,7 +174,18 @@ struct DashboardView: View {
                 handleGeofenceEntry(notification)
             }
         }
-        .background(Color.black.ignoresSafeArea())
+        .background(
+            LinearGradient(
+                stops: [
+                    .init(color: Color(hex: "0D4A5C"), location: 0),
+                    .init(color: Color(hex: "071E2E"), location: 0.5),
+                    .init(color: Color.black, location: 1.0),
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+        )
         .ignoresSafeArea(.all, edges: .top)
     }
 

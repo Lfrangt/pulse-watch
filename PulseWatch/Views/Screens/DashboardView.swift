@@ -210,8 +210,8 @@ struct DashboardView: View {
                 .ignoresSafeArea()
 
                 VStack(spacing: 0) {
-                    // Safe area top padding — fixed 64pt covers Dynamic Island (59pt) + buffer
-                    Spacer().frame(height: 64)
+                    // Safe area top padding — 12pt, hero gradient covers the rest
+                    Spacer().frame(height: 12)
 
                     // ── Score discs row  (Oura's top circle grid)
                     if let tri = triScore {

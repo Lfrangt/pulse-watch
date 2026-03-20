@@ -145,10 +145,11 @@ struct DashboardView: View {
                                 .staggered(index: 9)
                         }
 
-                        Spacer(minLength: 60)
+                        Spacer(minLength: 80)
                     }
                     .padding(.horizontal, PulseTheme.spacingM)
                     .padding(.top, PulseTheme.spacingM)
+                    .padding(.bottom, 16)
                 }
             }
             .scrollContentBackground(.hidden)

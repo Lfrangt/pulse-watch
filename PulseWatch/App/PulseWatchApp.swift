@@ -159,7 +159,7 @@ struct MainTabView: View {
         itemAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(PulseTheme.textTertiary)]
         itemAppearance.selected.iconColor = UIColor(PulseTheme.accent)
         itemAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(PulseTheme.accent)]
-        appearance.selectionIndicatorTintColor = UIColor.white.withAlphaComponent(0.15)
+        appearance.selectionIndicatorTintColor = UIColor.white.withAlphaComponent(0.1)
         appearance.stackedLayoutAppearance = itemAppearance
         appearance.inlineLayoutAppearance = itemAppearance
         appearance.compactInlineLayoutAppearance = itemAppearance

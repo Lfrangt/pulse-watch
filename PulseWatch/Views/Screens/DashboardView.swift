@@ -67,19 +67,16 @@ struct DashboardView: View {
 
                     // BELOW HERO — cards with padding
                     VStack(spacing: PulseTheme.spacingS) {
+                        // Vitals strip — HRV + Heart Rate front and centre
+                        if currentHRV != nil || currentHeartRate != nil {
+                            vitalsStrip
+                                .staggered(index: 0)
+                        }
+
                         // Sleep & Activity summary cards
                         if let tri = triScore {
                             ouraSleepActivityCards(tri)
                                 .staggered(index: 1)
-                        }
-
-                        // Strain vs Recovery
-                        if todayStrain > 0 || (brief != nil && demoMode) {
-                            strainRecoveryCard(
-                                strain: todayStrain,
-                                recovery: insight?.recoveryScore ?? brief?.score ?? 0
-                            )
-                            .staggered(index: 3)
                         }
 
                         // Health Age
@@ -207,11 +204,8 @@ struct DashboardView: View {
                         .stroke(Color.white.opacity(0.12), style: StrokeStyle(lineWidth: 5, lineCap: .round))
                         .frame(width: 160, height: 160)
 
-                    // Arc progress — accentTeal stroke
-                    arcTrack()
-                        .trim(from: 0, to: ringProgress)
-                        .stroke(PulseTheme.accentTeal, style: StrokeStyle(lineWidth: 5, lineCap: .round))
-                        .frame(width: 160, height: 160)
+                    // Arc progress — teal with fade-out tail
+                    arcGaugeProgress(progress: ringProgress)
 
                     // Marker dot at score position
                     arcMarkerDot(progress: ringProgress, radius: 80)
@@ -253,12 +247,17 @@ struct DashboardView: View {
                     .padding(.top, -200)
             )
             .overlay(alignment: .bottom) {
+                // Longer, softer fade so hero blends naturally into card section
                 LinearGradient(
-                    colors: [Color.clear, Color.black],
+                    stops: [
+                        .init(color: Color.clear, location: 0),
+                        .init(color: Color.black.opacity(0.4), location: 0.5),
+                        .init(color: Color.black, location: 1.0),
+                    ],
                     startPoint: .top,
                     endPoint: .bottom
                 )
-                .frame(height: 60)
+                .frame(height: 100)
                 .padding(.horizontal, -PulseTheme.spacingM)
             }
     }
@@ -307,6 +306,34 @@ struct DashboardView: View {
     /// 200° arc shape, open at the bottom — from 170° to 370° (= 10°)
     private func arcTrack() -> some Shape {
         Arc(startAngle: .degrees(170), endAngle: .degrees(370), clockwise: false)
+    }
+
+    /// Arc progress stroke with a smooth teal-to-transparent tail at the start
+    @ViewBuilder
+    private func arcGaugeProgress(progress: CGFloat) -> some View {
+        let teal = PulseTheme.accentTeal
+        ZStack {
+            // Faded tail: short segment at the start fades from clear → teal
+            arcTrack()
+                .trim(from: 0, to: min(progress, 0.15))
+                .stroke(
+                    LinearGradient(
+                        colors: [teal.opacity(0), teal.opacity(0.55)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ),
+                    style: StrokeStyle(lineWidth: 5, lineCap: .round)
+                )
+                .frame(width: 160, height: 160)
+
+            // Main body: from fade-in point to end
+            if progress > 0.12 {
+                arcTrack()
+                    .trim(from: 0.12, to: progress)
+                    .stroke(teal, style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                    .frame(width: 160, height: 160)
+            }
+        }
     }
 
     private func arcMarkerDot(progress: CGFloat, radius: CGFloat) -> some View {
@@ -361,47 +388,61 @@ struct DashboardView: View {
     }
 
     private func ouraSummaryRow(icon: String, iconColor: Color, title: String, statusLabel: String, statusColor: Color, score: Int) -> some View {
-        HStack(spacing: 12) {
-            // Icon container
-            ZStack {
-                Circle()
-                    .fill(iconColor.opacity(0.12))
-                    .frame(width: 36, height: 36)
-                Image(systemName: icon)
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(iconColor)
-            }
+        VStack(spacing: 10) {
+            HStack(spacing: 12) {
+                // Icon container
+                ZStack {
+                    Circle()
+                        .fill(iconColor.opacity(0.15))
+                        .frame(width: 34, height: 34)
+                    Image(systemName: icon)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(iconColor)
+                }
 
-            // Title + sub-label
-            VStack(alignment: .leading, spacing: 2) {
+                // Title
                 Text(title)
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
-                Text("\(score)")
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
+
+                Spacer()
+
+                // Status badge
+                Text(statusLabel)
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundStyle(statusColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(Capsule().fill(statusColor.opacity(0.13)))
+
+                // Chevron
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.18))
             }
 
-            Spacer()
-
-            // Status badge
-            Text(statusLabel)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundStyle(statusColor)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(
+            // Progress bar
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
                     Capsule()
-                        .fill(statusColor.opacity(0.12))
-                )
-
-            // Chevron
-            Image(systemName: "chevron.right")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.2))
+                        .fill(Color.white.opacity(0.07))
+                        .frame(height: 4)
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [iconColor.opacity(0.7), iconColor],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: geo.size.width * CGFloat(score) / 100, height: 4)
+                        .animation(.spring(response: 1.0, dampingFraction: 0.8).delay(0.3), value: score)
+                }
+            }
+            .frame(height: 4)
         }
         .padding(.horizontal, PulseTheme.spacingM)
-        .padding(.vertical, 13)
+        .padding(.vertical, 14)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
                 .fill(Color.white.opacity(0.04))
@@ -411,7 +452,7 @@ struct DashboardView: View {
                 )
         )
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(title) \(statusLabel)")
+        .accessibilityLabel("\(title) \(statusLabel) \(score)")
     }
 
     private func ouraStatusLabel(for score: Int) -> String {
@@ -582,6 +623,99 @@ struct DashboardView: View {
         healthManager.latestBloodOxygen
     }
 
+    // MARK: - Vitals Strip (HRV + Heart Rate)
+
+    private var vitalsStrip: some View {
+        HStack(spacing: 0) {
+            // HRV
+            if let hrv = currentHRV {
+                vitalsCell(
+                    icon: "waveform.path.ecg",
+                    label: "HRV",
+                    value: "\(Int(hrv))",
+                    unit: "ms",
+                    color: PulseTheme.accentTeal,
+                    trend: metricStatus(hrv, good: 45...200, ok: 30...45)
+                )
+                .padding(PulseTheme.spacingL)
+            }
+
+            // Divider
+            if currentHRV != nil && currentHeartRate != nil {
+                Rectangle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 0.5)
+                    .frame(maxHeight: .infinity)
+                    .padding(.vertical, PulseTheme.spacingM)
+            }
+
+            // Heart Rate
+            if let hr = currentHeartRate {
+                vitalsCell(
+                    icon: "heart.fill",
+                    label: String(localized: "Heart Rate"),
+                    value: "\(Int(hr))",
+                    unit: "bpm",
+                    color: PulseTheme.statusPoor,
+                    trend: metricStatus(hr, good: 55...70, ok: 50...80)
+                )
+                .padding(PulseTheme.spacingL)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
+                .fill(Color.white.opacity(0.04))
+                .shadow(color: PulseTheme.cardShadow, radius: 12, y: 4)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
+                .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
+        )
+        .padding(.horizontal, PulseTheme.spacingM)
+    }
+
+    private func vitalsCell(icon: String, label: String, value: String, unit: String, color: Color, trend: MetricStatus) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            // Top row: icon + trend badge
+            HStack {
+                ZStack {
+                    Circle()
+                        .fill(color.opacity(0.15))
+                        .frame(width: 36, height: 36)
+                    Image(systemName: icon)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(color)
+                        .symbolEffect(.pulse, options: .repeating, isActive: icon == "heart.fill")
+                }
+                Spacer()
+                Image(systemName: trend.arrow)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(trend.color)
+                    .padding(6)
+                    .background(Circle().fill(trend.color.opacity(0.12)))
+            }
+
+            // Big number + unit
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text(value)
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundStyle(PulseTheme.textPrimary)
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
+                Text(unit)
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+
+            // Label
+            Text(label)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(PulseTheme.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
     private var metricsGrid: some View {
         let columns = [
             GridItem(.flexible(), spacing: PulseTheme.spacingM),
@@ -589,31 +723,7 @@ struct DashboardView: View {
         ]
 
         return LazyVGrid(columns: columns, spacing: PulseTheme.spacingM) {
-            // 心率
-            if let hr = currentHeartRate {
-                metricTile(
-                    icon: "heart.fill",
-                    label: String(localized: "Heart Rate"),
-                    value: "\(Int(hr))",
-                    unit: "bpm",
-                    color: PulseTheme.statusPoor,
-                    trend: metricStatus(hr, good: 55...70, ok: 50...80),
-                    animated: true
-                )
-            }
-
-            // HRV
-            if let hrv = currentHRV {
-                metricTile(
-                    icon: "waveform.path.ecg",
-                    label: "HRV",
-                    value: "\(Int(hrv))",
-                    unit: "ms",
-                    color: PulseTheme.accent,
-                    trend: metricStatus(hrv, good: 45...200, ok: 30...45),
-                    animated: false
-                )
-            }
+            // HRV & Heart Rate are shown in vitalsStrip above — not repeated here
 
             // 睡眠
             if let sleep = currentSleep {
@@ -933,76 +1043,77 @@ struct DashboardView: View {
     private func healthAgeCard(result: HealthAgeService.HealthAgeResult) -> some View {
         let diff = result.difference
         let isYounger = diff < -0.5
-        let accentColor = isYounger ? PulseTheme.statusGood : PulseTheme.activityAccent
+        let accentColor = isYounger ? PulseTheme.accentTeal : PulseTheme.activityCoral
         let ageInt = Int(result.healthAge.rounded())
+        let diffInt = Int(abs(diff).rounded())
 
-        return VStack(spacing: PulseTheme.spacingM) {
-            // 主展示
-            Button {
-                withAnimation(.spring(response: 0.4)) { healthAgeExpanded.toggle() }
-            } label: {
-                HStack(spacing: PulseTheme.spacingM) {
-                    // 年龄大数字
-                    VStack(spacing: 2) {
+        return Button {
+            withAnimation(.spring(response: 0.4)) { healthAgeExpanded.toggle() }
+        } label: {
+            VStack(spacing: 0) {
+                // Main row
+                HStack(alignment: .center, spacing: 0) {
+                    // Left: big age number
+                    VStack(alignment: .leading, spacing: 2) {
                         Text("\(ageInt)")
-                            .font(.system(size: 36, weight: .bold, design: .rounded))
+                            .font(.system(size: 42, weight: .bold, design: .rounded))
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("Health Age")
-                            .font(PulseTheme.captionFont)
+                        Text(String(localized: "Health Age"))
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
-                    .frame(minWidth: 80)
 
                     Spacer()
 
-                    // 差值标签
-                    VStack(alignment: .trailing, spacing: 4) {
+                    // Right: delta + actual age
+                    VStack(alignment: .trailing, spacing: 6) {
                         if abs(diff) > 0.5 {
-                            HStack(spacing: 4) {
+                            HStack(spacing: 5) {
                                 Image(systemName: isYounger ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
-                                    .font(.system(size: 14))
-                                Text(String(format: String(localized: "%d years %@"), Int(abs(diff).rounded()),
+                                    .font(.system(size: 13))
+                                Text(String(format: "%d yr %@", diffInt,
                                             isYounger ? String(localized: "younger") : String(localized: "older")))
-                                    .font(.system(size: 14, weight: .semibold))
+                                    .font(.system(size: 13, weight: .bold, design: .rounded))
                             }
                             .foregroundStyle(accentColor)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Capsule().fill(accentColor.opacity(0.12)))
                         }
 
-                        Text(String(format: String(localized: "Actual age: %d"), result.chronologicalAge))
-                            .font(PulseTheme.captionFont)
-                            .foregroundStyle(PulseTheme.textTertiary)
-
-                        Text(String(format: String(localized: "Based on %d days of data"), result.daysOfData))
-                            .font(.system(size: 10))
+                        Text(String(format: String(localized: "Actual: %d · %d day data"), result.chronologicalAge, result.daysOfData))
+                            .font(.system(size: 11, design: .rounded))
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
 
                     Image(systemName: healthAgeExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.2))
+                        .padding(.leading, 8)
                 }
-            }
-            .buttonStyle(.plain)
+                .padding(PulseTheme.spacingM)
 
-            // 展开详情
-            if healthAgeExpanded {
-                Divider().background(PulseTheme.border)
-
-                VStack(spacing: PulseTheme.spacingS) {
-                    ForEach(result.metrics, id: \.metric) { metric in
-                        healthAgeMetricRow(metric)
+                // Expanded detail
+                if healthAgeExpanded {
+                    Divider().background(Color.white.opacity(0.06))
+                    VStack(spacing: PulseTheme.spacingS) {
+                        ForEach(result.metrics, id: \.metric) { metric in
+                            healthAgeMetricRow(metric)
+                        }
                     }
+                    .padding(PulseTheme.spacingM)
                 }
             }
-
-            // 免责声明
-            Text("Estimated using population-average baselines. Not a medical assessment.")
-                .font(.system(size: 10))
-                .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, PulseTheme.spacingS)
+            .background(
+                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                    .fill(Color.white.opacity(0.04))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                            .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                    )
+            )
         }
-        .pulseCard()
+        .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(format: String(localized: "Health Age %d"), ageInt))
     }

@@ -63,6 +63,11 @@ struct PulseWatchApp: App {
         // Background health data sync to OpenClaw
         OpenClawBridge.shared.registerBackgroundSync()
 
+        // Auto-reconnect to OpenClaw gateway (saved creds + subnet discovery)
+        Task {
+            await OpenClawBridge.shared.attemptAutoReconnect()
+        }
+
         // App Store 评价引导 — 记录活跃天数
         Task { @MainActor in
             ReviewRequestManager.shared.recordAppActive()
@@ -111,6 +116,11 @@ struct PulseWatchApp: App {
             if newPhase == .active {
                 // Re-check notification permission when returning from Settings
                 MorningBriefService.shared.refreshAuthorizationStatus()
+
+                // Re-establish OpenClaw gateway connection
+                Task {
+                    await OpenClawBridge.shared.attemptAutoReconnect()
+                }
             }
         }
     }

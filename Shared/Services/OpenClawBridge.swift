@@ -659,6 +659,70 @@ final class OpenClawBridge {
         }
     }
 
+    // MARK: - Auto-Reconnect + Subnet Discovery
+
+    /// Silently reconnect using saved credentials on launch / foreground.
+    /// If the saved URL is unreachable, scans the local /24 subnet for the gateway.
+    func attemptAutoReconnect() async {
+        guard isEnabled else { return }
+        guard let cfg = config else { return }
+
+        // Already confirmed recently — skip
+        if connectionStatus == .connected,
+           let lastSync = lastSyncTime,
+           Date().timeIntervalSince(lastSync) < 300 {
+            return
+        }
+
+        logger.info("Auto-reconnect: verifying saved gateway \(cfg.gatewayURL)")
+
+        // 1) Try the saved URL first
+        let reachable = await verifyConnection(url: cfg.gatewayURL, token: cfg.token)
+        if reachable {
+            await MainActor.run { connectionStatus = .connected }
+            logger.info("Auto-reconnect: saved gateway reachable")
+            return
+        }
+
+        // 2) Saved URL failed — attempt subnet discovery
+        logger.info("Auto-reconnect: saved URL unreachable, starting subnet scan")
+        await MainActor.run { connectionStatus = .syncing }
+
+        guard let savedURL = URL(string: cfg.gatewayURL),
+              let port = savedURL.port.map({ UInt16($0) }) ?? Optional(SubnetScanner.defaultPort)
+        else {
+            await MainActor.run { connectionStatus = .error }
+            return
+        }
+
+        guard let discoveredBase = await SubnetScanner.shared.findGateway(port: port) else {
+            logger.warning("Auto-reconnect: subnet scan found nothing")
+            await MainActor.run { connectionStatus = .error }
+            return
+        }
+
+        // 3) Verify the discovered host with saved token
+        let verified = await verifyConnection(url: discoveredBase, token: cfg.token)
+        if verified {
+            // Update saved URL to new IP
+            let updated = PulseOpenClawConfig(
+                gatewayURL: discoveredBase,
+                token: cfg.token,
+                agentID: cfg.agentID
+            )
+            updated.save()
+            await MainActor.run {
+                connectionStatus = .connected
+                // Sync @AppStorage used by SettingsView
+                UserDefaults.standard.set(discoveredBase, forKey: "pulse.openclaw.gatewayURL")
+            }
+            logger.info("Auto-reconnect: migrated gateway to \(discoveredBase)")
+        } else {
+            logger.warning("Auto-reconnect: discovered host rejected token")
+            await MainActor.run { connectionStatus = .error }
+        }
+    }
+
     // MARK: - Background Sync (BGAppRefreshTask)
 
     #if os(iOS)

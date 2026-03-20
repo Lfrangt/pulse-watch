@@ -200,26 +200,26 @@ struct DashboardView: View {
                     scorePillsRow(total: score, sleep: nil, activity: nil, readiness: nil)
                 }
 
-                // Arc gauge + score
+                // Arc gauge + score — number sits inside the arc naturally
                 ZStack {
                     // Arc track — 200° semicircle
                     arcTrack()
                         .stroke(Color.white.opacity(0.12), style: StrokeStyle(lineWidth: 5, lineCap: .round))
-                        .frame(width: 150, height: 150)
+                        .frame(width: 160, height: 160)
 
                     // Arc progress — accentTeal stroke
                     arcTrack()
                         .trim(from: 0, to: ringProgress)
                         .stroke(PulseTheme.accentTeal, style: StrokeStyle(lineWidth: 5, lineCap: .round))
-                        .frame(width: 150, height: 150)
+                        .frame(width: 160, height: 160)
 
                     // Marker dot at score position
-                    arcMarkerDot(progress: ringProgress, radius: 75)
+                    arcMarkerDot(progress: ringProgress, radius: 80)
 
-                    // Score number + label
+                    // Score number + label — centered in arc
                     VStack(spacing: 2) {
                         Text("\(animatedScore)")
-                            .font(.system(size: 52, weight: .bold, design: .rounded))
+                            .font(.system(size: 56, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                             .contentTransition(.numericText())
                             .minimumScaleFactor(0.6)
@@ -230,9 +230,8 @@ struct DashboardView: View {
                             .tracking(3)
                             .foregroundStyle(.white.opacity(0.6))
                     }
-                    .offset(y: 6)
                 }
-                .frame(height: 130)
+                .frame(width: 160, height: 160)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(String(localized: "Recovery Score"))
                 .accessibilityValue(String(localized: "\(score) out of 100, \(headline)"))

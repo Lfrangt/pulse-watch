@@ -4104,6 +4104,9 @@
         }
       }
     },
+    "Open PulseWatch Settings on your Mac to get the QR code" : {
+
+    },
     "Open Settings" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5080,6 +5083,7 @@
       }
     },
     "Scan OpenClaw pairing QR code" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

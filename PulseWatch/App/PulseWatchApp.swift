@@ -141,7 +141,7 @@ struct MainTabView: View {
         // 自定义 TabBar 外观
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(PulseTheme.surface)
+        appearance.backgroundColor = UIColor(PulseTheme.background)
         appearance.shadowColor = .clear
         // Remove iOS 18 tab selection background pill
         let itemAppearance = UITabBarItemAppearance()
@@ -149,6 +149,7 @@ struct MainTabView: View {
         itemAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(PulseTheme.textTertiary)]
         itemAppearance.selected.iconColor = UIColor(PulseTheme.accent)
         itemAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(PulseTheme.accent)]
+        appearance.selectionIndicatorTintColor = UIColor.white.withAlphaComponent(0.15)
         appearance.stackedLayoutAppearance = itemAppearance
         appearance.inlineLayoutAppearance = itemAppearance
         appearance.compactInlineLayoutAppearance = itemAppearance

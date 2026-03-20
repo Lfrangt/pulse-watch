@@ -1237,9 +1237,6 @@
         }
       }
     },
-    "Biometrics" : {
-
-    },
     "Birth Month" : {
 
     },
@@ -3398,6 +3395,9 @@
         }
       }
     },
+    "Learn more" : {
+
+    },
     "Leg Press" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4455,6 +4455,9 @@
           }
         }
       }
+    },
+    "READINESS" : {
+
     },
     "Readiness %d — %@ intensity recommended" : {
       "extractionState" : "manual",

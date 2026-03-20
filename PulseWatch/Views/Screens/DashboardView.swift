@@ -212,20 +212,20 @@ struct DashboardView: View {
                 ZStack {
                     // Arc track — 200° semicircle
                     arcTrack()
-                        .stroke(Color.white.opacity(0.12), style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                        .stroke(Color.white.opacity(0.12), style: StrokeStyle(lineWidth: 5, lineCap: .round))
                         .frame(width: 220, height: 220)
 
-                    // Arc progress
+                    // Arc progress — accentTeal stroke
                     arcTrack()
                         .trim(from: 0, to: ringProgress)
-                        .stroke(Color.white.opacity(0.8), style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                        .stroke(PulseTheme.accentTeal, style: StrokeStyle(lineWidth: 5, lineCap: .round))
                         .frame(width: 220, height: 220)
 
                     // Marker dot at score position
                     arcMarkerDot(progress: ringProgress, radius: 110)
 
                     // Score number + label
-                    VStack(spacing: 6) {
+                    VStack(spacing: 2) {
                         Text("\(animatedScore)")
                             .font(.system(size: 72, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
@@ -288,20 +288,9 @@ struct DashboardView: View {
             .padding(.horizontal, PulseTheme.spacingM)
             .frame(maxWidth: .infinity)
             .background(
-                LinearGradient(
-                    stops: [
-                        .init(color: Color(hex: "0A1628"), location: 0),
-                        .init(color: Color(hex: "0F2A3D"), location: 0.25),
-                        .init(color: Color(hex: "134E5E"), location: 0.45),
-                        .init(color: Color(hex: "0D3B4A"), location: 0.65),
-                        .init(color: Color(hex: "0A1A24"), location: 0.85),
-                        .init(color: Color.black, location: 1.0),
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .padding(.horizontal, -PulseTheme.spacingM)
-                .ignoresSafeArea(.all, edges: .top)
+                PulseTheme.heroGradient
+                    .padding(.horizontal, -PulseTheme.spacingM)
+                    .padding(.top, -200)
             )
     }
 
@@ -335,7 +324,7 @@ struct DashboardView: View {
         .padding(.vertical, 6)
         .background(
             Capsule()
-                .fill(Color(hex: "1A1A1A").opacity(0.8))
+                .fill(PulseTheme.surface.opacity(0.8))
         )
         .accessibilityLabel("\(label) \(value)")
     }
@@ -425,7 +414,7 @@ struct DashboardView: View {
         .padding(.vertical, 14)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color(hex: "1A1A1A"))
+                .fill(Color(hex: "111111"))
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(title) \(statusLabel)")

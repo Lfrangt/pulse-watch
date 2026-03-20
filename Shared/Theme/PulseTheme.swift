@@ -9,54 +9,92 @@ enum PulseTheme {
     // MARK: - Colors
     // Biometric Minimalism — cold precision, data-forward
 
-    /// Deep charcoal background
-    static let background = Color(hex: "131313")
+    /// Deep black background
+    static let background = Color(hex: "0A0A0A")
 
-    /// Slightly elevated surface
-    static let surface = Color(hex: "1C1B1B")
+    /// Elevated surface
+    static let surface = Color(hex: "1A1A1A")
+
+    /// Secondary surface
+    static let surface2 = Color(hex: "242424")
 
     /// Card background
-    static let cardBackground = Color(hex: "201F1F")
+    static let cardBackground = Color(hex: "1A1A1A")
 
     /// Elevated card (active/pressed)
-    static let cardElevated = Color(hex: "2A2A2A")
+    static let cardElevated = Color(hex: "242424")
 
     /// Subtle cool border
     static let border = Color(hex: "3A494A")
 
-    /// Primary text — cool off-white
-    static let textPrimary = Color(hex: "E5E2E1")
+    /// Primary text — pure white
+    static let textPrimary = Color(hex: "FFFFFF")
 
-    /// Secondary text — muted teal-gray
-    static let textSecondary = Color(hex: "B9CACA")
+    /// Secondary text — neutral gray
+    static let textSecondary = Color(hex: "A0A0A0")
 
     /// Tertiary text — dim
     static let textTertiary = Color(hex: "849495")
 
+    // MARK: - Accent Colors
+
+    /// TriScore primary / accent — electric teal
+    static let accentTeal = Color(hex: "00F5FF")
+
+    /// Sleep / HRV accent — soft violet
+    static let sleepViolet = Color(hex: "BF94FF")
+
+    /// Activity / steps accent — coral red
+    static let activityCoral = Color(hex: "FF6B6B")
+
     // MARK: - Status Colors
 
-    /// Good / recovered — electric teal (TriScore primary)
+    /// Good / recovered — electric teal
     static let statusGood = Color(hex: "00F5FF")
 
-    /// Moderate / okay — soft violet (sleep)
+    /// Warning / moderate — gold
+    static let statusWarning = Color(hex: "FFD700")
+
+    /// Moderate / okay — soft violet
     static let statusModerate = Color(hex: "BF94FF")
 
-    /// Poor / needs rest — coral red (activity/strain)
+    /// Poor / needs rest — coral red
     static let statusPoor = Color(hex: "FF6B6B")
 
-    /// Primary accent — electric teal
-    static let accent = Color(hex: "00F5FF")
-
-    /// Sleep accent — soft violet
-    static let sleepAccent = Color(hex: "BF94FF")
-
-    /// Activity accent — coral
-    static let activityAccent = Color(hex: "FF6B6B")
+    /// Legacy aliases
+    static let accent = accentTeal
+    static let sleepAccent = sleepViolet
+    static let activityAccent = activityCoral
 
     /// Subtle highlight for active states
     static let warmHighlight = Color(hex: "1A2A2A")
 
+    // MARK: - Semantic Colors
+
+    /// Trend / chart blue
+    static let trendBlue = Color(hex: "5B8DEF")
+
+    /// HRV chart blue
+    static let hrvBlue = Color(hex: "5C7BC7")
+
+    /// Chart purple
+    static let chartPurple = Color(hex: "4B3D8F")
+
     // MARK: - Gradients
+
+    /// Hero section gradient (teal atmospheric)
+    static let heroGradient = LinearGradient(
+        stops: [
+            .init(color: Color(hex: "0A1628"), location: 0),
+            .init(color: Color(hex: "0F2A3D"), location: 0.25),
+            .init(color: Color(hex: "134E5E"), location: 0.45),
+            .init(color: Color(hex: "0D3B4A"), location: 0.65),
+            .init(color: Color(hex: "0A1A24"), location: 0.85),
+            .init(color: Color.black, location: 1.0),
+        ],
+        startPoint: .top,
+        endPoint: .bottom
+    )
 
     static func statusGradient(for score: Int) -> LinearGradient {
         let color = statusColor(for: score)

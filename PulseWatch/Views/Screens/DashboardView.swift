@@ -193,7 +193,7 @@ struct DashboardView: View {
 
     private func heroSection(score: Int, headline: String) -> some View {
         GeometryReader { geo in
-            ZStack(alignment: .bottom) {
+            ZStack(alignment: .top) {
                 // ── Background: deep teal atmospheric gradient (Oura mountain vibe)
                 LinearGradient(
                     stops: [
@@ -217,6 +217,9 @@ struct DashboardView: View {
                 .ignoresSafeArea()
 
                 VStack(spacing: 0) {
+                    // Safe area top padding (Dynamic Island / notch)
+                    Spacer().frame(height: geo.safeAreaInsets.top + 8)
+
                     // ── Score discs row  (Oura's top circle grid)
                     if let tri = triScore {
                         ouraScoreDiscRow(
@@ -315,12 +318,11 @@ struct DashboardView: View {
 
                     Spacer().frame(height: 28)
                 }
-                .padding(.top, 12)
+                .padding(.top, 0)
             }
         }
         .frame(maxWidth: .infinity)
         .frame(height: heroHeight)
-        // Bottom fade into black card section
         .overlay(alignment: .bottom) {
             LinearGradient(
                 colors: [Color.clear, Color.black],
@@ -334,7 +336,7 @@ struct DashboardView: View {
     }
 
     /// Height for the hero section — tall enough to feel immersive
-    private var heroHeight: CGFloat { 480 }
+    private var heroHeight: CGFloat { 390 }
 
     // MARK: - Oura Score Disc Row
 

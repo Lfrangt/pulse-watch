@@ -178,88 +178,197 @@ struct DashboardView: View {
         .ignoresSafeArea(.all, edges: .top)
     }
 
-    // MARK: - Hero Section (Oura-style)
+    // MARK: - Hero Section (Oura-style full bleed)
 
     private func heroSection(score: Int, headline: String) -> some View {
-        VStack(spacing: 8) {
-                // Top padding to clear status bar (Dynamic Island ~59pt, notch ~47pt)
-                Spacer().frame(height: 4)
-
-                // Score pills row
-                if let tri = triScore {
-                    scorePillsRow(
-                        total: score,
-                        sleep: tri.sleep.score,
-                        activity: tri.activity.score,
-                        readiness: tri.readiness.score
-                    )
-                } else {
-                    scorePillsRow(total: score, sleep: nil, activity: nil, readiness: nil)
-                }
-
-                // Arc gauge + score — number sits inside the arc naturally
-                ZStack {
-                    // Arc track — 200° semicircle
-                    arcTrack()
-                        .stroke(Color.white.opacity(0.12), style: StrokeStyle(lineWidth: 5, lineCap: .round))
-                        .frame(width: 160, height: 160)
-
-                    // Arc progress — teal with fade-out tail
-                    arcGaugeProgress(progress: ringProgress)
-
-                    // Marker dot at score position
-                    arcMarkerDot(progress: ringProgress, radius: 80)
-
-                    // Score number + label — centered in arc
-                    VStack(spacing: 2) {
-                        Text("\(animatedScore)")
-                            .font(.system(size: 56, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .contentTransition(.numericText())
-                            .minimumScaleFactor(0.6)
-                            .lineLimit(1)
-
-                        Text("READINESS")
-                            .font(.system(size: 11, weight: .semibold))
-                            .tracking(3)
-                            .foregroundStyle(.white.opacity(0.6))
-                    }
-                }
-                .frame(width: 160, height: 160)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(String(localized: "Recovery Score"))
-                .accessibilityValue(String(localized: "\(score) out of 100, \(headline)"))
-                .onAppear {
-                    guard !ringAnimated else { return }
-                    ringAnimated = true
-                    withAnimation(.spring(response: 1.0, dampingFraction: 0.7).delay(0.3)) {
-                        ringProgress = CGFloat(score) / 100.0
-                    }
-                    animateScoreCounter(to: score)
-                }
-            }
-            .padding(.horizontal, PulseTheme.spacingM)
-            .frame(maxWidth: .infinity)
-            .frame(maxHeight: 260)
-            .background(
-                PulseTheme.heroGradient
-                    .padding(.horizontal, -PulseTheme.spacingM)
-                    .padding(.top, -200)
-            )
-            .overlay(alignment: .bottom) {
-                // Longer, softer fade so hero blends naturally into card section
+        GeometryReader { geo in
+            ZStack(alignment: .bottom) {
+                // ── Background: deep teal atmospheric gradient (Oura mountain vibe)
                 LinearGradient(
                     stops: [
-                        .init(color: Color.clear, location: 0),
-                        .init(color: Color.black.opacity(0.4), location: 0.5),
+                        .init(color: Color(hex: "0D4A5C"), location: 0),
+                        .init(color: Color(hex: "0A3347"), location: 0.35),
+                        .init(color: Color(hex: "071E2E"), location: 0.65),
                         .init(color: Color.black, location: 1.0),
                     ],
                     startPoint: .top,
                     endPoint: .bottom
                 )
-                .frame(height: 100)
-                .padding(.horizontal, -PulseTheme.spacingM)
+                .ignoresSafeArea()
+
+                // Subtle radial glow behind arc
+                RadialGradient(
+                    colors: [Color(hex: "1ADFFF").opacity(0.12), Color.clear],
+                    center: .init(x: 0.5, y: 0.42),
+                    startRadius: 10,
+                    endRadius: 220
+                )
+                .ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    // ── Score discs row  (Oura's top circle grid)
+                    if let tri = triScore {
+                        ouraScoreDiscRow(
+                            total: score,
+                            sleep: tri.sleep.score,
+                            activity: tri.activity.score,
+                            readiness: tri.readiness.score
+                        )
+                    } else {
+                        ouraScoreDiscRow(total: score, sleep: nil, activity: nil, readiness: nil)
+                    }
+
+                    Spacer().frame(height: 16)
+
+                    // ── Wide arc gauge (Oura's sweeping 180° arc)
+                    ZStack {
+                        // Track
+                        wideArcTrack()
+                            .stroke(Color.white.opacity(0.10),
+                                    style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                            .frame(width: geo.size.width - 60, height: (geo.size.width - 60) / 2 + 10)
+
+                        // Progress
+                        wideArcTrack()
+                            .trim(from: 0, to: ringProgress)
+                            .stroke(Color.white,
+                                    style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                            .frame(width: geo.size.width - 60, height: (geo.size.width - 60) / 2 + 10)
+
+                        // 0 / 100 labels on arc ends
+                        let arcW = geo.size.width - 60
+                        let arcH = arcW / 2 + 10
+                        Group {
+                            Text("0")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.4))
+                                .offset(x: -(arcW / 2) + 4, y: arcH / 2 - 2)
+                            Text("100")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.4))
+                                .offset(x: (arcW / 2) - 14, y: arcH / 2 - 2)
+                        }
+                        .frame(width: arcW, height: arcH)
+
+                        // Crown icon above score (Oura's achievement icon)
+                        VStack(spacing: 4) {
+                            Image(systemName: "crown.fill")
+                                .font(.system(size: 14))
+                                .foregroundStyle(Color(hex: "FFD700").opacity(0.85))
+
+                            // Score number
+                            Text("\(animatedScore)")
+                                .font(.system(size: 64, weight: .bold, design: .default))
+                                .foregroundStyle(.white)
+                                .contentTransition(.numericText())
+
+                            Text("READINESS")
+                                .font(.system(size: 11, weight: .semibold))
+                                .tracking(3.5)
+                                .foregroundStyle(.white.opacity(0.55))
+                        }
+                        .offset(y: 8)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .onAppear {
+                        guard !ringAnimated else { return }
+                        ringAnimated = true
+                        withAnimation(.spring(response: 1.2, dampingFraction: 0.75).delay(0.3)) {
+                            ringProgress = CGFloat(score) / 100.0
+                        }
+                        animateScoreCounter(to: score)
+                    }
+
+                    Spacer().frame(height: 20)
+
+                    // ── Headline — Oura's big serif-style motivational text
+                    Text(headline)
+                        .font(.system(size: 32, weight: .bold, design: .serif))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 28)
+
+                    Spacer().frame(height: 12)
+
+                    // ── Sub-headline (brief insight)
+                    if let insight = brief?.insight {
+                        Text(insight)
+                            .font(.system(size: 14, weight: .regular))
+                            .foregroundStyle(.white.opacity(0.65))
+                            .multilineTextAlignment(.center)
+                            .lineSpacing(3)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 36)
+                    }
+
+                    Spacer().frame(height: 28)
+                }
+                .padding(.top, 12)
             }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: heroHeight)
+        // Bottom fade into black card section
+        .overlay(alignment: .bottom) {
+            LinearGradient(
+                colors: [Color.clear, Color.black],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 60)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Recovery Score \(score), \(headline)"))
+    }
+
+    /// Height for the hero section — tall enough to feel immersive
+    private var heroHeight: CGFloat { 480 }
+
+    // MARK: - Oura Score Disc Row
+
+    private func ouraScoreDiscRow(total: Int, sleep: Int?, activity: Int?, readiness: Int?) -> some View {
+        HStack(spacing: 0) {
+            ouraScoreDisc(icon: "crown.fill", iconColor: Color(hex: "FFD700"), label: "Readiness", value: total)
+            if let sleep {
+                ouraScoreDisc(icon: "moon.fill", iconColor: .white, label: "Sleep", value: sleep)
+            }
+            if let activity {
+                ouraScoreDisc(icon: "figure.run", iconColor: .white, label: "Activity", value: activity)
+            }
+            if let readiness {
+                ouraScoreDisc(icon: "heart.fill", iconColor: .white, label: "Ready", value: readiness)
+            }
+        }
+        .padding(.horizontal, 8)
+    }
+
+    private func ouraScoreDisc(icon: String, iconColor: Color = .white, label: String, value: Int) -> some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 13))
+                .foregroundStyle(iconColor)
+            Text("\(value)")
+                .font(.system(size: 26, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+            Text(label)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(.white.opacity(0.55))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Color.white.opacity(0.08))
+        )
+        .padding(.horizontal, 4)
+        .accessibilityLabel("\(label) \(value)")
+    }
+
+    // MARK: - Wide Arc (Oura's sweeping 180° gauge)
+
+    private func wideArcTrack() -> some Shape {
+        Arc(startAngle: .degrees(180), endAngle: .degrees(360), clockwise: false)
     }
 
     // MARK: - Score Pills Row

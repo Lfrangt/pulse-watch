@@ -263,8 +263,12 @@ final class OpenClawBridge {
             cfg.save()
             await MainActor.run {
                 connectionStatus = .connected
+                // 确保 isEnabled = true，触发数据推送
+                UserDefaults.standard.set(true, forKey: "pulse.openclaw.enabled")
             }
             logger.info("OpenClaw Gateway 配对成功")
+            // 配对成功后立即推送健康数据
+            await pushHealthStatus()
         }
         return ok
     }

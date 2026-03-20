@@ -174,18 +174,7 @@ struct DashboardView: View {
                 handleGeofenceEntry(notification)
             }
         }
-        .background(
-            LinearGradient(
-                stops: [
-                    .init(color: Color(hex: "0D4A5C"), location: 0),
-                    .init(color: Color(hex: "071E2E"), location: 0.5),
-                    .init(color: Color.black, location: 1.0),
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-        )
+        .background(Color(hex: "0D4A5C").ignoresSafeArea())
         .ignoresSafeArea(.all, edges: .top)
     }
 
@@ -308,8 +297,8 @@ struct DashboardView: View {
                     // ── Sub-headline (brief insight)
                     if let insight = brief?.insight {
                         Text(insight)
-                            .font(.system(size: 14, weight: .regular))
-                            .foregroundStyle(.white.opacity(0.65))
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.88))
                             .multilineTextAlignment(.center)
                             .lineSpacing(3)
                             .fixedSize(horizontal: false, vertical: true)

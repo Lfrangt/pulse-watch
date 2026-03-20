@@ -69,7 +69,7 @@ struct DashboardView: View {
                     }
 
                     // BELOW HERO — cards with padding
-                    VStack(spacing: PulseTheme.spacingM) {
+                    VStack(spacing: PulseTheme.spacingS) {
                         // Sleep & Activity summary cards
                         if let tri = triScore {
                             ouraSleepActivityCards(tri)
@@ -255,7 +255,7 @@ struct DashboardView: View {
 
                 // Headline
                 Text(heroHeadline(for: score))
-                    .font(.system(size: 32, weight: .bold, design: .serif))
+                    .font(.system(size: 26, weight: .bold, design: .default))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
 
@@ -269,16 +269,16 @@ struct DashboardView: View {
                         .padding(.horizontal, PulseTheme.spacingXL)
                 }
 
-                // "Learn more" pill button
+                // "Learn more" ghost button
                 Button {} label: {
                     Text("Learn more")
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.8))
+                        .foregroundStyle(.white.opacity(0.7))
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
-                        .background(
+                        .overlay(
                             Capsule()
-                                .fill(Color.white.opacity(0.12))
+                                .stroke(Color.white.opacity(0.2), lineWidth: 0.5)
                         )
                 }
                 .buttonStyle(.plain)
@@ -292,13 +292,22 @@ struct DashboardView: View {
                     .padding(.horizontal, -PulseTheme.spacingM)
                     .padding(.top, -200)
             )
+            .overlay(alignment: .bottom) {
+                LinearGradient(
+                    colors: [Color.clear, Color.black],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 80)
+                .padding(.horizontal, -PulseTheme.spacingM)
+            }
     }
 
     // MARK: - Score Pills Row
 
     private func scorePillsRow(total: Int, sleep: Int?, activity: Int?, readiness: Int?) -> some View {
         HStack(spacing: PulseTheme.spacingS) {
-            scorePill(icon: "heart.circle.fill", label: "TriScore", value: total, color: PulseTheme.accent)
+            scorePill(icon: "bolt.fill", label: "TriScore", value: total, color: PulseTheme.accentTeal)
             if let sleep {
                 scorePill(icon: "moon.fill", label: "Sleep", value: sleep, color: PulseTheme.sleepAccent)
             }
@@ -306,7 +315,7 @@ struct DashboardView: View {
                 scorePill(icon: "flame.fill", label: "Activity", value: activity, color: PulseTheme.activityAccent)
             }
             if let readiness {
-                scorePill(icon: "bolt.heart.fill", label: "Ready", value: readiness, color: PulseTheme.accent)
+                scorePill(icon: "heart.fill", label: "Ready", value: readiness, color: .white.opacity(0.7))
             }
         }
     }
@@ -399,11 +408,16 @@ struct DashboardView: View {
 
             Spacer()
 
-            // Status badge
+            // Status badge pill
             Text(statusLabel.uppercased())
-                .font(.system(size: 12, weight: .bold))
-                .tracking(0.5)
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(statusColor)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(statusColor.opacity(0.15))
+                )
 
             // Chevron
             Image(systemName: "chevron.right")

@@ -231,7 +231,7 @@ struct DashboardView: View {
                     }
                     .offset(y: 6)
                 }
-                .frame(height: 150)
+                .frame(height: 130)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(String(localized: "Recovery Score"))
                 .accessibilityValue(String(localized: "\(score) out of 100, \(headline)"))
@@ -371,7 +371,7 @@ struct DashboardView: View {
             // Status label
             Text(statusLabel)
                 .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(Color(hex: "00C896"))
+                .foregroundStyle(Color(hex: "00C896").opacity(0.8))
 
             // Chevron
             Image(systemName: "chevron.right")
@@ -884,12 +884,13 @@ struct DashboardView: View {
                     // 年龄大数字
                     VStack(spacing: 2) {
                         Text("\(ageInt)")
-                            .font(.system(size: 44, weight: .bold, design: .rounded))
+                            .font(.system(size: 36, weight: .bold, design: .rounded))
                             .foregroundStyle(PulseTheme.textPrimary)
                         Text("Health Age")
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
+                    .frame(minWidth: 80)
 
                     Spacer()
 
@@ -898,10 +899,10 @@ struct DashboardView: View {
                         if abs(diff) > 0.5 {
                             HStack(spacing: 4) {
                                 Image(systemName: isYounger ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
-                                    .font(.system(size: 16))
+                                    .font(.system(size: 14))
                                 Text(String(format: String(localized: "%d years %@"), Int(abs(diff).rounded()),
                                             isYounger ? String(localized: "younger") : String(localized: "older")))
-                                    .font(PulseTheme.bodyFont.weight(.semibold))
+                                    .font(.system(size: 14, weight: .semibold))
                             }
                             .foregroundStyle(accentColor)
                         }

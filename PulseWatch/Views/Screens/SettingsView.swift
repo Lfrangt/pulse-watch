@@ -777,15 +777,15 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
             }
 
-            if !isPaired && !showGatewayConfig {
-                // 扫码配对（主入口）
+            if !showGatewayConfig {
+                // 扫码配对（主入口，已连接时也显示用于重新配对）
                 Button {
                     showQRScanner = true
                 } label: {
                     HStack(spacing: PulseTheme.spacingS) {
                         Image(systemName: "qrcode.viewfinder")
                             .font(.system(size: 16, weight: .medium))
-                        Text("Scan to Connect")
+                        Text(isPaired ? "Scan to Reconnect" : "Scan to Connect")
                             .font(PulseTheme.bodyFont.weight(.medium))
                     }
                     .foregroundStyle(PulseTheme.accent)

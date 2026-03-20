@@ -3395,9 +3395,6 @@
         }
       }
     },
-    "Learn more" : {
-
-    },
     "Leg Press" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4580,6 +4577,7 @@
       }
     },
     "Recovery" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4588,6 +4586,9 @@
           }
         }
       }
+    },
+    "RECOVERY" : {
+
     },
     "Recovery \\(score)" : {
       "extractionState" : "stale",
@@ -5716,6 +5717,9 @@
           }
         }
       }
+    },
+    "STRAIN" : {
+
     },
     "Strain %d, Recovery %d" : {
       "extractionState" : "manual",

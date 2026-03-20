@@ -293,40 +293,20 @@ final class OpenClawBridge {
 
         let status = buildHealthStatus()
 
-        // 将健康数据编码为 JSON 字符串作为 user message
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        guard let statusData = try? encoder.encode(status),
-              let statusJSON = String(data: statusData, encoding: .utf8) else {
-            connectionStatus = .error
-            return
-        }
-
-        // 附加 Watch 实时训练数据（如果有尚未被 HealthKit 同步的最新训练）
-        var watchWorkoutNote = ""
-        if let w = lastWatchWorkout,
-           Date().timeIntervalSince(w.timestamp) < 300 {
-            watchWorkoutNote = """
-
-            [RECENT_WATCH_WORKOUT]
-            category: \(w.category), duration: \(w.durationSeconds)s, calories: \(Int(w.activeCalories)), avgHR: \(Int(w.averageHeartRate)), maxHR: \(Int(w.maxHeartRate))
-            [/RECENT_WATCH_WORKOUT]
-            """
-            lastWatchWorkout = nil // 已包含在推送中，清除缓存
-        }
+        // Build health_sync format expected by Health Coach skill
+        let healthSyncJSON = buildHealthSyncJSON(from: status)
 
         let messageContent = """
         [HEALTH_DATA]
-        \(statusJSON)
+        \(healthSyncJSON)
         [/HEALTH_DATA]
-        \(watchWorkoutNote)
         Analyze the health data above. Provide a daily health summary and training advice. Reply in JSON with fields: morningBrief, trainingAdvice, alerts, recoveryScore, summary.
         """
 
         let body: [String: Any] = [
             "model": cfg.agentID,
             "messages": [
-                ["role": "system", "content": String(localized: "You are Pulse Coach, a personal fitness AI. Analyze HealthKit data and provide health insights and training advice. Reply in JSON.")],
+                ["role": "system", "content": "You are Pulse Coach, a personal health coach. The user's PulseWatch app sends you their HealthKit data in health_sync format. Analyze it and provide insights, morning briefs, and training advice. Reply in JSON."],
                 ["role": "user", "content": messageContent]
             ],
             "max_tokens": 1024
@@ -470,6 +450,108 @@ final class OpenClawBridge {
             trainingAdvice: insight.trainingAdvice.rawValue,
             recentWorkouts: recentWorkouts.isEmpty ? nil : recentWorkouts
         )
+    }
+
+    // MARK: - health_sync Format
+
+    /// Convert internal HealthStatus into the health_sync JSON format expected by Health Coach.
+    @MainActor
+    private func buildHealthSyncJSON(from status: HealthStatus) -> String {
+        let dateStr = DailySummary.dateFormatter.string(from: Date())
+        let ts = status.todaySummary
+        let v = status.latestVitals
+
+        // Compute light sleep = total - deep - rem (if available)
+        let totalSleepMin = ts.sleepHours.map { Int($0 * 60) }
+        let lightMin: Int? = {
+            guard let total = totalSleepMin else { return nil }
+            let deep = ts.deepSleepMinutes ?? 0
+            let rem = ts.remSleepMinutes ?? 0
+            let light = total - deep - rem
+            return light > 0 ? light : nil
+        }()
+
+        // Build workouts array including Watch real-time data
+        var workouts: [[String: Any]] = (status.recentWorkouts ?? []).map { w in
+            var workout: [String: Any] = [
+                "type": w.activityType,
+                "date": w.date,
+                "durationMinutes": w.durationMinutes
+            ]
+            if let cal = w.calories { workout["calories"] = Int(cal) }
+            if let hr = w.averageHeartRate { workout["averageHeartRate"] = Int(hr) }
+            return workout
+        }
+
+        // Append pending Watch workout if recent
+        if let w = lastWatchWorkout,
+           Date().timeIntervalSince(w.timestamp) < 300 {
+            workouts.insert([
+                "type": w.category,
+                "date": dateStr,
+                "durationMinutes": w.durationSeconds / 60,
+                "calories": Int(w.activeCalories),
+                "averageHeartRate": Int(w.averageHeartRate),
+                "maxHeartRate": Int(w.maxHeartRate),
+                "source": "watch_realtime"
+            ], at: 0)
+            lastWatchWorkout = nil
+        }
+
+        var metrics: [String: Any] = [:]
+
+        // Heart rate
+        var hr: [String: Any] = [:]
+        if let resting = v.restingHeartRate { hr["resting"] = Int(resting) }
+        if let current = v.heartRate { hr["average"] = Int(current) }
+        if !hr.isEmpty { metrics["heartRate"] = hr }
+
+        // HRV
+        if let hrv = v.hrv { metrics["hrv"] = ["average": Int(hrv)] }
+
+        // Blood oxygen
+        if let spo2 = v.bloodOxygen { metrics["bloodOxygen"] = ["average": Int(spo2)] }
+
+        // Sleep
+        var sleep: [String: Any] = [:]
+        if let total = totalSleepMin { sleep["totalMinutes"] = total }
+        if let deep = ts.deepSleepMinutes { sleep["deepMinutes"] = deep }
+        if let rem = ts.remSleepMinutes { sleep["remMinutes"] = rem }
+        if let light = lightMin { sleep["lightMinutes"] = light }
+        if !sleep.isEmpty { metrics["sleep"] = sleep }
+
+        // Activity
+        var activity: [String: Any] = [:]
+        if let steps = ts.totalSteps { activity["steps"] = steps }
+        if let cal = ts.activeCalories { activity["activeCalories"] = Int(cal) }
+        if !activity.isEmpty { metrics["activity"] = activity }
+
+        // Recovery
+        metrics["recoveryScore"] = status.recoveryScore
+
+        // Week trend
+        let wt = status.weekTrend
+        var trend: [String: Any] = [
+            "scoreTrend": wt.scoreTrend,
+            "hrvTrend": wt.hrvTrend,
+            "sleepTrend": wt.sleepTrend
+        ]
+        if let avg = wt.averageScore { trend["averageScore"] = avg }
+        trend["dailyScores"] = wt.dailyScores.map { ["date": $0.date, "score": $0.score] }
+        metrics["weekTrend"] = trend
+
+        let payload: [String: Any] = [
+            "type": "health_sync",
+            "date": dateStr,
+            "metrics": metrics,
+            "workouts": workouts
+        ]
+
+        guard let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
+              let json = String(data: data, encoding: .utf8) else {
+            return "{\"type\":\"health_sync\",\"date\":\"\(dateStr)\",\"metrics\":{}}"
+        }
+        return json
     }
 
     // MARK: - 解析 Agent 回复

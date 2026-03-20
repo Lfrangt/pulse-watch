@@ -987,53 +987,83 @@ struct CandlestickChartView: View {
     let animated: Bool
 
     @State private var revealProgress: CGFloat = 0
-    @State private var selectedCandle: CandlePoint? = nil
+    @State private var selectedIdx: Int? = nil
+
+    // Fallback to area chart when too few candles
+    private var useFallback: Bool { candles.count < 4 }
 
     var body: some View {
         if candles.isEmpty {
             VStack(spacing: 8) {
-                Image(systemName: "chart.bar.xaxis").font(.system(size: 24)).foregroundStyle(Color.white.opacity(0.2))
-                Text("Not enough data yet").font(.system(size: 12)).foregroundStyle(Color.white.opacity(0.3))
+                Image(systemName: "chart.bar.xaxis").font(.system(size: 24)).foregroundStyle(Color.white.opacity(0.15))
+                Text("Not enough data yet").font(.system(size: 12)).foregroundStyle(Color.white.opacity(0.25))
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if useFallback {
+            // Too few points — simple line chart
+            Chart(candles, id: \.id) { c in
+                LineMark(x: .value("Date", c.date), y: .value("Avg", c.avg))
+                    .foregroundStyle(color).interpolationMethod(.catmullRom)
+                    .lineStyle(StrokeStyle(lineWidth: 2))
+                AreaMark(x: .value("Date", c.date), y: .value("Avg", c.avg))
+                    .foregroundStyle(LinearGradient(colors: [color.opacity(0.18), color.opacity(0.02)], startPoint: .top, endPoint: .bottom))
+                    .interpolationMethod(.catmullRom)
+            }
+            .chartXAxis { AxisMarks { _ in AxisValueLabel(format: .dateTime.month(.abbreviated)).font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.4)) } }
+            .chartYAxis { AxisMarks(position: .leading) { _ in AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4])).foregroundStyle(Color.white.opacity(0.06)) } }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             GeometryReader { geo in
                 let w = geo.size.width
                 let h = geo.size.height
+                let padding: CGFloat = 36 // left margin for y-labels
+                let chartW = w - padding
                 let allVals = candles.flatMap { [$0.high, $0.low] }
-                let minVal = (allVals.min() ?? 0) * 0.95
-                let maxVal = (allVals.max() ?? 100) * 1.05
-                let range = maxVal - minVal
-                let candleW = max(4, (w / CGFloat(candles.count)) * 0.5)
-                let spacing = w / CGFloat(candles.count)
+                let rawMin = allVals.min() ?? 0
+                let rawMax = allVals.max() ?? 100
+                let spread = rawMax - rawMin
+                let minVal = rawMin - spread * 0.1
+                let maxVal = rawMax + spread * 0.1
+                let range = max(maxVal - minVal, 1)
+                let slotW = chartW / CGFloat(candles.count)
+                let candleW = max(3, slotW * 0.45)
+                let wickW: CGFloat = 1.5
+                let yPos = { (val: Double) -> CGFloat in h - h * CGFloat((val - minVal) / range) }
+                let xPos = { (idx: Int) -> CGFloat in padding + slotW * CGFloat(idx) + slotW / 2 }
 
                 ZStack(alignment: .topLeading) {
-                    // Grid
-                    ForEach([0, 1, 2, 3, 4], id: \.self) { i in
-                        let pct = CGFloat(i) / 4.0
-                        let val = minVal + (maxVal - minVal) * Double(4 - i) / 4.0
-                        Rectangle()
-                            .fill(Color.white.opacity(0.05))
-                            .frame(height: 0.5)
-                            .offset(y: h * pct)
-                        Text("\(Int(val))\(yLabel)")
-                            .font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.25))
-                            .offset(x: 0, y: h * pct - 7)
+                    // Y-axis grid + labels
+                    let steps = 4
+                    ForEach(0...steps, id: \.self) { i in
+                        let pct = CGFloat(i) / CGFloat(steps)
+                        let val = minVal + (maxVal - minVal) * Double(steps - i) / Double(steps)
+                        Group {
+                            Rectangle()
+                                .fill(Color.white.opacity(i == 0 || i == steps ? 0.0 : 0.05))
+                                .frame(width: chartW, height: 0.5)
+                                .offset(x: padding, y: h * pct)
+                            Text("\(Int(val))\(yLabel)")
+                                .font(.system(size: 9, design: .rounded))
+                                .foregroundStyle(Color.white.opacity(0.3))
+                                .frame(width: padding - 4, alignment: .trailing)
+                                .offset(x: 0, y: h * pct - 7)
+                        }
                     }
 
                     // Candles
                     ForEach(Array(candles.enumerated()), id: \.offset) { idx, candle in
-                        let cx = spacing * CGFloat(idx) + spacing / 2
-                        let openY  = h - h * CGFloat((candle.open  - minVal) / range)
-                        let closeY = h - h * CGFloat((candle.close - minVal) / range)
-                        let highY  = h - h * CGFloat((candle.high  - minVal) / range)
-                        let lowY   = h - h * CGFloat((candle.low   - minVal) / range)
+                        let cx     = xPos(idx)
+                        let highY  = yPos(candle.high)
+                        let lowY   = yPos(candle.low)
+                        let openY  = yPos(candle.open)
+                        let closeY = yPos(candle.close)
                         let bodyTop = min(openY, closeY)
                         let bodyH   = max(2, abs(closeY - openY))
                         let bullish = candle.isUp
-                        let candleColor = bullish ? color : Color(hex: "FF6B6B")
-                        let revealX = w * revealProgress
-                        let opacity = cx < revealX ? 1.0 : 0.0
+                        let c      = bullish ? color : Color(hex: "FF6B6B")
+                        let isSelected = selectedIdx == idx
+                        let revealX = padding + chartW * revealProgress
+                        let show = cx <= revealX
 
                         Group {
                             // Wick
@@ -1041,65 +1071,78 @@ struct CandlestickChartView: View {
                                 path.move(to: CGPoint(x: cx, y: highY))
                                 path.addLine(to: CGPoint(x: cx, y: lowY))
                             }
-                            .stroke(candleColor.opacity(0.55), lineWidth: 1.5)
+                            .stroke(c.opacity(isSelected ? 1.0 : 0.5), lineWidth: wickW)
 
-                            // Body
-                            Rectangle()
-                                .fill(bullish ? candleColor.opacity(0.85) : candleColor.opacity(0.7))
-                                .frame(width: candleW, height: bodyH)
-                                .position(x: cx, y: bodyTop + bodyH / 2)
+                            // Body — filled for up, outlined for down
+                            if bullish {
+                                Rectangle()
+                                    .fill(c.opacity(isSelected ? 1.0 : 0.8))
+                                    .frame(width: candleW, height: bodyH)
+                                    .position(x: cx, y: bodyTop + bodyH / 2)
+                            } else {
+                                Rectangle()
+                                    .strokeBorder(c.opacity(isSelected ? 1.0 : 0.75), lineWidth: 1.5)
+                                    .frame(width: candleW, height: bodyH)
+                                    .position(x: cx, y: bodyTop + bodyH / 2)
+                            }
                         }
-                        .opacity(opacity)
-                        .animation(.easeOut(duration: 0.04).delay(Double(idx) * 0.025), value: revealProgress)
+                        .opacity(show ? 1 : 0)
+                        .animation(.easeOut(duration: 0.06).delay(Double(idx) * 0.04), value: revealProgress)
                     }
 
-                    // Moving average line
+                    // Avg trend line
                     Path { path in
-                        let spacing2 = w / CGFloat(candles.count)
                         for (i, c) in candles.enumerated() {
-                            let x = spacing2 * CGFloat(i) + spacing2 / 2
-                            let y = h - h * CGFloat((c.avg - minVal) / range)
-                            if i == 0 { path.move(to: CGPoint(x: x, y: y)) }
-                            else { path.addLine(to: CGPoint(x: x, y: y)) }
+                            let pt = CGPoint(x: xPos(i), y: yPos(c.avg))
+                            i == 0 ? path.move(to: pt) : path.addLine(to: pt)
                         }
                     }
-                    .stroke(
-                        LinearGradient(colors: [color.opacity(0.25), color.opacity(0.6)], startPoint: .leading, endPoint: .trailing),
-                        style: StrokeStyle(lineWidth: 1.5, lineCap: .round, dash: [4, 3])
-                    )
+                    .stroke(color.opacity(0.45), style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [3, 4]))
                     .opacity(Double(revealProgress))
-                    .animation(.easeOut(duration: 0.8).delay(0.5), value: revealProgress)
+                    .animation(.easeOut(duration: 0.9).delay(0.5), value: revealProgress)
 
-                    // Touch
+                    // Touch target
                     Color.clear.contentShape(Rectangle())
                         .gesture(DragGesture(minimumDistance: 0)
-                            .onChanged { val in
-                                let idx = Int(val.location.x / spacing)
-                                if idx >= 0 && idx < candles.count { selectedCandle = candles[idx] }
+                            .onChanged { v in
+                                let i = Int((v.location.x - padding) / slotW)
+                                selectedIdx = (i >= 0 && i < candles.count) ? i : nil
                             }
-                            .onEnded { _ in withAnimation(.easeOut(duration: 0.3)) { selectedCandle = nil } }
+                            .onEnded { _ in
+                                withAnimation(.easeOut(duration: 0.25)) { selectedIdx = nil }
+                            }
                         )
                 }
                 .onAppear {
-                    guard animated else { revealProgress = 1; return }
-                    withAnimation(.easeInOut(duration: 1.3).delay(0.1)) { revealProgress = 1 }
+                    revealProgress = animated ? 0 : 1
+                    if animated {
+                        withAnimation(.easeOut(duration: 1.2).delay(0.15)) { revealProgress = 1 }
+                    }
                 }
                 .onChange(of: candles.count) {
                     revealProgress = 0
-                    withAnimation(.easeInOut(duration: 1.0).delay(0.1)) { revealProgress = 1 }
+                    withAnimation(.easeOut(duration: 1.0).delay(0.1)) { revealProgress = 1 }
                 }
             }
-            .overlay(alignment: .topLeading) {
-                if let sel = selectedCandle {
-                    HStack(spacing: 10) {
-                        Text(sel.date, style: .date).font(.system(size: 10)).foregroundStyle(.white.opacity(0.5))
-                        Text("H:\(Int(sel.high))").font(.system(size: 10, weight: .bold)).foregroundStyle(color)
-                        Text("L:\(Int(sel.low))").font(.system(size: 10, weight: .bold)).foregroundStyle(Color(hex: "FF6B6B"))
-                        Text("Avg:\(Int(sel.avg))").font(.system(size: 10, weight: .bold)).foregroundStyle(.white)
+            .overlay(alignment: .top) {
+                if let i = selectedIdx, i < candles.count {
+                    let sel = candles[i]
+                    HStack(spacing: 12) {
+                        Text(sel.date, format: .dateTime.month().day())
+                            .foregroundStyle(.white.opacity(0.5))
+                        Text("↑\(Int(sel.high))\(yLabel)").foregroundStyle(color)
+                        Text("↓\(Int(sel.low))\(yLabel)").foregroundStyle(Color(hex: "FF6B6B"))
+                        Text("~\(Int(sel.avg))\(yLabel)").foregroundStyle(.white.opacity(0.8))
                     }
-                    .padding(.horizontal, 10).padding(.vertical, 6)
-                    .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color(hex: "1A2A2A").opacity(0.95)))
-                    .transition(.opacity)
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .padding(.horizontal, 12).padding(.vertical, 7)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(Color(hex: "1C2A30").opacity(0.97))
+                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(color.opacity(0.3), lineWidth: 0.5))
+                    )
+                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                    .padding(.top, 2)
                 }
             }
         }

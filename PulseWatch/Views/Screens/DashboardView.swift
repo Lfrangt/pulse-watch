@@ -46,8 +46,7 @@ struct DashboardView: View {
                         heroSection(score: brief.score, headline: brief.headline)
                             .staggered(index: 0)
                     } else if isLoading {
-                        loadingCard
-                            .padding(.horizontal, PulseTheme.spacingM)
+                        heroLoadingPlaceholder
                     } else if !healthManager.hasHealthData && !demoMode {
                         VStack(spacing: PulseTheme.spacingM) {
                             healthKitPermissionGuide
@@ -1431,6 +1430,37 @@ struct DashboardView: View {
                 ProgressView()
                     .tint(PulseTheme.accent)
             )
+    }
+
+    /// Loading state — same teal hero background so no black flash
+    private var heroLoadingPlaceholder: some View {
+        ZStack {
+            LinearGradient(
+                stops: [
+                    .init(color: Color(hex: "0D4A5C"), location: 0),
+                    .init(color: Color(hex: "071E2E"), location: 0.7),
+                    .init(color: Color.black, location: 1.0),
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            VStack(spacing: 16) {
+                Spacer().frame(height: 80)
+                ProgressView()
+                    .tint(PulseTheme.accentTeal)
+                    .scaleEffect(1.3)
+                Text("Analysing your data…")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.4))
+                Spacer()
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 460)
+        .overlay(alignment: .bottom) {
+            LinearGradient(colors: [Color.clear, Color.black], startPoint: .top, endPoint: .bottom)
+                .frame(height: 32)
+        }
     }
 
     private var hasGymLocation: Bool {

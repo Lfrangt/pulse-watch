@@ -12,7 +12,6 @@ struct DashboardView: View {
     @State private var brief: ScoreEngine.DailyBrief?
     @State private var insight: HealthInsight?
     @State private var showLocationSetup = false
-    @State private var showShareSheet = false
     @State private var showGymPrompt = false
     @State private var breathe = false
 
@@ -163,48 +162,7 @@ struct DashboardView: View {
             }
             .background(Color.black.ignoresSafeArea())
             .scrollContentBackground(.hidden)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    HStack(spacing: 12) {
-                        if brief != nil {
-                            Button {
-                                showShareSheet = true
-                            } label: {
-                                Image(systemName: "square.and.arrow.up")
-                                    .font(.system(size: 16))
-                                    .foregroundStyle(PulseTheme.textTertiary)
-                            }
-                        }
-                        Button {
-                            showLocationSetup = true
-                        } label: {
-                            Image(systemName: "location.circle")
-                                .font(.system(size: 18))
-                                .foregroundStyle(PulseTheme.textTertiary)
-                        }
-                    }
-                }
-            }
-            .sheet(isPresented: $showShareSheet) {
-                if let brief, let image = ShareCardView(
-                    workoutName: brief.headline,
-                    workoutIcon: "heart.circle.fill",
-                    workoutColorHex: brief.score >= 70 ? "7FB069" : (brief.score >= 40 ? "D4A056" : "C75C5C"),
-                    durationMinutes: 0,
-                    calories: nil,
-                    averageHeartRate: nil,
-                    maxHeartRate: nil,
-                    distance: nil,
-                    heartRateZones: [],
-                    date: .now
-                ).renderImage(for: .story) {
-                    ShareSheet(items: [image])
-                        .onAppear { Analytics.trackShareTapped(source: "dashboard") }
-                }
-            }
+            .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $showLocationSetup) {
                 LocationSetupView()
             }
@@ -324,7 +282,8 @@ struct DashboardView: View {
                 Spacer().frame(height: PulseTheme.spacingM)
             }
             .padding(.horizontal, PulseTheme.spacingM)
-            .background {
+            .frame(maxWidth: .infinity)
+            .background(
                 LinearGradient(
                     stops: [
                         .init(color: Color(hex: "0A1628"), location: 0),
@@ -337,16 +296,8 @@ struct DashboardView: View {
                     startPoint: .top,
                     endPoint: .bottom
                 )
-                .clipShape(
-                    UnevenRoundedRectangle(
-                        topLeadingRadius: 0,
-                        bottomLeadingRadius: 32,
-                        bottomTrailingRadius: 32,
-                        topTrailingRadius: 0
-                    )
-                )
-                .ignoresSafeArea(.all, edges: .top)
-            }
+            )
+            .ignoresSafeArea(.all, edges: .top)
     }
 
     // MARK: - Score Pills Row

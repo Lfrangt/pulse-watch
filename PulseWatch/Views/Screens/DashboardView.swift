@@ -174,8 +174,12 @@ struct DashboardView: View {
                 handleGeofenceEntry(notification)
             }
         }
-        .background(Color(hex: "0D4A5C").ignoresSafeArea())
+        .background(
+            Color(hex: "0D4A5C")
+                .ignoresSafeArea(edges: .top)
+        )
         .ignoresSafeArea(.all, edges: .top)
+        .preferredColorScheme(.dark)
     }
 
     // MARK: - Hero Section (Oura-style full bleed)
@@ -206,8 +210,8 @@ struct DashboardView: View {
                 .ignoresSafeArea()
 
                 VStack(spacing: 0) {
-                    // Safe area top padding (Dynamic Island / notch)
-                    Spacer().frame(height: geo.safeAreaInsets.top + 8)
+                    // Safe area top padding — fixed 64pt covers Dynamic Island (59pt) + buffer
+                    Spacer().frame(height: 64)
 
                     // ── Score discs row  (Oura's top circle grid)
                     if let tri = triScore {

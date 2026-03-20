@@ -234,25 +234,26 @@ struct DashboardView: View {
 
     private func heroSection(score: Int, headline: String) -> some View {
         ZStack(alignment: .top) {
-            // Atmospheric gradient background — mountain/landscape feel
-            UnevenRoundedRectangle(
-                topLeadingRadius: 0,
-                bottomLeadingRadius: 32,
-                bottomTrailingRadius: 32,
-                topTrailingRadius: 0
+            // Atmospheric gradient background — extends into status bar
+            LinearGradient(
+                stops: [
+                    .init(color: Color(hex: "0A1628"), location: 0),
+                    .init(color: Color(hex: "0F2A3D"), location: 0.25),
+                    .init(color: Color(hex: "134E5E"), location: 0.45),
+                    .init(color: Color(hex: "0D3B4A"), location: 0.65),
+                    .init(color: Color(hex: "0A1A24"), location: 0.85),
+                    .init(color: Color.black, location: 1.0),
+                ],
+                startPoint: .top,
+                endPoint: .bottom
             )
-            .fill(
-                LinearGradient(
-                    stops: [
-                        .init(color: Color(hex: "0A1628"), location: 0),
-                        .init(color: Color(hex: "0F2A3D"), location: 0.25),
-                        .init(color: Color(hex: "134E5E"), location: 0.45),
-                        .init(color: Color(hex: "0D3B4A"), location: 0.65),
-                        .init(color: Color(hex: "0A1A24"), location: 0.85),
-                        .init(color: Color.black, location: 1.0),
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
+            .ignoresSafeArea(.all, edges: .top)
+            .clipShape(
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 0,
+                    bottomLeadingRadius: 32,
+                    bottomTrailingRadius: 32,
+                    topTrailingRadius: 0
                 )
             )
 

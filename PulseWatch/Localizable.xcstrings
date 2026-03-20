@@ -392,6 +392,9 @@
         }
       }
     },
+    "0" : {
+
+    },
     "1 Plate Club" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -506,6 +509,9 @@
       }
     },
     "82" : {
+
+    },
+    "100" : {
 
     },
     "About" : {
@@ -2080,9 +2086,6 @@
           }
         }
       }
-    },
-    "Estimated using population-average baselines. Not a medical assessment." : {
-
     },
     "Evening \\(timeStr)" : {
       "extractionState" : "stale",

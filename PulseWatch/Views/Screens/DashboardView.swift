@@ -762,17 +762,20 @@ struct DashboardView: View {
 
     private var vitalsStrip: some View {
         HStack(spacing: 0) {
-            // HRV
+            // HRV — tappable
             if let hrv = currentHRV {
-                vitalsCell(
-                    icon: "waveform.path.ecg",
-                    label: "HRV",
-                    value: "\(Int(hrv))",
-                    unit: "ms",
-                    color: PulseTheme.accentTeal,
-                    trend: metricStatus(hrv, good: 45...200, ok: 30...45)
-                )
-                .padding(PulseTheme.spacingL)
+                NavigationLink(destination: HRVDetailView()) {
+                    vitalsCell(
+                        icon: "waveform.path.ecg",
+                        label: "HRV",
+                        value: "\(Int(hrv))",
+                        unit: "ms",
+                        color: PulseTheme.accentTeal,
+                        trend: metricStatus(hrv, good: 45...200, ok: 30...45)
+                    )
+                    .padding(PulseTheme.spacingL)
+                }
+                .buttonStyle(.plain)
             }
 
             // Divider
@@ -784,17 +787,20 @@ struct DashboardView: View {
                     .padding(.vertical, PulseTheme.spacingM)
             }
 
-            // Heart Rate
+            // Heart Rate — tappable
             if let hr = currentHeartRate {
-                vitalsCell(
-                    icon: "heart.fill",
-                    label: String(localized: "Heart Rate"),
-                    value: "\(Int(hr))",
-                    unit: "bpm",
-                    color: PulseTheme.statusPoor,
-                    trend: metricStatus(hr, good: 55...70, ok: 50...80)
-                )
-                .padding(PulseTheme.spacingL)
+                NavigationLink(destination: HeartRateDetailView()) {
+                    vitalsCell(
+                        icon: "heart.fill",
+                        label: String(localized: "Heart Rate"),
+                        value: "\(Int(hr))",
+                        unit: "bpm",
+                        color: PulseTheme.statusPoor,
+                        trend: metricStatus(hr, good: 55...70, ok: 50...80)
+                    )
+                    .padding(PulseTheme.spacingL)
+                }
+                .buttonStyle(.plain)
             }
         }
         .frame(maxWidth: .infinity)

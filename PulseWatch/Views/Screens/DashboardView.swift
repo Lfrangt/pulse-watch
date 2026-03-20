@@ -183,9 +183,9 @@ struct DashboardView: View {
     // MARK: - Hero Section (Oura-style)
 
     private func heroSection(score: Int, headline: String) -> some View {
-        VStack(spacing: PulseTheme.spacingS) {
+        VStack(spacing: 12) {
                 // Top padding to clear status bar (Dynamic Island ~59pt, notch ~47pt)
-                Spacer().frame(height: 54)
+                Spacer().frame(height: 8)
 
                 // Score pills row
                 if let tri = triScore {
@@ -195,10 +195,8 @@ struct DashboardView: View {
                         activity: tri.activity.score,
                         readiness: tri.readiness.score
                     )
-                    .padding(.top, 8)
                 } else {
                     scorePillsRow(total: score, sleep: nil, activity: nil, readiness: nil)
-                        .padding(.top, 8)
                 }
 
                 // Arc gauge + score
@@ -370,16 +368,10 @@ struct DashboardView: View {
 
             Spacer()
 
-            // Status badge pill
-            Text(statusLabel.uppercased())
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(statusColor)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 3)
-                .background(
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .fill(statusColor.opacity(0.15))
-                )
+            // Status label
+            Text(statusLabel)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color(hex: "00C896"))
 
             // Chevron
             Image(systemName: "chevron.right")
@@ -793,23 +785,24 @@ struct DashboardView: View {
             // 双指标并排
             HStack(spacing: PulseTheme.spacingL) {
                 // Strain
-                VStack(spacing: 6) {
+                VStack(spacing: 8) {
+                    Text("STRAIN")
+                        .font(.system(size: 10, weight: .semibold))
+                        .tracking(1.5)
+                        .foregroundStyle(PulseTheme.textTertiary)
                     ZStack {
                         Circle()
-                            .stroke(PulseTheme.border, lineWidth: 6)
-                            .frame(width: 72, height: 72)
+                            .stroke(PulseTheme.border, lineWidth: 5)
+                            .frame(width: 60, height: 60)
                         Circle()
                             .trim(from: 0, to: CGFloat(strain) / 100)
-                            .stroke(strainColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
-                            .frame(width: 72, height: 72)
+                            .stroke(strainColor, style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                            .frame(width: 60, height: 60)
                             .rotationEffect(.degrees(-90))
                         Text("\(strain)")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
                             .foregroundStyle(PulseTheme.textPrimary)
                     }
-                    Text("Strain Score")
-                        .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
                     Text(strainLevel.label)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(strainColor)
@@ -819,26 +812,27 @@ struct DashboardView: View {
                 // Divider
                 Rectangle()
                     .fill(PulseTheme.border)
-                    .frame(width: 1, height: 60)
+                    .frame(width: 0.5, height: 80)
 
                 // Recovery
-                VStack(spacing: 6) {
+                VStack(spacing: 8) {
+                    Text("RECOVERY")
+                        .font(.system(size: 10, weight: .semibold))
+                        .tracking(1.5)
+                        .foregroundStyle(PulseTheme.textTertiary)
                     ZStack {
                         Circle()
-                            .stroke(PulseTheme.border, lineWidth: 6)
-                            .frame(width: 72, height: 72)
+                            .stroke(PulseTheme.border, lineWidth: 5)
+                            .frame(width: 60, height: 60)
                         Circle()
                             .trim(from: 0, to: CGFloat(recovery) / 100)
-                            .stroke(recoveryColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
-                            .frame(width: 72, height: 72)
+                            .stroke(recoveryColor, style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                            .frame(width: 60, height: 60)
                             .rotationEffect(.degrees(-90))
                         Text("\(recovery)")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
                             .foregroundStyle(PulseTheme.textPrimary)
                     }
-                    Text("Recovery")
-                        .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
                     Text(PulseTheme.statusLabel(for: recovery))
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(recoveryColor)
@@ -864,7 +858,11 @@ struct DashboardView: View {
                 )
             }
         }
-        .pulseCard()
+        .padding(PulseTheme.spacingL)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
+                .fill(Color.white.opacity(0.04))
+        )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(format: String(localized: "Strain %d, Recovery %d"), strain, recovery))
     }
@@ -934,13 +932,14 @@ struct DashboardView: View {
                     }
                 }
             }
+
+            // 免责声明
+            Text("Estimated using population-average baselines. Not a medical assessment.")
+                .font(.system(size: 10))
+                .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, PulseTheme.spacingS)
         }
-        // 免责声明
-        Text("Estimated using population-average baselines. Not a medical assessment.")
-            .font(.system(size: 10))
-            .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, PulseTheme.spacingS)
         .pulseCard()
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(format: String(localized: "Health Age %d"), ageInt))

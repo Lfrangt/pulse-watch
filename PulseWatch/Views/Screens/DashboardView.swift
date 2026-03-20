@@ -192,7 +192,7 @@ struct DashboardView: View {
     // MARK: - Hero Section (Oura-style)
 
     private func heroSection(score: Int, headline: String) -> some View {
-        VStack(spacing: PulseTheme.spacingL) {
+        VStack(spacing: PulseTheme.spacingS) {
                 // Top padding to clear status bar (Dynamic Island ~59pt, notch ~47pt)
                 Spacer().frame(height: 54)
 
@@ -204,8 +204,10 @@ struct DashboardView: View {
                         activity: tri.activity.score,
                         readiness: tri.readiness.score
                     )
+                    .padding(.top, 8)
                 } else {
                     scorePillsRow(total: score, sleep: nil, activity: nil, readiness: nil)
+                        .padding(.top, 8)
                 }
 
                 // Arc gauge + score
@@ -213,21 +215,21 @@ struct DashboardView: View {
                     // Arc track — 200° semicircle
                     arcTrack()
                         .stroke(Color.white.opacity(0.12), style: StrokeStyle(lineWidth: 5, lineCap: .round))
-                        .frame(width: 220, height: 220)
+                        .frame(width: 150, height: 150)
 
                     // Arc progress — accentTeal stroke
                     arcTrack()
                         .trim(from: 0, to: ringProgress)
                         .stroke(PulseTheme.accentTeal, style: StrokeStyle(lineWidth: 5, lineCap: .round))
-                        .frame(width: 220, height: 220)
+                        .frame(width: 150, height: 150)
 
                     // Marker dot at score position
-                    arcMarkerDot(progress: ringProgress, radius: 110)
+                    arcMarkerDot(progress: ringProgress, radius: 75)
 
                     // Score number + label
                     VStack(spacing: 2) {
                         Text("\(animatedScore)")
-                            .font(.system(size: 72, weight: .bold, design: .rounded))
+                            .font(.system(size: 52, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                             .contentTransition(.numericText())
                             .minimumScaleFactor(0.6)
@@ -238,9 +240,9 @@ struct DashboardView: View {
                             .tracking(3)
                             .foregroundStyle(.white.opacity(0.6))
                     }
-                    .offset(y: 10)
+                    .offset(y: 6)
                 }
-                .frame(height: 200)
+                .frame(height: 150)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(String(localized: "Recovery Score"))
                 .accessibilityValue(String(localized: "\(score) out of 100, \(headline)"))
@@ -252,41 +254,10 @@ struct DashboardView: View {
                     }
                     animateScoreCounter(to: score)
                 }
-
-                // Headline
-                Text(heroHeadline(for: score))
-                    .font(.system(size: 26, weight: .bold, design: .default))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-
-                // Insight text
-                if let brief {
-                    Text(brief.insight)
-                        .font(.system(size: 15, weight: .regular))
-                        .foregroundStyle(.white.opacity(0.55))
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-                        .padding(.horizontal, PulseTheme.spacingXL)
-                }
-
-                // "Learn more" ghost button
-                Button {} label: {
-                    Text("Learn more")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.7))
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .overlay(
-                            Capsule()
-                                .stroke(Color.white.opacity(0.2), lineWidth: 0.5)
-                        )
-                }
-                .buttonStyle(.plain)
-
-                Spacer().frame(height: PulseTheme.spacingM)
             }
             .padding(.horizontal, PulseTheme.spacingM)
             .frame(maxWidth: .infinity)
+            .frame(maxHeight: 260)
             .background(
                 PulseTheme.heroGradient
                     .padding(.horizontal, -PulseTheme.spacingM)
@@ -298,7 +269,7 @@ struct DashboardView: View {
                     startPoint: .top,
                     endPoint: .bottom
                 )
-                .frame(height: 80)
+                .frame(height: 60)
                 .padding(.horizontal, -PulseTheme.spacingM)
             }
     }
@@ -321,16 +292,16 @@ struct DashboardView: View {
     }
 
     private func scorePill(icon: String, label: String, value: Int, color: Color) -> some View {
-        HStack(spacing: 5) {
+        HStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 11))
+                .font(.system(size: 10))
                 .foregroundStyle(color)
             Text("\(value)")
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
         .background(
             Capsule()
                 .fill(PulseTheme.surface.opacity(0.8))

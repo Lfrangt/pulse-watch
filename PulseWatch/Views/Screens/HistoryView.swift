@@ -301,7 +301,8 @@ struct HistoryView: View {
         ) {
             if data.isEmpty {
                 emptyChartPlaceholder
-            } else {
+            } else if selectedRange == .week {
+                // 7D — 折线图
                 Chart(data, id: \.date) { item in
                     LineMark(
                         x: .value(String(localized: "Date"), item.date),
@@ -315,13 +316,10 @@ struct HistoryView: View {
                         x: .value(String(localized: "Date"), item.date),
                         y: .value(String(localized: "Score"), item.score)
                     )
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [PulseTheme.accent.opacity(0.2), PulseTheme.accent.opacity(0.02)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
+                    .foregroundStyle(LinearGradient(
+                        colors: [PulseTheme.accent.opacity(0.2), PulseTheme.accent.opacity(0.02)],
+                        startPoint: .top, endPoint: .bottom
+                    ))
                     .interpolationMethod(.catmullRom)
 
                     PointMark(
@@ -333,18 +331,15 @@ struct HistoryView: View {
                 }
                 .chartYScale(domain: 0...100)
                 .chartYAxis {
-                    AxisMarks(position: .leading, values: [0, 50, 100]) { value in
+                    AxisMarks(position: .leading, values: [0, 50, 100]) { _ in
                         AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
                             .foregroundStyle(PulseTheme.border.opacity(0.4))
-                        AxisValueLabel()
-                            .font(.system(size: 10))
+                        AxisValueLabel().font(.system(size: 10))
                             .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
                     }
                 }
                 .chartXAxis {
-                    AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
-                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
-                            .foregroundStyle(PulseTheme.border.opacity(0.5))
+                    AxisMarks(values: .stride(by: .day, count: 1)) { _ in
                         AxisValueLabel(format: .dateTime.month(.abbreviated).day())
                             .font(.system(size: 9))
                             .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
@@ -353,12 +348,19 @@ struct HistoryView: View {
                 .frame(height: 180)
                 .opacity(chartAnimated ? 1 : 0)
                 .animation(.easeOut(duration: 1.0), value: chartAnimated)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(String(localized: "Daily score trend"))
-                .accessibilityValue({
-                    let avg = data.map(\.score).reduce(0, +) / max(data.count, 1)
-                    return String(localized: "Average score \(avg) over \(data.count) days")
-                }())
+            } else {
+                // 30D / 90D — K 线图
+                let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
+                let rawData = data.map { (date: $0.date, value: Double($0.score)) }
+                let candles = aggregateToCandlePoints(from: rawData, groupBy: groupBy)
+                CandlestickChartView(
+                    candles: candles,
+                    color: PulseTheme.accentTeal,
+                    yLabel: "",
+                    animated: chartAnimated
+                )
+                .frame(height: 200)
+                .padding(.top, 24) // room for grid labels
             }
         }
     }
@@ -403,72 +405,27 @@ struct HistoryView: View {
         ) {
             if data.isEmpty {
                 VStack(spacing: 8) {
-                    Image(systemName: "applewatch")
-                        .font(.system(size: 24))
-                        .foregroundStyle(PulseTheme.textTertiary.opacity(0.5))
-                    Text("No heart rate data — wear your Apple Watch")
-                        .font(.system(size: 12))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                    Image(systemName: "applewatch").font(.system(size: 24)).foregroundStyle(PulseTheme.textTertiary.opacity(0.5))
+                    Text("No heart rate data — wear your Apple Watch").font(.system(size: 12)).foregroundStyle(PulseTheme.textTertiary)
                 }
-                .frame(maxWidth: .infinity)
-                .frame(height: 120)
-            } else {
+                .frame(maxWidth: .infinity).frame(height: 120)
+            } else if selectedRange == .week {
                 Chart(data, id: \.date) { item in
-                    LineMark(
-                        x: .value("Date", item.date),
-                        y: .value("RHR", item.resting)
-                    )
-                    .foregroundStyle(hrColor)
-                    .interpolationMethod(.catmullRom)
-                    .lineStyle(StrokeStyle(lineWidth: 2.5))
-
-                    AreaMark(
-                        x: .value("Date", item.date),
-                        y: .value("RHR", item.resting)
-                    )
-                    .foregroundStyle(
-                        LinearGradient(colors: [hrColor.opacity(0.15), hrColor.opacity(0.02)],
-                                       startPoint: .top, endPoint: .bottom)
-                    )
-                    .interpolationMethod(.catmullRom)
-
-                    PointMark(
-                        x: .value("Date", item.date),
-                        y: .value("RHR", item.resting)
-                    )
-                    .foregroundStyle(hrColor)
-                    .symbolSize(20)
+                    LineMark(x: .value("Date", item.date), y: .value("RHR", item.resting))
+                        .foregroundStyle(hrColor).interpolationMethod(.catmullRom).lineStyle(StrokeStyle(lineWidth: 2.5))
+                    AreaMark(x: .value("Date", item.date), y: .value("RHR", item.resting))
+                        .foregroundStyle(LinearGradient(colors: [hrColor.opacity(0.15), hrColor.opacity(0.02)], startPoint: .top, endPoint: .bottom))
+                        .interpolationMethod(.catmullRom)
                 }
-                .chartYScale(domain: {
-                    let lo = max(30, (data.map(\.resting).min() ?? 40) - 5)
-                    let hi = (data.map(\.resting).max() ?? 80) + 5
-                    return lo...hi
-                }())
-                .chartYAxis {
-                    AxisMarks(position: .leading) { _ in
-                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
-                            .foregroundStyle(PulseTheme.border.opacity(0.4))
-                        AxisValueLabel()
-                            .font(.system(size: 10))
-                            .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
-                    }
-                }
-                .chartXAxis {
-                    AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
-                        AxisValueLabel(format: .dateTime.month(.abbreviated).day())
-                            .font(.system(size: 9))
-                            .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
-                    }
-                }
-                .frame(height: 180)
-                .opacity(chartAnimated ? 1 : 0)
-                .animation(.easeOut(duration: 1.0), value: chartAnimated)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(String(localized: "Resting heart rate trend"))
-                .accessibilityValue({
-                    let avg = Int(data.map(\.resting).reduce(0, +) / max(Double(data.count), 1))
-                    return String(localized: "Average \(avg) bpm over \(data.count) days")
-                }())
+                .chartYScale(domain: { let lo = max(30, (data.map(\.resting).min() ?? 40) - 5); let hi = (data.map(\.resting).max() ?? 80) + 5; return lo...hi }())
+                .chartXAxis { AxisMarks(values: .stride(by: .day, count: 1)) { _ in AxisValueLabel(format: .dateTime.month(.abbreviated).day()).font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary.opacity(0.7)) } }
+                .frame(height: 180).opacity(chartAnimated ? 1 : 0).animation(.easeOut(duration: 1.0), value: chartAnimated)
+            } else {
+                let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
+                let rawData = data.map { (date: $0.date, value: $0.resting) }
+                CandlestickChartView(candles: aggregateToCandlePoints(from: rawData, groupBy: groupBy), color: hrColor, yLabel: "", animated: chartAnimated)
+                    .frame(height: 200)
+                    .padding(.top, 24)
             }
         }
     }
@@ -511,57 +468,21 @@ struct HistoryView: View {
         ) {
             if data.isEmpty {
                 emptyChartPlaceholder
-            } else {
+            } else if selectedRange == .week {
                 Chart(data, id: \.date) { item in
-                    LineMark(
-                        x: .value(String(localized: "Date"), item.date),
-                        y: .value("HRV", item.value)
-                    )
-                    .foregroundStyle(hrvColor)
-                    .interpolationMethod(.catmullRom)
-                    .lineStyle(StrokeStyle(lineWidth: 2.5))
-
-                    AreaMark(
-                        x: .value(String(localized: "Date"), item.date),
-                        y: .value("HRV", item.value)
-                    )
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [hrvColor.opacity(0.15), hrvColor.opacity(0.02)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .interpolationMethod(.catmullRom)
+                    LineMark(x: .value(String(localized: "Date"), item.date), y: .value("HRV", item.value))
+                        .foregroundStyle(hrvColor).interpolationMethod(.catmullRom).lineStyle(StrokeStyle(lineWidth: 2.5))
+                    AreaMark(x: .value(String(localized: "Date"), item.date), y: .value("HRV", item.value))
+                        .foregroundStyle(LinearGradient(colors: [hrvColor.opacity(0.15), hrvColor.opacity(0.02)], startPoint: .top, endPoint: .bottom))
+                        .interpolationMethod(.catmullRom)
                 }
-                .chartYAxis {
-                    AxisMarks(position: .leading) { value in
-                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
-                            .foregroundStyle(PulseTheme.border.opacity(0.4))
-                        AxisValueLabel {
-                            if let v = value.as(Double.self) {
-                                Text("\(Int(v))ms")
-                                    .foregroundStyle(PulseTheme.textTertiary)
-                            }
-                        }
-                    }
-                }
-                .chartXAxis {
-                    AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
-                        AxisValueLabel(format: .dateTime.month(.abbreviated).day())
-                            .font(.system(size: 9))
-                            .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
-                    }
-                }
-                .frame(height: 180)
-                .opacity(chartAnimated ? 1 : 0)
-                .animation(.easeOut(duration: 1.0), value: chartAnimated)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(String(localized: "HRV trend"))
-                .accessibilityValue({
-                    let avg = Int(data.map(\.value).reduce(0, +) / max(Double(data.count), 1))
-                    return String(localized: "Average \(avg) milliseconds over \(data.count) days")
-                }())
+                .chartXAxis { AxisMarks(values: .stride(by: .day, count: 1)) { _ in AxisValueLabel(format: .dateTime.month(.abbreviated).day()).font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary.opacity(0.7)) } }
+                .frame(height: 180).opacity(chartAnimated ? 1 : 0).animation(.easeOut(duration: 1.0), value: chartAnimated)
+            } else {
+                let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
+                CandlestickChartView(candles: aggregateToCandlePoints(from: data, groupBy: groupBy), color: hrvColor, yLabel: "ms", animated: chartAnimated)
+                    .frame(height: 200)
+                    .padding(.top, 24)
             }
         }
     }
@@ -1026,4 +947,161 @@ struct HistoryView: View {
 #Preview {
     HistoryView()
         .preferredColorScheme(.dark)
+}
+
+// MARK: - Candlestick Chart (K-line) — 30D/90D
+
+struct CandlePoint: Identifiable {
+    let id = UUID()
+    let date: Date
+    let open: Double
+    let close: Double
+    let high: Double
+    let low: Double
+    let avg: Double
+    var isUp: Bool { close >= open }
+}
+
+func aggregateToCandlePoints(from summaries: [(date: Date, value: Double)], groupBy: Calendar.Component) -> [CandlePoint] {
+    let cal = Calendar.current
+    var groups: [Date: [Double]] = [:]
+    for item in summaries {
+        let start = cal.dateInterval(of: groupBy, for: item.date)?.start ?? item.date
+        groups[start, default: []].append(item.value)
+    }
+    return groups.sorted { $0.key < $1.key }.compactMap { (date, values) in
+        guard !values.isEmpty else { return nil }
+        let sorted = values.sorted()
+        return CandlePoint(
+            date: date, open: values.first!, close: values.last!,
+            high: sorted.last!, low: sorted.first!,
+            avg: values.reduce(0, +) / Double(values.count)
+        )
+    }
+}
+
+struct CandlestickChartView: View {
+    let candles: [CandlePoint]
+    let color: Color
+    let yLabel: String
+    let animated: Bool
+
+    @State private var revealProgress: CGFloat = 0
+    @State private var selectedCandle: CandlePoint? = nil
+
+    var body: some View {
+        if candles.isEmpty {
+            VStack(spacing: 8) {
+                Image(systemName: "chart.bar.xaxis").font(.system(size: 24)).foregroundStyle(Color.white.opacity(0.2))
+                Text("Not enough data yet").font(.system(size: 12)).foregroundStyle(Color.white.opacity(0.3))
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            GeometryReader { geo in
+                let w = geo.size.width
+                let h = geo.size.height
+                let allVals = candles.flatMap { [$0.high, $0.low] }
+                let minVal = (allVals.min() ?? 0) * 0.95
+                let maxVal = (allVals.max() ?? 100) * 1.05
+                let range = maxVal - minVal
+                let candleW = max(4, (w / CGFloat(candles.count)) * 0.5)
+                let spacing = w / CGFloat(candles.count)
+
+                ZStack(alignment: .topLeading) {
+                    // Grid
+                    ForEach([0, 1, 2, 3, 4], id: \.self) { i in
+                        let pct = CGFloat(i) / 4.0
+                        let val = minVal + (maxVal - minVal) * Double(4 - i) / 4.0
+                        Rectangle()
+                            .fill(Color.white.opacity(0.05))
+                            .frame(height: 0.5)
+                            .offset(y: h * pct)
+                        Text("\(Int(val))\(yLabel)")
+                            .font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.25))
+                            .offset(x: 0, y: h * pct - 7)
+                    }
+
+                    // Candles
+                    ForEach(Array(candles.enumerated()), id: \.offset) { idx, candle in
+                        let cx = spacing * CGFloat(idx) + spacing / 2
+                        let openY  = h - h * CGFloat((candle.open  - minVal) / range)
+                        let closeY = h - h * CGFloat((candle.close - minVal) / range)
+                        let highY  = h - h * CGFloat((candle.high  - minVal) / range)
+                        let lowY   = h - h * CGFloat((candle.low   - minVal) / range)
+                        let bodyTop = min(openY, closeY)
+                        let bodyH   = max(2, abs(closeY - openY))
+                        let bullish = candle.isUp
+                        let candleColor = bullish ? color : Color(hex: "FF6B6B")
+                        let revealX = w * revealProgress
+                        let opacity = cx < revealX ? 1.0 : 0.0
+
+                        Group {
+                            // Wick
+                            Path { path in
+                                path.move(to: CGPoint(x: cx, y: highY))
+                                path.addLine(to: CGPoint(x: cx, y: lowY))
+                            }
+                            .stroke(candleColor.opacity(0.55), lineWidth: 1.5)
+
+                            // Body
+                            Rectangle()
+                                .fill(bullish ? candleColor.opacity(0.85) : candleColor.opacity(0.7))
+                                .frame(width: candleW, height: bodyH)
+                                .position(x: cx, y: bodyTop + bodyH / 2)
+                        }
+                        .opacity(opacity)
+                        .animation(.easeOut(duration: 0.04).delay(Double(idx) * 0.025), value: revealProgress)
+                    }
+
+                    // Moving average line
+                    Path { path in
+                        let spacing2 = w / CGFloat(candles.count)
+                        for (i, c) in candles.enumerated() {
+                            let x = spacing2 * CGFloat(i) + spacing2 / 2
+                            let y = h - h * CGFloat((c.avg - minVal) / range)
+                            if i == 0 { path.move(to: CGPoint(x: x, y: y)) }
+                            else { path.addLine(to: CGPoint(x: x, y: y)) }
+                        }
+                    }
+                    .stroke(
+                        LinearGradient(colors: [color.opacity(0.25), color.opacity(0.6)], startPoint: .leading, endPoint: .trailing),
+                        style: StrokeStyle(lineWidth: 1.5, lineCap: .round, dash: [4, 3])
+                    )
+                    .opacity(Double(revealProgress))
+                    .animation(.easeOut(duration: 0.8).delay(0.5), value: revealProgress)
+
+                    // Touch
+                    Color.clear.contentShape(Rectangle())
+                        .gesture(DragGesture(minimumDistance: 0)
+                            .onChanged { val in
+                                let idx = Int(val.location.x / spacing)
+                                if idx >= 0 && idx < candles.count { selectedCandle = candles[idx] }
+                            }
+                            .onEnded { _ in withAnimation(.easeOut(duration: 0.3)) { selectedCandle = nil } }
+                        )
+                }
+                .onAppear {
+                    guard animated else { revealProgress = 1; return }
+                    withAnimation(.easeInOut(duration: 1.3).delay(0.1)) { revealProgress = 1 }
+                }
+                .onChange(of: candles.count) {
+                    revealProgress = 0
+                    withAnimation(.easeInOut(duration: 1.0).delay(0.1)) { revealProgress = 1 }
+                }
+            }
+            .overlay(alignment: .topLeading) {
+                if let sel = selectedCandle {
+                    HStack(spacing: 10) {
+                        Text(sel.date, style: .date).font(.system(size: 10)).foregroundStyle(.white.opacity(0.5))
+                        Text("H:\(Int(sel.high))").font(.system(size: 10, weight: .bold)).foregroundStyle(color)
+                        Text("L:\(Int(sel.low))").font(.system(size: 10, weight: .bold)).foregroundStyle(Color(hex: "FF6B6B"))
+                        Text("Avg:\(Int(sel.avg))").font(.system(size: 10, weight: .bold)).foregroundStyle(.white)
+                    }
+                    .padding(.horizontal, 10).padding(.vertical, 6)
+                    .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color(hex: "1A2A2A").opacity(0.95)))
+                    .transition(.opacity)
+                }
+            }
+        }
+    }
 }

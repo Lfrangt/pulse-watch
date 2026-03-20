@@ -265,6 +265,45 @@ final class HealthKitManager {
         return (totalMinutes, deepMinutes, remMinutes)
     }
     
+    // MARK: - Sleep Samples (for hypnogram)
+
+    struct SleepSample: Identifiable {
+        let id = UUID()
+        let stage: SleepStage
+        let start: Date
+        let end: Date
+        var durationMinutes: Int { Int(end.timeIntervalSince(start) / 60) }
+    }
+
+    enum SleepStage: String, CaseIterable {
+        case deep, rem, core, awake
+    }
+
+    func fetchSleepSamples() async throws -> [SleepSample] {
+        let type = HKCategoryType(.sleepAnalysis)
+        let now = Date()
+        let yesterday = Calendar.current.date(byAdding: .hour, value: -24, to: now)!
+        let predicate = HKQuery.predicateForSamples(withStart: yesterday, end: now)
+        let descriptor = HKSampleQueryDescriptor(
+            predicates: [.categorySample(type: type, predicate: predicate)],
+            sortDescriptors: [SortDescriptor(\.startDate)]
+        )
+        let samples = try await descriptor.result(for: store)
+        return samples.compactMap { sample in
+            let value = HKCategoryValueSleepAnalysis(rawValue: sample.value)
+            let stage: SleepStage?
+            switch value {
+            case .asleepDeep: stage = .deep
+            case .asleepREM: stage = .rem
+            case .asleepCore: stage = .core
+            case .awake, .inBed: stage = .awake
+            default: stage = nil
+            }
+            guard let s = stage else { return nil }
+            return SleepSample(stage: s, start: sample.startDate, end: sample.endDate)
+        }
+    }
+
     // MARK: - Today's Last Workout
 
     func fetchTodayLastWorkout() async {

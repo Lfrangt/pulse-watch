@@ -55,6 +55,7 @@
 		527C0ED007B68F5D72EB14FA /* PulseWatchWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 69563E71C80C1C903EAB9E81 /* PulseWatchWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5AF2668F1996BFA0EA981730 /* GymArrivalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA6C27A8ED0F06D7371F978 /* GymArrivalView.swift */; };
 		5DFB4A4238D5002DE2C96573 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 914F3CFFE74D89F5CAED7075 /* DashboardView.swift */; };
+		A1B2C3D4E5F60718293A4B5C /* SleepDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6E7F8091A2B3C4D5E6F7A8B /* SleepDetailView.swift */; };
 		60BACF24F4F514EF36D9C6AB /* StatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB91463719D9CE6B82F0FEBB /* StatusCard.swift */; };
 		618BF1DDFDE515DBC9A5BC87 /* HeartRateAlertService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 989010913FA5279748CF31C6 /* HeartRateAlertService.swift */; };
 		6234C29DF50E6600563D4E0A /* HealthDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62B314F45ABCFD3CDEFC751D /* HealthDataService.swift */; };
@@ -225,6 +226,7 @@
 		8C689D7ED34748CC72C57C9D /* ScoreEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreEngine.swift; sourceTree = "<group>"; };
 		8C6B3FC12444C96A17FB56F8 /* PulseWatchWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PulseWatchWatch.entitlements; sourceTree = "<group>"; };
 		914F3CFFE74D89F5CAED7075 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		D6E7F8091A2B3C4D5E6F7A8B /* SleepDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDetailView.swift; sourceTree = "<group>"; };
 		9172671A31357A6065ECC2E7 /* PulseWatchWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseWatchWidget.swift; sourceTree = "<group>"; };
 		989010913FA5279748CF31C6 /* HeartRateAlertService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartRateAlertService.swift; sourceTree = "<group>"; };
 		9B6300CB232E8B273FA41B61 /* WorkoutShareScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutShareScreen.swift; sourceTree = "<group>"; };
@@ -445,6 +447,7 @@
 				576F3261E39C46ED8FED7115 /* StrengthView.swift */,
 				45F0E438D3E54B0EAD295912 /* ManualWorkoutView.swift */,
 				6D27506BF181433E909735E2 /* GymArrivalFlowView.swift */,
+				D6E7F8091A2B3C4D5E6F7A8B /* SleepDetailView.swift */,
 				9B6300CB232E8B273FA41B61 /* WorkoutShareScreen.swift */,
 				36ED27B3D9E0F37CE264F67B /* WorkoutView.swift */,
 			);
@@ -777,6 +780,7 @@
 				37C0AE89CC67FAE5F629520F /* AppIconView.swift in Sources */,
 				8D5549A30D2F578A86560129 /* DailySummary.swift in Sources */,
 				5DFB4A4238D5002DE2C96573 /* DashboardView.swift in Sources */,
+				A1B2C3D4E5F60718293A4B5C /* SleepDetailView.swift in Sources */,
 				0769AFDD1513AF8D8357A85F /* DemoDataProvider.swift in Sources */,
 				6D78E19149EBA723FFBE2C66 /* GymCoordinator.swift in Sources */,
 				DF3945F898AB21F858475D0D /* GymSearchView.swift in Sources */,

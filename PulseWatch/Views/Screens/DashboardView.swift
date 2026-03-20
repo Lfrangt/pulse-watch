@@ -334,14 +334,17 @@ struct DashboardView: View {
 
     private func ouraSleepActivityCards(_ tri: TriScoreService.TriScore) -> some View {
         VStack(spacing: PulseTheme.spacingS) {
-            ouraSummaryRow(
-                icon: "moon.fill",
-                iconColor: PulseTheme.sleepAccent,
-                title: String(localized: "Sleep"),
-                statusLabel: ouraStatusLabel(for: tri.sleep.score),
-                statusColor: ouraStatusColor(for: tri.sleep.score),
-                score: tri.sleep.score
-            )
+            NavigationLink(destination: SleepDetailView()) {
+                ouraSummaryRow(
+                    icon: "moon.fill",
+                    iconColor: PulseTheme.sleepAccent,
+                    title: String(localized: "Sleep"),
+                    statusLabel: ouraStatusLabel(for: tri.sleep.score),
+                    statusColor: ouraStatusColor(for: tri.sleep.score),
+                    score: tri.sleep.score
+                )
+            }
+            .buttonStyle(.plain)
             ouraSummaryRow(
                 icon: "flame.fill",
                 iconColor: PulseTheme.activityAccent,

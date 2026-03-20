@@ -23,9 +23,6 @@ struct DashboardView: View {
     // 演示模式时间线事件
     @State private var demoTimelineEvents: [TimelineEvent] = []
 
-    // Streak
-    @State private var currentStreak: Int = 0
-
     // Strain
     @State private var todayStrain: Int = 0
 
@@ -74,12 +71,6 @@ struct DashboardView: View {
                         if let tri = triScore {
                             ouraSleepActivityCards(tri)
                                 .staggered(index: 1)
-                        }
-
-                        // Streak badge
-                        if currentStreak >= 3 {
-                            streakBadge(streak: currentStreak)
-                                .staggered(index: 2)
                         }
 
                         // Strain vs Recovery
@@ -790,48 +781,6 @@ struct DashboardView: View {
 
     // (triScoreCard and triScoreRing replaced by heroSection + ouraSleepActivityCards)
 
-    // MARK: - 🔥 Streak Badge
-
-    private func streakBadge(streak: Int) -> some View {
-        HStack(spacing: PulseTheme.spacingS) {
-            // 火焰图标
-            ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(PulseTheme.activityAccent.opacity(0.15))
-                    .frame(width: 40, height: 40)
-                Text("🔥")
-                    .font(.system(size: 20))
-            }
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(String(format: String(localized: "%d-Day Streak"), streak))
-                    .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
-                Text(String(localized: "Keep going — don't break the chain!"))
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
-            }
-
-            Spacer()
-
-            // Best streak badge (if current is best)
-            if streak >= StreakService.shared.bestStreak && streak > 1 {
-                Text(String(localized: "Best"))
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(PulseTheme.activityAccent)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(
-                        Capsule()
-                            .fill(PulseTheme.activityAccent.opacity(0.15))
-                    )
-            }
-        }
-        .pulseCard()
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(String(format: String(localized: "%d-Day Streak"), streak))
-    }
-
     // MARK: - Strain vs Recovery Card
 
     private func strainRecoveryCard(strain: Int, recovery: Int) -> some View {
@@ -974,18 +923,6 @@ struct DashboardView: View {
                 }
             }
             .buttonStyle(.plain)
-
-            // 置信度提示
-            if result.daysOfData < 7 {
-                HStack(spacing: 6) {
-                    Image(systemName: "chart.line.uptrend.xyaxis")
-                        .font(.system(size: 11))
-                        .foregroundStyle(PulseTheme.accent)
-                    Text("More data = better accuracy. Keep wearing your Watch 📈")
-                        .font(.system(size: 11))
-                        .foregroundStyle(PulseTheme.textTertiary)
-                }
-            }
 
             // 展开详情
             if healthAgeExpanded {
@@ -1247,8 +1184,6 @@ struct DashboardView: View {
             brief = DemoDataProvider.makeBrief()
             insight = DemoDataProvider.makeInsight()
             demoTimelineEvents = DemoDataProvider.makeTimelineEvents()
-            StreakService.shared.setDemoStreak(12)
-            currentStreak = StreakService.shared.currentStreak
             todayStrain = StrainScoreService.demoStrain
             healthAgeResult = HealthAgeService.demoResult
             triScore = TriScoreService.demoTriScore
@@ -1305,10 +1240,6 @@ struct DashboardView: View {
             print("Dashboard load error: \(error)")
             #endif
         }
-
-        // Streak 计算
-        StreakService.shared.refresh(modelContext: modelContext)
-        currentStreak = StreakService.shared.currentStreak
 
         // Strain Score
         todayStrain = StrainScoreService.shared.todayStrain(modelContext: modelContext)

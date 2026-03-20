@@ -342,31 +342,40 @@ struct DashboardView: View {
 
     private func ouraScoreDiscRow(total: Int, sleep: Int?, activity: Int?, readiness: Int?) -> some View {
         HStack(spacing: 0) {
-            ouraScoreDisc(icon: "crown.fill", iconColor: Color(hex: "FFD700"), label: "Readiness", value: total)
             if let sleep {
-                ouraScoreDisc(icon: "moon.fill", iconColor: .white, label: "Sleep", value: sleep)
+                ouraScoreDisc(icon: "moon.fill", iconColor: PulseTheme.sleepViolet, label: String(localized: "Sleep"), value: sleep)
             }
             if let activity {
-                ouraScoreDisc(icon: "figure.run", iconColor: .white, label: "Activity", value: activity)
+                ouraScoreDisc(icon: "figure.run", iconColor: PulseTheme.activityCoral, label: String(localized: "Activity"), value: activity)
             }
-            if let readiness {
-                ouraScoreDisc(icon: "heart.fill", iconColor: .white, label: "Ready", value: readiness)
+            // HRV as third disc — more useful than repeating readiness
+            if let hrv = currentHRV {
+                ouraScoreDisc(icon: "waveform.path.ecg", iconColor: PulseTheme.accentTeal, label: "HRV", value: Int(hrv), unit: "ms")
+            } else if let hr = currentHeartRate {
+                ouraScoreDisc(icon: "heart.fill", iconColor: Color(hex: "FF6B6B"), label: String(localized: "Heart Rate"), value: Int(hr), unit: "bpm")
             }
         }
         .padding(.horizontal, 8)
     }
 
-    private func ouraScoreDisc(icon: String, iconColor: Color = .white, label: String, value: Int) -> some View {
-        VStack(spacing: 6) {
+    private func ouraScoreDisc(icon: String, iconColor: Color = .white, label: String, value: Int, unit: String = "") -> some View {
+        VStack(spacing: 5) {
             Image(systemName: icon)
-                .font(.system(size: 13))
+                .font(.system(size: 12))
                 .foregroundStyle(iconColor)
-            Text("\(value)")
-                .font(.system(size: 26, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                Text("\(value)")
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                if !unit.isEmpty {
+                    Text(unit)
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+            }
             Text(label)
                 .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(.white.opacity(0.55))
+                .foregroundStyle(.white.opacity(0.5))
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 14)
@@ -375,7 +384,7 @@ struct DashboardView: View {
                 .fill(Color.white.opacity(0.08))
         )
         .padding(.horizontal, 4)
-        .accessibilityLabel("\(label) \(value)")
+        .accessibilityLabel("\(label) \(value) \(unit)")
     }
 
     // MARK: - Wide Arc (Oura's sweeping 180° gauge)
@@ -498,14 +507,18 @@ struct DashboardView: View {
                 )
             }
             .buttonStyle(.plain)
-            ouraSummaryRow(
-                icon: "flame.fill",
-                iconColor: PulseTheme.activityAccent,
-                title: String(localized: "Activity"),
-                statusLabel: ouraStatusLabel(for: tri.activity.score),
-                statusColor: ouraStatusColor(for: tri.activity.score),
-                score: tri.activity.score
-            )
+
+            NavigationLink(destination: ActivityDetailView()) {
+                ouraSummaryRow(
+                    icon: "flame.fill",
+                    iconColor: PulseTheme.activityAccent,
+                    title: String(localized: "Activity"),
+                    statusLabel: ouraStatusLabel(for: tri.activity.score),
+                    statusColor: ouraStatusColor(for: tri.activity.score),
+                    score: tri.activity.score
+                )
+            }
+            .buttonStyle(.plain)
         }
     }
 

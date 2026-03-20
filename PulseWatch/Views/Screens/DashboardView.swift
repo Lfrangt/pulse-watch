@@ -301,6 +301,7 @@ struct DashboardView: View {
                     endPoint: .bottom
                 )
                 .padding(.horizontal, -PulseTheme.spacingM)
+                .ignoresSafeArea(.all, edges: .top)
             )
     }
 

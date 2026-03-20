@@ -68,7 +68,7 @@ struct DashboardView: View {
                     // BELOW HERO — cards with padding
                     VStack(spacing: PulseTheme.spacingS) {
                         // Vitals strip — HRV + Heart Rate front and centre
-                        if currentHRV != nil || currentHeartRate != nil {
+                        if currentHeartRate != nil {
                             vitalsStrip
                                 .staggered(index: 0)
                         }
@@ -751,32 +751,7 @@ struct DashboardView: View {
 
     private var vitalsStrip: some View {
         HStack(spacing: 0) {
-            // HRV — tappable
-            if let hrv = currentHRV {
-                NavigationLink(destination: HRVDetailView()) {
-                    vitalsCell(
-                        icon: "waveform.path.ecg",
-                        label: "HRV",
-                        value: "\(Int(hrv))",
-                        unit: "ms",
-                        color: PulseTheme.accentTeal,
-                        trend: metricStatus(hrv, good: 45...200, ok: 30...45)
-                    )
-                    .padding(PulseTheme.spacingL)
-                }
-                .buttonStyle(.plain)
-            }
-
-            // Divider
-            if currentHRV != nil && currentHeartRate != nil {
-                Rectangle()
-                    .fill(Color.white.opacity(0.08))
-                    .frame(width: 0.5)
-                    .frame(maxHeight: .infinity)
-                    .padding(.vertical, PulseTheme.spacingM)
-            }
-
-            // Heart Rate — tappable
+            // Heart Rate only — HRV already shown in disc row above
             if let hr = currentHeartRate {
                 NavigationLink(destination: HeartRateDetailView()) {
                     vitalsCell(
@@ -790,6 +765,7 @@ struct DashboardView: View {
                     .padding(PulseTheme.spacingL)
                 }
                 .buttonStyle(.plain)
+                .frame(maxWidth: .infinity)
             }
         }
         .frame(maxWidth: .infinity)

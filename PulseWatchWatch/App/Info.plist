@@ -17,9 +17,9 @@
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>NSHealthShareUsageDescription</key>
-    <string>Pulse 需要读取你的健康数据来显示状态评分。</string>
+    <string>Pulse needs to read your health data to display readiness scores and training insights. All data is stored on your device only.</string>
     <key>NSHealthUpdateUsageDescription</key>
-    <string>Pulse 需要记录你的运动数据。</string>
+    <string>Pulse needs to record your workout data to track your training progress.</string>
     <key>WKCompanionAppBundleIdentifier</key>
     <string>com.abundra.pulse</string>
     <key>WKApplication</key>

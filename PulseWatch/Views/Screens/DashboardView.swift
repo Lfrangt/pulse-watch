@@ -811,58 +811,36 @@ struct DashboardView: View {
         ]
 
         return LazyVGrid(columns: columns, spacing: PulseTheme.spacingM) {
-            // HRV & Heart Rate are shown in vitalsStrip above — not repeated here
-
             // 睡眠
             if let sleep = currentSleep {
-                metricTile(
-                    icon: "moon.fill",
-                    label: String(localized: "Sleep"),
-                    value: sleep,
-                    unit: "",
-                    color: PulseTheme.sleepAccent,
-                    trend: .good,
-                    animated: false
-                )
+                NavigationLink(destination: SleepDetailView()) {
+                    metricTile(icon: "moon.fill", label: "睡眠", value: sleep, unit: "", color: PulseTheme.sleepAccent, trend: .good, animated: false)
+                }
+                .buttonStyle(.plain)
             }
 
             // 步数
             if currentSteps > 0 {
-                metricTile(
-                    icon: "figure.run",
-                    label: String(localized: "Steps"),
-                    value: formatSteps(currentSteps),
-                    unit: "",
-                    color: PulseTheme.statusGood,
-                    trend: currentSteps >= 8000 ? .good : (currentSteps >= 5000 ? .ok : .poor),
-                    animated: true
-                )
+                NavigationLink(destination: StepsDetailView()) {
+                    metricTile(icon: "figure.run", label: "步数", value: formatSteps(currentSteps), unit: "", color: PulseTheme.accentTeal, trend: currentSteps >= 8000 ? .good : (currentSteps >= 5000 ? .ok : .poor), animated: true)
+                }
+                .buttonStyle(.plain)
             }
 
             // 卡路里
             if currentCalories > 0 {
-                metricTile(
-                    icon: "flame.fill",
-                    label: String(localized: "Calories"),
-                    value: "\(Int(currentCalories))",
-                    unit: "kcal",
-                    color: PulseTheme.statusModerate,
-                    trend: currentCalories >= 300 ? .good : .ok,
-                    animated: false
-                )
+                NavigationLink(destination: CaloriesDetailView()) {
+                    metricTile(icon: "flame.fill", label: "卡路里", value: "\(Int(currentCalories))", unit: "kcal", color: PulseTheme.activityCoral, trend: currentCalories >= 300 ? .good : .ok, animated: false)
+                }
+                .buttonStyle(.plain)
             }
 
             // 血氧
             if let spo2 = currentBloodOxygen {
-                metricTile(
-                    icon: "lungs.fill",
-                    label: String(localized: "Blood Oxygen"),
-                    value: "\(Int(spo2))%",
-                    unit: "",
-                    color: PulseTheme.statusGood,
-                    trend: spo2 >= 96 ? .good : (spo2 >= 93 ? .ok : .poor),
-                    animated: false
-                )
+                NavigationLink(destination: BloodOxygenDetailView()) {
+                    metricTile(icon: "lungs.fill", label: "血氧", value: "\(Int(spo2))%", unit: "", color: PulseTheme.statusGood, trend: spo2 >= 96 ? .good : (spo2 >= 93 ? .ok : .poor), animated: false)
+                }
+                .buttonStyle(.plain)
             }
         }
     }

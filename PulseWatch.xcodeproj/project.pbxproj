@@ -57,6 +57,8 @@
 		6DAFBD2E3282EF5798FA9AC6 /* HealthSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B43CF30861598DBA2C32FFCB /* HealthSnapshot.swift */; };
 		70E336723187F6425DC9A7AC /* HRVDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38170A1368D4C4402DEF435 /* HRVDetailView.swift */; };
 		768575509E830D69A51F6CAF /* StrengthRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3507BAE41D478283507E23E6 /* StrengthRecord.swift */; };
+		78C81F66F78D630A6E6326FF /* CaloriesDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6BBF3968BD1F9038B30E966 /* CaloriesDetailView.swift */; };
+		7D2109E93BF9196387C1E451 /* StepsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802CE9EB0608CE8AC43655FB /* StepsDetailView.swift */; };
 		7E8927C86DC375790CBC4B30 /* OpenClawBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD1EDEE975D246E28C222AE /* OpenClawBridge.swift */; };
 		83F37F4DCF2C79966B016C4C /* GymCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 624D05567DAEB29F5F5F6D38 /* GymCoordinator.swift */; };
 		89C526FBDA02E0052CB7F0FD /* MuscleGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B21D1F6B84CCCC36D620B5 /* MuscleGroup.swift */; };
@@ -94,6 +96,7 @@
 		C8990A8AFC1244F626875120 /* GymArrivalFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64E4CE8BE2D55EEEDC683F0 /* GymArrivalFlowView.swift */; };
 		CE20B6A05EC107EACC93B1C9 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6181030B012FB16DCC5EEF7 /* HealthKitService.swift */; };
 		D0351D74457D111D2FD929C1 /* WorkoutHistoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6823C145E8FB8D24A8C8EE8A /* WorkoutHistoryService.swift */; };
+		D07374AFB9C29A212F4179F7 /* BloodOxygenDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39BEEB57ED5B970B6E19A09E /* BloodOxygenDetailView.swift */; };
 		D0776B758D3ED9D164AB1C78 /* StreakService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D094A4CFEA51DAFEC7F2C90 /* StreakService.swift */; };
 		D28393438A06C7D343A78659 /* StrainScoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 041C8FF7C0784FC8DF790EE4 /* StrainScoreService.swift */; };
 		D345F9C062304D37747F4365 /* SleepDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FD59A72CE05A8315F63437 /* SleepDetailView.swift */; };
@@ -196,6 +199,7 @@
 		363204A6CBD545ECC1DD5485 /* RecoveryTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryTimelineView.swift; sourceTree = "<group>"; };
 		36ED27B3D9E0F37CE264F67B /* WorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutView.swift; sourceTree = "<group>"; };
 		38391093558DC51B8526D406 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
+		39BEEB57ED5B970B6E19A09E /* BloodOxygenDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BloodOxygenDetailView.swift; sourceTree = "<group>"; };
 		3F5B090F59F8EDC17549FEC2 /* DemoDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDataProvider.swift; sourceTree = "<group>"; };
 		423E402954856FBC1F53AFD4 /* HealthRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthRecord.swift; sourceTree = "<group>"; };
 		448F93975172D1B5FF12A497 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -223,6 +227,7 @@
 		7C1C0D07C1855FDE1FE7E6D5 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		7D9EF7F9A71B5B0CB3D007D8 /* WatchConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityManager.swift; sourceTree = "<group>"; };
 		7DE41B5DD16B2F31475F9460 /* PulseWatchWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PulseWatchWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		802CE9EB0608CE8AC43655FB /* StepsDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsDetailView.swift; sourceTree = "<group>"; };
 		803938428A1B484E25FA34E0 /* HeartRateDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartRateDetailView.swift; sourceTree = "<group>"; };
 		8334C65FC6CA06682ADE69B9 /* PulseTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseTheme.swift; sourceTree = "<group>"; };
 		844153431AA98297C50BE5BC /* WorkoutSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionManager.swift; sourceTree = "<group>"; };
@@ -258,6 +263,7 @@
 		D01195020D34743F50D83026 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		D0586343BF113608113C25B9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D4FD59A72CE05A8315F63437 /* SleepDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDetailView.swift; sourceTree = "<group>"; };
+		D6BBF3968BD1F9038B30E966 /* CaloriesDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaloriesDetailView.swift; sourceTree = "<group>"; };
 		D78EF6591F143A435A280533 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		D8941CCC61662258ECB2889D /* DailySummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailySummary.swift; sourceTree = "<group>"; };
 		E6181030B012FB16DCC5EEF7 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
@@ -443,6 +449,8 @@
 			isa = PBXGroup;
 			children = (
 				96E5DBE85D44616D2F49A293 /* ActivityDetailView.swift */,
+				39BEEB57ED5B970B6E19A09E /* BloodOxygenDetailView.swift */,
+				D6BBF3968BD1F9038B30E966 /* CaloriesDetailView.swift */,
 				914F3CFFE74D89F5CAED7075 /* DashboardView.swift */,
 				3F5B090F59F8EDC17549FEC2 /* DemoDataProvider.swift */,
 				A64E4CE8BE2D55EEEDC683F0 /* GymArrivalFlowView.swift */,
@@ -455,6 +463,7 @@
 				2D7EAB8DD243A4A5F0B782B0 /* OnboardingView.swift */,
 				D01195020D34743F50D83026 /* SettingsView.swift */,
 				D4FD59A72CE05A8315F63437 /* SleepDetailView.swift */,
+				802CE9EB0608CE8AC43655FB /* StepsDetailView.swift */,
 				2B14DBC2277915D1A11FA68B /* StrengthView.swift */,
 				C79EAA80DBA326B8681C5688 /* TrainingCalendarView.swift */,
 				5E74FC5907036F49B32AC895 /* WeeklyReportView.swift */,
@@ -794,6 +803,8 @@
 				40233695BE785984209BA032 /* ActivityDetailView.swift in Sources */,
 				45D0A502CB1409C957F97E7B /* Analytics.swift in Sources */,
 				37C0AE89CC67FAE5F629520F /* AppIconView.swift in Sources */,
+				D07374AFB9C29A212F4179F7 /* BloodOxygenDetailView.swift in Sources */,
+				78C81F66F78D630A6E6326FF /* CaloriesDetailView.swift in Sources */,
 				8D5549A30D2F578A86560129 /* DailySummary.swift in Sources */,
 				5DFB4A4238D5002DE2C96573 /* DashboardView.swift in Sources */,
 				0769AFDD1513AF8D8357A85F /* DemoDataProvider.swift in Sources */,
@@ -833,6 +844,7 @@
 				BAC6D54255750F06A13EC211 /* ShareCardView.swift in Sources */,
 				D345F9C062304D37747F4365 /* SleepDetailView.swift in Sources */,
 				60BACF24F4F514EF36D9C6AB /* StatusCard.swift in Sources */,
+				7D2109E93BF9196387C1E451 /* StepsDetailView.swift in Sources */,
 				D28393438A06C7D343A78659 /* StrainScoreService.swift in Sources */,
 				D0776B758D3ED9D164AB1C78 /* StreakService.swift in Sources */,
 				768575509E830D69A51F6CAF /* StrengthRecord.swift in Sources */,

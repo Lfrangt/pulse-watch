@@ -120,71 +120,77 @@ final class HealthAgeService {
         var totalImpact: Double = 0
         var metrics: [MetricScore] = []
 
-        // 1. 静息心率: 基准 ~60+年龄/3, 低更好
+        // 单项影响上限 ±3 年，防止单指标异常值主导结果
+        func clamp(_ val: Double, limit: Double = 3.0) -> Double {
+            max(-limit, min(limit, val))
+        }
+
+        // 1. 静息心率: 基准 60 bpm，偏高老化，偏低年轻
         if let rhr = avgRHR {
-            let baseline = 60.0 + Double(actualAge) / 3.0
-            let diff = rhr - baseline
-            let impact = diff * 0.4  // 每 bpm 偏差 ≈ 0.4 岁
+            let diff = rhr - 60.0
+            let impact = clamp(diff * 0.15)
             totalImpact += impact
-            let advice = rhr > 70
-                ? String(localized: "Resting HR is elevated — more aerobic exercise can help")
-                : String(localized: "Resting HR is in a healthy range")
+            let advice = rhr > 75
+                ? String(localized: "静息心率偏高，增加有氧运动有帮助")
+                : String(localized: "静息心率在健康范围内")
             metrics.append(MetricScore(metric: .restingHR, value: rhr, ageImpact: impact, advice: advice))
         }
 
-        // 2. HRV: 基准 ~45-年龄/3, 高更好
+        // 2. HRV: 基准依年龄，范围 25-75ms 合理，超出按比例计算，限 ±3 年
         if let hrv = avgHRV {
-            let baseline = 45.0 - Double(actualAge) / 3.0
+            let baseline = max(25.0, 55.0 - Double(actualAge) * 0.5)
             let diff = baseline - hrv  // 低于基准 = 更老
-            let impact = diff * 0.35
+            let impact = clamp(diff * 0.06)
             totalImpact += impact
-            let advice = hrv < 30
-                ? String(localized: "HRV is below average — prioritize sleep and stress management")
-                : String(localized: "HRV indicates good autonomic health")
+            let advice = hrv < 25
+                ? String(localized: "HRV偏低，注意睡眠和压力管理")
+                : hrv > 80
+                    ? String(localized: "HRV优秀，自主神经功能良好")
+                    : String(localized: "HRV显示自主神经功能良好")
             metrics.append(MetricScore(metric: .hrv, value: hrv, ageImpact: impact, advice: advice))
         }
 
-        // 3. 睡眠: 7-9h 最优，偏离越多越差
+        // 3. 睡眠: 7-9h 最优，偏离每小时 0.8 岁，限 ±2 年
         if let sleepMin = avgSleepMin {
             let hours = sleepMin / 60.0
-            let optimalCenter = 8.0
-            let diff = abs(hours - optimalCenter)
-            let impact = diff * 1.2  // 每小时偏差 ≈ 1.2 岁
+            let diff = abs(hours - 8.0)
+            let impact = clamp(diff * 0.8, limit: 2.0)
             totalImpact += impact
             let advice: String
             if hours < 6.5 {
-                advice = String(localized: "Sleep is too short — aim for 7-9 hours")
+                advice = String(localized: "睡眠不足，建议保证 7-9 小时")
             } else if hours > 9.5 {
-                advice = String(localized: "Oversleeping may indicate underlying issues")
+                advice = String(localized: "睡眠偏多，可能需要关注睡眠质量")
             } else {
-                advice = String(localized: "Sleep duration is in the optimal range")
+                advice = String(localized: "睡眠时长在最佳范围内")
             }
             metrics.append(MetricScore(metric: .sleep, value: hours, ageImpact: impact, advice: advice))
         }
 
-        // 4. 步数: 10000 为基准
+        // 4. 步数: 8000 为基准，每 2000 步 0.8 岁，限 ±2 年
         if let steps = avgSteps {
-            let diff = (10000 - steps) / 2000  // 每 2000 步偏差 ≈ 1 岁
-            let impact = max(-3, min(3, diff))
+            let diff = (8000.0 - steps) / 2000.0
+            let impact = clamp(diff * 0.8, limit: 2.0)
             totalImpact += impact
-            let advice = steps < 6000
-                ? String(localized: "Steps are below average — try walking 30 min daily")
-                : String(localized: "Step count is solid — keep it up")
+            let advice = steps < 5000
+                ? String(localized: "步数较低，尝试每天步行 30 分钟")
+                : String(localized: "步数达标，继续保持")
             metrics.append(MetricScore(metric: .steps, value: steps, ageImpact: impact, advice: advice))
         }
 
-        // 5. 活跃分钟: WHO 建议每周 150 min = 每天 ~21 min
+        // 5. 活跃分钟: WHO 建议每天 ~21 min，限 ±1.5 年
         let dailyActiveTarget = 21.0
-        let activeDiff = (dailyActiveTarget - avgActiveMin) / 7.0  // 每 7 min 偏差 ≈ 1 岁
-        let activeImpact = max(-2, min(2, activeDiff))
+        let activeDiff = (dailyActiveTarget - avgActiveMin) / 10.0
+        let activeImpact = clamp(activeDiff, limit: 1.5)
         totalImpact += activeImpact
         let activeAdvice = avgActiveMin < 15
-            ? String(localized: "Low activity — WHO recommends 150 min/week of moderate exercise")
-            : String(localized: "Activity level meets WHO guidelines")
+            ? String(localized: "活动量较低，WHO 建议每周 150 分钟中等强度运动")
+            : String(localized: "活动量达到 WHO 建议标准")
         metrics.append(MetricScore(metric: .activeMinutes, value: avgActiveMin, ageImpact: activeImpact, advice: activeAdvice))
 
         let healthAge = Double(actualAge) + totalImpact
-        let clampedAge = max(max(Double(actualAge) - 10, 18), min(Double(actualAge) + 15, healthAge))
+        // 整体结果限制在实际年龄 ±8 年内
+        let clampedAge = max(Double(actualAge) - 8, min(Double(actualAge) + 8, healthAge))
 
         return HealthAgeResult(
             healthAge: clampedAge,

@@ -250,13 +250,22 @@ struct ManualWorkoutView: View {
             endDate: endDate,
             durationSeconds: durationSec,
             totalCalories: cal,
-            sourceName: String(localized: "Manual Entry"),
+            sourceName: String(localized: "手动记录"),
             isManual: true,
             notes: notes.isEmpty ? nil : notes
         )
         entry.muscleGroupTags = Array(selectedMuscleGroups)
         modelContext.insert(entry)
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+            #if DEBUG
+            print("✅ WorkoutHistoryEntry saved: \(entry.activityName), uuid=\(entry.hkWorkoutUUID ?? "nil")")
+            #endif
+        } catch {
+            #if DEBUG
+            print("❌ Save failed: \(error)")
+            #endif
+        }
     }
 }
 

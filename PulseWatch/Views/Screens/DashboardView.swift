@@ -68,12 +68,6 @@ struct DashboardView: View {
                     VStack(spacing: PulseTheme.spacingS) {
 
 
-                        // Health Age (compact)
-                        if let result = healthAgeResult {
-                            healthAgeCardCompact(result: result)
-                                .staggered(index: 2)
-                        }
-
                         // Metrics grid
                         if hasAnyMetric {
                             metricsGrid

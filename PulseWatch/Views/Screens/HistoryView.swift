@@ -61,6 +61,10 @@ struct HistoryView: View {
                     MuscleInsightsCard(workouts: allWorkouts, summaries: allSummaries)
                         .staggered(index: 7)
 
+                    // Analytics Pro 入口
+                    analyticsProSection
+                        .staggered(index: 8)
+
                     Spacer(minLength: 60)
                 }
                 .padding(.horizontal, PulseTheme.spacingM)
@@ -1014,6 +1018,35 @@ struct HistoryView: View {
     }
 
     // MARK: - 快捷入口
+
+    // MARK: - Analytics Pro 入口
+
+    private var analyticsProSection: some View {
+        VStack(spacing: PulseTheme.spacingS) {
+            HStack(spacing: PulseTheme.spacingS) {
+                NavigationLink {
+                    CorrelationInsightsView().preferredColorScheme(.dark)
+                } label: {
+                    shortcutTile(icon: "link", color: PulseTheme.sleepViolet, title: String(localized: "数据洞察"))
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
+                    AnomalyTimelineView().preferredColorScheme(.dark)
+                } label: {
+                    shortcutTile(icon: "exclamationmark.triangle.fill", color: PulseTheme.statusWarning, title: String(localized: "异常记录"))
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
+                    ChallengeView().preferredColorScheme(.dark)
+                } label: {
+                    shortcutTile(icon: "flame.fill", color: PulseTheme.activityCoral, title: String(localized: "训练挑战"))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
 
     private var shortcutButtons: some View {
         HStack(spacing: PulseTheme.spacingS) {

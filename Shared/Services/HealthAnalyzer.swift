@@ -305,6 +305,16 @@ final class HealthAnalyzer {
 
     // MARK: - 异常检测（基于个人基线标准差）
 
+    /// 公开接口：对历史某天进行异常检测（用于时间线视图）
+    func detectAnomaliesForDate(summary: DailySummary, history: [DailySummary]) -> [Anomaly] {
+        var vitals = LatestVitals()
+        vitals.heartRate = summary.averageHeartRate
+        vitals.restingHeartRate = summary.restingHeartRate
+        vitals.hrv = summary.averageHRV
+        vitals.bloodOxygen = summary.averageBloodOxygen
+        return detectAnomalies(current: summary, vitals: vitals, history: history)
+    }
+
     /// 基于个人基线的标准差方法检测异常（不是固定阈值）
     private func detectAnomalies(
         current: DailySummary?,

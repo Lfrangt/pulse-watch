@@ -763,9 +763,21 @@ struct HistoryView: View {
 
         VStack(alignment: .leading, spacing: 8) {
             Chart(candles) { c in
-                // Avg trend line
+                // Area fill
+                AreaMark(
+                    x: .value("Date", c.date),
+                    yStart: .value("Base", lo - pad),
+                    yEnd: .value("Avg", c.avg)
+                )
+                .foregroundStyle(LinearGradient(
+                    colors: [color.opacity(0.2), color.opacity(0.03)],
+                    startPoint: .top, endPoint: .bottom
+                ))
+                .interpolationMethod(.catmullRom)
+
+                // Trend line
                 LineMark(
-                    x: .value("Date", c.date, unit: unit),
+                    x: .value("Date", c.date),
                     y: .value("Avg", c.avg)
                 )
                 .foregroundStyle(color)
@@ -774,24 +786,13 @@ struct HistoryView: View {
                 .symbol {
                     Circle()
                         .fill(c.isUp ? color : Color(hex: "FF6B6B"))
-                        .frame(width: 7, height: 7)
-                        .shadow(color: (c.isUp ? color : Color(hex: "FF6B6B")).opacity(0.5), radius: 3)
+                        .frame(width: 8, height: 8)
+                        .shadow(color: (c.isUp ? color : Color(hex: "FF6B6B")).opacity(0.6), radius: 4)
                 }
-
-                // Area fill under trend line
-                AreaMark(
-                    x: .value("Date", c.date, unit: unit),
-                    y: .value("Avg", c.avg)
-                )
-                .foregroundStyle(LinearGradient(
-                    colors: [color.opacity(0.18), color.opacity(0.02)],
-                    startPoint: .top, endPoint: .bottom
-                ))
-                .interpolationMethod(.catmullRom)
             }
             .chartYScale(domain: (lo - pad)...(hi + pad))
             .chartYAxis {
-                AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { _ in
+                AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { _ in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
                         .foregroundStyle(Color.white.opacity(0.07))
                     AxisValueLabel()
@@ -800,8 +801,8 @@ struct HistoryView: View {
                 }
             }
             .chartXAxis {
-                AxisMarks { _ in
-                    AxisValueLabel(format: xFormat)
+                AxisMarks(values: .automatic(desiredCount: candles.count)) { _ in
+                    AxisValueLabel(format: .dateTime.month(.defaultDigits).day())
                         .font(.system(size: 9))
                         .foregroundStyle(Color.white.opacity(0.4))
                 }

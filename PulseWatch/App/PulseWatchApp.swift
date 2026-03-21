@@ -17,6 +17,8 @@ struct PulseWatchApp: App {
             WorkoutHistoryEntry.self,
             HeartRateAlertEvent.self,
             StrengthRecord.self,
+            HealthGoal.self,
+            TrainingChallenge.self,
         ])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -53,6 +55,9 @@ struct PulseWatchApp: App {
 
         // Weekly Health Summary 通知
         WeeklySummaryService.shared.scheduleWeeklySummary()
+
+        // Monthly Health Summary 通知
+        MonthlySummaryService.shared.scheduleMonthlySummary()
 
         // Weekly PB Reminder
         AchievementService.shared.scheduleWeeklyPBReminder()

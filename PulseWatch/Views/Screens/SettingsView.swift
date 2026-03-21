@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import UserNotifications
 import HealthKit
+import UniformTypeIdentifiers
 
 /// 设置页面 — 控制通知、健身房、数据采集等
 struct SettingsView: View {
@@ -39,9 +40,19 @@ struct SettingsView: View {
     @State private var showClearHistoryAlert = false
     @State private var showResetOnboardingAlert = false
     @State private var historyClearSuccess = false
+    @State private var isExporting = false
+    @State private var exportURL: URL?
+    @State private var showExportShare = false
+    @State private var exportError: String?
+    @State private var showImportPicker = false
+    @State private var importResult: ImportResult?
 
     @Query(filter: #Predicate<SavedLocation> { $0.locationType == "gym" && $0.isActive })
     private var gymLocations: [SavedLocation]
+
+    @Query(sort: \DailySummary.date) private var allDailySummaries: [DailySummary]
+    @Query(sort: \StrengthRecord.date) private var allStrengthRecords: [StrengthRecord]
+    @Query(sort: \HealthGoal.createdAt) private var allGoals: [HealthGoal]
 
     @Environment(\.modelContext) private var modelContext
 
@@ -76,13 +87,25 @@ struct SettingsView: View {
 
                     // (采集频率已移除 — Apple Watch 心率采集由系统控制)
 
+                    // 目标设置
+                    goalsSection
+                        .staggered(index: 7)
+
+                    // 教练模式
+                    coachModeSection
+                        .staggered(index: 8)
+
+                    // 数据导出 & 备份
+                    dataExportSection
+                        .staggered(index: 9)
+
                     // 数据管理
                     dataManagementSection
-                        .staggered(index: 7)
+                        .staggered(index: 9)
 
                     // OpenClaw（预留）
                     openClawSection
-                        .staggered(index: 8)
+                        .staggered(index: 10)
 
                     // 开发者选项（仅 Debug 构建）
                     #if DEBUG
@@ -1059,6 +1082,258 @@ struct SettingsView: View {
     // MARK: - 数据管理
 
     @Query private var allWorkoutHistory: [WorkoutHistoryEntry]
+
+    // MARK: - 目标设置入口
+
+    private var goalsSection: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            sectionHeader(icon: "target", title: String(localized: "Goals"))
+
+            settingRow {
+                NavigationLink {
+                    GoalSettingView().preferredColorScheme(.dark)
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(String(localized: "健康目标"))
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(String(localized: "设定步数、睡眠、训练等每日目标"))
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .pulseCard()
+    }
+
+    // MARK: - 教练模式
+
+    private var coachModeSection: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            sectionHeader(icon: "person.2.fill", title: String(localized: "Coach Mode"))
+
+            settingRow {
+                NavigationLink {
+                    CoachModeView().preferredColorScheme(.dark)
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(String(localized: "教练模式"))
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(String(localized: "生成健康快照，分享给教练或朋友"))
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .pulseCard()
+    }
+
+    // MARK: - 数据导出 & 备份
+
+    private var dataExportSection: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            sectionHeader(icon: "square.and.arrow.up", title: String(localized: "Data Export"))
+
+            // CSV 导出
+            settingRow {
+                Button {
+                    exportCSV()
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(String(localized: "导出健康数据 (CSV)"))
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(String(localized: "\(allDailySummaries.count) 天数据"))
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        if isExporting {
+                            ProgressView().tint(PulseTheme.accent)
+                        } else {
+                            Image(systemName: "tablecells")
+                                .font(.system(size: 14))
+                                .foregroundStyle(PulseTheme.accentTeal)
+                        }
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+
+            // JSON 备份
+            settingRow {
+                Button {
+                    exportBackup()
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(String(localized: "完整备份 (JSON)"))
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(String(localized: "所有健康数据、训练记录、目标"))
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        Image(systemName: "doc.zipper")
+                            .font(.system(size: 14))
+                            .foregroundStyle(PulseTheme.sleepViolet)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+
+            // PDF 报告
+            settingRow {
+                Button {
+                    exportPDF()
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(String(localized: "生成 PDF 报告"))
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(String(localized: "上月健康数据的完整 PDF 报告"))
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        Image(systemName: "doc.richtext")
+                            .font(.system(size: 14))
+                            .foregroundStyle(PulseTheme.activityCoral)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+
+            // 从备份恢复
+            settingRow {
+                Button {
+                    showImportPicker = true
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(String(localized: "从备份恢复"))
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(String(localized: "导入之前导出的 JSON 备份文件"))
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.down.doc")
+                            .font(.system(size: 14))
+                            .foregroundStyle(PulseTheme.accentTeal)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+
+            if let importResult = importResult {
+                Text(String(localized: "已导入 \(importResult.total) 条记录"))
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.accentTeal)
+            }
+
+            if let error = exportError {
+                Text(error)
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.statusPoor)
+            }
+        }
+        .pulseCard()
+        .sheet(isPresented: $showExportShare) {
+            if let url = exportURL {
+                ShareSheet(items: [url])
+            }
+        }
+        .fileImporter(isPresented: $showImportPicker, allowedContentTypes: [.json]) { result in
+            switch result {
+            case .success(let url):
+                guard url.startAccessingSecurityScopedResource() else { return }
+                defer { url.stopAccessingSecurityScopedResource() }
+                do {
+                    importResult = try DataExportService.shared.importBackup(from: url, modelContext: modelContext)
+                } catch {
+                    exportError = error.localizedDescription
+                }
+            case .failure(let error):
+                exportError = error.localizedDescription
+            }
+        }
+    }
+
+    private func exportPDF() {
+        isExporting = true
+        exportError = nil
+        Task {
+            do {
+                let url = try PDFReportService.shared.generateMonthlyPDF(
+                    summaries: allDailySummaries,
+                    workouts: allWorkoutHistory,
+                    strengthRecords: allStrengthRecords
+                )
+                exportURL = url
+                showExportShare = true
+            } catch {
+                exportError = error.localizedDescription
+            }
+            isExporting = false
+        }
+    }
+
+    private func exportCSV() {
+        isExporting = true
+        exportError = nil
+        Task {
+            do {
+                let url = try DataExportService.shared.exportDailySummariesCSV(summaries: allDailySummaries)
+                exportURL = url
+                showExportShare = true
+            } catch {
+                exportError = error.localizedDescription
+            }
+            isExporting = false
+        }
+    }
+
+    private func exportBackup() {
+        isExporting = true
+        exportError = nil
+        Task {
+            do {
+                let url = try DataExportService.shared.exportBackup(
+                    summaries: allDailySummaries,
+                    workouts: allWorkoutHistory,
+                    strengthRecords: allStrengthRecords,
+                    goals: allGoals
+                )
+                exportURL = url
+                showExportShare = true
+            } catch {
+                exportError = error.localizedDescription
+            }
+            isExporting = false
+        }
+    }
 
     private var dataManagementSection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {

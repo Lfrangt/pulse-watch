@@ -31,6 +31,7 @@ struct DashboardView: View {
     // Health Age
     @State private var healthAgeResult: HealthAgeService.HealthAgeResult?
     @State private var healthAgeExpanded = false
+    @State private var showShareSnapshot = false
 
     @Query(sort: \WorkoutRecord.date, order: .reverse) private var recentWorkouts: [WorkoutRecord]
     @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
@@ -103,6 +104,28 @@ struct DashboardView: View {
                                 .staggered(index: 6)
                         }
 
+                        // Goal progress
+                        GoalProgressCard()
+                            .staggered(index: 7)
+
+                        // Share snapshot button
+                        Button { showShareSnapshot = true } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.system(size: 13, weight: .medium))
+                                Text(String(localized: "分享今日快照"))
+                                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                            }
+                            .foregroundStyle(PulseTheme.accentTeal)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                                    .fill(PulseTheme.accentTeal.opacity(0.08))
+                            )
+                        }
+                        .staggered(index: 7)
+
                         // Recent workouts
                         if !recentWorkouts.isEmpty {
                             recentWorkoutsSection
@@ -128,6 +151,10 @@ struct DashboardView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .sheet(isPresented: $showLocationSetup) {
                 LocationSetupView()
+            }
+            .sheet(isPresented: $showShareSnapshot) {
+                HealthSnapshotShareScreen()
+                    .preferredColorScheme(.dark)
             }
             .fullScreenCover(isPresented: $showGymPrompt) {
                 GymArrivalFlowView(

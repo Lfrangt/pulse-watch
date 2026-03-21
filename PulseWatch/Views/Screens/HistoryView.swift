@@ -7,6 +7,7 @@ struct HistoryView: View {
 
     @State private var selectedRange: TimeRange = .week
     @State private var showWeeklyReport = false
+    @State private var showMonthlyReport = false
     @State private var chartAnimated = false
     @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
     @Query(sort: \WorkoutHistoryEntry.startDate, order: .reverse) private var allWorkouts: [WorkoutHistoryEntry]
@@ -61,6 +62,10 @@ struct HistoryView: View {
                     MuscleInsightsCard(workouts: allWorkouts, summaries: allSummaries)
                         .staggered(index: 7)
 
+                    // Analytics Pro 入口
+                    analyticsProSection
+                        .staggered(index: 8)
+
                     Spacer(minLength: 60)
                 }
                 .padding(.horizontal, PulseTheme.spacingM)
@@ -74,6 +79,10 @@ struct HistoryView: View {
                 WeeklyReportView()
                     .preferredColorScheme(.dark)
                     .onAppear { Analytics.trackWeeklyReportViewed() }
+            }
+            .sheet(isPresented: $showMonthlyReport) {
+                MonthlyReportView()
+                    .preferredColorScheme(.dark)
             }
             .onAppear {
                 // Chart animation trigger
@@ -102,18 +111,20 @@ struct HistoryView: View {
         case week = "7D"
         case month = "30D"
         case quarter = "90D"
+        case all = "All"
 
         var days: Int {
             switch self {
             case .week: return 7
             case .month: return 30
             case .quarter: return 90
+            case .all: return 365 * 3  // 3 年上限
             }
         }
 
         /// 是否需要按周聚合（避免图表过密）
         var shouldAggregate: Bool {
-            self == .quarter
+            self == .quarter || self == .all
         }
 
         var xAxisStride: Int {
@@ -121,6 +132,7 @@ struct HistoryView: View {
             case .week: return 1
             case .month: return 5
             case .quarter: return 14
+            case .all: return 30
             }
         }
     }
@@ -1011,6 +1023,46 @@ struct HistoryView: View {
     }
 
     // MARK: - 快捷入口
+
+    // MARK: - Analytics Pro 入口
+
+    private var analyticsProSection: some View {
+        VStack(spacing: PulseTheme.spacingS) {
+            HStack(spacing: PulseTheme.spacingS) {
+                NavigationLink {
+                    CorrelationInsightsView().preferredColorScheme(.dark)
+                } label: {
+                    shortcutTile(icon: "link", color: PulseTheme.sleepViolet, title: String(localized: "数据洞察"))
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
+                    AnomalyTimelineView().preferredColorScheme(.dark)
+                } label: {
+                    shortcutTile(icon: "exclamationmark.triangle.fill", color: PulseTheme.statusWarning, title: String(localized: "异常记录"))
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
+                    ChallengeView().preferredColorScheme(.dark)
+                } label: {
+                    shortcutTile(icon: "flame.fill", color: PulseTheme.activityCoral, title: String(localized: "训练挑战"))
+                }
+                .buttonStyle(.plain)
+            }
+
+            HStack(spacing: PulseTheme.spacingS) {
+                Button { showMonthlyReport = true } label: {
+                    shortcutTile(icon: "calendar.badge.clock", color: PulseTheme.accentTeal, title: String(localized: "月度报告"))
+                }
+                .buttonStyle(.plain)
+
+                // 占位保持布局平衡
+                Color.clear.frame(maxWidth: .infinity)
+                Color.clear.frame(maxWidth: .infinity)
+            }
+        }
+    }
 
     private var shortcutButtons: some View {
         HStack(spacing: PulseTheme.spacingS) {

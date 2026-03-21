@@ -212,20 +212,7 @@ struct DashboardView: View {
                                     style: StrokeStyle(lineWidth: 3, lineCap: .round))
                             .frame(width: geo.size.width - 60, height: (geo.size.width - 60) / 2 + 10)
 
-                        // 0 / 100 labels on arc ends
-                        let arcW = geo.size.width - 60
-                        let arcH = arcW / 2 + 10
-                        Group {
-                            Text("0")
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.4))
-                                .offset(x: -(arcW / 2) + 4, y: arcH / 2 - 2)
-                            Text("100")
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.4))
-                                .offset(x: (arcW / 2) - 14, y: arcH / 2 - 2)
-                        }
-                        .frame(width: arcW, height: arcH)
+                        // Arc end labels removed — score number is self-explanatory
 
                         // Crown icon above score (Oura's achievement icon)
                         VStack(spacing: 4) {

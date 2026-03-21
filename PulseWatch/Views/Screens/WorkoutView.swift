@@ -10,7 +10,7 @@ struct WorkoutView: View {
     @State private var expandedId: UUID?
     @State private var isLoading = true
     @State private var weekStats: WeekWorkoutStats?
-    @State private var strengthExpanded = false
+    @State private var strengthExpanded = true
 
     @Query(sort: \StrengthRecord.date, order: .reverse) private var strengthRecords: [StrengthRecord]
     @Query(sort: \WorkoutHistoryEntry.startDate, order: .reverse) private var allHistoryEntries: [WorkoutHistoryEntry]
@@ -28,17 +28,20 @@ struct WorkoutView: View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: PulseTheme.spacingM) {
-                    // ── 模块一：训练记录 ──
-                    // 本周统计
+                    // ── 本周统计 ──
                     if let stats = weekStats, stats.totalCount > 0 {
                         weekStatsCard(stats)
                             .staggered(index: 0)
                     }
 
-                    // 运动记录列表
+                    // ── 力量训练（最近5条，紧跟本周统计）──
+                    strengthSection
+                        .staggered(index: 1)
+
+                    // ── HealthKit 运动记录 ──
                     if workouts.isEmpty && !isLoading {
                         emptyState
-                            .staggered(index: 1)
+                            .staggered(index: 2)
                     } else {
                         ForEach(Array(workouts.enumerated()), id: \.element.uuid) { index, workout in
                             workoutRow(workout, index: index + 1)
@@ -52,12 +55,8 @@ struct WorkoutView: View {
                     // ── AI 记录（OpenClaw 写入）──
                     if !recentAIWorkouts.isEmpty {
                         aiWorkoutsSection
-                            .staggered(index: workouts.count + 1)
+                            .staggered(index: workouts.count + 2)
                     }
-
-                    // ── 模块二：力量训练 ──
-                    strengthSection
-                        .staggered(index: workouts.count + 3)
 
                     Spacer(minLength: 60)
                 }
@@ -598,7 +597,7 @@ struct WorkoutView: View {
                 // 最近记录
                 if !strengthRecords.isEmpty {
                     Divider().background(PulseTheme.border)
-                    ForEach(strengthRecords.prefix(8)) { record in
+                    ForEach(strengthRecords.prefix(5)) { record in
                         let type = StrengthService.LiftType(rawValue: record.liftType) ?? .squat
                         HStack(spacing: PulseTheme.spacingS) {
                             Circle()

@@ -88,7 +88,7 @@ enum DemoDataProvider {
                 time: wakeTime,
                 icon: "sunrise.fill",
                 title: String(localized: "Awake"),
-                detail: String(localized: "Resting HR 58bpm"),
+                detail: String(localized: "静息心率 58bpm"),
                 impact: String(localized: "Good Recovery"),
                 impactPositive: true,
                 color: PulseTheme.statusGood

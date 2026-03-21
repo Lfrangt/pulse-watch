@@ -146,6 +146,7 @@ struct DashboardView: View {
                 }
             }
             .scrollContentBackground(.hidden)
+            .background(Color(hex: "0D4A5C").ignoresSafeArea(edges: .top))
             .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $showLocationSetup) {
                 LocationSetupView()
@@ -573,11 +574,11 @@ struct DashboardView: View {
 
     private func ouraStatusLabel(for score: Int) -> String {
         switch score {
-        case 0..<30: return String(localized: "Poor")
-        case 30..<50: return String(localized: "Fair")
-        case 50..<70: return String(localized: "Good")
-        case 70..<85: return String(localized: "Great")
-        default: return String(localized: "Optimal")
+        case 0..<30: return "较差"
+        case 30..<50: return "一般"
+        case 50..<70: return "良好"
+        case 70..<85: return "优秀"
+        default: return "极佳"
         }
     }
 
@@ -1444,8 +1445,9 @@ struct DashboardView: View {
                 startPoint: .top,
                 endPoint: .bottom
             )
+            .ignoresSafeArea(edges: .top)
             VStack(spacing: 16) {
-                Spacer().frame(height: 80)
+                Spacer()
                 ProgressView()
                     .tint(PulseTheme.accentTeal)
                     .scaleEffect(1.3)
@@ -1456,10 +1458,10 @@ struct DashboardView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 460)
+        .frame(height: heroHeight)
         .overlay(alignment: .bottom) {
             LinearGradient(colors: [Color.clear, Color.black], startPoint: .top, endPoint: .bottom)
-                .frame(height: 32)
+                .frame(height: 60)
         }
     }
 

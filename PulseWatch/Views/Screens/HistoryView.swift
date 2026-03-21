@@ -303,6 +303,9 @@ struct HistoryView: View {
                 emptyChartPlaceholder
             } else if selectedRange == .week {
                 // 7D — 折线图
+                let scores = data.map { Double($0.score) }
+                let lo = max(0, (scores.min() ?? 0) - 10)
+                let hi = min(100, (scores.max() ?? 100) + 10)
                 Chart(data, id: \.date) { item in
                     LineMark(
                         x: .value(String(localized: "Date"), item.date),
@@ -314,10 +317,11 @@ struct HistoryView: View {
 
                     AreaMark(
                         x: .value(String(localized: "Date"), item.date),
-                        y: .value(String(localized: "Score"), item.score)
+                        yStart: .value("Base", lo),
+                        yEnd: .value(String(localized: "Score"), Double(item.score))
                     )
                     .foregroundStyle(LinearGradient(
-                        colors: [PulseTheme.accent.opacity(0.2), PulseTheme.accent.opacity(0.02)],
+                        colors: [PulseTheme.accent.opacity(0.25), PulseTheme.accent.opacity(0.02)],
                         startPoint: .top, endPoint: .bottom
                     ))
                     .interpolationMethod(.catmullRom)
@@ -329,12 +333,7 @@ struct HistoryView: View {
                     .foregroundStyle(PulseTheme.accent)
                     .symbolSize(20)
                 }
-                .chartYScale(domain: {
-                    let scores = data.map { Double($0.score) }
-                    let lo = max(0, (scores.min() ?? 0) - 10)
-                    let hi = min(100, (scores.max() ?? 100) + 10)
-                    return lo...hi
-                }())
+                .chartYScale(domain: lo...hi)
                 .chartYAxis {
                     AxisMarks(position: .leading, values: [0, 50, 100]) { _ in
                         AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
@@ -351,6 +350,7 @@ struct HistoryView: View {
                     }
                 }
                 .frame(height: 180)
+                .clipped()
                 .opacity(chartAnimated ? 1 : 0)
                 .animation(.easeOut(duration: 1.0), value: chartAnimated)
             } else {
@@ -358,14 +358,18 @@ struct HistoryView: View {
                 let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
                 let rawData = data.map { (date: $0.date, value: Double($0.score)) }
                 let candles = aggregateToCandlePoints(from: rawData, groupBy: groupBy)
-                CandlestickChartView(
-                    candles: candles,
-                    color: PulseTheme.accentTeal,
-                    yLabel: "",
-                    animated: chartAnimated
-                )
-                .frame(height: 200)
-                .padding(.top, 24) // room for grid labels
+                if candles.count < 2 {
+                    emptyChartPlaceholder
+                } else {
+                    CandlestickChartView(
+                        candles: candles,
+                        color: PulseTheme.accentTeal,
+                        yLabel: "",
+                        animated: chartAnimated
+                    )
+                    .frame(height: 200)
+                    .padding(.top, 24)
+                }
             }
         }
     }
@@ -415,22 +419,29 @@ struct HistoryView: View {
                 }
                 .frame(maxWidth: .infinity).frame(height: 120)
             } else if selectedRange == .week {
+                let hrLo = max(30.0, (data.map(\.resting).min() ?? 40) - 5)
+                let hrHi = (data.map(\.resting).max() ?? 80) + 5
                 Chart(data, id: \.date) { item in
                     LineMark(x: .value("Date", item.date), y: .value("RHR", item.resting))
                         .foregroundStyle(hrColor).interpolationMethod(.catmullRom).lineStyle(StrokeStyle(lineWidth: 2.5))
-                    AreaMark(x: .value("Date", item.date), y: .value("RHR", item.resting))
-                        .foregroundStyle(LinearGradient(colors: [hrColor.opacity(0.15), hrColor.opacity(0.02)], startPoint: .top, endPoint: .bottom))
+                    AreaMark(x: .value("Date", item.date), yStart: .value("Base", hrLo), yEnd: .value("RHR", item.resting))
+                        .foregroundStyle(LinearGradient(colors: [hrColor.opacity(0.2), hrColor.opacity(0.02)], startPoint: .top, endPoint: .bottom))
                         .interpolationMethod(.catmullRom)
                 }
-                .chartYScale(domain: { let lo = max(30, (data.map(\.resting).min() ?? 40) - 5); let hi = (data.map(\.resting).max() ?? 80) + 5; return lo...hi }())
+                .chartYScale(domain: hrLo...hrHi)
                 .chartXAxis { AxisMarks(values: .stride(by: .day, count: 1)) { _ in AxisValueLabel(format: .dateTime.month(.defaultDigits).day()).font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary.opacity(0.7)) } }
-                .frame(height: 180).opacity(chartAnimated ? 1 : 0).animation(.easeOut(duration: 1.0), value: chartAnimated)
+                .frame(height: 180).clipped().opacity(chartAnimated ? 1 : 0).animation(.easeOut(duration: 1.0), value: chartAnimated)
             } else {
                 let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
                 let rawData = data.map { (date: $0.date, value: $0.resting) }
-                CandlestickChartView(candles: aggregateToCandlePoints(from: rawData, groupBy: groupBy), color: hrColor, yLabel: "", animated: chartAnimated)
-                    .frame(height: 200)
-                    .padding(.top, 24)
+                let candles = aggregateToCandlePoints(from: rawData, groupBy: groupBy)
+                if candles.count < 2 {
+                    emptyChartPlaceholder
+                } else {
+                    CandlestickChartView(candles: candles, color: hrColor, yLabel: "", animated: chartAnimated)
+                        .frame(height: 200)
+                        .padding(.top, 24)
+                }
             }
         }
     }
@@ -474,25 +485,28 @@ struct HistoryView: View {
             if data.isEmpty {
                 emptyChartPlaceholder
             } else if selectedRange == .week {
+                let hrvLo = max(0.0, (data.map(\.value).min() ?? 0) - 10)
+                let hrvHi = (data.map(\.value).max() ?? 100) + 10
                 Chart(data, id: \.date) { item in
                     LineMark(x: .value(String(localized: "Date"), item.date), y: .value("HRV", item.value))
                         .foregroundStyle(hrvColor).interpolationMethod(.catmullRom).lineStyle(StrokeStyle(lineWidth: 2.5))
-                    AreaMark(x: .value(String(localized: "Date"), item.date), y: .value("HRV", item.value))
-                        .foregroundStyle(LinearGradient(colors: [hrvColor.opacity(0.15), hrvColor.opacity(0.02)], startPoint: .top, endPoint: .bottom))
+                    AreaMark(x: .value(String(localized: "Date"), item.date), yStart: .value("Base", hrvLo), yEnd: .value("HRV", item.value))
+                        .foregroundStyle(LinearGradient(colors: [hrvColor.opacity(0.2), hrvColor.opacity(0.02)], startPoint: .top, endPoint: .bottom))
                         .interpolationMethod(.catmullRom)
                 }
-                .chartYScale(domain: {
-                    let lo = max(0, (data.map(\.value).min() ?? 0) - 10)
-                    let hi = (data.map(\.value).max() ?? 100) + 10
-                    return lo...hi
-                }())
+                .chartYScale(domain: hrvLo...hrvHi)
                 .chartXAxis { AxisMarks(values: .stride(by: .day, count: 1)) { _ in AxisValueLabel(format: .dateTime.month(.defaultDigits).day()).font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary.opacity(0.7)) } }
-                .frame(height: 180).opacity(chartAnimated ? 1 : 0).animation(.easeOut(duration: 1.0), value: chartAnimated)
+                .frame(height: 180).clipped().opacity(chartAnimated ? 1 : 0).animation(.easeOut(duration: 1.0), value: chartAnimated)
             } else {
                 let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
-                CandlestickChartView(candles: aggregateToCandlePoints(from: data, groupBy: groupBy), color: hrvColor, yLabel: "ms", animated: chartAnimated)
-                    .frame(height: 200)
-                    .padding(.top, 24)
+                let candles = aggregateToCandlePoints(from: data, groupBy: groupBy)
+                if candles.count < 2 {
+                    emptyChartPlaceholder
+                } else {
+                    CandlestickChartView(candles: candles, color: hrvColor, yLabel: "ms", animated: chartAnimated)
+                        .frame(height: 200)
+                        .padding(.top, 24)
+                }
             }
         }
     }
@@ -1010,18 +1024,22 @@ struct CandlestickChartView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if useFallback {
-            // Too few points — simple line chart
+            // Too few candle points — bar chart works even with 1 point
             Chart(candles, id: \.id) { c in
-                LineMark(x: .value("Date", c.date), y: .value("Avg", c.avg))
-                    .foregroundStyle(color).interpolationMethod(.catmullRom)
-                    .lineStyle(StrokeStyle(lineWidth: 2))
-                AreaMark(x: .value("Date", c.date), y: .value("Avg", c.avg))
-                    .foregroundStyle(LinearGradient(colors: [color.opacity(0.18), color.opacity(0.02)], startPoint: .top, endPoint: .bottom))
-                    .interpolationMethod(.catmullRom)
+                BarMark(x: .value("Date", c.date, unit: .month), y: .value("Avg", c.avg))
+                    .foregroundStyle(color.opacity(0.75))
+                    .cornerRadius(4)
+                if candles.count > 1 {
+                    LineMark(x: .value("Date", c.date, unit: .month), y: .value("Avg", c.avg))
+                        .foregroundStyle(color)
+                        .interpolationMethod(.catmullRom)
+                        .lineStyle(StrokeStyle(lineWidth: 2))
+                }
             }
-            .chartXAxis { AxisMarks { _ in AxisValueLabel(format: .dateTime.month(.defaultDigits).day()).font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.4)) } }
-            .chartYAxis { AxisMarks(position: .leading) { _ in AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4])).foregroundStyle(Color.white.opacity(0.06)) } }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .chartXAxis { AxisMarks { _ in AxisValueLabel(format: .dateTime.month(.abbreviated)).font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.4)) } }
+            .chartYAxis { AxisMarks(position: .leading) { _ in AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4])).foregroundStyle(Color.white.opacity(0.06)); AxisValueLabel().font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.4)) } }
+            .frame(maxWidth: .infinity)
+            .frame(height: 160)
         } else {
             GeometryReader { geo in
                 let w = geo.size.width

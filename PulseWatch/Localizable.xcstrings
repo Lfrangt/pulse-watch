@@ -268,6 +268,26 @@
         }
       }
     },
+    "↑%@%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "↑%1$@%2$@"
+          }
+        }
+      }
+    },
+    "↓%@%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "↓%1$@%2$@"
+          }
+        }
+      }
+    },
     "+%.0f kg to %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -281,6 +301,16 @@
     },
     "+%@" : {
 
+    },
+    "~%@%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "~%1$@%2$@"
+          }
+        }
+      }
     },
     "~%d min" : {
       "extractionState" : "manual",
@@ -873,6 +903,9 @@
         }
       }
     },
+    "Analysing your data…" : {
+
+    },
     "Any new PRs this week? 💪" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1076,9 +1109,6 @@
           }
         }
       }
-    },
-    "Avg:%@" : {
-
     },
     "Awake" : {
       "extractionState" : "stale",
@@ -2601,9 +2631,6 @@
         }
       }
     },
-    "H:%@" : {
-
-    },
     "Health Age" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3285,9 +3312,6 @@
           }
         }
       }
-    },
-    "L:%@" : {
-
     },
     "Last \\(localizedGroup(bestGroup)) was \\(maxDays) days ago" : {
       "extractionState" : "stale",

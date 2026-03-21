@@ -53,7 +53,7 @@ struct WeeklyTrendChartsView: View {
                         .foregroundStyle(PulseTheme.accent)
                 }
 
-                Text(String(localized: "7-Day Trends"))
+                Text(String(localized: "7日趋势"))
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
                     .accessibilityAddTraits(.isHeader)
@@ -169,7 +169,7 @@ struct WeeklyTrendChartsView: View {
         return VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
             chartHeader(
                 icon: "heart.fill",
-                title: String(localized: "Resting HR"),
+                title: String(localized: "静息心率"),
                 color: PulseTheme.activityAccent,
                 summary: hrData.isEmpty ? nil : restingHRSummary(hrData)
             )

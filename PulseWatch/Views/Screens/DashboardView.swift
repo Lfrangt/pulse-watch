@@ -890,18 +890,10 @@ struct DashboardView: View {
 
                 Spacer()
 
-                // Trend badge
-                HStack(spacing: 3) {
-                    Image(systemName: trend.arrow)
-                        .font(.system(size: 9, weight: .bold))
-                    // no text — just arrow
-                }
-                .foregroundStyle(trend.color)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
-                .background(
-                    Capsule().fill(trend.color.opacity(0.12))
-                )
+                // Navigate hint
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.25))
             }
 
             // Value
@@ -920,10 +912,15 @@ struct DashboardView: View {
                 }
             }
 
-            // Label
-            Text(label)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(PulseTheme.textTertiary)
+            // Label + trend dot
+            HStack(spacing: 5) {
+                Text(label)
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(PulseTheme.textTertiary)
+                Circle()
+                    .fill(trend.color)
+                    .frame(width: 5, height: 5)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(PulseTheme.spacingM)
@@ -938,7 +935,7 @@ struct DashboardView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
         .accessibilityValue(unit.isEmpty ? value : "\(value) \(unit)")
-        .accessibilityAddTraits(.isStaticText)
+        .accessibilityAddTraits(.isButton)
     }
 
     // MARK: - 训练建议卡片

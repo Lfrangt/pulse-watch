@@ -256,30 +256,30 @@ struct DashboardView: View {
                         animateScoreCounter(to: score)
                     }
 
-                    Spacer().frame(height: 20)
+                    Spacer().frame(height: 10)
 
-                    // ── Headline — Oura's big serif-style motivational text
+                    // ── Headline
                     Text(headline)
-                        .font(.system(size: 32, weight: .bold, design: .serif))
+                        .font(.system(size: 26, weight: .bold, design: .serif))
                         .foregroundStyle(.white)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(.horizontal, 28)
 
-                    Spacer().frame(height: 12)
+                    Spacer().frame(height: 6)
 
-                    // ── Sub-headline (brief insight)
+                    // ── Sub-headline
                     if let insight = brief?.insight {
                         Text(insight)
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.88))
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.75))
                             .multilineTextAlignment(.center)
-                            .lineSpacing(3)
+                            .lineSpacing(2)
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.horizontal, 36)
                     }
 
-                    Spacer().frame(height: 28)
+                    Spacer().frame(height: 16)
                 }
                 .padding(.top, 0)
             }
@@ -303,7 +303,7 @@ struct DashboardView: View {
     }
 
     /// Height for the hero section — tall enough to feel immersive
-    private var heroHeight: CGFloat { 460 }
+    private var heroHeight: CGFloat { 410 }
 
     // MARK: - Oura Score Disc Row
 

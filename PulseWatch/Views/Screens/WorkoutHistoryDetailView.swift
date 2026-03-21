@@ -104,9 +104,11 @@ struct WorkoutHistoryDetailView: View {
                     .accessibilityHidden(true)
             }
 
-            // 运动名称
+            // 运动名称（OpenClaw: 用 notes；其他: 用 activityName）
             VStack(spacing: 6) {
-                Text(entry.activityName)
+                Text(entry.sourceName == "OpenClaw" && !(entry.notes ?? "").isEmpty
+                     ? (entry.notes ?? entry.activityName)
+                     : entry.activityName)
                     .font(.system(size: 24, weight: .semibold, design: .rounded))
                     .foregroundStyle(PulseTheme.textPrimary)
                     .minimumScaleFactor(0.7)

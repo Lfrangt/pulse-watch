@@ -215,9 +215,13 @@ struct WorkoutHistoryListView: View {
             // 名称 + 日期 + 肌群 badge
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 5) {
-                    Text(entry.activityName)
+                    // OpenClaw 来源：优先用 notes 作为主标题
+                    Text(entry.sourceName == "OpenClaw" && !(entry.notes ?? "").isEmpty
+                         ? (entry.notes ?? entry.activityName)
+                         : entry.activityName)
                         .font(PulseTheme.bodyFont.weight(.medium))
                         .foregroundStyle(PulseTheme.textPrimary)
+                        .lineLimit(1)
                     if entry.sourceName == "OpenClaw" {
                         Text("AI")
                             .font(.system(size: 9, weight: .bold, design: .rounded))

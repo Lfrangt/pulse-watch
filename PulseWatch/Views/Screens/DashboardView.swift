@@ -81,9 +81,15 @@ struct DashboardView: View {
                         )
                         .staggered(index: 4)
 
+                        // Health Age — compact, lower priority
+                        if let result = healthAgeResult {
+                            healthAgeCardCompact(result: result)
+                                .staggered(index: 5)
+                        }
+
                         // Recovery timeline
                         recoveryTimelineSection
-                            .staggered(index: 5)
+                            .staggered(index: 6)
 
                         // Training advice
                         if let advice = insight?.trainingAdvice {

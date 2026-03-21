@@ -823,6 +823,9 @@
     "Agent ID" : {
 
     },
+    "AI" : {
+
+    },
     "AI analyzes your Apple Watch data\\nDaily recovery scores and training advice" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -7037,6 +7040,9 @@
 
     },
     "生理年龄" : {
+
+    },
+    "由 OpenClaw AI 记录" : {
 
     },
     "目标 %@ kcal" : {

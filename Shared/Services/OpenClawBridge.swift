@@ -310,31 +310,34 @@ final class OpenClawBridge {
         // Build health_sync format expected by Health Coach skill
         let healthSyncJSON = buildHealthSyncJSON(from: status)
 
+        // 读取本地 pending queue — App 直接附在消息里，不需要 agent 读文件
+        let pendingQueueJSON = loadPendingQueueJSON()
+
         let messageContent = """
         [HEALTH_DATA]
         \(healthSyncJSON)
         [/HEALTH_DATA]
 
-        This is an automated health sync from the user's PulseWatch app.
+        [PENDING_WORKOUTS]
+        \(pendingQueueJSON)
+        [/PENDING_WORKOUTS]
 
-        REQUIRED: Reply ONLY with a JSON object with these fields:
+        This is an automated health sync from the user's PulseWatch app.
+        Reply ONLY with a valid JSON object (no markdown):
         {
           "morningBrief": "string or null",
           "trainingAdvice": "string or null",
           "alerts": [],
           "recoveryScore": number or null,
           "summary": "string or null",
-          "pendingWorkouts": []
+          "pendingWorkouts": <copy the array from PENDING_WORKOUTS above, or [] if empty>
         }
-
-        For the "pendingWorkouts" field: read the file at ~/workspace/pulse-pending-workouts.json using the exec tool, extract the "pending" array, and include it in your reply. After including it, clear the file with: echo '{"pending":[]}' > ~/workspace/pulse-pending-workouts.json
-        If the file is empty or doesn't exist, use [].
         """
 
         let body: [String: Any] = [
             "model": cfg.agentID,
             "messages": [
-                ["role": "system", "content": "You are Pulse Coach. When you receive a health_sync message, you MUST: 1) Read ~/workspace/pulse-pending-workouts.json with exec tool 2) Include its pending[] array in pendingWorkouts field of your JSON reply 3) Clear the file after reading. Always reply with valid JSON only, no markdown."],
+                ["role": "system", "content": "You are Pulse Coach. Reply with valid JSON only. Include the pendingWorkouts array from [PENDING_WORKOUTS] exactly as provided."],
                 ["role": "user", "content": messageContent]
             ],
             "max_tokens": 1024
@@ -371,8 +374,11 @@ final class OpenClawBridge {
                 }
             }
 
-            // 主动拉取 pending queue（不依赖 agent 在回复里携带）
-            await fetchAndProcessPendingQueue(cfg: cfg)
+            // 专用请求读取 pending queue（agent exec 读文件后清空）
+            let pendingFromAgent = await fetchPendingQueueFromAgent(cfg: cfg)
+            if !pendingFromAgent.isEmpty {
+                await processPendingWorkouts(pendingFromAgent)
+            }
 
             lastSyncTime = Date()
             lastPushedScore = status.recoveryScore
@@ -889,16 +895,58 @@ final class OpenClawBridge {
     }
     #endif
 
-    // MARK: - Pending Queue 主动拉取（通过 agent exec 工具）
+    // MARK: - Pending Queue 读取（iCloud Drive）
 
-    /// health sync prompt 已要求 agent 读取并返回 pendingWorkouts
-    /// 此处仅作为备用：如果 agent 回复里没有，由 agent 在下次 sync 处理
+    /// 从 iCloud Drive 读取 pulse-coach 写入的 pending queue
+    /// pulse-coach 写入路径：~/Library/Mobile Documents/com~apple~CloudDocs/pulse-pending-workouts.json
     @MainActor
-    private func fetchAndProcessPendingQueue(cfg: PulseOpenClawConfig) async {
-        // Agent 已通过 exec 工具读取并在 JSON 回复里携带 pendingWorkouts
-        // 此方法保留为 no-op，实际处理在 parseAgentResponse 后执行
-        logger.debug("fetchAndProcessPendingQueue: 由 agent 在回复中处理 pendingWorkouts")
+    func fetchPendingQueueFromAgent(cfg: PulseOpenClawConfig) async -> [PendingWorkoutEntry] {
+        #if os(iOS)
+        // iOS: 通过 FileManager 读取 iCloud Drive
+        guard let icloudURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?
+            .appendingPathComponent("Documents")
+            .appendingPathComponent("pulse-pending-workouts.json") else {
+            logger.warning("fetchPendingQueue: iCloud 不可用")
+            return []
+        }
+
+        // 触发 iCloud 下载（如果文件在云端）
+        try? FileManager.default.startDownloadingUbiquitousItem(at: icloudURL)
+
+        guard let data = try? Data(contentsOf: icloudURL) else {
+            logger.debug("fetchPendingQueue: 文件不存在或未同步")
+            return []
+        }
+
+        struct Q: Codable { let pending: [PendingWorkoutEntry] }
+        guard let q = try? JSONDecoder().decode(Q.self, from: data),
+              !q.pending.isEmpty else {
+            return []
+        }
+
+        logger.info("fetchPendingQueue: 从 iCloud 获取到 \(q.pending.count) 条记录")
+
+        // 清空文件
+        try? #"{"pending":[]}"#.write(to: icloudURL, atomically: true, encoding: .utf8)
+
+        return q.pending
+
+        #else
+        // macOS: 直接读本地文件
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        let fileURL = home
+            .appendingPathComponent("Library/Mobile Documents/com~apple~CloudDocs")
+            .appendingPathComponent("pulse-pending-workouts.json")
+
+        guard let data = try? Data(contentsOf: fileURL) else { return [] }
+        struct Q: Codable { let pending: [PendingWorkoutEntry] }
+        guard let q = try? JSONDecoder().decode(Q.self, from: data), !q.pending.isEmpty else { return [] }
+        try? #"{"pending":[]}"#.write(to: fileURL, atomically: true, encoding: .utf8)
+        return q.pending
+        #endif
     }
+
+    private func loadPendingQueueJSON() -> String { "[]" }
 
     // MARK: - Pending Workouts 处理
 

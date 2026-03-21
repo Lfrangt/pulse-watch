@@ -141,7 +141,7 @@ struct DashboardView: View {
                         Spacer(minLength: 80)
                     }
                     .padding(.horizontal, PulseTheme.spacingM)
-                    .padding(.top, PulseTheme.spacingM)
+                    .padding(.top, 4)
                     .padding(.bottom, 16)
                 }
             }
@@ -315,11 +315,16 @@ struct DashboardView: View {
         .frame(height: heroHeight)
         .overlay(alignment: .bottom) {
             LinearGradient(
-                colors: [Color.clear, Color.black],
+                stops: [
+                    .init(color: .clear, location: 0),
+                    .init(color: Color.black.opacity(0.3), location: 0.4),
+                    .init(color: Color.black.opacity(0.85), location: 0.75),
+                    .init(color: Color.black, location: 1.0),
+                ],
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .frame(height: 32)
+            .frame(height: 80)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(localized: "Recovery Score \(score), \(headline)"))

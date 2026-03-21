@@ -1049,9 +1049,9 @@ struct CandlestickChartView: View {
                 let allVals = candles.flatMap { [$0.high, $0.low] }
                 let rawMin = allVals.min() ?? 0
                 let rawMax = allVals.max() ?? 100
-                let spread = rawMax - rawMin
-                let minVal = rawMin - spread * 0.1
-                let maxVal = rawMax + spread * 0.1
+                let spread = max(rawMax - rawMin, 5.0) // 最小 spread 5，防止数据全相同时色块
+                let minVal = rawMin - spread * 0.15
+                let maxVal = rawMax + spread * 0.15
                 let range = max(maxVal - minVal, 1)
                 let slotW = chartW / CGFloat(candles.count)
                 let candleW = max(3, slotW * 0.45)
@@ -1086,7 +1086,7 @@ struct CandlestickChartView: View {
                         let openY  = yPos(candle.open)
                         let closeY = yPos(candle.close)
                         let bodyTop = min(openY, closeY)
-                        let bodyH   = max(2, abs(closeY - openY))
+                        let bodyH   = min(h * 0.8, max(2, abs(closeY - openY)))
                         let bullish = candle.isUp
                         let c      = bullish ? color : Color(hex: "FF6B6B")
                         let isSelected = selectedIdx == idx

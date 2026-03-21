@@ -66,11 +66,7 @@ struct DashboardView: View {
 
                     // BELOW HERO — cards with padding
                     VStack(spacing: PulseTheme.spacingS) {
-                        // Sleep & Activity — tap to detail
-                        if let tri = triScore {
-                            ouraSleepActivityCards(tri)
-                                .staggered(index: 1)
-                        }
+
 
                         // Health Age (compact)
                         if let result = healthAgeResult {
@@ -311,16 +307,28 @@ struct DashboardView: View {
     private func ouraScoreDiscRow(total: Int, sleep: Int?, activity: Int?, readiness: Int?) -> some View {
         HStack(spacing: 0) {
             if let sleep {
-                ouraScoreDisc(icon: "moon.fill", iconColor: PulseTheme.sleepViolet, label: String(localized: "Sleep"), value: sleep)
+                NavigationLink(destination: SleepDetailView()) {
+                    ouraScoreDisc(icon: "moon.fill", iconColor: PulseTheme.sleepViolet, label: String(localized: "睡眠"), value: sleep)
+                }
+                .buttonStyle(.plain)
             }
             if let activity {
-                ouraScoreDisc(icon: "figure.run", iconColor: PulseTheme.activityCoral, label: String(localized: "Activity"), value: activity)
+                NavigationLink(destination: ActivityDetailView()) {
+                    ouraScoreDisc(icon: "figure.run", iconColor: PulseTheme.activityCoral, label: String(localized: "活动"), value: activity)
+                }
+                .buttonStyle(.plain)
             }
-            // HRV as third disc — more useful than repeating readiness
+            // HRV disc
             if let hrv = currentHRV {
-                ouraScoreDisc(icon: "waveform.path.ecg", iconColor: PulseTheme.accentTeal, label: "HRV", value: Int(hrv), unit: "ms")
+                NavigationLink(destination: HRVDetailView()) {
+                    ouraScoreDisc(icon: "waveform.path.ecg", iconColor: PulseTheme.accentTeal, label: "HRV", value: Int(hrv), unit: "ms")
+                }
+                .buttonStyle(.plain)
             } else if let hr = currentHeartRate {
-                ouraScoreDisc(icon: "heart.fill", iconColor: Color(hex: "FF6B6B"), label: String(localized: "Heart Rate"), value: Int(hr), unit: "bpm")
+                NavigationLink(destination: HeartRateDetailView()) {
+                    ouraScoreDisc(icon: "heart.fill", iconColor: Color(hex: "FF6B6B"), label: String(localized: "心率"), value: Int(hr), unit: "bpm")
+                }
+                .buttonStyle(.plain)
             }
         }
         .padding(.horizontal, 8)

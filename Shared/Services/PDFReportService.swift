@@ -251,14 +251,13 @@ final class PDFReportService {
         let fmt = DateFormatter()
         fmt.dateFormat = "M/d"
 
-        let values = [
-            fmt.string(from: s.date),
-            s.dailyScore.map { "\($0)" } ?? "—",
-            s.restingHeartRate.map { String(format: "%.0f", $0) } ?? "—",
-            s.averageHRV.map { String(format: "%.0f", $0) } ?? "—",
-            s.sleepDurationMinutes.map { String(format: "%.1fh", Double($0) / 60.0) } ?? "—",
-            s.totalSteps.map { "\($0)" } ?? "—"
-        ]
+        var values: [String] = []
+        values.append(fmt.string(from: s.date))
+        values.append(s.dailyScore.map { "\($0)" } ?? "—")
+        values.append(s.restingHeartRate.map { String(format: "%.0f", $0) } ?? "—")
+        values.append(s.averageHRV.map { String(format: "%.0f", $0) } ?? "—")
+        values.append(s.sleepDurationMinutes.map { String(format: "%.1fh", Double($0) / 60.0) } ?? "—")
+        values.append(s.totalSteps.map { "\($0)" } ?? "—")
 
         let attrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 9, weight: .regular),

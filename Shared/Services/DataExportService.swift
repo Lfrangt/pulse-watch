@@ -14,19 +14,25 @@ final class DataExportService {
         var csv = "date,averageHeartRate,minHeartRate,maxHeartRate,restingHeartRate,averageHRV,averageBloodOxygen,minBloodOxygen,totalSteps,activeCalories,restingCalories,exerciseMinutes,sleepDurationMinutes,deepSleepMinutes,remSleepMinutes,coreSleepMinutes,dailyScore\n"
 
         for s in summaries.sorted(by: { $0.date < $1.date }) {
-            csv += [
-                s.dateString,
-                optStr(s.averageHeartRate), optStr(s.minHeartRate), optStr(s.maxHeartRate),
-                optStr(s.restingHeartRate), optStr(s.averageHRV),
-                optStr(s.averageBloodOxygen), optStr(s.minBloodOxygen),
-                s.totalSteps.map(String.init) ?? "",
-                optStr(s.activeCalories), optStr(s.restingCalories), optStr(s.exerciseMinutes),
-                s.sleepDurationMinutes.map(String.init) ?? "",
-                s.deepSleepMinutes.map(String.init) ?? "",
-                s.remSleepMinutes.map(String.init) ?? "",
-                s.coreSleepMinutes.map(String.init) ?? "",
-                s.dailyScore.map(String.init) ?? ""
-            ].joined(separator: ",") + "\n"
+            var row: [String] = []
+            row.append(s.dateString)
+            row.append(optStr(s.averageHeartRate))
+            row.append(optStr(s.minHeartRate))
+            row.append(optStr(s.maxHeartRate))
+            row.append(optStr(s.restingHeartRate))
+            row.append(optStr(s.averageHRV))
+            row.append(optStr(s.averageBloodOxygen))
+            row.append(optStr(s.minBloodOxygen))
+            row.append(s.totalSteps.map { String($0) } ?? "")
+            row.append(optStr(s.activeCalories))
+            row.append(optStr(s.restingCalories))
+            row.append(optStr(s.exerciseMinutes))
+            row.append(s.sleepDurationMinutes.map { String($0) } ?? "")
+            row.append(s.deepSleepMinutes.map { String($0) } ?? "")
+            row.append(s.remSleepMinutes.map { String($0) } ?? "")
+            row.append(s.coreSleepMinutes.map { String($0) } ?? "")
+            row.append(s.dailyScore.map { String($0) } ?? "")
+            csv += row.joined(separator: ",") + "\n"
         }
 
         let url = tempURL("pulse-daily-health.csv")

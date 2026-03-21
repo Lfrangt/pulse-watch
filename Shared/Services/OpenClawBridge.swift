@@ -918,10 +918,7 @@ final class OpenClawBridge {
 
         let body: [String: Any] = [
             "model": cfg.agentID,
-            "input": """
-            PULSE_PENDING_QUERY: Read ~/workspace/pulse-pending-workouts.json and return its raw JSON content only. \
-            Then clear it with: echo '{"pending":[]}' > ~/workspace/pulse-pending-workouts.json
-            """,
+            "input": "PULSE_PENDING_QUERY: Read ~/workspace/pulse-pending-workouts.json and return ONLY the raw JSON content. Do NOT clear or modify the file.",
             "max_output_tokens": 1024
         ]
 
@@ -965,6 +962,24 @@ final class OpenClawBridge {
         }
 
         logger.info("fetchPendingQueue: 获取到 \(q.pending.count) 条待写入记录")
+
+        // App 自己清空 — 通过另一个 /v1/responses 请求让 agent 执行清空
+        Task {
+            let clearBody: [String: Any] = [
+                "model": cfg.agentID,
+                "input": "PULSE_CLEAR_QUEUE: Run this command: echo '{\"pending\":[]}' > ~/workspace/pulse-pending-workouts.json",
+                "max_output_tokens": 50
+            ]
+            var clearReq = URLRequest(url: url)
+            clearReq.httpMethod = "POST"
+            clearReq.setValue("Bearer \(cfg.token)", forHTTPHeaderField: "Authorization")
+            clearReq.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            clearReq.httpBody = try? JSONSerialization.data(withJSONObject: clearBody)
+            clearReq.timeoutInterval = 15
+            _ = try? await session.data(for: clearReq)
+            logger.info("fetchPendingQueue: 队列已清空")
+        }
+
         return q.pending
     }
 

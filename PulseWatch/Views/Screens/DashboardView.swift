@@ -81,10 +81,13 @@ struct DashboardView: View {
                         )
                         .staggered(index: 4)
 
-                        // Health Age — compact, lower priority
+                        // Health Age — compact, tap to detail
                         if let result = healthAgeResult {
-                            healthAgeCardCompact(result: result)
-                                .staggered(index: 5)
+                            NavigationLink(destination: HealthAgeDetailView(result: result)) {
+                                healthAgeCardCompact(result: result)
+                            }
+                            .buttonStyle(.plain)
+                            .staggered(index: 5)
                         }
 
                         // Recovery timeline

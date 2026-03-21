@@ -50,58 +50,116 @@ struct ScoreEngine {
     }
     
     // MARK: - Score Calculation
-    
+    //
+    // Weighted average of 4 components — realistic, hard to max out.
+    // Each component scores 0-100, final = weighted sum.
+    // Weights: HRV 35% | Sleep 30% | RHR 25% | SpO2 10%
+    //
+    // Design goal: genuinely excellent metrics → 88-92
+    //              good metrics → 70-82
+    //              average → 55-68
+    //              poor → below 50
+
     private static func calculateScore(
         hrv: Double?,
         restingHR: Double?,
         bloodOxygen: Double?,
         sleepMinutes: Int
     ) -> Int {
-        var score = 50
-        
-        if let hrv {
-            if hrv > 65 { score += 20 }
-            else if hrv > 45 { score += 10 }
-            else if hrv > 30 { score += 0 }
-            else { score -= 15 }
+
+        // HRV component (35%) — higher = better
+        // Young adult population ranges: ~20-120ms, median ~50ms
+        let hrvScore: Double = {
+            guard let hrv else { return 55 } // no data → average
+            switch hrv {
+            case ..<20:   return 10
+            case 20..<30: return 28
+            case 30..<40: return 45
+            case 40..<50: return 60
+            case 50..<62: return 72
+            case 62..<75: return 82
+            case 75..<90: return 88
+            case 90..<110: return 93
+            default:      return 96 // >110ms — elite
+            }
+        }()
+
+        // RHR component (25%) — lower = better, but <40 may indicate overtraining
+        let rhrScore: Double = {
+            guard let rhr = restingHR else { return 55 }
+            switch rhr {
+            case ..<40:    return 78 // possibly overtraining
+            case 40..<48:  return 92 // elite
+            case 48..<55:  return 85 // very good
+            case 55..<63:  return 72 // good
+            case 63..<70:  return 60 // average
+            case 70..<78:  return 45 // below average
+            case 78..<88:  return 28
+            default:       return 15
+            }
+        }()
+
+        // Sleep component (30%) — optimal 7-8.5h, penalise both short and long
+        let sleepScore: Double = {
+            guard sleepMinutes > 0 else { return 30 }
+            let h = Double(sleepMinutes) / 60.0
+            switch h {
+            case ..<5.0:       return 15
+            case 5.0..<6.0:    return 35
+            case 6.0..<6.5:    return 52
+            case 6.5..<7.0:    return 67
+            case 7.0..<7.5:    return 80
+            case 7.5..<8.5:    return 90 // optimal window
+            case 8.5..<9.5:    return 78 // slightly long
+            default:           return 60 // oversleeping
+            }
+        }()
+
+        // SpO2 component (10%) — mostly binary
+        let spo2Score: Double = {
+            guard let spo2 = bloodOxygen else { return 78 }
+            switch spo2 {
+            case 98...:     return 100
+            case 96..<98:   return 88
+            case 94..<96:   return 65
+            case 92..<94:   return 38
+            default:        return 18
+            }
+        }()
+
+        let raw = hrvScore * 0.35 + rhrScore * 0.25 + sleepScore * 0.30 + spo2Score * 0.10
+
+        // Apply a soft ceiling: scores above 85 are progressively harder
+        let adjusted: Double
+        if raw > 85 {
+            adjusted = 85 + (raw - 85) * 0.45
+        } else {
+            adjusted = raw
         }
-        
-        if let rhr = restingHR {
-            if rhr < 55 { score += 10 }
-            else if rhr < 65 { score += 5 }
-            else if rhr > 80 { score -= 10 }
-        }
-        
-        if sleepMinutes >= 450 { score += 15 }       // 7.5h+
-        else if sleepMinutes >= 390 { score += 10 }   // 6.5h+
-        else if sleepMinutes >= 330 { score += 0 }     // 5.5h+
-        else { score -= 15 }
-        
-        if let spo2 = bloodOxygen {
-            if spo2 >= 97 { score += 5 }
-            else if spo2 < 93 { score -= 10 }
-        }
-        
-        return max(0, min(100, score))
+
+        return max(0, min(100, Int(adjusted.rounded())))
     }
     
     // MARK: - Insight Generation
     
     private static func generateInsight(score: Int, hrv: Double?, sleepMinutes: Int) -> String {
-        if score >= 80 {
-            return String(localized: "Great recovery — go hard today")
-        } else if score >= 60 {
-            if sleepMinutes < 360 {
-                return String(localized: "Sleep deficit — try to catch up today")
+        switch score {
+        case 88...:
+            return "恢复极佳，今天可以全力冲"
+        case 78..<88:
+            return "状态很好，按计划训练"
+        case 65..<78:
+            if sleepMinutes < 390 {
+                return "睡眠不足，适度训练，今晚早点休息"
             }
-            return String(localized: "Looking good — train as planned")
-        } else if score >= 40 {
-            if let hrv, hrv < 30 {
-                return String(localized: "HRV low — try light activity or rest")
+            return "恢复良好，中等强度训练"
+        case 50..<65:
+            if let hrv, hrv < 35 {
+                return "HRV 偏低，以恢复为主，避免高强度"
             }
-            return String(localized: "Still recovering — avoid high intensity")
-        } else {
-            return String(localized: "Your body needs rest — don't push it")
+            return "身体还在恢复，轻松活动即可"
+        default:
+            return "今天需要充分休息，不要强撑训练"
         }
     }
     

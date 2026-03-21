@@ -102,18 +102,20 @@ struct HistoryView: View {
         case week = "7D"
         case month = "30D"
         case quarter = "90D"
+        case all = "All"
 
         var days: Int {
             switch self {
             case .week: return 7
             case .month: return 30
             case .quarter: return 90
+            case .all: return 365 * 3  // 3 年上限
             }
         }
 
         /// 是否需要按周聚合（避免图表过密）
         var shouldAggregate: Bool {
-            self == .quarter
+            self == .quarter || self == .all
         }
 
         var xAxisStride: Int {
@@ -121,6 +123,7 @@ struct HistoryView: View {
             case .week: return 1
             case .month: return 5
             case .quarter: return 14
+            case .all: return 30
             }
         }
     }

@@ -37,3 +37,4 @@ fastlane/README.md
 vendor/bundle
 .bundle
 Gemfile.lock
+.gstack/

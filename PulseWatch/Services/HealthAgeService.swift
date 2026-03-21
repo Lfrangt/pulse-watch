@@ -236,9 +236,12 @@ final class HealthAgeService {
         metrics.append(MetricScore(metric: .activeMinutes, value: avgActiveMin, ageImpact: activeImpact, advice: activeAdvice))
 
         let healthAge = Double(actualAge) + totalImpact
-        // 总影响限 ±5 年，最低不低于 16 岁
-        let lowerBound = max(16.0, Double(actualAge) - 5)
-        let upperBound = Double(actualAge) + 5
+        // 按年龄比例限制：年轻人生理储备小，改善空间有限
+        // 19岁最多年轻 ~2.8年；40岁最多年轻 ~6年；80岁最多年轻 ~12年
+        let maxImprovement = Double(actualAge) * 0.15  // 最多年轻 15%
+        let maxDeterioration = Double(actualAge) * 0.20 // 最多偏老 20%
+        let lowerBound = Double(actualAge) - maxImprovement
+        let upperBound = Double(actualAge) + maxDeterioration
         let clampedAge = max(lowerBound, min(upperBound, healthAge))
 
         return HealthAgeResult(

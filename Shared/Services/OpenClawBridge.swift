@@ -314,13 +314,27 @@ final class OpenClawBridge {
         [HEALTH_DATA]
         \(healthSyncJSON)
         [/HEALTH_DATA]
-        Analyze the health data above. Provide a daily health summary and training advice. Reply in JSON with fields: morningBrief, trainingAdvice, alerts, recoveryScore, summary.
+
+        This is an automated health sync from the user's PulseWatch app.
+
+        REQUIRED: Reply ONLY with a JSON object with these fields:
+        {
+          "morningBrief": "string or null",
+          "trainingAdvice": "string or null",
+          "alerts": [],
+          "recoveryScore": number or null,
+          "summary": "string or null",
+          "pendingWorkouts": []
+        }
+
+        For the "pendingWorkouts" field: read the file at ~/workspace/pulse-pending-workouts.json using the exec tool, extract the "pending" array, and include it in your reply. After including it, clear the file with: echo '{"pending":[]}' > ~/workspace/pulse-pending-workouts.json
+        If the file is empty or doesn't exist, use [].
         """
 
         let body: [String: Any] = [
             "model": cfg.agentID,
             "messages": [
-                ["role": "system", "content": "You are Pulse Coach, a personal health coach. The user's PulseWatch app sends you their HealthKit data in health_sync format. Analyze it and provide insights, morning briefs, and training advice. Reply in JSON."],
+                ["role": "system", "content": "You are Pulse Coach. When you receive a health_sync message, you MUST: 1) Read ~/workspace/pulse-pending-workouts.json with exec tool 2) Include its pending[] array in pendingWorkouts field of your JSON reply 3) Clear the file after reading. Always reply with valid JSON only, no markdown."],
                 ["role": "user", "content": messageContent]
             ],
             "max_tokens": 1024
@@ -875,69 +889,15 @@ final class OpenClawBridge {
     }
     #endif
 
-    // MARK: - Pending Queue 主动拉取
+    // MARK: - Pending Queue 主动拉取（通过 agent exec 工具）
 
-    /// 通过 Gateway API 读取 workspace 的 pending queue 文件并处理
+    /// health sync prompt 已要求 agent 读取并返回 pendingWorkouts
+    /// 此处仅作为备用：如果 agent 回复里没有，由 agent 在下次 sync 处理
     @MainActor
     private func fetchAndProcessPendingQueue(cfg: PulseOpenClawConfig) async {
-        let base = cfg.gatewayURL.hasSuffix("/") ? String(cfg.gatewayURL.dropLast()) : cfg.gatewayURL
-        let pendingPath = "workspace/pulse-pending-workouts.json"
-
-        // OpenClaw Gateway: GET /v1/files/read?path=<path>
-        guard let url = URL(string: "\(base)/v1/files/read?path=\(pendingPath)") else { return }
-
-        var req = URLRequest(url: url)
-        req.httpMethod = "GET"
-        req.setValue("Bearer \(cfg.token)", forHTTPHeaderField: "Authorization")
-        req.timeoutInterval = 10
-
-        guard let (data, resp) = try? await session.data(for: req),
-              let http = resp as? HTTPURLResponse,
-              (200..<300).contains(http.statusCode) else {
-            logger.debug("fetchPendingQueue: 文件读取失败或不存在")
-            return
-        }
-
-        struct PendingQueue: Codable {
-            let pending: [PendingWorkoutEntry]
-        }
-
-        guard let queue = try? JSONDecoder().decode(PendingQueue.self, from: data),
-              !queue.pending.isEmpty else {
-            return
-        }
-
-        logger.info("fetchPendingQueue: 发现 \(queue.pending.count) 条待写入记录")
-        await processPendingWorkouts(queue.pending)
-
-        // 清空已处理的队列
-        await clearPendingQueue(cfg: cfg, processedIDs: queue.pending.map(\.id))
-    }
-
-    /// 清空已处理的 pending queue
-    @MainActor
-    private func clearPendingQueue(cfg: PulseOpenClawConfig, processedIDs: [String]) async {
-        let base = cfg.gatewayURL.hasSuffix("/") ? String(cfg.gatewayURL.dropLast()) : cfg.gatewayURL
-        guard let url = URL(string: "\(base)/v1/files/write") else { return }
-
-        let emptyQueue = #"{"pending":[]}"#
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.setValue("Bearer \(cfg.token)", forHTTPHeaderField: "Authorization")
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let body: [String: Any] = [
-            "path": "workspace/pulse-pending-workouts.json",
-            "content": emptyQueue
-        ]
-        req.httpBody = try? JSONSerialization.data(withJSONObject: body)
-        req.timeoutInterval = 10
-
-        if let (_, resp) = try? await session.data(for: req),
-           let http = resp as? HTTPURLResponse,
-           (200..<300).contains(http.statusCode) {
-            logger.info("clearPendingQueue: 队列已清空")
-        }
+        // Agent 已通过 exec 工具读取并在 JSON 回复里携带 pendingWorkouts
+        // 此方法保留为 no-op，实际处理在 parseAgentResponse 后执行
+        logger.debug("fetchAndProcessPendingQueue: 由 agent 在回复中处理 pendingWorkouts")
     }
 
     // MARK: - Pending Workouts 处理

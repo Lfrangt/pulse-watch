@@ -195,8 +195,15 @@ struct WorkoutHistoryListView: View {
                         .foregroundStyle(color)
                 }
 
-                // 手动添加标识
-                if entry.isManual {
+                // OpenClaw AI 写入标识
+                if entry.sourceName == "OpenClaw" {
+                    Image(systemName: "cpu.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(PulseTheme.accentTeal)
+                        .background(Circle().fill(PulseTheme.cardBackground).frame(width: 15, height: 15))
+                        .offset(x: 3, y: 3)
+                } else if entry.isManual {
+                    // 手动添加标识
                     Image(systemName: "pencil.circle.fill")
                         .font(.system(size: 12))
                         .foregroundStyle(PulseTheme.accent)
@@ -207,9 +214,18 @@ struct WorkoutHistoryListView: View {
 
             // 名称 + 日期 + 肌群 badge
             VStack(alignment: .leading, spacing: 4) {
-                Text(entry.activityName)
-                    .font(PulseTheme.bodyFont.weight(.medium))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                HStack(spacing: 5) {
+                    Text(entry.activityName)
+                        .font(PulseTheme.bodyFont.weight(.medium))
+                        .foregroundStyle(PulseTheme.textPrimary)
+                    if entry.sourceName == "OpenClaw" {
+                        Text("AI")
+                            .font(.system(size: 9, weight: .bold, design: .rounded))
+                            .foregroundStyle(PulseTheme.accentTeal)
+                            .padding(.horizontal, 5).padding(.vertical, 2)
+                            .background(Capsule().fill(PulseTheme.accentTeal.opacity(0.13)))
+                    }
+                }
 
                 Text(formatRelativeDate(entry.startDate))
                     .font(PulseTheme.captionFont)

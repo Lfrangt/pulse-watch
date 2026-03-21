@@ -105,12 +105,26 @@ struct WorkoutHistoryDetailView: View {
             }
 
             // 运动名称
-            Text(entry.activityName)
-                .font(.system(size: 24, weight: .semibold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
-                .minimumScaleFactor(0.7)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
+            VStack(spacing: 6) {
+                Text(entry.activityName)
+                    .font(.system(size: 24, weight: .semibold, design: .rounded))
+                    .foregroundStyle(PulseTheme.textPrimary)
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+
+                if entry.sourceName == "OpenClaw" {
+                    HStack(spacing: 5) {
+                        Image(systemName: "cpu.fill")
+                            .font(.system(size: 10))
+                        Text("由 OpenClaw AI 记录")
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                    }
+                    .foregroundStyle(PulseTheme.accentTeal)
+                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .background(Capsule().fill(PulseTheme.accentTeal.opacity(0.12)))
+                }
+            }
 
             // 日期时间
             Text(formatFullDate(entry.startDate))

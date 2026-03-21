@@ -347,14 +347,17 @@ struct HistoryView: View {
                 .opacity(chartAnimated ? 1 : 0)
                 .animation(.easeOut(duration: 1.0), value: chartAnimated)
             } else {
-                // 30D / 90D — Range bar chart (weekly/monthly aggregation)
+                // 30D / 90D — try weekly/monthly candles, fallback to daily line
                 let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
                 let rawData = data.map { (date: $0.date, value: Double($0.score)) }
                 let candles = aggregateToCandlePoints(from: rawData, groupBy: groupBy)
-                if candles.isEmpty {
-                    emptyChartPlaceholder
-                } else {
+                if candles.count >= 3 {
                     rangeBarChart(candles: candles, color: PulseTheme.accentTeal, yLabel: "")
+                } else if !rawData.isEmpty {
+                    // 数据不足以聚合 — 直接展示每日折线
+                    dailyLineChart(data: rawData, color: PulseTheme.accentTeal, yLabel: "")
+                } else {
+                    emptyChartPlaceholder
                 }
             }
         }
@@ -421,10 +424,12 @@ struct HistoryView: View {
                 let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
                 let rawData = data.map { (date: $0.date, value: $0.resting) }
                 let candles = aggregateToCandlePoints(from: rawData, groupBy: groupBy)
-                if candles.isEmpty {
-                    emptyChartPlaceholder
-                } else {
+                if candles.count >= 3 {
                     rangeBarChart(candles: candles, color: hrColor, yLabel: "bpm")
+                } else if !rawData.isEmpty {
+                    dailyLineChart(data: rawData, color: hrColor, yLabel: "bpm")
+                } else {
+                    emptyChartPlaceholder
                 }
             }
         }
@@ -484,10 +489,12 @@ struct HistoryView: View {
             } else {
                 let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
                 let candles = aggregateToCandlePoints(from: data, groupBy: groupBy)
-                if candles.count < 2 {
-                    emptyChartPlaceholder
-                } else {
+                if candles.count >= 3 {
                     rangeBarChart(candles: candles, color: hrvColor, yLabel: "ms")
+                } else if !data.isEmpty {
+                    dailyLineChart(data: data, color: hrvColor, yLabel: "ms")
+                } else {
+                    emptyChartPlaceholder
                 }
             }
         }
@@ -745,6 +752,68 @@ struct HistoryView: View {
             )
         }
         .buttonStyle(.plain)
+    }
+
+    // MARK: - Daily Line Chart (fallback when not enough data to aggregate)
+
+    @ViewBuilder
+    private func dailyLineChart(data: [(date: Date, value: Double)], color: Color, yLabel: String) -> some View {
+        let vals = data.map(\.value)
+        let lo = (vals.min() ?? 0)
+        let hi = (vals.max() ?? 100)
+        let pad = max((hi - lo) * 0.2, 3)
+
+        VStack(alignment: .leading, spacing: 8) {
+            Chart(data, id: \.date) { item in
+                AreaMark(
+                    x: .value("Date", item.date),
+                    yStart: .value("Base", lo - pad),
+                    yEnd: .value("Value", item.value)
+                )
+                .foregroundStyle(LinearGradient(
+                    colors: [color.opacity(0.2), color.opacity(0.03)],
+                    startPoint: .top, endPoint: .bottom
+                ))
+                .interpolationMethod(.catmullRom)
+
+                LineMark(
+                    x: .value("Date", item.date),
+                    y: .value("Value", item.value)
+                )
+                .foregroundStyle(color)
+                .lineStyle(StrokeStyle(lineWidth: 2.5))
+                .interpolationMethod(.catmullRom)
+                .symbol { Circle().fill(color).frame(width: 6, height: 6) }
+            }
+            .chartYScale(domain: (lo - pad)...(hi + pad))
+            .chartYAxis {
+                AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { _ in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
+                        .foregroundStyle(Color.white.opacity(0.07))
+                    AxisValueLabel()
+                        .font(.system(size: 9, design: .rounded))
+                        .foregroundStyle(Color.white.opacity(0.4))
+                }
+            }
+            .chartXAxis {
+                AxisMarks(values: .automatic(desiredCount: min(data.count, 6))) { _ in
+                    AxisValueLabel(format: .dateTime.month(.defaultDigits).day())
+                        .font(.system(size: 9))
+                        .foregroundStyle(Color.white.opacity(0.4))
+                }
+            }
+            .frame(height: 180)
+            .opacity(chartAnimated ? 1 : 0)
+            .animation(.easeOut(duration: 1.0), value: chartAnimated)
+
+            // Data range note
+            if let first = data.first, let last = data.last {
+                let days = Calendar.current.dateComponents([.day], from: first.date, to: last.date).day ?? 0
+                Text("显示 \(data.count) 天数据（\(days + 1)天跨度），积累更多数据后将显示趋势聚合图")
+                    .font(.system(size: 10))
+                    .foregroundStyle(.white.opacity(0.3))
+            }
+        }
     }
 
     // MARK: - Range Bar Chart (30D/90D aggregated)

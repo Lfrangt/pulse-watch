@@ -751,61 +751,97 @@ struct HistoryView: View {
 
     @ViewBuilder
     private func rangeBarChart(candles: [CandlePoint], color: Color, yLabel: String) -> some View {
-        let lo = (candles.map(\.low).min() ?? 0)
-        let hi = (candles.map(\.high).max() ?? 100)
-        let pad = max((hi - lo) * 0.15, 3)
+        let avgs = candles.map(\.avg)
+        let lo = (avgs.min() ?? 0)
+        let hi = (avgs.max() ?? 100)
+        let spread = max(hi - lo, 5.0)
+        let pad = spread * 0.25
+        let unit: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
+        let xFormat: Date.FormatStyle = selectedRange == .month
+            ? .dateTime.month(.defaultDigits).day()
+            : .dateTime.month(.abbreviated)
 
-        Chart(candles) { c in
-            // High-Low range bar
-            RectangleMark(
-                x: .value("Date", c.date, unit: selectedRange == .month ? .weekOfYear : .month),
-                yStart: .value("Low", c.low),
-                yEnd: .value("High", c.high),
-                width: .ratio(0.35)
-            )
-            .foregroundStyle(c.isUp ? color.opacity(0.25) : Color(hex: "FF6B6B").opacity(0.25))
-            .cornerRadius(3)
+        VStack(alignment: .leading, spacing: 8) {
+            Chart(candles) { c in
+                // Shaded range band (high-low)
+                AreaMark(
+                    x: .value("Date", c.date, unit: unit),
+                    yStart: .value("Low", c.low),
+                    yEnd: .value("High", c.high)
+                )
+                .foregroundStyle(color.opacity(0.08))
+                .interpolationMethod(.catmullRom)
 
-            // Open-Close body
-            RectangleMark(
-                x: .value("Date", c.date, unit: selectedRange == .month ? .weekOfYear : .month),
-                yStart: .value("Open", min(c.open, c.close)),
-                yEnd: .value("Close", max(c.open, c.close)),
-                width: .ratio(0.35)
-            )
-            .foregroundStyle(c.isUp ? color.opacity(0.85) : Color(hex: "FF6B6B").opacity(0.85))
-            .cornerRadius(3)
+                // Avg trend line — primary visual
+                LineMark(
+                    x: .value("Date", c.date, unit: unit),
+                    y: .value("Avg", c.avg)
+                )
+                .foregroundStyle(color)
+                .lineStyle(StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                .interpolationMethod(.catmullRom)
+                .symbol {
+                    Circle()
+                        .fill(c.isUp ? color : Color(hex: "FF6B6B"))
+                        .frame(width: 7, height: 7)
+                        .shadow(color: (c.isUp ? color : Color(hex: "FF6B6B")).opacity(0.5), radius: 3)
+                }
 
-            // Avg line
-            LineMark(
-                x: .value("Date", c.date, unit: selectedRange == .month ? .weekOfYear : .month),
-                y: .value("Avg", c.avg)
-            )
-            .foregroundStyle(color.opacity(0.6))
-            .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
-        }
-        .chartYScale(domain: (lo - pad)...(hi + pad))
-        .chartYAxis {
-            AxisMarks(position: .leading) { _ in
-                AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
-                    .foregroundStyle(Color.white.opacity(0.07))
-                AxisValueLabel()
-                    .font(.system(size: 9))
-                    .foregroundStyle(Color.white.opacity(0.4))
+                // Subtle area fill under avg line
+                AreaMark(
+                    x: .value("Date", c.date, unit: unit),
+                    y: .value("Avg", c.avg)
+                )
+                .foregroundStyle(LinearGradient(
+                    colors: [color.opacity(0.18), color.opacity(0.02)],
+                    startPoint: .top, endPoint: .bottom
+                ))
+                .interpolationMethod(.catmullRom)
+            }
+            .chartYScale(domain: (lo - pad)...(hi + pad))
+            .chartYAxis {
+                AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { _ in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
+                        .foregroundStyle(Color.white.opacity(0.07))
+                    AxisValueLabel()
+                        .font(.system(size: 9, design: .rounded))
+                        .foregroundStyle(Color.white.opacity(0.4))
+                }
+            }
+            .chartXAxis {
+                AxisMarks { _ in
+                    AxisValueLabel(format: xFormat)
+                        .font(.system(size: 9))
+                        .foregroundStyle(Color.white.opacity(0.4))
+                }
+            }
+            .frame(height: 180)
+            .opacity(chartAnimated ? 1 : 0)
+            .animation(.easeOut(duration: 1.0), value: chartAnimated)
+
+            // Period summary row
+            if candles.count >= 2 {
+                let first = candles.first!.avg
+                let last = candles.last!.avg
+                let delta = last - first
+                let pct = first > 0 ? (delta / first) * 100 : 0
+                let isUp = delta >= 0
+
+                HStack(spacing: 6) {
+                    Image(systemName: isUp ? "arrow.up.right" : "arrow.down.right")
+                        .font(.system(size: 10, weight: .bold))
+                    Text(String(format: "%@%.1f%@ (%@%.0f%%)",
+                                isUp ? "+" : "", delta, yLabel.isEmpty ? "" : " \(yLabel)",
+                                isUp ? "+" : "", pct))
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    Text(selectedRange == .month ? "vs 30天前" : "vs 90天前")
+                        .font(.system(size: 11, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.4))
+                }
+                .foregroundStyle(isUp ? color : Color(hex: "FF6B6B"))
+                .padding(.leading, 4)
             }
         }
-        .chartXAxis {
-            AxisMarks { _ in
-                AxisValueLabel(format: selectedRange == .month
-                    ? .dateTime.month(.defaultDigits).day()
-                    : .dateTime.month(.abbreviated))
-                    .font(.system(size: 9))
-                    .foregroundStyle(Color.white.opacity(0.4))
-            }
-        }
-        .frame(height: 180)
-        .opacity(chartAnimated ? 1 : 0)
-        .animation(.easeOut(duration: 1.0), value: chartAnimated)
     }
 
     // MARK: - 通用图表卡片容器

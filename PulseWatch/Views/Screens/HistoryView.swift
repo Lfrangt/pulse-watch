@@ -354,21 +354,14 @@ struct HistoryView: View {
                 .opacity(chartAnimated ? 1 : 0)
                 .animation(.easeOut(duration: 1.0), value: chartAnimated)
             } else {
-                // 30D / 90D — K 线图
+                // 30D / 90D — Range bar chart (weekly/monthly aggregation)
                 let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
                 let rawData = data.map { (date: $0.date, value: Double($0.score)) }
                 let candles = aggregateToCandlePoints(from: rawData, groupBy: groupBy)
-                if candles.count < 2 {
+                if candles.isEmpty {
                     emptyChartPlaceholder
                 } else {
-                    CandlestickChartView(
-                        candles: candles,
-                        color: PulseTheme.accentTeal,
-                        yLabel: "",
-                        animated: chartAnimated
-                    )
-                    .frame(height: 200)
-                    .padding(.top, 24)
+                    rangeBarChart(candles: candles, color: PulseTheme.accentTeal, yLabel: "")
                 }
             }
         }
@@ -435,12 +428,10 @@ struct HistoryView: View {
                 let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
                 let rawData = data.map { (date: $0.date, value: $0.resting) }
                 let candles = aggregateToCandlePoints(from: rawData, groupBy: groupBy)
-                if candles.count < 2 {
+                if candles.isEmpty {
                     emptyChartPlaceholder
                 } else {
-                    CandlestickChartView(candles: candles, color: hrColor, yLabel: "", animated: chartAnimated)
-                        .frame(height: 200)
-                        .padding(.top, 24)
+                    rangeBarChart(candles: candles, color: hrColor, yLabel: "bpm")
                 }
             }
         }
@@ -503,9 +494,7 @@ struct HistoryView: View {
                 if candles.count < 2 {
                     emptyChartPlaceholder
                 } else {
-                    CandlestickChartView(candles: candles, color: hrvColor, yLabel: "ms", animated: chartAnimated)
-                        .frame(height: 200)
-                        .padding(.top, 24)
+                    rangeBarChart(candles: candles, color: hrvColor, yLabel: "ms")
                 }
             }
         }
@@ -763,6 +752,67 @@ struct HistoryView: View {
             )
         }
         .buttonStyle(.plain)
+    }
+
+    // MARK: - Range Bar Chart (30D/90D aggregated)
+
+    @ViewBuilder
+    private func rangeBarChart(candles: [CandlePoint], color: Color, yLabel: String) -> some View {
+        let lo = (candles.map(\.low).min() ?? 0)
+        let hi = (candles.map(\.high).max() ?? 100)
+        let pad = max((hi - lo) * 0.15, 3)
+
+        Chart(candles) { c in
+            // High-Low range bar
+            RectangleMark(
+                x: .value("Date", c.date, unit: selectedRange == .month ? .weekOfYear : .month),
+                yStart: .value("Low", c.low),
+                yEnd: .value("High", c.high),
+                width: .ratio(0.35)
+            )
+            .foregroundStyle(c.isUp ? color.opacity(0.25) : Color(hex: "FF6B6B").opacity(0.25))
+            .cornerRadius(3)
+
+            // Open-Close body
+            RectangleMark(
+                x: .value("Date", c.date, unit: selectedRange == .month ? .weekOfYear : .month),
+                yStart: .value("Open", min(c.open, c.close)),
+                yEnd: .value("Close", max(c.open, c.close)),
+                width: .ratio(0.35)
+            )
+            .foregroundStyle(c.isUp ? color.opacity(0.85) : Color(hex: "FF6B6B").opacity(0.85))
+            .cornerRadius(3)
+
+            // Avg line
+            LineMark(
+                x: .value("Date", c.date, unit: selectedRange == .month ? .weekOfYear : .month),
+                y: .value("Avg", c.avg)
+            )
+            .foregroundStyle(color.opacity(0.6))
+            .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
+        }
+        .chartYScale(domain: (lo - pad)...(hi + pad))
+        .chartYAxis {
+            AxisMarks(position: .leading) { _ in
+                AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
+                    .foregroundStyle(Color.white.opacity(0.07))
+                AxisValueLabel()
+                    .font(.system(size: 9))
+                    .foregroundStyle(Color.white.opacity(0.4))
+            }
+        }
+        .chartXAxis {
+            AxisMarks { _ in
+                AxisValueLabel(format: selectedRange == .month
+                    ? .dateTime.month(.defaultDigits).day()
+                    : .dateTime.month(.abbreviated))
+                    .font(.system(size: 9))
+                    .foregroundStyle(Color.white.opacity(0.4))
+            }
+        }
+        .frame(height: 180)
+        .opacity(chartAnimated ? 1 : 0)
+        .animation(.easeOut(duration: 1.0), value: chartAnimated)
     }
 
     // MARK: - 通用图表卡片容器

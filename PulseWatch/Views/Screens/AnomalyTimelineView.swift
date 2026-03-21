@@ -4,6 +4,7 @@ import SwiftData
 /// 异常事件时间线 — 按日期展示检测到的健康异常
 struct AnomalyTimelineView: View {
 
+    @AppStorage("pulse.demo.enabled") private var demoMode = false
     @Query(sort: \DailySummary.date, order: .reverse) private var allSummaries: [DailySummary]
     @State private var anomalyDays: [(date: Date, anomalies: [Anomaly])] = []
     @State private var isLoading = true
@@ -41,7 +42,12 @@ struct AnomalyTimelineView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .task {
-            await detectAnomalies()
+            if demoMode {
+                anomalyDays = DemoDataProvider.makeAnomalyDays()
+                isLoading = false
+            } else {
+                await detectAnomalies()
+            }
         }
     }
 
@@ -62,6 +68,7 @@ struct AnomalyTimelineView: View {
                 Text(String(localized: "健康异常时间线"))
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
                 Text(String(localized: "基于个人基线的标准差检测，非医学诊断"))
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)

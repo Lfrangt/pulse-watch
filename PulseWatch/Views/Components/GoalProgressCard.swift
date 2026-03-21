@@ -4,9 +4,8 @@ import SwiftData
 /// 目标进度卡片 — 在 Dashboard 显示活跃目标的完成进度
 struct GoalProgressCard: View {
 
-    let summaries: [DailySummary]
-    let workouts: [WorkoutHistoryEntry]
-
+    @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
+    @Query(sort: \WorkoutHistoryEntry.startDate, order: .reverse) private var allWorkouts: [WorkoutHistoryEntry]
     @Query(filter: #Predicate<HealthGoal> { $0.isActive }) private var activeGoals: [HealthGoal]
 
     var body: some View {
@@ -26,6 +25,7 @@ struct GoalProgressCard: View {
                     Text(String(localized: "今日目标"))
                         .font(PulseTheme.headlineFont)
                         .foregroundStyle(PulseTheme.textPrimary)
+                        .accessibilityAddTraits(.isHeader)
 
                     Spacer()
                 }
@@ -94,7 +94,7 @@ struct GoalProgressCard: View {
     private func currentProgress(for goal: HealthGoal) -> Double {
         let metric = GoalMetricType(rawValue: goal.metricType)
         let today = Calendar.current.startOfDay(for: .now)
-        let todaySummary = summaries.first { Calendar.current.isDate($0.date, inSameDayAs: today) }
+        let todaySummary = allSummaries.first { Calendar.current.isDate($0.date, inSameDayAs: today) }
 
         switch metric {
         case .steps:
@@ -106,7 +106,7 @@ struct GoalProgressCard: View {
         case .workoutCount:
             // 本周训练次数
             let weekStart = Calendar.current.date(from: Calendar.current.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today))!
-            return Double(workouts.filter { $0.startDate >= weekStart }.count)
+            return Double(allWorkouts.filter { $0.startDate >= weekStart }.count)
         case .none:
             return 0
         }

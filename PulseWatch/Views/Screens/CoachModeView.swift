@@ -5,6 +5,7 @@ import CoreImage.CIFilterBuiltins
 /// Coach Mode — 生成只读健康快照 QR 码，供教练/朋友扫描查看
 struct CoachModeView: View {
 
+    @AppStorage("pulse.demo.enabled") private var demoMode = false
     @Query(sort: \DailySummary.date, order: .reverse) private var summaries: [DailySummary]
     @State private var qrImage: UIImage?
     @State private var snapshotRendered: UIImage?
@@ -58,6 +59,7 @@ struct CoachModeView: View {
                 Text(String(localized: "教练模式"))
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
                 Text(String(localized: "生成健康快照分享给教练或朋友"))
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
@@ -69,9 +71,13 @@ struct CoachModeView: View {
 
     // MARK: - Status Card
 
+    private var currentInsight: HealthInsight {
+        demoMode ? DemoDataProvider.makeInsight() : HealthAnalyzer.shared.generateInsight()
+    }
+
     private var statusCard: some View {
         let today = summaries.first { Calendar.current.isDateInToday($0.date) }
-        let insight = HealthAnalyzer.shared.generateInsight()
+        let insight = currentInsight
 
         return VStack(spacing: PulseTheme.spacingM) {
             // 评分
@@ -142,6 +148,7 @@ struct CoachModeView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 200, height: 200)
+                    .accessibilityLabel(String(localized: "健康快照 QR 码"))
                     .background(
                         RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
                             .fill(.white)
@@ -207,7 +214,7 @@ struct CoachModeView: View {
 
     private func generateQRCode() {
         let today = summaries.first { Calendar.current.isDateInToday($0.date) }
-        let insight = HealthAnalyzer.shared.generateInsight()
+        let insight = currentInsight
 
         // 编码健康快照为 JSON → base64 → deep link
         let snapshot: [String: Any] = [
@@ -244,7 +251,7 @@ struct CoachModeView: View {
     @MainActor
     private func shareSnapshot() {
         let today = summaries.first { Calendar.current.isDateInToday($0.date) }
-        let insight = HealthAnalyzer.shared.generateInsight()
+        let insight = currentInsight
 
         let card = HealthSnapshotShareCard(
             score: insight.dailyScore,

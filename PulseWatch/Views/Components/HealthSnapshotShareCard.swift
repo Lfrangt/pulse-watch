@@ -129,6 +129,7 @@ struct HealthSnapshotShareCard: View {
 
 struct HealthSnapshotShareScreen: View {
 
+    @AppStorage("pulse.demo.enabled") private var demoMode = false
     @Query(sort: \DailySummary.date, order: .reverse) private var summaries: [DailySummary]
     @State private var selectedRatio: HealthSnapshotShareCard.CardRatio = .story
     @State private var renderedImage: UIImage?
@@ -185,7 +186,7 @@ struct HealthSnapshotShareScreen: View {
 
     private var cardView: some View {
         let summary = todaySummary
-        let insight = HealthAnalyzer.shared.generateInsight()
+        let insight = demoMode ? DemoDataProvider.makeInsight() : HealthAnalyzer.shared.generateInsight()
 
         return HealthSnapshotShareCard(
             score: insight.dailyScore,

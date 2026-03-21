@@ -79,6 +79,7 @@ struct ChallengeView: View {
                 Text(String(localized: "训练挑战"))
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
                 Text(String(localized: "设定挑战，每天打卡，养成习惯"))
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)

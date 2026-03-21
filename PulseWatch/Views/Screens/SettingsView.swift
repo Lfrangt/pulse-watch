@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import UserNotifications
 import HealthKit
+import UniformTypeIdentifiers
 
 /// 设置页面 — 控制通知、健身房、数据采集等
 struct SettingsView: View {
@@ -43,6 +44,8 @@ struct SettingsView: View {
     @State private var exportURL: URL?
     @State private var showExportShare = false
     @State private var exportError: String?
+    @State private var showImportPicker = false
+    @State private var importResult: ImportResult?
 
     @Query(filter: #Predicate<SavedLocation> { $0.locationType == "gym" && $0.isActive })
     private var gymLocations: [SavedLocation]
@@ -1221,6 +1224,35 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
             }
 
+            // 从备份恢复
+            settingRow {
+                Button {
+                    showImportPicker = true
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(String(localized: "从备份恢复"))
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(String(localized: "导入之前导出的 JSON 备份文件"))
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.down.doc")
+                            .font(.system(size: 14))
+                            .foregroundStyle(PulseTheme.accentTeal)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+
+            if let importResult = importResult {
+                Text(String(localized: "已导入 \(importResult.total) 条记录"))
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.accentTeal)
+            }
+
             if let error = exportError {
                 Text(error)
                     .font(PulseTheme.captionFont)
@@ -1231,6 +1263,20 @@ struct SettingsView: View {
         .sheet(isPresented: $showExportShare) {
             if let url = exportURL {
                 ShareSheet(items: [url])
+            }
+        }
+        .fileImporter(isPresented: $showImportPicker, allowedContentTypes: [.json]) { result in
+            switch result {
+            case .success(let url):
+                guard url.startAccessingSecurityScopedResource() else { return }
+                defer { url.stopAccessingSecurityScopedResource() }
+                do {
+                    importResult = try DataExportService.shared.importBackup(from: url, modelContext: modelContext)
+                } catch {
+                    exportError = error.localizedDescription
+                }
+            case .failure(let error):
+                exportError = error.localizedDescription
             }
         }
     }

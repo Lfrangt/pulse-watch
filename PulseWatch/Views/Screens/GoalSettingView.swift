@@ -68,6 +68,7 @@ struct GoalSettingView: View {
                 Text(String(localized: "健康目标"))
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
                 Text(String(localized: "设定目标，追踪每日进度"))
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)

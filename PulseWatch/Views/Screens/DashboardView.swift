@@ -105,7 +105,7 @@ struct DashboardView: View {
                         }
 
                         // Goal progress
-                        GoalProgressCard(summaries: allSummaries, workouts: [])
+                        GoalProgressCard()
                             .staggered(index: 7)
 
                         // Share snapshot button

@@ -126,4 +126,56 @@ enum DemoDataProvider {
             ("legs", cal.date(byAdding: .day, value: -7, to: now)!, 60),
         ]
     }
+
+    // MARK: - 相关性分析 Demo
+
+    static func makeCorrelations() -> [CorrelationResult] {
+        [
+            CorrelationResult(
+                metricA: .sleepDuration, metricB: .hrv,
+                coefficient: 0.62, sampleSize: 28,
+                insight: String(localized: "睡眠 ≥ 7h 时，HRV 平均高 18%")
+            ),
+            CorrelationResult(
+                metricA: .sleepDuration, metricB: .dailyScore,
+                coefficient: 0.55, sampleSize: 28,
+                insight: String(localized: "睡够 7h 的日子，评分平均高 12 分")
+            ),
+            CorrelationResult(
+                metricA: .restingHR, metricB: .hrv,
+                coefficient: -0.48, sampleSize: 28,
+                insight: String(localized: "静息心率越低，HRV 越高 — 心肺能力的体现")
+            ),
+            CorrelationResult(
+                metricA: .exerciseMinutes, metricB: .dailyScore,
+                coefficient: 0.35, sampleSize: 28,
+                insight: String(localized: "坚持运动的日子，整体状态更好")
+            ),
+        ]
+    }
+
+    // MARK: - 异常时间线 Demo
+
+    static func makeAnomalyDays() -> [(date: Date, anomalies: [Anomaly])] {
+        let cal = Calendar.current
+        let now = Date()
+        return [
+            (cal.date(byAdding: .day, value: -3, to: now)!, [
+                Anomaly(metric: .hrv, severity: .medium,
+                        message: String(localized: "HRV below baseline"),
+                        detail: "Current 32ms, below avg 48ms",
+                        currentValue: 32, baselineValue: 48, zScore: -1.6)
+            ]),
+            (cal.date(byAdding: .day, value: -8, to: now)!, [
+                Anomaly(metric: .sleep, severity: .high,
+                        message: String(localized: "Severe sleep deficit"),
+                        detail: "Last night 4h30m, well below avg 7h12m",
+                        currentValue: 270, baselineValue: 432, zScore: -2.3),
+                Anomaly(metric: .restingHeartRate, severity: .medium,
+                        message: String(localized: "Resting HR elevated"),
+                        detail: "Current 68bpm, above avg 58bpm",
+                        currentValue: 68, baselineValue: 58, zScore: 1.7)
+            ]),
+        ]
+    }
 }

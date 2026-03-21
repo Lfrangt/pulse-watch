@@ -5,6 +5,7 @@ import Charts
 /// 指标相关性洞察页 — 展示健康指标间的统计关联
 struct CorrelationInsightsView: View {
 
+    @AppStorage("pulse.demo.enabled") private var demoMode = false
     @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
     @State private var correlations: [CorrelationResult] = []
 
@@ -35,9 +36,13 @@ struct CorrelationInsightsView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .task {
-            correlations = await Task.detached {
-                await CorrelationService.shared.computeCorrelations(summaries: allSummaries)
-            }.value
+            if demoMode {
+                correlations = DemoDataProvider.makeCorrelations()
+            } else {
+                correlations = await Task.detached {
+                    await CorrelationService.shared.computeCorrelations(summaries: allSummaries)
+                }.value
+            }
         }
     }
 
@@ -58,6 +63,7 @@ struct CorrelationInsightsView: View {
                 Text(String(localized: "指标关联分析"))
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
                 Text(String(localized: "基于你 \(allSummaries.count) 天的数据，发现以下健康指标间的关联"))
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
@@ -152,6 +158,8 @@ struct CorrelationInsightsView: View {
     }
 
     // MARK: - 相关系数条
+
+    // MARK: - 相关系数条（带动画）
 
     private func correlationBar(_ result: CorrelationResult) -> some View {
         let r = result.coefficient

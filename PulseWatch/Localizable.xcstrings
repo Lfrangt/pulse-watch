@@ -43,6 +43,9 @@
     "·" : {
 
     },
+    "· Apple Watch" : {
+
+    },
     "(Elevated RHR \\(Int(rhr))bpm)" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -103,6 +106,9 @@
           }
         }
       }
+    },
+    "%" : {
+
     },
     "%.1fk steps" : {
       "extractionState" : "stale",
@@ -3215,7 +3221,6 @@
       }
     },
     "kcal" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -3469,6 +3474,7 @@
       }
     },
     "Legend" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -3834,6 +3840,7 @@
       }
     },
     "Monthly Overview" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -6986,6 +6993,9 @@
     "什么影响生理年龄？" : {
 
     },
+    "图例" : {
+
+    },
     "基于 %@ 天数据" : {
 
     },
@@ -6993,6 +7003,12 @@
 
     },
     "岁" : {
+
+    },
+    "当前读数" : {
+
+    },
+    "恢复 %@" : {
 
     },
     "指标详情" : {
@@ -7008,7 +7024,28 @@
         }
       }
     },
+    "暂无历史数据" : {
+
+    },
+    "本月概览" : {
+
+    },
+    "正常范围：95% – 100%" : {
+
+    },
+    "步" : {
+
+    },
     "生理年龄" : {
+
+    },
+    "目标 %@ kcal" : {
+
+    },
+    "目标 %@ 步" : {
+
+    },
+    "血氧数据由 Apple Watch 实时测量。持续历史记录将在未来版本中支持。" : {
 
     }
   },

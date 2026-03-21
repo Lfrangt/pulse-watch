@@ -54,6 +54,16 @@ struct PulseOpenClawConfig: Codable, Equatable {
 
 // MARK: - Agent 回复模型
 
+/// OpenClaw 下发的待写入训练记录
+struct PendingWorkoutEntry: Codable {
+    let id: String            // UUID string, 用于去重
+    let type: String          // "strength", "running", "cycling" 等
+    let timestamp: String?    // ISO 8601
+    let durationMinutes: Int?
+    let notes: String?
+    let muscleGroups: [String]?
+}
+
 /// Agent 返回的健康建议结构
 struct AgentHealthAdvice: Codable {
     let morningBrief: String?
@@ -61,6 +71,7 @@ struct AgentHealthAdvice: Codable {
     let alerts: [String]?
     let recoveryScore: Int?
     let summary: String?
+    let pendingWorkouts: [PendingWorkoutEntry]?
 }
 
 /// OpenClaw 集成桥接层
@@ -98,6 +109,9 @@ final class OpenClawBridge {
 
     /// 最新的 agent 分析结果
     var latestAdvice: AgentHealthAdvice?
+
+    /// SwiftData ModelContainer，由 App 在启动时注入，用于写入训练记录
+    var modelContainer: ModelContainer?
 
     /// 配置
     var config: PulseOpenClawConfig? {
@@ -337,7 +351,14 @@ final class OpenClawBridge {
             // 解析 OpenAI-compatible 回复
             if let advice = parseAgentResponse(data) {
                 latestAdvice = advice
+                // 处理 OpenClaw 下发的待写入训练记录（agent 回复路径）
+                if let pending = advice.pendingWorkouts, !pending.isEmpty {
+                    await processPendingWorkouts(pending)
+                }
             }
+
+            // 主动拉取 pending queue（不依赖 agent 在回复里携带）
+            await fetchAndProcessPendingQueue(cfg: cfg)
 
             lastSyncTime = Date()
             lastPushedScore = status.recoveryScore
@@ -581,7 +602,8 @@ final class OpenClawBridge {
             trainingAdvice: nil,
             alerts: nil,
             recoveryScore: nil,
-            summary: content
+            summary: content,
+            pendingWorkouts: nil
         )
     }
 
@@ -852,6 +874,155 @@ final class OpenClawBridge {
         }
     }
     #endif
+
+    // MARK: - Pending Queue 主动拉取
+
+    /// 通过 Gateway API 读取 workspace 的 pending queue 文件并处理
+    @MainActor
+    private func fetchAndProcessPendingQueue(cfg: PulseOpenClawConfig) async {
+        let base = cfg.gatewayURL.hasSuffix("/") ? String(cfg.gatewayURL.dropLast()) : cfg.gatewayURL
+        let pendingPath = "workspace/pulse-pending-workouts.json"
+
+        // OpenClaw Gateway: GET /v1/files/read?path=<path>
+        guard let url = URL(string: "\(base)/v1/files/read?path=\(pendingPath)") else { return }
+
+        var req = URLRequest(url: url)
+        req.httpMethod = "GET"
+        req.setValue("Bearer \(cfg.token)", forHTTPHeaderField: "Authorization")
+        req.timeoutInterval = 10
+
+        guard let (data, resp) = try? await session.data(for: req),
+              let http = resp as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            logger.debug("fetchPendingQueue: 文件读取失败或不存在")
+            return
+        }
+
+        struct PendingQueue: Codable {
+            let pending: [PendingWorkoutEntry]
+        }
+
+        guard let queue = try? JSONDecoder().decode(PendingQueue.self, from: data),
+              !queue.pending.isEmpty else {
+            return
+        }
+
+        logger.info("fetchPendingQueue: 发现 \(queue.pending.count) 条待写入记录")
+        await processPendingWorkouts(queue.pending)
+
+        // 清空已处理的队列
+        await clearPendingQueue(cfg: cfg, processedIDs: queue.pending.map(\.id))
+    }
+
+    /// 清空已处理的 pending queue
+    @MainActor
+    private func clearPendingQueue(cfg: PulseOpenClawConfig, processedIDs: [String]) async {
+        let base = cfg.gatewayURL.hasSuffix("/") ? String(cfg.gatewayURL.dropLast()) : cfg.gatewayURL
+        guard let url = URL(string: "\(base)/v1/files/write") else { return }
+
+        let emptyQueue = #"{"pending":[]}"#
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("Bearer \(cfg.token)", forHTTPHeaderField: "Authorization")
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+            "path": "workspace/pulse-pending-workouts.json",
+            "content": emptyQueue
+        ]
+        req.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        req.timeoutInterval = 10
+
+        if let (_, resp) = try? await session.data(for: req),
+           let http = resp as? HTTPURLResponse,
+           (200..<300).contains(http.statusCode) {
+            logger.info("clearPendingQueue: 队列已清空")
+        }
+    }
+
+    // MARK: - Pending Workouts 处理
+
+    /// 将 OpenClaw 下发的 pendingWorkouts 写入 SwiftData，已存在则跳过
+    @MainActor
+    private func processPendingWorkouts(_ pending: [PendingWorkoutEntry]) async {
+        guard let container = modelContainer else {
+            logger.warning("processPendingWorkouts: modelContainer 未注入，跳过")
+            return
+        }
+
+        let context = ModelContext(container)
+        var written = 0
+
+        for entry in pending {
+            let uuid = "openclaw-\(entry.id)"
+
+            // 去重：检查是否已存在
+            let descriptor = FetchDescriptor<WorkoutHistoryEntry>(
+                predicate: #Predicate { $0.hkWorkoutUUID == uuid }
+            )
+            if let existing = try? context.fetch(descriptor), !existing.isEmpty {
+                logger.debug("processPendingWorkouts: 已存在 \(uuid)，跳过")
+                continue
+            }
+
+            // 解析时间
+            let startDate: Date
+            if let ts = entry.timestamp {
+                let iso = ISO8601DateFormatter()
+                iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                startDate = iso.date(from: ts) ?? Date()
+            } else {
+                startDate = Date()
+            }
+
+            let durationSec = Double((entry.durationMinutes ?? 10) * 60)
+            let endDate = startDate.addingTimeInterval(durationSec)
+
+            // 类型映射
+            let activityType: Int
+            switch entry.type.lowercased() {
+            case "strength":   activityType = 58
+            case "running":    activityType = 37
+            case "cycling":    activityType = 13
+            case "swimming":   activityType = 46
+            case "yoga":       activityType = 50
+            case "basketball": activityType = 4
+            case "soccer":     activityType = 43
+            default:           activityType = 3  // HKWorkoutActivityTypeFunctionalStrengthTraining fallback
+            }
+
+            let record = WorkoutHistoryEntry(
+                hkWorkoutUUID: uuid,
+                activityType: activityType,
+                startDate: startDate,
+                endDate: endDate,
+                durationSeconds: durationSec,
+                sourceName: "OpenClaw",
+                isManual: true,
+                notes: entry.notes
+            )
+
+            // 设置肌群标签
+            if let groups = entry.muscleGroups, !groups.isEmpty {
+                let mapped = groups.compactMap { MuscleGroup(rawValue: $0) }
+                if !mapped.isEmpty {
+                    record.muscleGroupTags = mapped
+                }
+            }
+
+            context.insert(record)
+            written += 1
+        }
+
+        if written > 0 {
+            do {
+                try context.save()
+                logger.info("processPendingWorkouts: 成功写入 \(written) 条训练记录")
+            } catch {
+                logger.error("processPendingWorkouts: 写入失败 — \(error.localizedDescription)")
+            }
+        }
+    }
 
     // MARK: - 格式化
 

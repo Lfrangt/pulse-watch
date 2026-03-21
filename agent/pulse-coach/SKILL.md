@@ -1,12 +1,12 @@
 ---
 name: pulse-coach
-description: AI 健身教练 — 基于 Pulse Watch 实时健康数据的智能训练指导。读取用户的恢复评分、HRV、睡眠质量、心率趋势，生成个性化训练计划、营养建议和恢复策略。支持 Push/Pull/Legs 轮换、渐进超载追踪、异常预警。
+description: AI 健身教练 — 基于 Pulse Watch 实时健康数据的智能训练指导。读取用户的恢复评分、HRV、睡眠质量、心率趋势，生成个性化训练计划、营养建议和恢复策略。支持 Push/Pull/Legs 轮换、渐进超载追踪、异常预警。支持口语/文字训练记录，自动写回 Pulse Watch app。
 metadata:
   openclaw:
     emoji: "💪"
     category: "health"
     author: "Abundra"
-    version: "1.0.0"
+    version: "1.1.0"
     license: "MIT"
 ---
 
@@ -102,6 +102,122 @@ defaults read group.com.abundra.pulse.shared pulse.healthStatus 2>/dev/null | py
 1. 读取最新数据
 2. 对比 7 天趋势
 3. 给出简洁评估
+
+## 训练记录写回 Pulse Watch（⭐ 核心功能）
+
+当用户汇报完成的训练时（例如："刚做了100个俯卧撑"、"跑了5公里"、"练了45分钟腿"），需要：
+
+### 第一步：识别训练意图
+
+判断用户是否在汇报一次已完成的训练。触发词：
+- "刚做了/刚练了/刚跑了"
+- "完成了/做完了/练完了"
+- "今天做了/今天练了"
+- "做了 X 个/跑了 X 公里/练了 X 分钟"
+
+### 第二步：提取训练信息
+
+从自然语言提取：
+- **type**: 训练类型 → 映射到 "strength"/"running"/"cycling"/"swimming"/"yoga"/"other"
+  - 俯卧撑/卧推/深蹲/硬拉/引体向上/哑铃/杠铃 → "strength"
+  - 跑步/慢跑 → "running"
+  - 骑车 → "cycling"
+  - 游泳 → "swimming"
+  - 瑜伽 → "yoga"
+- **notes**: 原始描述（例如："100个俯卧撑 x 3组"）
+- **durationMinutes**: 时长（如果有）
+- **muscleGroups**: 涉及肌群（如果能推断）
+  - 俯卧撑 → ["chest", "triceps", "shoulders"]
+  - 深蹲 → ["quads", "glutes", "hamstrings"]
+  - 引体向上 → ["back", "biceps"]
+  - 跑步 → ["cardio"]
+
+### 第三步：存入 pending queue
+
+```bash
+PENDING_FILE="$HOME/.openclaw/workspace/pulse-pending-workouts.json"
+
+# 读取现有 queue
+EXISTING=$(cat "$PENDING_FILE" 2>/dev/null || echo '{"pending":[]}')
+
+# 生成新记录
+python3 -c "
+import json, sys, uuid
+from datetime import datetime, timezone
+
+data = json.loads('$EXISTING')
+entry = {
+    'id': str(uuid.uuid4()),
+    'type': 'TYPE_PLACEHOLDER',
+    'timestamp': datetime.now(timezone.utc).isoformat(),
+    'notes': 'NOTES_PLACEHOLDER',
+    'durationMinutes': DURATION_PLACEHOLDER,
+    'muscleGroups': MUSCLE_GROUPS_PLACEHOLDER
+}
+# 移除 None 值
+entry = {k: v for k, v in entry.items() if v is not None}
+data['pending'].append(entry)
+with open('$PENDING_FILE', 'w') as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+print('✅ 已加入队列')
+"
+```
+
+**注意**：把上面的 PLACEHOLDER 替换成实际提取的值。
+
+### 第四步：在 health sync 回复中下发
+
+当 Pulse Watch app 发来 `[HEALTH_DATA]` 时，在 JSON 回复里加入 `pendingWorkouts` 字段：
+
+```json
+{
+  "morningBrief": "...",
+  "trainingAdvice": "...",
+  "alerts": [],
+  "recoveryScore": 72,
+  "summary": "...",
+  "pendingWorkouts": [
+    {
+      "id": "abc-uuid",
+      "type": "strength",
+      "timestamp": "2024-01-15T14:30:00Z",
+      "durationMinutes": 30,
+      "notes": "100个俯卧撑 x 3组",
+      "muscleGroups": ["chest", "triceps", "shoulders"]
+    }
+  ]
+}
+```
+
+读取 pending queue 并附加到回复：
+
+```bash
+PENDING_FILE="$HOME/.openclaw/workspace/pulse-pending-workouts.json"
+cat "$PENDING_FILE" 2>/dev/null | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+pending = data.get('pending', [])
+print(json.dumps(pending))
+"
+```
+
+**App 处理完后会自动清空已处理记录。如果 App 没有清空（连接断开等情况），下次 sync 继续下发，iOS 端有去重逻辑。**
+
+手动清空队列（如果需要）：
+```bash
+echo '{"pending":[]}' > "$HOME/.openclaw/workspace/pulse-pending-workouts.json"
+```
+
+### 交互示例
+
+用户：「刚做了100个俯卧撑，分了5组」
+
+你：
+1. 提取：type=strength, notes="俯卧撑 100个 5组", muscleGroups=["chest","triceps","shoulders"]
+2. 写入 pending queue
+3. 回复用户："✅ 已记录到 Pulse Watch — 俯卧撑 100个/5组，胸/三头。恢复建议：…"
+
+---
 
 ## 记忆管理
 

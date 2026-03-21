@@ -42,6 +42,7 @@ struct PulseWatchApp: App {
         HealthKitService.shared.modelContainer = container
         HealthDataService.shared.modelContainer = container
         WorkoutHistoryService.shared.modelContainer = container
+        OpenClawBridge.shared.modelContainer = container
 
         // HealthKit 后台采集
         HealthKitService.shared.enableBackgroundDelivery()

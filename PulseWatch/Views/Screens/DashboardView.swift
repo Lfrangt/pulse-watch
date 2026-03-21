@@ -66,31 +66,15 @@ struct DashboardView: View {
 
                     // BELOW HERO — cards with padding
                     VStack(spacing: PulseTheme.spacingS) {
-                        // Vitals strip — HRV + Heart Rate front and centre
-
-
-                        // Sleep & Activity summary cards
+                        // Sleep & Activity — tap to detail
                         if let tri = triScore {
                             ouraSleepActivityCards(tri)
                                 .staggered(index: 1)
                         }
 
-                        // Health Age
+                        // Health Age (compact)
                         if let result = healthAgeResult {
-                            healthAgeCard(result: result)
-                                .staggered(index: 3)
-                        }
-
-                        // Insights
-                        if let insight, !insight.insights.isEmpty {
-                            let mergedInsights: [String] = {
-                                var list = insight.insights
-                                if let tri = triScore {
-                                    list[0] = tri.readiness.advice
-                                }
-                                return list
-                            }()
-                            insightCards(mergedInsights)
+                            healthAgeCardCompact(result: result)
                                 .staggered(index: 2)
                         }
 
@@ -120,12 +104,6 @@ struct DashboardView: View {
                                 .staggered(index: 6)
                         }
 
-                        // Recovery note
-                        if let note = brief?.recoveryNote {
-                            RecoveryCard(note: note)
-                                .staggered(index: 7)
-                        }
-
                         // Recent workouts
                         if !recentWorkouts.isEmpty {
                             recentWorkoutsSection
@@ -138,16 +116,17 @@ struct DashboardView: View {
                                 .staggered(index: 9)
                         }
 
-                        Spacer(minLength: 80)
+                        Spacer(minLength: 16)
                     }
                     .padding(.horizontal, PulseTheme.spacingM)
                     .padding(.top, 4)
-                    .padding(.bottom, 16)
+                    .padding(.bottom, 8)
                 }
             }
             .scrollContentBackground(.hidden)
-            .background(Color(hex: "0D4A5C").ignoresSafeArea(edges: .top))
+            .background(PulseTheme.background.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .sheet(isPresented: $showLocationSetup) {
                 LocationSetupView()
             }
@@ -171,11 +150,6 @@ struct DashboardView: View {
                 handleGeofenceEntry(notification)
             }
         }
-        .background(
-            Color(hex: "0D4A5C")
-                .ignoresSafeArea(edges: .top)
-        )
-        .ignoresSafeArea(.all, edges: .top)
         .preferredColorScheme(.dark)
     }
 
@@ -190,7 +164,7 @@ struct DashboardView: View {
                         .init(color: Color(hex: "0D4A5C"), location: 0),
                         .init(color: Color(hex: "0A3347"), location: 0.35),
                         .init(color: Color(hex: "071E2E"), location: 0.65),
-                        .init(color: Color.black, location: 1.0),
+                        .init(color: PulseTheme.background, location: 1.0),
                     ],
                     startPoint: .top,
                     endPoint: .bottom
@@ -317,14 +291,13 @@ struct DashboardView: View {
             LinearGradient(
                 stops: [
                     .init(color: .clear, location: 0),
-                    .init(color: Color.black.opacity(0.3), location: 0.4),
-                    .init(color: Color.black.opacity(0.85), location: 0.75),
-                    .init(color: Color.black, location: 1.0),
+                    .init(color: PulseTheme.background.opacity(0.5), location: 0.5),
+                    .init(color: PulseTheme.background, location: 1.0),
                 ],
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .frame(height: 80)
+            .frame(height: 60)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(localized: "Recovery Score \(score), \(headline)"))
@@ -1144,6 +1117,61 @@ struct DashboardView: View {
 
     // MARK: - Health Age 卡片
 
+    // MARK: - Health Age Compact (single row)
+
+    private func healthAgeCardCompact(result: HealthAgeService.HealthAgeResult) -> some View {
+        let diff = result.difference
+        let isYounger = diff < -0.5
+        let accentColor = isYounger ? PulseTheme.accentTeal : PulseTheme.activityCoral
+        let ageInt = Int(result.healthAge.rounded())
+        let diffInt = Int(abs(diff).rounded())
+
+        return HStack(spacing: 14) {
+            // Icon
+            ZStack {
+                Circle().fill(accentColor.opacity(0.12)).frame(width: 36, height: 36)
+                Image(systemName: "figure.run.circle")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(accentColor)
+            }
+
+            // Label
+            VStack(alignment: .leading, spacing: 2) {
+                Text("生理年龄")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.45))
+                Text("\(ageInt) 岁")
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+            }
+
+            Spacer()
+
+            // Delta badge
+            if abs(diff) > 0.5 {
+                HStack(spacing: 4) {
+                    Image(systemName: isYounger ? "arrow.down" : "arrow.up")
+                        .font(.system(size: 10, weight: .bold))
+                    Text("\(diffInt) yr \(isYounger ? "更年轻" : "偏老")")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                }
+                .foregroundStyle(accentColor)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Capsule().fill(accentColor.opacity(0.12)))
+            }
+        }
+        .padding(.horizontal, PulseTheme.spacingM)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                .fill(Color.white.opacity(0.04))
+                .overlay(RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                    .stroke(Color.white.opacity(0.06), lineWidth: 0.5))
+        )
+        .accessibilityLabel("生理年龄 \(ageInt) 岁")
+    }
+
     private func healthAgeCard(result: HealthAgeService.HealthAgeResult) -> some View {
         let diff = result.difference
         let isYounger = diff < -0.5
@@ -1445,7 +1473,7 @@ struct DashboardView: View {
                 stops: [
                     .init(color: Color(hex: "0D4A5C"), location: 0),
                     .init(color: Color(hex: "071E2E"), location: 0.7),
-                    .init(color: Color.black, location: 1.0),
+                    .init(color: PulseTheme.background, location: 1.0),
                 ],
                 startPoint: .top,
                 endPoint: .bottom
@@ -1465,7 +1493,7 @@ struct DashboardView: View {
         .frame(maxWidth: .infinity)
         .frame(height: heroHeight)
         .overlay(alignment: .bottom) {
-            LinearGradient(colors: [Color.clear, Color.black], startPoint: .top, endPoint: .bottom)
+            LinearGradient(colors: [Color.clear, PulseTheme.background], startPoint: .top, endPoint: .bottom)
                 .frame(height: 60)
         }
     }

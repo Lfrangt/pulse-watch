@@ -895,55 +895,64 @@ final class OpenClawBridge {
     }
     #endif
 
-    // MARK: - Pending Queue 读取（iCloud Drive）
+    // MARK: - Pending Queue — 通过 /v1/responses 让 agent 读文件
 
-    /// 从 iCloud Drive 读取 pulse-coach 写入的 pending queue
-    /// pulse-coach 写入路径：~/Library/Mobile Documents/com~apple~CloudDocs/pulse-pending-workouts.json
+    /// 调用 /v1/responses（有 exec 工具的真实 agent session）读取并清空 pending queue
     @MainActor
     func fetchPendingQueueFromAgent(cfg: PulseOpenClawConfig) async -> [PendingWorkoutEntry] {
-        #if os(iOS)
-        // iOS: 通过 FileManager 读取 iCloud Drive
-        guard let icloudURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?
-            .appendingPathComponent("Documents")
-            .appendingPathComponent("pulse-pending-workouts.json") else {
-            logger.warning("fetchPendingQueue: iCloud 不可用")
+        let base = cfg.gatewayURL.hasSuffix("/") ? String(cfg.gatewayURL.dropLast()) : cfg.gatewayURL
+        guard let url = URL(string: "\(base)/v1/responses") else { return [] }
+
+        let body: [String: Any] = [
+            "model": cfg.agentID,
+            "input": """
+            PULSE_PENDING_QUERY: Read ~/workspace/pulse-pending-workouts.json and return its raw JSON content only. \
+            Then clear it with: echo '{"pending":[]}' > ~/workspace/pulse-pending-workouts.json
+            """,
+            "max_output_tokens": 1024
+        ]
+
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("Bearer \(cfg.token)", forHTTPHeaderField: "Authorization")
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        req.timeoutInterval = 30
+
+        guard let (data, resp) = try? await session.data(for: req),
+              let http = resp as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            logger.debug("fetchPendingQueue: /v1/responses 请求失败")
             return []
         }
 
-        // 触发 iCloud 下载（如果文件在云端）
-        try? FileManager.default.startDownloadingUbiquitousItem(at: icloudURL)
-
-        guard let data = try? Data(contentsOf: icloudURL) else {
-            logger.debug("fetchPendingQueue: 文件不存在或未同步")
-            return []
+        // 从 output[].content[].text 提取内容
+        var text = ""
+        if let output = json["output"] as? [[String: Any]] {
+            for item in output {
+                if item["type"] as? String == "message",
+                   let contents = item["content"] as? [[String: Any]] {
+                    for c in contents {
+                        if let t = c["text"] as? String { text += t }
+                    }
+                }
+            }
         }
 
+        guard !text.isEmpty else { return [] }
+
+        let extracted = extractJSON(from: text)
         struct Q: Codable { let pending: [PendingWorkoutEntry] }
-        guard let q = try? JSONDecoder().decode(Q.self, from: data),
+        guard let qData = extracted.data(using: .utf8),
+              let q = try? JSONDecoder().decode(Q.self, from: qData),
               !q.pending.isEmpty else {
+            logger.debug("fetchPendingQueue: 队列为空")
             return []
         }
 
-        logger.info("fetchPendingQueue: 从 iCloud 获取到 \(q.pending.count) 条记录")
-
-        // 清空文件
-        try? #"{"pending":[]}"#.write(to: icloudURL, atomically: true, encoding: .utf8)
-
+        logger.info("fetchPendingQueue: 获取到 \(q.pending.count) 条待写入记录")
         return q.pending
-
-        #else
-        // macOS: 直接读本地文件
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        let fileURL = home
-            .appendingPathComponent("Library/Mobile Documents/com~apple~CloudDocs")
-            .appendingPathComponent("pulse-pending-workouts.json")
-
-        guard let data = try? Data(contentsOf: fileURL) else { return [] }
-        struct Q: Codable { let pending: [PendingWorkoutEntry] }
-        guard let q = try? JSONDecoder().decode(Q.self, from: data), !q.pending.isEmpty else { return [] }
-        try? #"{"pending":[]}"#.write(to: fileURL, atomically: true, encoding: .utf8)
-        return q.pending
-        #endif
     }
 
     private func loadPendingQueueJSON() -> String { "[]" }

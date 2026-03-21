@@ -763,16 +763,7 @@ struct HistoryView: View {
 
         VStack(alignment: .leading, spacing: 8) {
             Chart(candles) { c in
-                // Shaded range band (high-low)
-                AreaMark(
-                    x: .value("Date", c.date, unit: unit),
-                    yStart: .value("Low", c.low),
-                    yEnd: .value("High", c.high)
-                )
-                .foregroundStyle(color.opacity(0.08))
-                .interpolationMethod(.catmullRom)
-
-                // Avg trend line — primary visual
+                // Avg trend line
                 LineMark(
                     x: .value("Date", c.date, unit: unit),
                     y: .value("Avg", c.avg)
@@ -787,7 +778,7 @@ struct HistoryView: View {
                         .shadow(color: (c.isUp ? color : Color(hex: "FF6B6B")).opacity(0.5), radius: 3)
                 }
 
-                // Subtle area fill under avg line
+                // Area fill under trend line
                 AreaMark(
                     x: .value("Date", c.date, unit: unit),
                     y: .value("Avg", c.avg)

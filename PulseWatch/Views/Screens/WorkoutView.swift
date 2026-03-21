@@ -13,7 +13,14 @@ struct WorkoutView: View {
     @State private var strengthExpanded = false
 
     @Query(sort: \StrengthRecord.date, order: .reverse) private var strengthRecords: [StrengthRecord]
+    @Query(sort: \WorkoutHistoryEntry.startDate, order: .reverse) private var allHistoryEntries: [WorkoutHistoryEntry]
     @AppStorage("pulse.user.weightKg") private var bodyweight: Double = 0
+
+    /// 最近 7 天的 OpenClaw AI 训练记录
+    private var recentAIWorkouts: [WorkoutHistoryEntry] {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -7, to: .now) ?? .now
+        return allHistoryEntries.filter { $0.sourceName == "OpenClaw" && $0.startDate >= cutoff }
+    }
 
     private let store = HKHealthStore()
 
@@ -42,9 +49,15 @@ struct WorkoutView: View {
                         loadingView
                     }
 
+                    // ── AI 记录（OpenClaw 写入）──
+                    if !recentAIWorkouts.isEmpty {
+                        aiWorkoutsSection
+                            .staggered(index: workouts.count + 1)
+                    }
+
                     // ── 模块二：力量训练 ──
                     strengthSection
-                        .staggered(index: workouts.count + 2)
+                        .staggered(index: workouts.count + 3)
 
                     Spacer(minLength: 60)
                 }
@@ -78,6 +91,72 @@ struct WorkoutView: View {
                 await loadWorkouts()
             }
         }
+    }
+
+    // MARK: - AI 训练记录 section
+
+    private var aiWorkoutsSection: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+            HStack(spacing: 6) {
+                Image(systemName: "cpu.fill")
+                    .font(.system(size: 12))
+                    .foregroundStyle(PulseTheme.accentTeal)
+                Text("OpenClaw AI 记录")
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+            .padding(.leading, 4)
+
+            ForEach(Array(recentAIWorkouts.enumerated()), id: \.offset) { _, entry in
+                aiWorkoutRow(entry)
+            }
+        }
+    }
+
+    private func aiWorkoutRow(_ entry: WorkoutHistoryEntry) -> some View {
+        let title = !(entry.notes ?? "").isEmpty ? entry.notes! : entry.activityName
+        return NavigationLink(destination: WorkoutHistoryDetailView(entry: entry)) {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(PulseTheme.accentTeal.opacity(0.12))
+                        .frame(width: 40, height: 40)
+                    Image(systemName: entry.activityIcon)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(PulseTheme.accentTeal)
+                }
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 5) {
+                        Text(title)
+                            .font(PulseTheme.bodyFont.weight(.medium))
+                            .foregroundStyle(PulseTheme.textPrimary)
+                            .lineLimit(1)
+                        Text("AI")
+                            .font(.system(size: 9, weight: .bold, design: .rounded))
+                            .foregroundStyle(PulseTheme.accentTeal)
+                            .padding(.horizontal, 5).padding(.vertical, 2)
+                            .background(Capsule().fill(PulseTheme.accentTeal.opacity(0.13)))
+                    }
+                    Text(timeString(entry.startDate))
+                        .font(PulseTheme.captionFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+                Spacer()
+                Text("\(entry.durationMinutes)m")
+                    .font(PulseTheme.captionFont)
+                    .foregroundStyle(PulseTheme.textSecondary)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+            .padding(PulseTheme.spacingM)
+            .background(
+                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                    .fill(Color.white.opacity(0.04))
+                    .overlay(RoundedRectangle(cornerRadius: PulseTheme.radiusM).stroke(PulseTheme.accentTeal.opacity(0.2), lineWidth: 0.5))
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - 本周统计卡片

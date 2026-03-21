@@ -56,6 +56,9 @@ struct PulseWatchApp: App {
         // Weekly Health Summary 通知
         WeeklySummaryService.shared.scheduleWeeklySummary()
 
+        // Monthly Health Summary 通知
+        MonthlySummaryService.shared.scheduleMonthlySummary()
+
         // Weekly PB Reminder
         AchievementService.shared.scheduleWeeklyPBReminder()
 

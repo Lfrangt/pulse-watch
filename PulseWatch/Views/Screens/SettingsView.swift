@@ -88,9 +88,13 @@ struct SettingsView: View {
                     goalsSection
                         .staggered(index: 7)
 
+                    // 教练模式
+                    coachModeSection
+                        .staggered(index: 8)
+
                     // 数据导出 & 备份
                     dataExportSection
-                        .staggered(index: 8)
+                        .staggered(index: 9)
 
                     // 数据管理
                     dataManagementSection
@@ -1092,6 +1096,37 @@ struct SettingsView: View {
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
                             Text(String(localized: "设定步数、睡眠、训练等每日目标"))
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .pulseCard()
+    }
+
+    // MARK: - 教练模式
+
+    private var coachModeSection: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            sectionHeader(icon: "person.2.fill", title: String(localized: "Coach Mode"))
+
+            settingRow {
+                NavigationLink {
+                    CoachModeView().preferredColorScheme(.dark)
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(String(localized: "教练模式"))
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(String(localized: "生成健康快照，分享给教练或朋友"))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }

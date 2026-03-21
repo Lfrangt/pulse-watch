@@ -7,6 +7,7 @@ struct HistoryView: View {
 
     @State private var selectedRange: TimeRange = .week
     @State private var showWeeklyReport = false
+    @State private var showMonthlyReport = false
     @State private var chartAnimated = false
     @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
     @Query(sort: \WorkoutHistoryEntry.startDate, order: .reverse) private var allWorkouts: [WorkoutHistoryEntry]
@@ -78,6 +79,10 @@ struct HistoryView: View {
                 WeeklyReportView()
                     .preferredColorScheme(.dark)
                     .onAppear { Analytics.trackWeeklyReportViewed() }
+            }
+            .sheet(isPresented: $showMonthlyReport) {
+                MonthlyReportView()
+                    .preferredColorScheme(.dark)
             }
             .onAppear {
                 // Chart animation trigger
@@ -1044,6 +1049,17 @@ struct HistoryView: View {
                     shortcutTile(icon: "flame.fill", color: PulseTheme.activityCoral, title: String(localized: "训练挑战"))
                 }
                 .buttonStyle(.plain)
+            }
+
+            HStack(spacing: PulseTheme.spacingS) {
+                Button { showMonthlyReport = true } label: {
+                    shortcutTile(icon: "calendar.badge.clock", color: PulseTheme.accentTeal, title: String(localized: "月度报告"))
+                }
+                .buttonStyle(.plain)
+
+                // 占位保持布局平衡
+                Color.clear.frame(maxWidth: .infinity)
+                Color.clear.frame(maxWidth: .infinity)
             }
         }
     }

@@ -1198,6 +1198,29 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
             }
 
+            // PDF 报告
+            settingRow {
+                Button {
+                    exportPDF()
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(String(localized: "生成 PDF 报告"))
+                                .font(PulseTheme.bodyFont)
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(String(localized: "上月健康数据的完整 PDF 报告"))
+                                .font(PulseTheme.captionFont)
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                        Spacer()
+                        Image(systemName: "doc.richtext")
+                            .font(.system(size: 14))
+                            .foregroundStyle(PulseTheme.activityCoral)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+
             if let error = exportError {
                 Text(error)
                     .font(PulseTheme.captionFont)
@@ -1209,6 +1232,25 @@ struct SettingsView: View {
             if let url = exportURL {
                 ShareSheet(items: [url])
             }
+        }
+    }
+
+    private func exportPDF() {
+        isExporting = true
+        exportError = nil
+        Task {
+            do {
+                let url = try PDFReportService.shared.generateMonthlyPDF(
+                    summaries: allDailySummaries,
+                    workouts: allWorkoutHistory,
+                    strengthRecords: allStrengthRecords
+                )
+                exportURL = url
+                showExportShare = true
+            } catch {
+                exportError = error.localizedDescription
+            }
+            isExporting = false
         }
     }
 

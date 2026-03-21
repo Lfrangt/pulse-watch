@@ -329,7 +329,12 @@ struct HistoryView: View {
                     .foregroundStyle(PulseTheme.accent)
                     .symbolSize(20)
                 }
-                .chartYScale(domain: 0...100)
+                .chartYScale(domain: {
+                    let scores = data.map { Double($0.score) }
+                    let lo = max(0, (scores.min() ?? 0) - 10)
+                    let hi = min(100, (scores.max() ?? 100) + 10)
+                    return lo...hi
+                }())
                 .chartYAxis {
                     AxisMarks(position: .leading, values: [0, 50, 100]) { _ in
                         AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
@@ -340,7 +345,7 @@ struct HistoryView: View {
                 }
                 .chartXAxis {
                     AxisMarks(values: .stride(by: .day, count: 1)) { _ in
-                        AxisValueLabel(format: .dateTime.month(.abbreviated).day())
+                        AxisValueLabel(format: .dateTime.month(.defaultDigits).day())
                             .font(.system(size: 9))
                             .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
                     }
@@ -418,7 +423,7 @@ struct HistoryView: View {
                         .interpolationMethod(.catmullRom)
                 }
                 .chartYScale(domain: { let lo = max(30, (data.map(\.resting).min() ?? 40) - 5); let hi = (data.map(\.resting).max() ?? 80) + 5; return lo...hi }())
-                .chartXAxis { AxisMarks(values: .stride(by: .day, count: 1)) { _ in AxisValueLabel(format: .dateTime.month(.abbreviated).day()).font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary.opacity(0.7)) } }
+                .chartXAxis { AxisMarks(values: .stride(by: .day, count: 1)) { _ in AxisValueLabel(format: .dateTime.month(.defaultDigits).day()).font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary.opacity(0.7)) } }
                 .frame(height: 180).opacity(chartAnimated ? 1 : 0).animation(.easeOut(duration: 1.0), value: chartAnimated)
             } else {
                 let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
@@ -476,7 +481,12 @@ struct HistoryView: View {
                         .foregroundStyle(LinearGradient(colors: [hrvColor.opacity(0.15), hrvColor.opacity(0.02)], startPoint: .top, endPoint: .bottom))
                         .interpolationMethod(.catmullRom)
                 }
-                .chartXAxis { AxisMarks(values: .stride(by: .day, count: 1)) { _ in AxisValueLabel(format: .dateTime.month(.abbreviated).day()).font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary.opacity(0.7)) } }
+                .chartYScale(domain: {
+                    let lo = max(0, (data.map(\.value).min() ?? 0) - 10)
+                    let hi = (data.map(\.value).max() ?? 100) + 10
+                    return lo...hi
+                }())
+                .chartXAxis { AxisMarks(values: .stride(by: .day, count: 1)) { _ in AxisValueLabel(format: .dateTime.month(.defaultDigits).day()).font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary.opacity(0.7)) } }
                 .frame(height: 180).opacity(chartAnimated ? 1 : 0).animation(.easeOut(duration: 1.0), value: chartAnimated)
             } else {
                 let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
@@ -572,7 +582,7 @@ struct HistoryView: View {
                 }
                 .chartXAxis {
                     AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
-                        AxisValueLabel(format: .dateTime.month(.abbreviated).day())
+                        AxisValueLabel(format: .dateTime.month(.defaultDigits).day())
                             .font(.system(size: 9))
                             .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
                     }
@@ -865,7 +875,7 @@ struct HistoryView: View {
             NavigationLink {
                 WorkoutHistoryListView().preferredColorScheme(.dark)
             } label: {
-                shortcutTile(icon: "clock.fill", color: PulseTheme.activityCoral, title: String(localized: "Workout History"))
+                shortcutTile(icon: "clock.fill", color: PulseTheme.activityCoral, title: String(localized: "训练记录"))
             }
             .buttonStyle(.plain)
         }
@@ -1009,7 +1019,7 @@ struct CandlestickChartView: View {
                     .foregroundStyle(LinearGradient(colors: [color.opacity(0.18), color.opacity(0.02)], startPoint: .top, endPoint: .bottom))
                     .interpolationMethod(.catmullRom)
             }
-            .chartXAxis { AxisMarks { _ in AxisValueLabel(format: .dateTime.month(.abbreviated)).font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.4)) } }
+            .chartXAxis { AxisMarks { _ in AxisValueLabel(format: .dateTime.month(.defaultDigits).day()).font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.4)) } }
             .chartYAxis { AxisMarks(position: .leading) { _ in AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4])).foregroundStyle(Color.white.opacity(0.06)) } }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {

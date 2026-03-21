@@ -203,33 +203,37 @@ final class HealthAgeService {
             metrics.append(MetricScore(metric: .sleep, value: hours, ageImpact: impact, advice: advice))
         }
 
-        // ④ 每日步数 [4] JAMA 2020/2022：8000 步临界点，每 1000 步 ≈ 0.3 年
+        // ④ 每日步数 [4] Paluch et al. JAMA Netw Open 2022
+        //    关键结论：8000步/天是死亡率显著下降的"阈值"，非线性关系
+        //    ≥8000步 → 健康基线，无额外"年轻"加分（步数不是生理年龄的线性因子）
+        //    <8000步 → 久坐风险，每减少2000步 ≈ 0.4年负影响，上限 +1.5年（偏老）
+        //    注意：马拉松运动员步数再高也不会因此"变年轻"——这不是步数测量的
         if let steps = avgSteps {
-            let optimalSteps = 8000.0
-            let diff = optimalSteps - steps      // 正 = 低于目标
-            let impact = clampImpact(diff / 1000.0 * 0.3)
+            let deficit = max(0, 8000.0 - steps)   // 只计算不足，不计算超出
+            let impact = min(1.5, deficit / 2000.0 * 0.4)  // 只有正值（偏老）
             totalImpact += impact
             let advice: String
             switch steps {
-            case ..<4000:   advice = String(localized: "步数极低（<4000），心血管和代谢风险显著偏高")
-            case 4000..<7000: advice = String(localized: "步数低于 8000 步临界值（JAMA 2022）")
-            case 7000..<10000: advice = String(localized: "步数接近或达标，继续保持")
-            default:        advice = String(localized: "步数出色，超过 10000 步，与更好的健康结局相关")
+            case ..<4000:   advice = String(localized: "长期久坐（<4000步），心血管和代谢风险显著上升（JAMA 2022）")
+            case 4000..<6000: advice = String(localized: "步数偏低，建议每天步行至少 8000 步")
+            case 6000..<8000: advice = String(localized: "接近推荐阈值，继续保持")
+            default:        advice = String(localized: "步数达标（≥8000步），久坐风险低")
             }
             metrics.append(MetricScore(metric: .steps, value: steps, ageImpact: impact, advice: advice))
         }
 
-        // ⑤ 活跃时间 [5] WHO 2020：≥150 min/week = 每天 ≥21.4 min
-        //    不足时每 10 min 差距 ≈ 0.5 年影响
+        // ⑤ 活跃时间 [5] WHO 2020 身体活动指南
+        //    同样是阈值效应：达到 150 min/week 是基线，超过无额外加分
+        //    不足时才有负影响
         let whoDaily = 21.4
-        let activeDiff = max(0, whoDaily - avgActiveMin)
-        let activeImpact = clampImpact(activeDiff / 10.0 * 0.5)
+        let activeDeficit = max(0, whoDaily - avgActiveMin)  // 只计算不足
+        let activeImpact = min(1.0, activeDeficit / 10.0 * 0.4)  // 只有正值（偏老）
         totalImpact += activeImpact
         let activeAdvice: String
         if avgActiveMin >= whoDaily {
-            activeAdvice = String(localized: "活动量达到 WHO 2020 推荐（150 min/week）")
+            activeAdvice = String(localized: "活动量达到 WHO 2020 推荐标准（≥150 min/week）")
         } else if avgActiveMin >= 10 {
-            activeAdvice = String(localized: "活动量略不足，WHO 建议每天至少 21 分钟中等强度")
+            activeAdvice = String(localized: "活动量略不足，WHO 建议每天至少 21 分钟中等强度运动")
         } else {
             activeAdvice = String(localized: "活动量严重不足，增加日常运动可显著降低慢病风险")
         }

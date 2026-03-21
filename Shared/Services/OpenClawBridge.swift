@@ -895,6 +895,19 @@ final class OpenClawBridge {
     }
     #endif
 
+    // MARK: - 前台检查 pending queue
+
+    /// App 进前台时调用 — 轻量检查，只调 /v1/responses 读 pending queue
+    @MainActor
+    func checkAndProcessPendingIfNeeded() async {
+        guard isEnabled, let cfg = config else { return }
+        let pending = await fetchPendingQueueFromAgent(cfg: cfg)
+        if !pending.isEmpty {
+            logger.info("前台检查: 发现 \(pending.count) 条 pending workouts，开始写入")
+            await processPendingWorkouts(pending)
+        }
+    }
+
     // MARK: - Pending Queue — 通过 /v1/responses 让 agent 读文件
 
     /// 调用 /v1/responses（有 exec 工具的真实 agent session）读取并清空 pending queue

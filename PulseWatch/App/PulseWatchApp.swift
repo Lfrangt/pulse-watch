@@ -122,6 +122,11 @@ struct PulseWatchApp: App {
                 Task {
                     await OpenClawBridge.shared.attemptAutoReconnect()
                 }
+
+                // 检查并处理 OpenClaw pending workouts（每次前台都检查）
+                Task {
+                    await OpenClawBridge.shared.checkAndProcessPendingIfNeeded()
+                }
             }
         }
     }

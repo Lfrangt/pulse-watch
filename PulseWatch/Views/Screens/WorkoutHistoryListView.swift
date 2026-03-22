@@ -390,7 +390,7 @@ struct WorkoutHistoryListView: View {
     private var groupedByMonth: [MonthSection] {
         let formatter = DateFormatter()
         formatter.locale = Locale.current
-        formatter.dateFormat = "yyyy年M月"
+        formatter.dateFormat = "MMMM yyyy"
 
         let grouped = Dictionary(grouping: allEntries) { entry in
             formatter.string(from: entry.startDate)

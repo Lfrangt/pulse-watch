@@ -44,7 +44,7 @@ struct WorkoutShareScreen: View {
                         .padding(.bottom, PulseTheme.spacingM)
                 }
             }
-            .navigationTitle(String(localized: "Share Workout"))
+            .navigationTitle("Share Workout")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {

@@ -325,13 +325,13 @@ struct DashboardView: View {
         HStack(spacing: 0) {
             if let sleep {
                 NavigationLink(destination: SleepDetailView()) {
-                    ouraScoreDisc(icon: "moon.fill", iconColor: PulseTheme.sleepViolet, label: String(localized: "睡眠"), value: sleep)
+                    ouraScoreDisc(icon: "moon.fill", iconColor: PulseTheme.sleepViolet, label: String(localized: "Sleep"), value: sleep)
                 }
                 .buttonStyle(.plain)
             }
             if let activity {
                 NavigationLink(destination: ActivityDetailView()) {
-                    ouraScoreDisc(icon: "figure.run", iconColor: PulseTheme.activityCoral, label: String(localized: "活动"), value: activity)
+                    ouraScoreDisc(icon: "figure.run", iconColor: PulseTheme.activityCoral, label: String(localized: "Activity"), value: activity)
                 }
                 .buttonStyle(.plain)
             }
@@ -343,7 +343,7 @@ struct DashboardView: View {
                 .buttonStyle(.plain)
             } else if let hr = currentHeartRate {
                 NavigationLink(destination: HeartRateDetailView()) {
-                    ouraScoreDisc(icon: "heart.fill", iconColor: Color(hex: "FF6B6B"), label: String(localized: "心率"), value: Int(hr), unit: "bpm")
+                    ouraScoreDisc(icon: "heart.fill", iconColor: Color(hex: "FF6B6B"), label: String(localized: "Heart Rate"), value: Int(hr), unit: "bpm")
                 }
                 .buttonStyle(.plain)
             }
@@ -577,11 +577,11 @@ struct DashboardView: View {
 
     private func ouraStatusLabel(for score: Int) -> String {
         switch score {
-        case 0..<30: return "较差"
-        case 30..<50: return "一般"
-        case 50..<70: return "良好"
-        case 70..<85: return "优秀"
-        default: return "极佳"
+        case 0..<30: return "Poor"
+        case 30..<50: return "Fair"
+        case 50..<70: return "Good"
+        case 70..<85: return "Great"
+        default: return "Optimal"
         }
     }
 
@@ -828,7 +828,7 @@ struct DashboardView: View {
             // 睡眠
             if let sleep = currentSleep {
                 NavigationLink(destination: SleepDetailView()) {
-                    metricTile(icon: "moon.fill", label: "睡眠", value: sleep, unit: "", color: PulseTheme.sleepAccent, trend: .good, animated: false)
+                    metricTile(icon: "moon.fill", label: "Sleep", value: sleep, unit: "", color: PulseTheme.sleepAccent, trend: .good, animated: false)
                 }
                 .buttonStyle(.plain)
             }
@@ -836,7 +836,7 @@ struct DashboardView: View {
             // 步数
             if currentSteps > 0 {
                 NavigationLink(destination: StepsDetailView()) {
-                    metricTile(icon: "figure.run", label: "步数", value: formatSteps(currentSteps), unit: "", color: PulseTheme.accentTeal, trend: currentSteps >= 8000 ? .good : (currentSteps >= 5000 ? .ok : .poor), animated: true)
+                    metricTile(icon: "figure.run", label: "Steps", value: formatSteps(currentSteps), unit: "", color: PulseTheme.accentTeal, trend: currentSteps >= 8000 ? .good : (currentSteps >= 5000 ? .ok : .poor), animated: true)
                 }
                 .buttonStyle(.plain)
             }
@@ -844,7 +844,7 @@ struct DashboardView: View {
             // 卡路里
             if currentCalories > 0 {
                 NavigationLink(destination: CaloriesDetailView()) {
-                    metricTile(icon: "flame.fill", label: "卡路里", value: "\(Int(currentCalories))", unit: "kcal", color: PulseTheme.activityCoral, trend: currentCalories >= 300 ? .good : .ok, animated: false)
+                    metricTile(icon: "flame.fill", label: "Calories", value: "\(Int(currentCalories))", unit: "kcal", color: PulseTheme.activityCoral, trend: currentCalories >= 300 ? .good : .ok, animated: false)
                 }
                 .buttonStyle(.plain)
             }
@@ -852,7 +852,7 @@ struct DashboardView: View {
             // 血氧
             if let spo2 = currentBloodOxygen {
                 NavigationLink(destination: BloodOxygenDetailView()) {
-                    metricTile(icon: "lungs.fill", label: "血氧", value: "\(Int(spo2))%", unit: "", color: PulseTheme.statusGood, trend: spo2 >= 96 ? .good : (spo2 >= 93 ? .ok : .poor), animated: false)
+                    metricTile(icon: "lungs.fill", label: "SpO₂", value: "\(Int(spo2))%", unit: "", color: PulseTheme.statusGood, trend: spo2 >= 96 ? .good : (spo2 >= 93 ? .ok : .poor), animated: false)
                 }
                 .buttonStyle(.plain)
             }
@@ -1137,10 +1137,10 @@ struct DashboardView: View {
 
             // Label
             VStack(alignment: .leading, spacing: 2) {
-                Text("生理年龄")
+                Text("Health Age")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.45))
-                Text("\(ageInt) 岁")
+                Text("\(ageInt) yr")
                     .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
             }
@@ -1152,7 +1152,7 @@ struct DashboardView: View {
                 HStack(spacing: 4) {
                     Image(systemName: isYounger ? "arrow.down" : "arrow.up")
                         .font(.system(size: 10, weight: .bold))
-                    Text("\(diffInt) yr \(isYounger ? "更年轻" : "偏老")")
+                    Text("\(diffInt) yr \(isYounger ? "younger" : "older")")
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                 }
                 .foregroundStyle(accentColor)
@@ -1169,7 +1169,7 @@ struct DashboardView: View {
                 .overlay(RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
                     .stroke(Color.white.opacity(0.06), lineWidth: 0.5))
         )
-        .accessibilityLabel("生理年龄 \(ageInt) 岁")
+        .accessibilityLabel("Health Age \(ageInt) years")
     }
 
     private func healthAgeCard(result: HealthAgeService.HealthAgeResult) -> some View {

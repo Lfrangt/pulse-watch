@@ -601,10 +601,10 @@ enum TrainingAdvice: String, Codable {
 
     var label: String {
         switch self {
-        case .intense:  return String(localized: "高强度训练")
-        case .moderate: return String(localized: "中等强度")
-        case .light:    return String(localized: "轻松恢复")
-        case .rest:     return String(localized: "休息日")
+        case .intense:  return String(localized: "High Intensity")
+        case .moderate: return String(localized: "Moderate Intensity")
+        case .light:    return String(localized: "Light Recovery")
+        case .rest:     return String(localized: "Rest Day")
         }
     }
 

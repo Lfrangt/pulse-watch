@@ -119,7 +119,7 @@ struct WorkoutHistoryDetailView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "cpu.fill")
                             .font(.system(size: 10))
-                        Text("由 OpenClaw AI 记录")
+                        Text("Recorded by OpenClaw AI")
                             .font(.system(size: 11, weight: .medium, design: .rounded))
                     }
                     .foregroundStyle(PulseTheme.accentTeal)
@@ -470,7 +470,7 @@ struct WorkoutHistoryDetailView: View {
     private func formatFullDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale.current
-        formatter.dateFormat = "yyyy年M月d日 EEEE HH:mm"
+        formatter.dateFormat = "EEEE, MMM d, yyyy HH:mm"
         return formatter.string(from: date)
     }
 

@@ -809,7 +809,7 @@ struct HistoryView: View {
             // Data range note
             if let first = data.first, let last = data.last {
                 let days = Calendar.current.dateComponents([.day], from: first.date, to: last.date).day ?? 0
-                Text("显示 \(data.count) 天数据（\(days + 1)天跨度），积累更多数据后将显示趋势聚合图")
+                Text("Showing \(data.count) days of data (\(days + 1)-day span). Aggregated trend charts will appear as more data accumulates.")
                     .font(.system(size: 10))
                     .foregroundStyle(.white.opacity(0.3))
             }
@@ -895,7 +895,7 @@ struct HistoryView: View {
                                 isUp ? "+" : "", delta, yLabel.isEmpty ? "" : " \(yLabel)",
                                 isUp ? "+" : "", pct))
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    Text(selectedRange == .month ? "vs 30天前" : "vs 90天前")
+                    Text(selectedRange == .month ? "vs prev 30d" : "vs prev 90d")
                         .font(.system(size: 11, design: .rounded))
                         .foregroundStyle(.white.opacity(0.4))
                 }
@@ -1029,7 +1029,7 @@ struct HistoryView: View {
             NavigationLink {
                 WorkoutHistoryListView().preferredColorScheme(.dark)
             } label: {
-                shortcutTile(icon: "clock.fill", color: PulseTheme.activityCoral, title: String(localized: "训练记录"))
+                shortcutTile(icon: "clock.fill", color: PulseTheme.activityCoral, title: String(localized: "Workout History"))
             }
             .buttonStyle(.plain)
         }

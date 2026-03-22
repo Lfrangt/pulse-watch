@@ -100,7 +100,7 @@ struct WorkoutView: View {
                 Image(systemName: "cpu.fill")
                     .font(.system(size: 12))
                     .foregroundStyle(PulseTheme.accentTeal)
-                Text("OpenClaw AI 记录")
+                Text("OpenClaw AI Records")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(PulseTheme.textTertiary)
             }
@@ -734,7 +734,7 @@ struct WorkoutView: View {
             return String(localized: "Yesterday ") + timeString(date)
         } else {
             let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "zh_CN")
+            formatter.locale = Locale.current
             formatter.dateFormat = "M/d EEE"
             return formatter.string(from: date)
         }

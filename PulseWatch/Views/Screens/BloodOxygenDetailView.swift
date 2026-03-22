@@ -9,10 +9,10 @@ struct BloodOxygenDetailView: View {
     private var spo2: Double { healthManager.latestBloodOxygen ?? 0 }
     private var statusLabel: String {
         switch spo2 {
-        case 98...100: return "极佳"
-        case 96..<98:  return "正常"
-        case 93..<96:  return "偏低"
-        default:       return spo2 > 0 ? "注意" : "--"
+        case 98...100: return "Excellent"
+        case 96..<98:  return "Normal"
+        case 93..<96:  return "Low"
+        default:       return spo2 > 0 ? "Warning" : "--"
         }
     }
     private var statusColor: Color {
@@ -36,7 +36,7 @@ struct BloodOxygenDetailView: View {
             .padding(.top, PulseTheme.spacingM)
         }
         .background(PulseTheme.background.ignoresSafeArea())
-        .navigationTitle("血氧饱和度")
+        .navigationTitle("Blood Oxygen")
         .navigationBarTitleDisplayMode(.large)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .preferredColorScheme(.dark)
@@ -58,7 +58,7 @@ struct BloodOxygenDetailView: View {
                 .foregroundStyle(statusColor)
                 .padding(.horizontal, 14).padding(.vertical, 6)
                 .background(Capsule().fill(statusColor.opacity(0.13)))
-            Text("正常范围：95% – 100%")
+            Text("Normal range: 95% – 100%")
                 .font(.system(size: 12, design: .rounded))
                 .foregroundStyle(.white.opacity(0.35))
         }
@@ -77,18 +77,18 @@ struct BloodOxygenDetailView: View {
             return nil
         }
         return VStack(alignment: .leading, spacing: 10) {
-            sectionHeader("14日趋势", icon: "lungs.fill")
+            sectionHeader("14-Day Trend", icon: "lungs.fill")
             // SpO2 daily storage not yet implemented — show live reading context
             VStack(spacing: 8) {
                 HStack {
-                    Text("当前读数")
+                    Text("Current Reading")
                         .font(.system(size: 13)).foregroundStyle(.white.opacity(0.45))
                     Spacer()
                     Text(spo2 > 0 ? "\(Int(spo2))%" : "--")
                         .font(.system(size: 15, weight: .bold, design: .rounded))
                         .foregroundStyle(statusColor)
                 }
-                Text("血氧数据由 Apple Watch 实时测量。持续历史记录将在未来版本中支持。")
+                Text("Blood oxygen is measured in real time by Apple Watch. Continuous history will be supported in a future update.")
                     .font(.system(size: 12)).foregroundStyle(.white.opacity(0.35))
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -98,13 +98,13 @@ struct BloodOxygenDetailView: View {
 
     private var rangeCard: some View {
         let ranges: [(String, String, Color)] = [
-            ("98% – 100%", "极佳，红细胞携氧充足", PulseTheme.accentTeal),
-            ("95% – 97%",  "正常范围，无需担忧", .white.opacity(0.6)),
-            ("93% – 94%",  "偏低，建议深呼吸并休息", PulseTheme.statusWarning),
-            ("< 93%",      "异常，建议就医检查", PulseTheme.activityCoral),
+            ("98% – 100%", "Excellent — red blood cells fully oxygenated", PulseTheme.accentTeal),
+            ("95% – 97%",  "Normal range — no concern", .white.opacity(0.6)),
+            ("93% – 94%",  "Low — try deep breathing and rest", PulseTheme.statusWarning),
+            ("< 93%",      "Abnormal — consider medical evaluation", PulseTheme.activityCoral),
         ]
         return VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("血氧参考区间", icon: "chart.bar.fill")
+            sectionHeader("SpO2 Reference Ranges", icon: "chart.bar.fill")
             ForEach(ranges, id: \.0) { range in
                 HStack(spacing: 12) {
                     Capsule().fill(range.2).frame(width: 4, height: 36)
@@ -120,10 +120,10 @@ struct BloodOxygenDetailView: View {
 
     private var infoCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("关于血氧饱和度", icon: "info.circle")
-            tipRow("SpO₂ 反映血液中氧气携带能力，正常人静息时应在 95% 以上")
-            tipRow("高强度训练、高海拔或睡眠呼吸暂停可导致短暂下降")
-            tipRow("Apple Watch 的血氧测量仅供参考，不作医疗诊断使用")
+            sectionHeader("About Blood Oxygen", icon: "info.circle")
+            tipRow("SpO2 reflects how well your blood carries oxygen — resting values should be above 95%")
+            tipRow("Intense exercise, high altitude, or sleep apnea can cause temporary drops")
+            tipRow("Apple Watch blood oxygen readings are for reference only, not medical diagnosis")
         }
         .padding(PulseTheme.spacingM).background(glassCard)
     }

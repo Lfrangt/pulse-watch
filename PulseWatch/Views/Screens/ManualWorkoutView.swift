@@ -250,7 +250,7 @@ struct ManualWorkoutView: View {
             endDate: endDate,
             durationSeconds: durationSec,
             totalCalories: cal,
-            sourceName: String(localized: "手动记录"),
+            sourceName: String(localized: "Manual Entry"),
             isManual: true,
             notes: notes.isEmpty ? nil : notes
         )

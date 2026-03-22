@@ -13,7 +13,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Pulse"
           }
         }
@@ -43,7 +43,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Pulse 需要相机来扫描 OpenClaw 配对二维码。"
           }
         }
@@ -61,7 +61,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Pulse 需要读取你的健康数据来生成每日状态评分和训练建议。所有数据仅存储在你的设备上。"
           }
         }
@@ -79,7 +79,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Pulse 需要记录你的运动数据以追踪你的训练进度。"
           }
         }
@@ -97,7 +97,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Pulse Watch 在你到达设定的健身房位置时提醒你开始训练。位置数据保存在设备本地，不会上传到任何服务器。"
           }
         }
@@ -115,7 +115,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Pulse Watch 在你到达设定的健身房位置时提醒你开始训练。"
           }
         }

@@ -145,21 +145,21 @@ struct ScoreEngine {
     private static func generateInsight(score: Int, hrv: Double?, sleepMinutes: Int) -> String {
         switch score {
         case 88...:
-            return "恢复极佳，今天可以全力冲"
+            return String(localized: "Peak recovery — go all out today")
         case 78..<88:
-            return "状态很好，按计划训练"
+            return String(localized: "Feeling good — train as planned")
         case 65..<78:
             if sleepMinutes < 390 {
-                return "睡眠不足，适度训练，今晚早点休息"
+                return String(localized: "Sleep deficit — train lightly, rest early tonight")
             }
-            return "恢复良好，中等强度训练"
+            return String(localized: "Good recovery — moderate intensity training")
         case 50..<65:
             if let hrv, hrv < 35 {
-                return "HRV 偏低，以恢复为主，避免高强度"
+                return String(localized: "HRV is low — focus on recovery, avoid high intensity")
             }
-            return "身体还在恢复，轻松活动即可"
+            return String(localized: "Still recovering — light activity only")
         default:
-            return "今天需要充分休息，不要强撑训练"
+            return String(localized: "Rest day — your body needs full recovery")
         }
     }
     

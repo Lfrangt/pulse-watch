@@ -140,8 +140,12 @@ final class HealthAgeService {
 
     // Prior uncertainty on biological age (years).
     // Controls how strongly the estimate anchors to chronological age.
-    // Lower = stronger anchor. 6 gives stable results for wearable-only data.
-    private static let sBA: Double = 6.0
+    // Age-adaptive: young users anchor more strongly because wearable metrics
+    // explain less biological age variance before age ~30 (Ahadi 2020).
+    // 19yo → 3.4, 30yo → 4.5, 40yo → 5.5, 60yo → 7.5
+    private static func adaptiveSBA(for age: Double) -> Double {
+        max(3.0, min(8.0, 1.5 + age * 0.1))
+    }
 
     // MARK: - Computation
 
@@ -177,8 +181,9 @@ final class HealthAgeService {
         // BioAge = [ Σ_j (m_j − q_j) · k_j / s_j²  +  CA / s_BA² ]
         //          ÷ [ Σ_j k_j² / s_j²  +  1 / s_BA² ]
 
-        var numerator = ca / (Self.sBA * Self.sBA)
-        var denominator = 1.0 / (Self.sBA * Self.sBA)
+        let sBA = Self.adaptiveSBA(for: ca)
+        var numerator = ca / (sBA * sBA)
+        var denominator = 1.0 / (sBA * sBA)
 
         struct BiomarkerInput {
             let param: KDMBiomarker
@@ -326,8 +331,10 @@ final class HealthAgeService {
         let rawBioAge = kdmAge + sleepPenalty + activePenalty
 
         // Clamp: wearable-only estimates have ±5–8 year confidence interval.
-        // Cap offset to prevent unrealistic extremes.
-        let maxOffset = max(3.0, ca * 0.12)  // e.g. 19yo → ±3yr, 40yo → ±4.8yr, 60yo → ±7.2yr
+        // Age-adaptive cap — young users have less physiological aging to reverse,
+        // so the offset should be tighter. Scales from ±1.5yr at 19 to ±5yr at 50+.
+        // Formula: (chronologicalAge − 16) × 0.3, floored at 1.5, capped at 5.
+        let maxOffset = min(5.0, max(1.5, (ca - 16.0) * 0.3))
         let clampedAge = max(ca - maxOffset, min(ca + maxOffset, rawBioAge))
 
         return HealthAgeResult(

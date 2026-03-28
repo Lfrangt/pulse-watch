@@ -242,8 +242,6 @@ struct HealthAgeDetailView: View {
         case .restingHR:     return String(format: "%.0f bpm", m.value)
         case .hrv:           return String(format: "%.0f ms", m.value)
         case .sleep:         return String(format: "%.1fh", m.value)
-        case .steps:         return String(format: "%.0f", m.value)
-        case .activeMinutes: return String(format: String(localized: "%.0f min"), m.value)
         }
     }
 }

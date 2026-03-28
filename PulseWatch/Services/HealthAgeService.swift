@@ -90,16 +90,12 @@ final class HealthAgeService {
             case restingHR = "restingHR"
             case hrv = "hrv"
             case sleep = "sleep"
-            case steps = "steps"
-            case activeMinutes = "activeMinutes"
 
             var label: String {
                 switch self {
                 case .restingHR:      return String(localized: "Resting Heart Rate")
                 case .hrv:            return String(localized: "Heart Rate Variability")
                 case .sleep:          return String(localized: "Sleep Duration")
-                case .steps:          return String(localized: "Daily Steps")
-                case .activeMinutes:  return String(localized: "Active Minutes")
                 }
             }
 
@@ -108,8 +104,6 @@ final class HealthAgeService {
                 case .restingHR:      return "heart.fill"
                 case .hrv:            return "waveform.path.ecg"
                 case .sleep:          return "moon.fill"
-                case .steps:          return "figure.walk"
-                case .activeMinutes:  return "flame.fill"
                 }
             }
         }
@@ -134,9 +128,6 @@ final class HealthAgeService {
 
     // [3] Short-window SDNN: −0.55 ms/year, SD ≈ 17 ms
     private static let sdnnParam = KDMBiomarker(intercept: 62.0, slope: -0.55, residualSE: 17.0)
-
-    // [4] Daily steps: −80 steps/year, SD ≈ 3000 steps
-    private static let stepsParam = KDMBiomarker(intercept: 10500, slope: -80, residualSE: 3000)
 
     // Prior uncertainty on biological age (years).
     // Controls how strongly the estimate anchors to chronological age.
@@ -163,16 +154,6 @@ final class HealthAgeService {
         let avgRHR = avg(summaries.compactMap(\.restingHeartRate))
         let avgHRV = avg(summaries.compactMap(\.averageHRV))
         let avgSleepMin = avg(summaries.compactMap(\.sleepDurationMinutes).map(Double.init))
-        let avgSteps = avg(summaries.compactMap(\.totalSteps).map(Double.init))
-        let avgActiveCal = avg(summaries.compactMap(\.activeCalories))
-
-        let avgExerciseMin = avg(summaries.compactMap(\.exerciseMinutes))
-        let avgActiveMin: Double
-        if let real = avgExerciseMin, real > 0 {
-            avgActiveMin = real
-        } else {
-            avgActiveMin = avgActiveCal.map { $0 / 5.0 } ?? 0
-        }
 
         let ca = Double(actualAge)
 
@@ -197,9 +178,6 @@ final class HealthAgeService {
         }
         if let hrv = avgHRV {
             inputs.append((.hrv, BiomarkerInput(param: Self.sdnnParam, observed: hrv)))
-        }
-        if let steps = avgSteps {
-            inputs.append((.steps, BiomarkerInput(param: Self.stepsParam, observed: steps)))
         }
 
         for input in inputs {
@@ -248,16 +226,6 @@ final class HealthAgeService {
                 } else {
                     advice = String(localized: "HRV below age norm — improving sleep and reducing stress can help")
                 }
-            case .steps:
-                if m >= 10000 {
-                    advice = String(localized: "Excellent step count — well above the 8000 mortality threshold (JAMA 2020)")
-                } else if m >= 8000 {
-                    advice = String(localized: "Steps meet the key health threshold (Saint-Maurice 2020)")
-                } else if m >= 6000 {
-                    advice = String(localized: "Steps slightly below optimal — aim for 8000+ daily")
-                } else {
-                    advice = String(localized: "Step count low — sedentary risk elevated (JAMA 2020)")
-                }
             default:
                 advice = ""
             }
@@ -303,32 +271,8 @@ final class HealthAgeService {
             ))
         }
 
-        // ── Active Minutes Penalty [6] ──────────────────────────────
-        // WHO threshold: 150 min/week ≈ 21 min/day. Below → penalty.
-        let whoDaily = 21.4
-        let activePenalty: Double
-        if avgActiveMin >= whoDaily {
-            activePenalty = 0
-        } else {
-            activePenalty = min(1.5, (whoDaily - avgActiveMin) / whoDaily * 1.5)
-        }
-        let activeAdvice: String
-        if avgActiveMin >= whoDaily {
-            activeAdvice = String(localized: "Activity meets WHO 2020 recommendation (≥150 min/week)")
-        } else if avgActiveMin >= 10 {
-            activeAdvice = String(localized: "Activity slightly below WHO target — aim for 21+ minutes daily")
-        } else {
-            activeAdvice = String(localized: "Activity very low — increasing daily movement significantly reduces chronic disease risk")
-        }
-        metrics.append(MetricScore(
-            metric: .activeMinutes,
-            value: avgActiveMin,
-            ageImpact: activePenalty,
-            advice: activeAdvice
-        ))
-
         // ── Final Biological Age ────────────────────────────────────
-        let rawBioAge = kdmAge + sleepPenalty + activePenalty
+        let rawBioAge = kdmAge + sleepPenalty
 
         // Clamp: wearable-only estimates have ±5–8 year confidence interval.
         // Age-adaptive cap — young users have less physiological aging to reverse,
@@ -364,8 +308,6 @@ final class HealthAgeService {
             MetricScore(metric: .restingHR, value: 58, ageImpact: -1.0, advice: "Resting HR is in a healthy range"),
             MetricScore(metric: .hrv, value: 52, ageImpact: -1.5, advice: "HRV indicates good autonomic health"),
             MetricScore(metric: .sleep, value: 7.5, ageImpact: 0, advice: "Sleep duration is in the optimal range"),
-            MetricScore(metric: .steps, value: 9200, ageImpact: -0.3, advice: "Step count is solid — keep it up"),
-            MetricScore(metric: .activeMinutes, value: 35, ageImpact: 0, advice: "Activity level meets WHO guidelines"),
         ],
         daysOfData: 14
     )

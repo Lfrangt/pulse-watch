@@ -16,25 +16,49 @@ metadata:
 
 ## 数据源
 
-Pulse Watch 通过 OpenClaw Bridge 共享健康数据。用以下方式获取：
+Pulse Watch 通过 OpenClaw Bridge 自动推送健康数据到 `~/.pulse/health-data.json`。
+
+### CLI 工具（推荐）
 
 ```bash
-# 读取最新健康状态
-defaults read group.com.abundra.pulse.shared pulse.healthStatus 2>/dev/null | python3 -c "import sys,json; print(json.dumps(json.loads(sys.stdin.read()), indent=2, ensure_ascii=False))"
+# 查看健康状态概览
+pulse-health status
+
+# 获取原始 JSON（用于脚本处理）
+pulse-health json
+
+# 关键指标 JSON（简洁格式）
+pulse-health metrics
+
+# 7 天每日历史数据
+pulse-health history
 ```
 
-数据格式：
+安装：`cp agent/pulse-health /usr/local/bin/ && chmod +x /usr/local/bin/pulse-health`
+
+### 直接读文件
+
+```bash
+cat ~/.pulse/health-data.json | python3 -c "import sys,json; print(json.dumps(json.load(sys.stdin), indent=2))"
+```
+
+### 数据格式（health_sync JSON）
+
 ```json
 {
-  "score": 72,
-  "headline": "状态不错",
-  "heartRate": 68,
-  "restingHR": 62,
-  "hrv": 45,
-  "steps": 8230,
-  "sleepHours": 7.2,
-  "trainingAdvice": "moderate",
-  "insights": ["HRV 趋势上升", "睡眠质量良好"]
+  "type": "health_sync",
+  "date": "2025-03-28",
+  "metrics": {
+    "heartRate": { "resting": 51, "average": 68 },
+    "hrv": { "average": 88 },
+    "sleep": { "totalMinutes": 462, "deepMinutes": 95, "remMinutes": 110 },
+    "activity": { "steps": 14645, "activeCalories": 450 },
+    "recoveryScore": 70,
+    "weekTrend": { "averageScore": 72, "scoreTrend": "up", "hrvTrend": "stable" }
+  },
+  "dailyHistory": [
+    { "date": "2025-03-27", "score": 75, "restingHeartRate": 52, "hrv": 85, "steps": 12000 }
+  ]
 }
 ```
 
@@ -76,6 +100,20 @@ defaults read group.com.abundra.pulse.shared pulse.healthStatus 2>/dev/null | py
 - HRV 连续 3 天下降 → "可能过度训练，建议 deload 一周"
 - 静息心率升高 → "身体在恢复，跳过今天的高强度训练"
 - 睡眠不足 5 小时 → "今天完全休息，不要勉强"
+
+### 6. 自动缓存健康数据（⭐ 重要）
+
+当收到 `[HEALTH_DATA]` 推送时，**必须**将 JSON 保存到本地文件供 CLI 读取：
+
+```bash
+mkdir -p ~/.pulse
+# 将 [HEALTH_DATA] 和 [/HEALTH_DATA] 之间的 JSON 内容写入文件
+cat > ~/.pulse/health-data.json << 'HEALTH_EOF'
+<这里粘贴收到的 health_sync JSON>
+HEALTH_EOF
+```
+
+这样 `pulse-health` CLI 和其他工具可以随时读取最新数据，不依赖实时连接。
 
 ## 交互风格
 

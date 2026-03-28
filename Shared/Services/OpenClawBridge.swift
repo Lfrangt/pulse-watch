@@ -390,11 +390,24 @@ final class OpenClawBridge {
             // 同时写入 App Group 供 Widget 读取
             writeToAppGroup(status)
 
+            // 写入 App Group JSON 文件供 CLI / Agent 直接读取
+            writeHealthSyncFile(healthSyncJSON)
+
             logger.info("健康数据已推送到 OpenClaw — 恢复评分: \(status.recoveryScore)")
 
         } catch {
             logger.error("推送健康数据失败: \(error.localizedDescription)")
             connectionStatus = .error
+            // Push failed — try to find the gateway on the local subnet
+            // (IP may have changed after DHCP renewal / Wi-Fi reconnect)
+            Task {
+                await attemptAutoReconnect()
+                // Retry push once after reconnect
+                if connectionStatus == .connected {
+                    logger.info("Auto-reconnect succeeded, retrying push")
+                    await pushHealthStatus()
+                }
+            }
         }
     }
 
@@ -681,6 +694,20 @@ final class OpenClawBridge {
 
     private static let appGroupID = "group.com.abundra.pulse.shared"
 
+    /// 写入 health_sync JSON 文件到 App Group 容器，供 CLI 工具读取
+    private func writeHealthSyncFile(_ json: String) {
+        guard let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Self.appGroupID
+        ) else { return }
+        let fileURL = containerURL.appendingPathComponent("health-data.json")
+        do {
+            try json.write(to: fileURL, atomically: true, encoding: .utf8)
+            logger.debug("Health sync JSON written to \(fileURL.path)")
+        } catch {
+            logger.error("Failed to write health sync file: \(error.localizedDescription)")
+        }
+    }
+
     /// 写入 App Group 供 Widget 读取
     private func writeToAppGroup(_ status: HealthStatus) {
         guard let sharedDefaults = UserDefaults(suiteName: Self.appGroupID) else { return }
@@ -804,8 +831,11 @@ final class OpenClawBridge {
 
     private func checkConnection() {
         if isEnabled, config != nil {
+            // Only mark connected if we have a very recent successful sync.
+            // Otherwise mark disconnected — actual connectivity is verified
+            // by attemptAutoReconnect() which runs on foreground.
             if let lastSync = lastSyncTime,
-               Date().timeIntervalSince(lastSync) < 7200 {
+               Date().timeIntervalSince(lastSync) < 120 {
                 connectionStatus = .connected
             } else {
                 connectionStatus = .disconnected
@@ -823,10 +853,10 @@ final class OpenClawBridge {
         guard isEnabled else { return }
         guard let cfg = config else { return }
 
-        // Already confirmed recently — skip
+        // Already confirmed recently — skip (60s cooldown to avoid scan spam)
         if connectionStatus == .connected,
            let lastSync = lastSyncTime,
-           Date().timeIntervalSince(lastSync) < 300 {
+           Date().timeIntervalSince(lastSync) < 60 {
             return
         }
 

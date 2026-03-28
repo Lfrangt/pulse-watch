@@ -271,18 +271,17 @@ struct ActivityDetailView: View {
     }
 
     private func loadData() async {
-        let calendar = Calendar.current
-        var results: [(date: Date, steps: Int)] = []
-        for daysAgo in (0..<7).reversed() {
-            if let date = calendar.date(byAdding: .day, value: -daysAgo, to: .now) {
-                if daysAgo == 0 {
-                    results.append((date: date, steps: steps))
-                } else {
-                    results.append((date: date, steps: Int.random(in: 3000...13000)))
-                }
+        // Fetch 7-day daily steps from HealthKit (auto-deduplicated across sources)
+        do {
+            let hkData = try await healthManager.fetchWeeklySteps()
+            if !hkData.isEmpty {
+                weekSteps = hkData.map { (date: $0.date, steps: Int($0.value)) }
             }
+        } catch {
+            #if DEBUG
+            print("Steps weekly fetch error: \(error)")
+            #endif
         }
-        weekSteps = results
         withAnimation(.easeInOut(duration: 0.6).delay(0.3)) {
             chartAppeared = true
         }

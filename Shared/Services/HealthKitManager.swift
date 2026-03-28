@@ -391,8 +391,76 @@ final class HealthKitManager {
         return max(0, min(100, score))
     }
     
+    // MARK: - Weekly Statistics (7-day daily breakdown)
+
+    /// Fetch daily average HRV for the past 7 days from HealthKit
+    func fetchWeeklyHRV() async throws -> [(date: Date, value: Double)] {
+        let type = HKQuantityType(.heartRateVariabilitySDNN)
+        let unit = HKUnit.secondUnit(with: .milli)
+        return try await fetchDailyStatistics(type: type, unit: unit, days: 7, options: .discreteAverage)
+    }
+
+    /// Fetch daily total steps for the past 7 days from HealthKit (auto-deduplicated)
+    func fetchWeeklySteps() async throws -> [(date: Date, value: Double)] {
+        let type = HKQuantityType(.stepCount)
+        return try await fetchDailyStatistics(type: type, unit: .count(), days: 7, options: .cumulativeSum)
+    }
+
+    /// Generic daily statistics collection query
+    private func fetchDailyStatistics(
+        type: HKQuantityType,
+        unit: HKUnit,
+        days: Int,
+        options: HKStatisticsOptions
+    ) async throws -> [(date: Date, value: Double)] {
+        let calendar = Calendar.current
+        let now = Date()
+        let startDate = calendar.date(byAdding: .day, value: -days + 1, to: calendar.startOfDay(for: now))!
+        let anchorDate = calendar.startOfDay(for: now)
+
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: now)
+        let interval = DateComponents(day: 1)
+
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKStatisticsCollectionQuery(
+                quantityType: type,
+                quantitySamplePredicate: predicate,
+                options: options,
+                anchorDate: anchorDate,
+                intervalComponents: interval
+            )
+
+            query.initialResultsHandler = { _, results, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                var dataPoints: [(date: Date, value: Double)] = []
+                results?.enumerateStatistics(from: startDate, to: now) { statistics, _ in
+                    let quantity: HKQuantity?
+                    switch options {
+                    case .cumulativeSum:
+                        quantity = statistics.sumQuantity()
+                    case .discreteAverage:
+                        quantity = statistics.averageQuantity()
+                    default:
+                        quantity = statistics.averageQuantity()
+                    }
+                    if let value = quantity?.doubleValue(for: unit) {
+                        dataPoints.append((date: statistics.startDate, value: value))
+                    }
+                }
+
+                continuation.resume(returning: dataPoints)
+            }
+
+            store.execute(query)
+        }
+    }
+
     // MARK: - Private Helpers
-    
+
     private func fetchMostRecentSample(for type: HKQuantityType) async throws -> HKQuantitySample? {
         let descriptor = HKSampleQueryDescriptor(
             predicates: [.quantitySample(type: type)],

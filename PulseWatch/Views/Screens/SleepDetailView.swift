@@ -79,21 +79,14 @@ struct SleepDetailView: View {
     // MARK: - Data Loading
 
     private func loadData() async {
+        // Refresh sleep data from HealthKit first
+        _ = try? await healthManager.fetchLastNightSleep()
+
         do {
             let fetched = try await healthManager.fetchSleepSamples()
-            samples = fetched.isEmpty ? Self.demoSamples : fetched
+            samples = fetched
         } catch {
-            samples = Self.demoSamples
-        }
-        // If no real data was fetched earlier, set demo aggregates
-        if totalMinutes == 0 {
-            healthManager.lastNightSleepMinutes = 450
-            healthManager.lastNightDeepSleepMinutes = 95
-            healthManager.lastNightREMSleepMinutes = 110
-            let cal = Calendar.current
-            let today = cal.startOfDay(for: Date())
-            healthManager.lastNightSleepStart = cal.date(bySettingHour: 23, minute: 0, second: 0, of: cal.date(byAdding: .day, value: -1, to: today)!)
-            healthManager.lastNightSleepEnd = cal.date(bySettingHour: 7, minute: 0, second: 0, of: today)
+            samples = []
         }
         isLoading = false
         withAnimation(.easeInOut(duration: 0.8).delay(0.2)) {
@@ -346,17 +339,38 @@ struct SleepDetailView: View {
     }
 
     private var sleepLatencyInsight: String {
-        String(localized: "入睡用时约 12 分钟，快于平均水平")
+        guard let start = sleepStart, let firstSleep = samples.first(where: { $0.stage != .awake }) else {
+            return String(localized: "入睡用时数据不足")
+        }
+        let latencyMin = Int(firstSleep.start.timeIntervalSince(start) / 60)
+        if latencyMin <= 15 {
+            return String(localized: "入睡用时约 \(latencyMin) 分钟，快于平均水平")
+        } else if latencyMin <= 30 {
+            return String(localized: "入睡用时约 \(latencyMin) 分钟，属于正常范围")
+        } else {
+            return String(localized: "入睡用时约 \(latencyMin) 分钟，建议改善睡前习惯")
+        }
     }
 
     private var deepSleepInsight: String {
         let pct = totalMinutes > 0 ? Int(Double(deepMinutes) / Double(totalMinutes) * 100) : 0
-        return String(localized: "深睡占比 \(pct)%，处于健康范围")
+        if pct >= 20 {
+            return String(localized: "深睡占比 \(pct)%，表现优秀")
+        } else if pct >= 13 {
+            return String(localized: "深睡占比 \(pct)%，处于健康范围")
+        } else if pct > 0 {
+            return String(localized: "深睡占比 \(pct)%，偏低")
+        } else {
+            return String(localized: "深睡数据不足")
+        }
     }
 
     private var weeklyTrendInsight: String {
+        guard totalMinutes > 0 else {
+            return String(localized: "暂无本周睡眠趋势数据")
+        }
         let hours = String(format: "%.1f", Double(totalMinutes) / 60)
-        return String(localized: "本周平均睡眠 \(hours)h，保持稳定")
+        return String(localized: "昨晚睡眠 \(hours)h")
     }
 
     // MARK: - Helpers

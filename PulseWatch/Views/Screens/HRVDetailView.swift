@@ -244,22 +244,17 @@ struct HRVDetailView: View {
     }
 
     private func loadData() async {
-        // Fetch 7-day HRV samples from HealthKit (simplified — daily latest)
-        let calendar = Calendar.current
-        var results: [(date: Date, value: Double)] = []
-        for daysAgo in (0..<7).reversed() {
-            if let date = calendar.date(byAdding: .day, value: -daysAgo, to: .now) {
-                // Use current value for today, demo values for past days
-                if daysAgo == 0, let v = healthManager.latestHRV {
-                    results.append((date: date, value: v))
-                } else {
-                    // Randomised demo — replace with real HK query if needed
-                    let demo = Double.random(in: 45...95)
-                    results.append((date: date, value: demo))
-                }
+        // Fetch 7-day HRV daily averages from HealthKit
+        do {
+            let hkData = try await healthManager.fetchWeeklyHRV()
+            if !hkData.isEmpty {
+                weekSamples = hkData
             }
+        } catch {
+            #if DEBUG
+            print("HRV weekly fetch error: \(error)")
+            #endif
         }
-        weekSamples = results
         withAnimation(.easeInOut(duration: 0.6).delay(0.2)) {
             chartAppeared = true
         }

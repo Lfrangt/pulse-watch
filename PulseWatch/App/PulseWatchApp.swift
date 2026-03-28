@@ -84,6 +84,10 @@ struct PulseWatchApp: App {
             await HealthKitService.shared.performInitialFetch()
             // 训练历史同步 — 每次启动时增量同步
             await WorkoutHistoryService.shared.syncWorkouts()
+            // 数据采集完成后立即推送到 OpenClaw（确保 Agent 有最新数据）
+            await MainActor.run {
+                OpenClawBridge.shared.checkAndPushIfNeeded()
+            }
         }
     }
 
@@ -131,6 +135,11 @@ struct PulseWatchApp: App {
                 // 检查并处理 OpenClaw pending workouts（每次前台都检查）
                 Task {
                     await OpenClawBridge.shared.checkAndProcessPendingIfNeeded()
+                }
+
+                // 回到前台时推送最新健康数据到 OpenClaw
+                Task { @MainActor in
+                    OpenClawBridge.shared.checkAndPushIfNeeded()
                 }
             }
         }

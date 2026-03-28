@@ -121,6 +121,9 @@ final class OpenClawBridge {
     /// 上次推送的评分（用于检测重大变化）
     private var lastPushedScore: Int?
 
+    /// 缓存周数据供 buildHealthSyncJSON 使用
+    private var cachedWeekSummaries: [DailySummary] = []
+
     /// 推送间隔（秒）
     private let pushInterval: TimeInterval = 1800 // 30 分钟
 
@@ -437,6 +440,9 @@ final class OpenClawBridge {
         let vitals = dataService.getLatestVitals()
         let insight = HealthAnalyzer.shared.generateInsight()
 
+        // 缓存周数据供 buildHealthSyncJSON 使用
+        cachedWeekSummaries = week
+
         let todaySummary = TodaySummaryPayload(
             date: DailySummary.dateFormatter.string(from: Date()),
             dailyScore: today?.dailyScore,
@@ -581,11 +587,33 @@ final class OpenClawBridge {
         trend["dailyScores"] = wt.dailyScores.map { ["date": $0.date, "score": $0.score] }
         metrics["weekTrend"] = trend
 
+        // 过去 7 天每日详细数据 — 让 Agent 能回答"昨天状态怎么样"等历史问题
+        let dailyHistory: [[String: Any]] = cachedWeekSummaries.map { s in
+            var day: [String: Any] = ["date": s.dateString]
+            if let score = s.dailyScore { day["score"] = score }
+            if let rhr = s.restingHeartRate { day["restingHeartRate"] = Int(rhr) }
+            if let hrv = s.averageHRV { day["hrv"] = Int(hrv) }
+            if let avgHR = s.averageHeartRate { day["averageHeartRate"] = Int(avgHR) }
+            if let spo2 = s.averageBloodOxygen { day["bloodOxygen"] = Int(spo2) }
+            if let steps = s.totalSteps { day["steps"] = steps }
+            if let cal = s.activeCalories { day["activeCalories"] = Int(cal) }
+            if let exMin = s.exerciseMinutes { day["exerciseMinutes"] = Int(exMin) }
+            if let sleepMin = s.sleepDurationMinutes {
+                var sleep: [String: Any] = ["totalMinutes": sleepMin]
+                if let deep = s.deepSleepMinutes { sleep["deepMinutes"] = deep }
+                if let rem = s.remSleepMinutes { sleep["remMinutes"] = rem }
+                if let core = s.coreSleepMinutes { sleep["coreMinutes"] = core }
+                day["sleep"] = sleep
+            }
+            return day
+        }
+
         let payload: [String: Any] = [
             "type": "health_sync",
             "date": dateStr,
             "metrics": metrics,
-            "workouts": workouts
+            "workouts": workouts,
+            "dailyHistory": dailyHistory
         ]
 
         guard let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),

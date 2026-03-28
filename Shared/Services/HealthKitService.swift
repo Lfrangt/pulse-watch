@@ -184,7 +184,8 @@ final class HealthKitService {
                     metricType: metricType,
                     value: value,
                     timestamp: sample.startDate,
-                    source: source
+                    source: source,
+                    sampleUUID: sample.uuid.uuidString
                 )
             }
 
@@ -250,37 +251,42 @@ final class HealthKitService {
 
                 let durationMinutes = sample.endDate.timeIntervalSince(sample.startDate) / 60
                 let source = sample.sourceRevision.source.name
+                let baseUUID = sample.uuid.uuidString
 
                 // 总睡眠记录
                 records.append(HealthRecord(
                     metricType: .sleepAnalysis,
                     value: durationMinutes,
                     timestamp: sample.startDate,
-                    source: source
+                    source: source,
+                    sampleUUID: "\(baseUUID)-sleep"
                 ))
 
-                // 按阶段记录
+                // 按阶段记录（使用 HKSample UUID + 阶段后缀保证唯一性）
                 switch sleepValue {
                 case .asleepDeep:
                     records.append(HealthRecord(
                         metricType: .sleepDeep,
                         value: durationMinutes,
                         timestamp: sample.startDate,
-                        source: source
+                        source: source,
+                        sampleUUID: "\(baseUUID)-deep"
                     ))
                 case .asleepREM:
                     records.append(HealthRecord(
                         metricType: .sleepREM,
                         value: durationMinutes,
                         timestamp: sample.startDate,
-                        source: source
+                        source: source,
+                        sampleUUID: "\(baseUUID)-rem"
                     ))
                 case .asleepCore:
                     records.append(HealthRecord(
                         metricType: .sleepCore,
                         value: durationMinutes,
                         timestamp: sample.startDate,
-                        source: source
+                        source: source,
+                        sampleUUID: "\(baseUUID)-core"
                     ))
                 default:
                     break // asleepUnspecified — 只计入总睡眠

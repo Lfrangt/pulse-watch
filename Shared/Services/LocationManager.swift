@@ -25,12 +25,18 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
 
     // MARK: - Authorization
 
+    /// 请求位置权限 — 先请求 WhenInUse，用户同意后自动升级到 Always（地理围栏需要）
     func requestAuthorization() {
-        manager.requestWhenInUseAuthorization()
-    }
-
-    func requestAlwaysAuthorization() {
-        manager.requestAlwaysAuthorization()
+        let status = manager.authorizationStatus
+        switch status {
+        case .notDetermined:
+            manager.requestWhenInUseAuthorization()
+        case .authorizedWhenInUse:
+            // 已有 WhenInUse，升级到 Always（地理围栏后台触发需要）
+            manager.requestAlwaysAuthorization()
+        default:
+            break
+        }
     }
 
     // MARK: - Geofencing (iOS only — Watch receives events via WatchConnectivity)
@@ -126,9 +132,15 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
-        case .authorizedAlways, .authorizedWhenInUse:
+        case .authorizedAlways:
             isAuthorized = true
             manager.startUpdatingLocation()
+            manager.allowsBackgroundLocationUpdates = true
+        case .authorizedWhenInUse:
+            isAuthorized = true
+            manager.startUpdatingLocation()
+            // 自动请求升级到 Always — 地理围栏后台触发需要
+            manager.requestAlwaysAuthorization()
         default:
             isAuthorized = false
         }

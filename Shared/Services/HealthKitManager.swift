@@ -322,25 +322,21 @@ final class HealthKitManager {
     // MARK: - Refresh All
     
     func refreshAll() async {
-        do {
-            _ = try await fetchLatestHeartRate()
-            _ = try await fetchLatestHRV()
-            _ = try await fetchRestingHeartRate()
-            _ = try await fetchBloodOxygen()
-            _ = try await fetchTodaySteps()
-            _ = try await fetchTodayCalories()
-            _ = try await fetchTodayExerciseTime()
-            _ = try await fetchLastNightSleep()
-            await fetchTodayLastWorkout()
-            
-            // Check if we have any meaningful health data
-            updateHealthDataAvailability()
-        } catch {
-            #if DEBUG
-            print("HealthKit refresh error: \(error)")
-            #endif
-            hasHealthData = false
-        }
+        // 并行获取所有指标 — 独立查询，互不阻塞，单个失败不影响其他
+        async let hr = try? fetchLatestHeartRate()
+        async let hrv = try? fetchLatestHRV()
+        async let rhr = try? fetchRestingHeartRate()
+        async let spo2 = try? fetchBloodOxygen()
+        async let steps = try? fetchTodaySteps()
+        async let cal = try? fetchTodayCalories()
+        async let exercise = try? fetchTodayExerciseTime()
+        async let sleep = try? fetchLastNightSleep()
+        async let workout: Void = fetchTodayLastWorkout()
+
+        _ = await (hr, hrv, rhr, spo2, steps, cal, exercise, sleep, workout)
+
+        // Check if we have any meaningful health data
+        updateHealthDataAvailability()
     }
     
     private func updateHealthDataAvailability() {

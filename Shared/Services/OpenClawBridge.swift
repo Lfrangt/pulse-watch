@@ -113,9 +113,22 @@ final class OpenClawBridge {
     /// SwiftData ModelContainer，由 App 在启动时注入，用于写入训练记录
     var modelContainer: ModelContainer?
 
-    /// 配置
+    /// 配置 — cached to avoid repeated Keychain reads; invalidated on pair/unpair
+    private var _cachedConfig: PulseOpenClawConfig?
+    private var _configLoaded = false
+
     var config: PulseOpenClawConfig? {
-        PulseOpenClawConfig.load()
+        if !_configLoaded {
+            _cachedConfig = PulseOpenClawConfig.load()
+            _configLoaded = true
+        }
+        return _cachedConfig
+    }
+
+    /// Invalidate cached config (call after pair/unpair/clear)
+    func invalidateConfigCache() {
+        _configLoaded = false
+        _cachedConfig = nil
     }
 
     /// 上次推送的评分（用于检测重大变化）
@@ -278,6 +291,7 @@ final class OpenClawBridge {
                 agentID: agentID ?? PulseOpenClawConfig.defaultAgentID
             )
             cfg.save()
+            invalidateConfigCache()
             await MainActor.run {
                 connectionStatus = .connected
                 // 确保 isEnabled = true，触发数据推送
@@ -386,6 +400,9 @@ final class OpenClawBridge {
             lastSyncTime = Date()
             lastPushedScore = status.recoveryScore
             connectionStatus = .connected
+
+            // 写入 Agent workspace 供 Pulse Coach skill 离线读取
+            writeHealthSyncToWorkspace(healthSyncJSON, cfg: cfg)
 
             // 同时写入 App Group 供 Widget 读取
             writeToAppGroup(status)
@@ -690,6 +707,45 @@ final class OpenClawBridge {
         return text
     }
 
+    // MARK: - Agent Workspace 持久化
+
+    /// 让 Agent 把 health_sync JSON 保存到 ~/.pulse/health-data.json
+    /// Agent 有 bash tool 权限，通过 completions API 指令执行
+    private func writeHealthSyncToWorkspace(_ json: String, cfg: PulseOpenClawConfig) {
+        guard let endpoint = cfg.completionsURL else { return }
+
+        // 使用 base64 编码避免 heredoc 终止符注入和特殊字符转义问题
+        guard let jsonData = json.data(using: .utf8) else { return }
+        let base64JSON = jsonData.base64EncodedString()
+
+        let message = """
+        Execute this bash command silently, reply with only "ok":
+        mkdir -p ~/.pulse && echo '\(base64JSON)' | base64 -d > ~/.pulse/health-data.json
+        """
+
+        let body: [String: Any] = [
+            "model": cfg.agentID,
+            "messages": [
+                ["role": "system", "content": "You are a silent helper. Execute the bash command and reply with only \"ok\". No other output."],
+                ["role": "user", "content": message]
+            ],
+            "max_tokens": 32
+        ]
+
+        guard let bodyData = try? JSONSerialization.data(withJSONObject: body) else { return }
+
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(cfg.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = bodyData
+
+        // Fire-and-forget — 不阻塞主 sync 流程
+        Task.detached(priority: .utility) { [session] in
+            _ = try? await session.data(for: request)
+        }
+    }
+
     // MARK: - App Group (Widget 兼容)
 
     private static let appGroupID = "group.com.abundra.pulse.shared"
@@ -881,7 +937,10 @@ final class OpenClawBridge {
             return
         }
 
-        guard let discoveredBase = await SubnetScanner.shared.findGateway(port: port) else {
+        // 保留原始配置的 scheme（http/https），避免子网发现后 ATS 降级
+        let scheme = savedURL.scheme ?? "http"
+
+        guard let discoveredBase = await SubnetScanner.shared.findGateway(port: port, scheme: scheme) else {
             logger.warning("Auto-reconnect: subnet scan found nothing")
             await MainActor.run { connectionStatus = .error }
             return
@@ -897,6 +956,7 @@ final class OpenClawBridge {
                 agentID: cfg.agentID
             )
             updated.save()
+            invalidateConfigCache()
             await MainActor.run {
                 connectionStatus = .connected
                 // Sync @AppStorage used by SettingsView

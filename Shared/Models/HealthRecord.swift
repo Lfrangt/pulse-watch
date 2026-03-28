@@ -52,9 +52,9 @@ final class HealthRecord {
     var id: UUID
     var metricType: String               // HealthMetricType.rawValue
     var value: Double
-    var timestamp: Date
+    @Attribute(.spotlight) var timestamp: Date  // 索引加速按日期范围查询
     var source: String                   // 数据来源（Apple Watch、iPhone 等）
-    var anchorKey: String?               // 用于 Anchored Object Query 去重
+    @Attribute(.unique) var sampleUUID: String  // HKSample.uuid 去重键
 
     /// 方便类型安全访问
     var metric: HealthMetricType? {
@@ -65,12 +65,14 @@ final class HealthRecord {
         metricType: HealthMetricType,
         value: Double,
         timestamp: Date = .now,
-        source: String = "HealthKit"
+        source: String = "HealthKit",
+        sampleUUID: String = UUID().uuidString
     ) {
         self.id = UUID()
         self.metricType = metricType.rawValue
         self.value = value
         self.timestamp = timestamp
         self.source = source
+        self.sampleUUID = sampleUUID
     }
 }

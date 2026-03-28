@@ -2,11 +2,11 @@ import Foundation
 import SwiftData
 
 /// 按天聚合的健康摘要 — 由 HealthKitService 每次后台采集时更新
-/// dateString 作为逻辑唯一键，在代码中通过 fetch + upsert 保证唯一性
+/// dateString 使用 @Attribute(.unique) 保证数据库级唯一性，防止并发写入创建重复记录
 @Model
 final class DailySummary {
     var id: UUID
-    var dateString: String               // "yyyy-MM-dd" 格式，用作唯一键
+    @Attribute(.unique) var dateString: String  // "yyyy-MM-dd" 格式，数据库级唯一键
     var date: Date                       // 当天 00:00:00
 
     // 心率
@@ -51,10 +51,10 @@ final class DailySummary {
         self.lastUpdated = .now
     }
 
-    /// 共享的日期格式化器
-    static let dateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy-MM-dd"
+    /// 共享的日期格式化器 — 使用 ISO8601DateFormatter（线程安全，无需加锁）
+    static let dateFormatter: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withFullDate, .withDashSeparatorInDate]
         f.timeZone = .current
         return f
     }()

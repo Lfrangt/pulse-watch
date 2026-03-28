@@ -5,6 +5,7 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.abundra.pulse.morning-brief-refresh</string>
+		<string>com.abundra.pulse.health-sync</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
@@ -21,7 +22,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -45,17 +46,20 @@
 	<string>Pulse needs to read your health data to generate daily readiness scores and training insights. All data is stored on your device only.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Pulse needs to record your workout data to track your training progress.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Pulse scans your local network to discover and connect to your OpenClaw AI coach gateway.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Pulse uses your location to detect when you arrive at the gym and suggest training plans. Location data is never uploaded to any server.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Pulse uses your location to save your frequent places for smart reminders.</string>
+	<key>TELEMETRYDECK_APP_ID</key>
+	<string>$(TELEMETRYDECK_APP_ID)</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
 		<string>processing</string>
 		<string>fetch</string>
 		<string>health-update</string>
-		<string>remote-notification</string>
 	</array>
 	<key>UILaunchScreen</key>
 	<dict>

@@ -55,8 +55,11 @@ final class WorkoutHistoryService {
 
             let context = container.mainContext
 
-            // 获取已有记录的 UUID 集合，用于去重
-            let existingDescriptor = FetchDescriptor<WorkoutHistoryEntry>()
+            // 获取 90 天内已有记录的 UUID 集合，用于去重（不加载全部历史）
+            var existingDescriptor = FetchDescriptor<WorkoutHistoryEntry>(
+                predicate: #Predicate { $0.startDate >= ninetyDaysAgo }
+            )
+            existingDescriptor.propertiesToFetch = [\.hkWorkoutUUID]
             let existing = (try? context.fetch(existingDescriptor)) ?? []
             let existingUUIDs = Set(existing.map(\.hkWorkoutUUID))
 
@@ -135,8 +138,10 @@ final class WorkoutHistoryService {
             let avg = bpmValues.reduce(0, +) / Double(bpmValues.count)
             let maxBPM = bpmValues.max()
 
-            // 5区间划分（最大心率估算 220-age，默认 190）
-            let maxHR: Double = 190
+            // 5区间划分 — 使用用户设置的最大心率，否则从年龄估算（220-age），默认 190
+            let userMaxHR = UserDefaults.standard.double(forKey: "pulse.user.maxHeartRate")
+            let userAge = UserDefaults.standard.integer(forKey: "pulse.user.age")
+            let maxHR: Double = userMaxHR > 0 ? userMaxHR : (userAge > 0 ? Double(220 - userAge) : 190)
             var zoneCounts = [0, 0, 0, 0, 0]
             let total = Double(bpmValues.count)
 

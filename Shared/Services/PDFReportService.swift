@@ -30,7 +30,7 @@ final class PDFReportService {
             .sorted { $0.date < $1.date }
 
         let fmt = DateFormatter()
-        fmt.dateFormat = "yyyy年M月"
+        fmt.dateFormat = String(localized: "yyyy-MM")
         let monthLabel = fmt.string(from: lastMonthStart)
 
         // A4 尺寸 (points)
@@ -55,7 +55,7 @@ final class PDFReportService {
             y += 8
 
             // 月份标题
-            y = drawText("\(monthLabel) 健康报告", x: margin, y: y, width: contentWidth,
+            y = drawText(String(format: String(localized: "%@ Health Report"), monthLabel), x: margin, y: y, width: contentWidth,
                          font: .systemFont(ofSize: 24, weight: .bold),
                          color: .black, alignment: .center)
             y += 4
@@ -70,7 +70,7 @@ final class PDFReportService {
             y += 16
 
             // 核心指标概览
-            y = drawText("核心指标概览", x: margin, y: y, width: contentWidth,
+            y = drawText(String(localized: "Key Metrics Overview"), x: margin, y: y, width: contentWidth,
                          font: .systemFont(ofSize: 16, weight: .semibold),
                          color: .black, alignment: .left)
             y += 12
@@ -86,13 +86,13 @@ final class PDFReportService {
             let totalSteps = monthSummaries.compactMap(\.totalSteps).reduce(0, +)
 
             let metrics: [(String, String)] = [
-                ("平均评分", avgScore),
-                ("平均 HRV", avgHRVStr),
-                ("平均静息心率", avgRHRStr),
-                ("平均睡眠", avgSleep),
-                ("总步数", "\(totalSteps.formatted())"),
-                ("训练次数", "\(monthWorkouts.count) 次"),
-                ("数据天数", "\(monthSummaries.count) 天"),
+                (String(localized: "Average Score"), avgScore),
+                (String(localized: "Average HRV"), avgHRVStr),
+                (String(localized: "Average RHR"), avgRHRStr),
+                (String(localized: "Average Sleep"), avgSleep),
+                (String(localized: "Total Steps"), "\(totalSteps.formatted())"),
+                (String(localized: "Workouts"), "\(monthWorkouts.count)"),
+                (String(localized: "Days of Data"), "\(monthSummaries.count)"),
             ]
 
             for (label, value) in metrics {
@@ -104,7 +104,7 @@ final class PDFReportService {
             y += 16
 
             // 每日评分列表
-            y = drawText("每日评分记录", x: margin, y: y, width: contentWidth,
+            y = drawText(String(localized: "Daily Score Records"), x: margin, y: y, width: contentWidth,
                          font: .systemFont(ofSize: 16, weight: .semibold),
                          color: .black, alignment: .left)
             y += 12
@@ -126,7 +126,7 @@ final class PDFReportService {
                 context.beginPage()
                 y = margin
 
-                y = drawText("训练记录", x: margin, y: y, width: contentWidth,
+                y = drawText(String(localized: "Workout Records"), x: margin, y: y, width: contentWidth,
                              font: .systemFont(ofSize: 16, weight: .semibold),
                              color: .black, alignment: .left)
                 y += 12
@@ -151,7 +151,7 @@ final class PDFReportService {
                 y = drawLine(x: margin, y: y, width: contentWidth)
                 y += 16
 
-                y = drawText("力量训练记录", x: margin, y: y, width: contentWidth,
+                y = drawText(String(localized: "Strength Training Records"), x: margin, y: y, width: contentWidth,
                              font: .systemFont(ofSize: 16, weight: .semibold),
                              color: .black, alignment: .left)
                 y += 12
@@ -229,7 +229,14 @@ final class PDFReportService {
     }
 
     private func drawTableHeader(x: CGFloat, y: CGFloat, width: CGFloat) -> CGFloat {
-        let headers = ["日期", "评分", "心率", "HRV", "睡眠", "步数"]
+        let headers = [
+            String(localized: "Date"),
+            String(localized: "Score"),
+            String(localized: "HR"),
+            "HRV",
+            String(localized: "Sleep"),
+            String(localized: "Steps")
+        ]
         let colWidths: [CGFloat] = [0.18, 0.12, 0.15, 0.15, 0.15, 0.25]
         let attrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 9, weight: .bold),

@@ -73,7 +73,7 @@ struct StrengthView: View {
             .padding(.top, PulseTheme.spacingS)
         }
         .background(PulseTheme.background)
-        .navigationTitle("Strength")
+        .navigationTitle(String(localized: "Strength"))
         .navigationBarTitleDisplayMode(.large)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
@@ -713,7 +713,7 @@ struct AddStrengthRecordView: View {
                 .padding(.top, PulseTheme.spacingM)
             }
             .background(PulseTheme.background)
-            .navigationTitle("Add Lift")
+            .navigationTitle(String(localized: "Add Lift"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {

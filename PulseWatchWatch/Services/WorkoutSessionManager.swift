@@ -231,7 +231,7 @@ final class WorkoutSessionManager: NSObject {
         )
 
         // 埋点
-        Analytics.trackWorkoutComplete(type: "\(currentWorkoutType.rawValue)", durationMinutes: elapsedSeconds / 60)
+        Analytics.trackWorkoutComplete(type: "\(currentWorkoutType.rawValue)")
     }
 
     // MARK: - 重置（返回空闲）

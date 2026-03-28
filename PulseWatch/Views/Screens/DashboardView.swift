@@ -253,7 +253,7 @@ struct DashboardView: View {
                                 .foregroundStyle(.white)
                                 .contentTransition(.numericText())
 
-                            Text("READINESS")
+                            Text(String(localized: "READINESS"))
                                 .font(.system(size: 11, weight: .semibold))
                                 .tracking(3.5)
                                 .foregroundStyle(.white.opacity(0.55))
@@ -577,11 +577,11 @@ struct DashboardView: View {
 
     private func ouraStatusLabel(for score: Int) -> String {
         switch score {
-        case 0..<30: return "较差"
-        case 30..<50: return "一般"
-        case 50..<70: return "良好"
-        case 70..<85: return "优秀"
-        default: return "极佳"
+        case 0..<30: return String(localized: "Poor")
+        case 30..<50: return String(localized: "Average")
+        case 50..<70: return String(localized: "Fair")
+        case 70..<85: return String(localized: "Good")
+        default: return String(localized: "Excellent")
         }
     }
 
@@ -663,7 +663,7 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             // Header
             HStack {
-                Text("Today's Insights")
+                Text(String(localized: "Today's Insights"))
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .tracking(1.2)
                     .foregroundStyle(PulseTheme.textTertiary)
@@ -828,7 +828,7 @@ struct DashboardView: View {
             // 睡眠
             if let sleep = currentSleep {
                 NavigationLink(destination: SleepDetailView()) {
-                    metricTile(icon: "moon.fill", label: "睡眠", value: sleep, unit: "", color: PulseTheme.sleepAccent, trend: .good, animated: false)
+                    metricTile(icon: "moon.fill", label: String(localized: "Sleep"), value: sleep, unit: "", color: PulseTheme.sleepAccent, trend: .good, animated: false)
                 }
                 .buttonStyle(.plain)
             }
@@ -836,7 +836,7 @@ struct DashboardView: View {
             // 步数
             if currentSteps > 0 {
                 NavigationLink(destination: StepsDetailView()) {
-                    metricTile(icon: "figure.run", label: "步数", value: formatSteps(currentSteps), unit: "", color: PulseTheme.accentTeal, trend: currentSteps >= 8000 ? .good : (currentSteps >= 5000 ? .ok : .poor), animated: true)
+                    metricTile(icon: "figure.run", label: String(localized: "Steps"), value: formatSteps(currentSteps), unit: "", color: PulseTheme.accentTeal, trend: currentSteps >= 8000 ? .good : (currentSteps >= 5000 ? .ok : .poor), animated: true)
                 }
                 .buttonStyle(.plain)
             }
@@ -844,7 +844,7 @@ struct DashboardView: View {
             // 卡路里
             if currentCalories > 0 {
                 NavigationLink(destination: CaloriesDetailView()) {
-                    metricTile(icon: "flame.fill", label: "卡路里", value: "\(Int(currentCalories))", unit: "kcal", color: PulseTheme.activityCoral, trend: currentCalories >= 300 ? .good : .ok, animated: false)
+                    metricTile(icon: "flame.fill", label: String(localized: "Calories"), value: "\(Int(currentCalories))", unit: "kcal", color: PulseTheme.activityCoral, trend: currentCalories >= 300 ? .good : .ok, animated: false)
                 }
                 .buttonStyle(.plain)
             }
@@ -852,7 +852,7 @@ struct DashboardView: View {
             // 血氧
             if let spo2 = currentBloodOxygen {
                 NavigationLink(destination: BloodOxygenDetailView()) {
-                    metricTile(icon: "lungs.fill", label: "血氧", value: "\(Int(spo2))%", unit: "", color: PulseTheme.statusGood, trend: spo2 >= 96 ? .good : (spo2 >= 93 ? .ok : .poor), animated: false)
+                    metricTile(icon: "lungs.fill", label: String(localized: "Blood Oxygen"), value: "\(Int(spo2))%", unit: "", color: PulseTheme.statusGood, trend: spo2 >= 96 ? .good : (spo2 >= 93 ? .ok : .poor), animated: false)
                 }
                 .buttonStyle(.plain)
             }
@@ -976,7 +976,7 @@ struct DashboardView: View {
             }
 
             VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
-                Text("Training Advice")
+                Text(String(localized: "Training Advice"))
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
 
@@ -1034,7 +1034,7 @@ struct DashboardView: View {
             HStack(spacing: PulseTheme.spacingL) {
                 // Strain
                 VStack(spacing: 8) {
-                    Text("STRAIN")
+                    Text(String(localized: "STRAIN"))
                         .font(.system(size: 10, weight: .semibold))
                         .tracking(1.5)
                         .foregroundStyle(PulseTheme.textTertiary)
@@ -1064,7 +1064,7 @@ struct DashboardView: View {
 
                 // Recovery
                 VStack(spacing: 8) {
-                    Text("RECOVERY")
+                    Text(String(localized: "RECOVERY"))
                         .font(.system(size: 10, weight: .semibold))
                         .tracking(1.5)
                         .foregroundStyle(PulseTheme.textTertiary)
@@ -1330,7 +1330,7 @@ struct DashboardView: View {
             Spacer()
 
             // 时长
-            Text("(workout.durationMinutes) min")
+            Text("\(workout.durationMinutes) min")
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textSecondary)
         }
@@ -1386,7 +1386,7 @@ struct DashboardView: View {
         switch days {
         case 0: return String(localized: "Today")
         case 1: return String(localized: "Yesterday")
-        default: return "(days)d ago"
+        default: return String(localized: "\(days)d ago")
         }
     }
 
@@ -1408,11 +1408,11 @@ struct DashboardView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Set Gym Location")
+                    Text(String(localized: "Set Gym Location"))
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
-                    Text("Auto-remind when arriving")
+                    Text(String(localized: "Auto-remind when arriving"))
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                 }
@@ -1482,7 +1482,7 @@ struct DashboardView: View {
                 ProgressView()
                     .tint(PulseTheme.accentTeal)
                     .scaleEffect(1.3)
-                Text("Analysing your data…")
+                Text(String(localized: "Analysing your data…"))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.white.opacity(0.4))
                 Spacer()
@@ -1545,7 +1545,7 @@ struct DashboardView: View {
             )
 
             if let brief {
-                Analytics.trackScoreViewed(score: brief.score)
+                Analytics.trackScoreViewed()
             }
 
             // 同步 workout 总数到 ReviewRequestManager

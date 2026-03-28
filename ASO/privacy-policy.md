@@ -29,6 +29,10 @@ Pulse reads the following data from Apple HealthKit with your explicit permissio
 
 **All health data processing happens locally on your device.** Your recovery scores, training suggestions, sleep analysis, and anomaly detection are computed by algorithms running on your iPhone and Apple Watch. No health data is ever sent to any external server.
 
+## Local Network
+
+Pulse may use local network discovery (Bonjour) to find OpenClaw gateway instances on your local network. This is an optional feature. No network scan data is transmitted externally.
+
 ## OpenClaw Integration (Optional)
 
 Pulse offers an optional connection to OpenClaw, a local-first AI agent framework. When enabled:
@@ -38,9 +42,13 @@ Pulse offers an optional connection to OpenClaw, a local-first AI agent framewor
 - No data is sent to Abundra or any third party
 - You can disable this at any time in Settings
 
+## Analytics
+
+Pulse uses [TelemetryDeck](https://telemetrydeck.com/privacy) for anonymous, privacy-preserving usage analytics (e.g., feature adoption, crash-free rates). TelemetryDeck does not collect personal information and complies with GDPR without requiring user consent. No health data is included in analytics.
+
 ## Third-Party Services
 
-Pulse does not integrate with any third-party analytics, advertising, or tracking services.
+Pulse does not integrate with any advertising or tracking services. The only third-party service is TelemetryDeck for anonymous analytics as described above.
 
 ## Data Storage
 
@@ -65,8 +73,8 @@ If we ever change this policy, we will update this page and the "Last updated" d
 
 If you have questions about this privacy policy:
 
-- Email: privacy@abundra.com
-- GitHub: github.com/abundra
+- Email: abundra.dev@gmail.com
+- GitHub: https://github.com/Lfrangt/pulse-watch/issues
 
 ## Your Rights
 

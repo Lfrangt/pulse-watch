@@ -34,7 +34,7 @@ enum PulseTheme {
     static let textSecondary = Color(hex: "A0A0A0")
 
     /// Tertiary text — dim
-    static let textTertiary = Color(hex: "849495")
+    static let textTertiary = Color(hex: "9AABAC")
 
     // MARK: - Accent Colors
 

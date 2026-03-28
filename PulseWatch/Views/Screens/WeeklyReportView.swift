@@ -29,12 +29,12 @@ struct WeeklyReportView: View {
                 .padding(.top, PulseTheme.spacingS)
             }
             .background(PulseTheme.background)
-            .navigationTitle("Weekly Report")
+            .navigationTitle(String(localized: "Weekly Report"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button(String(localized: "Done")) { dismiss() }
                         .foregroundStyle(PulseTheme.accent)
                 }
             }

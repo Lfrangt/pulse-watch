@@ -1,7 +1,7 @@
 # App Store Listing — 中文
 
 ## App 名称
-Pulse — AI 健身教练
+Pulse — AI Fitness Coach
 
 ## 副标题（30 字以内）
 Apple Watch 恢复评分 & 训练计划
@@ -66,7 +66,7 @@ Pulse 帮你发现可能忽略的身体信号：
 WHOOP 的功能，买断的价格。这就是 Pulse。
 
 ## 关键词（100 字以内）
-恢复评分,HRV,健身,AI,教练,训练计划,睡眠,追踪,WHOOP平替,Apple Watch,健康,运动
+恢复评分,HRV,健身,AI,教练,训练计划,睡眠,追踪,心率变异,Apple Watch,健康,运动
 
 ## 新功能（v1.0.0）
 🎉 Pulse v1.0 来了！
@@ -80,7 +80,7 @@ WHOOP 的功能，买断的价格。这就是 Pulse。
 
 ## 类别
 主要：健康健美
-次要：医疗
+次要：生活
 
 ## 年龄分级
 4+

@@ -96,7 +96,7 @@ struct HomeView: View {
                 LocationSetupView()
             }
             .alert(String(localized: "Arrived at Gym"), isPresented: $showGymPrompt) {
-                Button("OK") {}
+                Button(String(localized: "OK")) {}
             } message: {
                 if let plan = brief?.trainingPlan {
                     Text("Suggested: \(localizedGroup(plan.targetMuscleGroup)) — Watch notified")
@@ -164,11 +164,11 @@ struct HomeView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Set Gym Location")
+                    Text(String(localized: "Set Gym Location"))
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
-                    Text("Auto-remind when arriving")
+                    Text(String(localized: "Auto-remind when arriving"))
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                 }
@@ -350,7 +350,7 @@ struct LocationSetupView: View {
                     .disabled(isSaving)
                 }
 
-                Button("Set Up Later") {
+                Button(String(localized: "Set Up Later")) {
                     dismiss()
                 }
                 .foregroundStyle(PulseTheme.textTertiary)
@@ -361,7 +361,7 @@ struct LocationSetupView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Close") { dismiss() }
+                    Button(String(localized: "Close")) { dismiss() }
                         .foregroundStyle(PulseTheme.textSecondary)
                 }
             }

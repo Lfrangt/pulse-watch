@@ -40,7 +40,7 @@ struct ManualWorkoutView: View {
                 .padding(.top, PulseTheme.spacingM)
             }
             .background(PulseTheme.background)
-            .navigationTitle("Add Workout")
+            .navigationTitle(String(localized: "Add Workout"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {

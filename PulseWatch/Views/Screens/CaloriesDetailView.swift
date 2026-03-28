@@ -12,10 +12,10 @@ struct CaloriesDetailView: View {
     private var statusColor: Color { active >= goal ? PulseTheme.accentTeal : active >= 250 ? PulseTheme.statusWarning : PulseTheme.activityCoral }
     private var statusLabel: String {
         switch active {
-        case 0..<150: return "低活动消耗"
-        case 150..<300: return "轻度活动"
-        case 300..<400: return "接近目标"
-        default: return "目标达成"
+        case 0..<150: return String(localized: "Low Activity")
+        case 150..<300: return String(localized: "Light Activity")
+        case 300..<400: return String(localized: "Near Goal")
+        default: return String(localized: "Goal Reached")
         }
     }
 
@@ -31,8 +31,8 @@ struct CaloriesDetailView: View {
             .padding(.top, PulseTheme.spacingM)
         }
         .background(PulseTheme.background.ignoresSafeArea())
-        .navigationTitle("卡路里")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle(String(localized: "Calories"))
+        .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .preferredColorScheme(.dark)
     }
@@ -64,11 +64,14 @@ struct CaloriesDetailView: View {
                     .padding(.horizontal, 10).padding(.vertical, 4)
                     .background(Capsule().fill(statusColor.opacity(0.13)))
                 Spacer()
-                Text("目标 \(Int(goal)) kcal")
+                Text(String(localized: "Goal \(Int(goal)) kcal"))
                     .font(.system(size: 13, design: .rounded)).foregroundStyle(.white.opacity(0.4))
             }
         }
         .padding(PulseTheme.spacingM).background(glassCard)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Active Calories"))
+        .accessibilityValue("\(Int(active)) kcal, \(statusLabel)")
     }
 
     private var weeklyChart: some View {
@@ -77,7 +80,7 @@ struct CaloriesDetailView: View {
             return (s.date, c)
         }
         return VStack(alignment: .leading, spacing: 10) {
-            sectionHeader("14日卡路里趋势", icon: "flame.fill")
+            sectionHeader(String(localized: "14-Day Calorie Trend"), icon: "flame.fill")
             if data.isEmpty { emptyHint } else {
                 Chart(data, id: \.date) { item in
                     BarMark(x: .value("Date", item.date, unit: .day), y: .value("Cal", item.cal), width: .ratio(0.6))
@@ -97,10 +100,10 @@ struct CaloriesDetailView: View {
 
     private var infoCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("关于活动卡路里", icon: "info.circle")
-            tipRow("活动卡路里 = 运动和日常活动消耗，不含基础代谢")
-            tipRow("每天燃烧 300-500 kcal 有助于维持体重和心血管健康")
-            tipRow("力量训练后静息代谢率提高，利于长期热量管理")
+            sectionHeader(String(localized: "About Active Calories"), icon: "info.circle")
+            tipRow(String(localized: "Active calories are burned through exercise and daily movement, excluding basal metabolism."))
+            tipRow(String(localized: "Burning 300–500 kcal daily supports weight management and cardiovascular health."))
+            tipRow(String(localized: "Strength training raises resting metabolic rate, aiding long-term calorie management."))
         }
         .padding(PulseTheme.spacingM).background(glassCard)
     }
@@ -117,7 +120,13 @@ struct CaloriesDetailView: View {
             Text(text).font(.system(size: 13)).foregroundStyle(.white.opacity(0.65)).fixedSize(horizontal: false, vertical: true)
         }
     }
-    private var emptyHint: some View { Text("暂无历史数据").font(.system(size: 13)).foregroundStyle(.white.opacity(0.3)).frame(maxWidth: .infinity).padding() }
+    private var emptyHint: some View {
+        EmptyStateView(
+            icon: "flame",
+            title: String(localized: "No Calorie Data"),
+            message: String(localized: "Wear your Apple Watch to start tracking calories")
+        )
+    }
     private var glassCard: some View {
         RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
             .fill(Color.white.opacity(0.04))

@@ -1,6 +1,7 @@
 # Privacy Policy — Pulse
 
-**Last Updated: March 15, 2026**
+**Last Updated: March 27, 2026**
+**Effective Date: March 15, 2026**
 
 Pulse ("the App") is developed by Abundra. This privacy policy explains how we handle your data.
 
@@ -33,6 +34,10 @@ The App uses location services to detect when you arrive at a saved gym location
 ### Camera
 
 The App uses the camera solely to scan QR codes for OpenClaw pairing. No images or video are stored or transmitted.
+
+### Local Network
+
+The App may use local network discovery (Bonjour) to find OpenClaw gateway instances on your local network. This is an optional feature for AI coaching integration. No network scan data is transmitted externally.
 
 ### Analytics
 
@@ -79,13 +84,14 @@ We may update this privacy policy from time to time. Changes will be reflected i
 ## Contact
 
 If you have questions about this privacy policy, please contact us at:
-- GitHub: https://github.com/nicexe/pulse-watch/issues
+- Email: abundra.dev@gmail.com
+- GitHub: https://github.com/Lfrangt/pulse-watch/issues
 
 ---
 
 # 隐私政策 — Pulse
 
-**最后更新：2026年3月15日**
+**最后更新：2026年3月27日**
 
 Pulse（以下简称"本应用"）由 Abundra 开发。本隐私政策说明我们如何处理您的数据。
 
@@ -143,4 +149,4 @@ Pulse 是一款隐私优先的应用。**您的所有健康数据均存储在您
 
 ## 联系方式
 
-如有隐私相关问题，请通过 GitHub Issues 联系我们。
+如有隐私相关问题，请通过邮件 abundra.dev@gmail.com 或 [GitHub Issues](https://github.com/Lfrangt/pulse-watch/issues) 联系我们。

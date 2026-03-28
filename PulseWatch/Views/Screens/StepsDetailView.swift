@@ -12,11 +12,11 @@ struct StepsDetailView: View {
 
     private var statusLabel: String {
         switch steps {
-        case 0..<3000: return "活动不足"
-        case 3000..<6000: return "低活动"
-        case 6000..<8000: return "接近目标"
-        case 8000..<10000: return "达标"
-        default: return "超额完成"
+        case 0..<3000: return String(localized: "Insufficient Activity")
+        case 3000..<6000: return String(localized: "Low Activity")
+        case 6000..<8000: return String(localized: "Near Goal")
+        case 8000..<10000: return String(localized: "On Target")
+        default: return String(localized: "Goal Exceeded")
         }
     }
     private var statusColor: Color {
@@ -35,8 +35,8 @@ struct StepsDetailView: View {
             .padding(.top, PulseTheme.spacingM)
         }
         .background(PulseTheme.background.ignoresSafeArea())
-        .navigationTitle("步数")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle(String(localized: "Steps"))
+        .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .preferredColorScheme(.dark)
     }
@@ -47,7 +47,7 @@ struct StepsDetailView: View {
                 Text("\(steps)")
                     .font(.system(size: 64, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                Text("步")
+                Text(String(localized: "steps"))
                     .font(.system(size: 24, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.5))
                     .offset(y: -8)
@@ -72,13 +72,16 @@ struct StepsDetailView: View {
                     .padding(.horizontal, 10).padding(.vertical, 4)
                     .background(Capsule().fill(statusColor.opacity(0.13)))
                 Spacer()
-                Text("目标 \(goal) 步")
+                Text(String(localized: "Goal \(goal) steps"))
                     .font(.system(size: 13, design: .rounded))
                     .foregroundStyle(.white.opacity(0.4))
             }
         }
         .padding(PulseTheme.spacingM)
         .background(glassCard)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Steps"))
+        .accessibilityValue("\(steps), \(statusLabel)")
     }
 
     private var weeklyChart: some View {
@@ -87,7 +90,7 @@ struct StepsDetailView: View {
             return (s.date, st)
         }
         return VStack(alignment: .leading, spacing: 10) {
-            sectionHeader("14日步数趋势", icon: "figure.run")
+            sectionHeader(String(localized: "14-Day Step Trend"), icon: "figure.run")
             if data.isEmpty {
                 emptyHint
             } else {
@@ -110,10 +113,10 @@ struct StepsDetailView: View {
 
     private var infoCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("为什么步数重要？", icon: "info.circle")
-            tipRow("每天 8000 步与全因死亡率显著降低相关（JAMA研究）")
-            tipRow("步行是最简单的有氧运动，保护心血管健康")
-            tipRow("长期久坐可用每小时起身走动 2-3 分钟来补偿")
+            sectionHeader(String(localized: "Why Steps Matter"), icon: "info.circle")
+            tipRow(String(localized: "8,000 daily steps is linked to significantly lower all-cause mortality (JAMA study)."))
+            tipRow(String(localized: "Walking is the simplest form of aerobic exercise and protects cardiovascular health."))
+            tipRow(String(localized: "Combat prolonged sitting by walking 2–3 minutes every hour."))
         }
         .padding(PulseTheme.spacingM)
         .background(glassCard)
@@ -132,7 +135,11 @@ struct StepsDetailView: View {
         }
     }
     private var emptyHint: some View {
-        Text("暂无历史数据").font(.system(size: 13)).foregroundStyle(.white.opacity(0.3)).frame(maxWidth: .infinity).padding()
+        EmptyStateView(
+            icon: "figure.walk",
+            title: String(localized: "No Step Data"),
+            message: String(localized: "Wear your Apple Watch to start tracking steps")
+        )
     }
     private var glassCard: some View {
         RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)

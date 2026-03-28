@@ -1,14 +1,14 @@
 # Pulse — App Store Listing
 
 ## App Name
-Pulse — AI Health Agent
+Pulse — AI Fitness Coach
 
 ## Subtitle (30 chars max)
-Smart Health Scores & Training
+Recovery Score for Apple Watch
 
 ## Category
 Primary: Health & Fitness
-Secondary: Medical
+Secondary: Lifestyle
 
 ---
 
@@ -67,13 +67,23 @@ Pulse 采集你的 HealthKit 数据 — 心率、HRV、睡眠、步数、血氧 
 
 ---
 
+## Promotional Text (170 chars max, can update without review)
+Your body talks. Pulse listens. Get daily recovery scores, AI-powered training advice, and smart workout plans — all from your Apple Watch. One-time purchase, no subscription.
+
 ## Keywords
 
 health,fitness,heart rate,HRV,sleep,Apple Watch,workout,training,score,recovery,wellness,HealthKit
 
 ## What's New (v1.0.0)
 
-Initial release of Pulse — your personal AI health agent for Apple Watch.
+Initial release of Pulse — your AI fitness coach for Apple Watch.
+- Daily recovery score (0-100) based on your personal baseline
+- Smart Push/Pull/Legs training plans
+- Apple Watch complications & real-time workout tracking
+- Gym arrival auto-detection
+- Sleep analysis with regularity tracking
+- Optional AI coaching via OpenClaw
+- Home Screen & Lock Screen widgets
 
 ---
 
@@ -83,4 +93,29 @@ This app uses HealthKit to read health data (heart rate, HRV, sleep analysis, st
 
 The app uses location services for gym detection (geofencing) to suggest training plans. Location data is processed on-device and never uploaded.
 
-Demo/test account is not required — the app works with real HealthKit data from the user's Apple Watch.
+The app uses local network discovery (Bonjour) to find OpenClaw gateway instances on the user's local network. This is an optional feature for AI coaching integration.
+
+**Demo Mode:** To test without an Apple Watch, launch the app with demo data by going to Settings tab → scroll to bottom → enable "Demo Mode". This populates the app with sample health data for review purposes.
+
+Demo/test account is not required — the app works with real HealthKit data from the user's Apple Watch, or with Demo Mode enabled.
+
+---
+
+## App Store Connect Privacy Nutrition Labels
+
+**Data Types Collected:**
+
+| Data Type | Collected | Linked to User | Tracking | Purpose |
+|-----------|-----------|----------------|----------|---------|
+| Health & Fitness (Heart Rate, HRV, Sleep, Steps, SpO2, Calories) | Yes | No | No | App Functionality |
+| Precise Location | Yes | No | No | App Functionality (gym detection) |
+| Diagnostics (Crash Data, Performance) | Yes | No | No | Analytics (via TelemetryDeck, anonymous) |
+| Usage Data (Feature Interaction) | Yes | No | No | Analytics (via TelemetryDeck, anonymous) |
+
+**Data NOT collected:** Name, Email, Phone, Payment, Contacts, User Content, Search History, Browsing History, Identifiers, Purchases, Photos/Videos.
+
+**Notes:**
+- All health data is processed and stored on-device only
+- TelemetryDeck analytics are anonymous and privacy-preserving (no user ID, GDPR compliant)
+- Location data is never transmitted off-device
+- No third-party advertising or tracking SDKs

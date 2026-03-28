@@ -433,7 +433,7 @@ struct OnboardingView: View {
             let _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
 
             // Location (for gym geo-fence)
-            LocationManager.shared.requestAlwaysAuthorization()
+            LocationManager.shared.requestAuthorization()
 
             await MainActor.run {
                 completeOnboarding()

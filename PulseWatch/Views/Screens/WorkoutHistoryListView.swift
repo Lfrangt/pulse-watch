@@ -24,7 +24,7 @@ struct WorkoutHistoryListView: View {
                 }
             }
             .background(PulseTheme.background)
-            .navigationTitle("Workout History")
+            .navigationTitle(String(localized: "Workout History"))
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {

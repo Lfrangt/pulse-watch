@@ -57,7 +57,7 @@ struct HRVDetailView: View {
             .padding(.top, PulseTheme.spacingM)
         }
         .background(PulseTheme.background)
-        .navigationTitle("HRV")
+        .navigationTitle(String(localized: "HRV"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await loadData() }
     }

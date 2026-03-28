@@ -50,7 +50,8 @@ These terms are governed by the laws of British Columbia, Canada.
 
 ## Contact
 
-Email: support@abundra.com
+Email: abundra.dev@gmail.com
+GitHub: https://github.com/Lfrangt/pulse-watch/issues
 
 ---
 

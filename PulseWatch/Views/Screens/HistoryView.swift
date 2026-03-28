@@ -72,7 +72,7 @@ struct HistoryView: View {
                 .padding(.top, PulseTheme.spacingS)
             }
             .background(PulseTheme.background)
-            .navigationTitle("Historical Trends")
+            .navigationTitle(String(localized: "Historical Trends"))
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .sheet(isPresented: $showWeeklyReport) {
@@ -821,7 +821,7 @@ struct HistoryView: View {
             // Data range note
             if let first = data.first, let last = data.last {
                 let days = Calendar.current.dateComponents([.day], from: first.date, to: last.date).day ?? 0
-                Text("显示 \(data.count) 天数据（\(days + 1)天跨度），积累更多数据后将显示趋势聚合图")
+                Text(String(localized: "Showing \(data.count) days of data (\(days + 1)-day span). Trend aggregation will appear as more data accumulates."))
                     .font(.system(size: 10))
                     .foregroundStyle(.white.opacity(0.3))
             }
@@ -907,7 +907,7 @@ struct HistoryView: View {
                                 isUp ? "+" : "", delta, yLabel.isEmpty ? "" : " \(yLabel)",
                                 isUp ? "+" : "", pct))
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    Text(selectedRange == .month ? "vs 30天前" : "vs 90天前")
+                    Text(selectedRange == .month ? String(localized: "vs 30 days ago") : String(localized: "vs 90 days ago"))
                         .font(.system(size: 11, design: .rounded))
                         .foregroundStyle(.white.opacity(0.4))
                 }
@@ -1032,28 +1032,28 @@ struct HistoryView: View {
                 NavigationLink {
                     CorrelationInsightsView().preferredColorScheme(.dark)
                 } label: {
-                    shortcutTile(icon: "link", color: PulseTheme.sleepViolet, title: String(localized: "数据洞察"))
+                    shortcutTile(icon: "link", color: PulseTheme.sleepViolet, title: String(localized: "Insights"))
                 }
                 .buttonStyle(.plain)
 
                 NavigationLink {
                     AnomalyTimelineView().preferredColorScheme(.dark)
                 } label: {
-                    shortcutTile(icon: "exclamationmark.triangle.fill", color: PulseTheme.statusWarning, title: String(localized: "异常记录"))
+                    shortcutTile(icon: "exclamationmark.triangle.fill", color: PulseTheme.statusWarning, title: String(localized: "Anomalies"))
                 }
                 .buttonStyle(.plain)
 
                 NavigationLink {
                     ChallengeView().preferredColorScheme(.dark)
                 } label: {
-                    shortcutTile(icon: "flame.fill", color: PulseTheme.activityCoral, title: String(localized: "训练挑战"))
+                    shortcutTile(icon: "flame.fill", color: PulseTheme.activityCoral, title: String(localized: "Challenges"))
                 }
                 .buttonStyle(.plain)
             }
 
             HStack(spacing: PulseTheme.spacingS) {
                 Button { showMonthlyReport = true } label: {
-                    shortcutTile(icon: "calendar.badge.clock", color: PulseTheme.accentTeal, title: String(localized: "月度报告"))
+                    shortcutTile(icon: "calendar.badge.clock", color: PulseTheme.accentTeal, title: String(localized: "Monthly Report"))
                 }
                 .buttonStyle(.plain)
 
@@ -1081,7 +1081,7 @@ struct HistoryView: View {
             NavigationLink {
                 WorkoutHistoryListView().preferredColorScheme(.dark)
             } label: {
-                shortcutTile(icon: "clock.fill", color: PulseTheme.activityCoral, title: String(localized: "训练记录"))
+                shortcutTile(icon: "clock.fill", color: PulseTheme.activityCoral, title: String(localized: "Workout Log"))
             }
             .buttonStyle(.plain)
         }

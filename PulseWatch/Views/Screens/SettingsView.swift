@@ -127,7 +127,7 @@ struct SettingsView: View {
                 .padding(.top, PulseTheme.spacingS)
             }
             .background(PulseTheme.background)
-            .navigationTitle("Settings")
+            .navigationTitle(String(localized: "Settings"))
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .task {
@@ -150,10 +150,10 @@ struct SettingsView: View {
                         Image(systemName: "bell.slash.fill")
                             .foregroundStyle(PulseTheme.statusPoor)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Notifications Disabled")
+                            Text(String(localized: "Notifications Disabled"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text("Enable in Settings → Notifications → Pulse")
+                            Text(String(localized: "Enable in Settings → Notifications → Pulse"))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -163,7 +163,7 @@ struct SettingsView: View {
                                 UIApplication.shared.open(url)
                             }
                         } label: {
-                            Text("Open")
+                            Text(String(localized: "Open"))
                                 .font(PulseTheme.captionFont.weight(.semibold))
                                 .foregroundStyle(PulseTheme.accent)
                         }
@@ -176,10 +176,10 @@ struct SettingsView: View {
             settingRow {
                 Toggle(isOn: $morningBriefEnabled) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Daily Health Summary")
+                        Text(String(localized: "Daily Health Summary"))
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("Daily recovery score and training advice")
+                        Text(String(localized: "Daily recovery score and training advice"))
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -194,14 +194,14 @@ struct SettingsView: View {
             if morningBriefEnabled {
                 settingRow {
                     VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                        Text("Notification Time")
+                        Text(String(localized: "Notification Time"))
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
 
                         HStack(spacing: PulseTheme.spacingM) {
                             // 小时
                             HStack(spacing: 4) {
-                                Text("h")
+                                Text(String(localized: "h"))
                                     .font(PulseTheme.captionFont)
                                     .foregroundStyle(PulseTheme.textTertiary)
                                 Picker(String(localized: "hour"), selection: $briefHour) {
@@ -216,7 +216,7 @@ struct SettingsView: View {
 
                             // 分钟
                             HStack(spacing: 4) {
-                                Text("pts")
+                                Text(String(localized: "min"))
                                     .font(PulseTheme.captionFont)
                                     .foregroundStyle(PulseTheme.textTertiary)
                                 Picker(String(localized: "min"), selection: $briefMinute) {
@@ -243,10 +243,10 @@ struct SettingsView: View {
             settingRow {
                 Toggle(isOn: $weeklySummaryEnabled) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Weekly Health Summary")
+                        Text(String(localized: "Weekly Health Summary"))
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("Every Sunday 9:00 AM — score, workouts & trends")
+                        Text(String(localized: "Every Sunday 9:00 AM — score, workouts & trends"))
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -261,10 +261,10 @@ struct SettingsView: View {
             settingRow {
                 Toggle(isOn: $trainingReminderEnabled) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Training Reminders")
+                        Text(String(localized: "Training Reminders"))
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("Remind you when arriving at gym")
+                        Text(String(localized: "Remind you when arriving at gym"))
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -276,10 +276,10 @@ struct SettingsView: View {
             settingRow {
                 Toggle(isOn: $pbReminderEnabled) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Weekly PB Reminder")
+                        Text(String(localized: "Weekly PB Reminder"))
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("Sunday 8 PM — record your new PRs")
+                        Text(String(localized: "Sunday 8 PM — record your new PRs"))
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -311,10 +311,10 @@ struct SettingsView: View {
             settingRow {
                 Toggle(isOn: $gymDetectionEnabled) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Gym Location Detection")
+                        Text(String(localized: "Gym Location Detection"))
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("Remind you when arriving at gym")
+                        Text(String(localized: "Remind you when arriving at gym"))
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -337,7 +337,7 @@ struct SettingsView: View {
                             Text(gym.name)
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text("Auto-remind when you arrive")
+                            Text(String(localized: "Auto-remind when you arrive"))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -355,7 +355,7 @@ struct SettingsView: View {
                     Button {
                         showGymSearch = true
                     } label: {
-                        Text("Change")
+                        Text(String(localized: "Change"))
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.accent)
                     }
@@ -363,7 +363,7 @@ struct SettingsView: View {
                     Button {
                         removeGymLocation(gym)
                     } label: {
-                        Text("Remove")
+                        Text(String(localized: "Remove"))
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.statusPoor)
                     }
@@ -377,7 +377,7 @@ struct SettingsView: View {
                     HStack(spacing: PulseTheme.spacingS) {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 14, weight: .medium))
-                        Text("Search Gym")
+                        Text(String(localized: "Search Gym"))
                             .font(PulseTheme.bodyFont.weight(.medium))
                     }
                     .foregroundStyle(PulseTheme.accent)
@@ -403,7 +403,7 @@ struct SettingsView: View {
                             Image(systemName: "location.fill")
                                 .font(.system(size: 13))
                         }
-                        Text("Use Current Location")
+                        Text(String(localized: "Use Current Location"))
                             .font(PulseTheme.captionFont)
                     }
                     .foregroundStyle(PulseTheme.textSecondary)
@@ -416,7 +416,7 @@ struct SettingsView: View {
                 if gymSaveSuccess {
                     HStack(spacing: PulseTheme.spacingXS) {
                         Image(systemName: "checkmark.circle.fill")
-                        Text("Saved")
+                        Text(String(localized: "Saved"))
                     }
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.statusGood)
@@ -465,10 +465,10 @@ struct SettingsView: View {
             settingRow {
                 Toggle(isOn: $hrAlertEnabled) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Heart Rate Alerts")
+                        Text(String(localized: "Heart Rate Alerts"))
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("Alert when resting heart rate is abnormal")
+                        Text(String(localized: "Alert when resting heart rate is abnormal"))
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -484,11 +484,11 @@ struct SettingsView: View {
                 settingRow {
                     VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
                         HStack {
-                            Text("High Threshold")
+                            Text(String(localized: "High Threshold"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
                             Spacer()
-                            Text("\(hrAlertHigh) bpm")
+                            Text(String(localized: "\(hrAlertHigh) bpm"))
                                 .font(PulseTheme.bodyFont.monospacedDigit())
                                 .foregroundStyle(PulseTheme.statusPoor)
                         }
@@ -507,11 +507,11 @@ struct SettingsView: View {
                 settingRow {
                     VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
                         HStack {
-                            Text("Low Threshold")
+                            Text(String(localized: "Low Threshold"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
                             Spacer()
-                            Text("\(hrAlertLow) bpm")
+                            Text(String(localized: "\(hrAlertLow) bpm"))
                                 .font(PulseTheme.bodyFont.monospacedDigit())
                                 .foregroundStyle(PulseTheme.accent)
                         }
@@ -531,7 +531,7 @@ struct SettingsView: View {
                     Image(systemName: "clock.fill")
                         .font(.system(size: 11))
                         .foregroundStyle(PulseTheme.textTertiary)
-                    Text("Same alert won't repeat within 1 hour")
+                    Text(String(localized: "Same alert won't repeat within 1 hour"))
                         .font(.system(size: 11, weight: .regular, design: .rounded))
                         .foregroundStyle(PulseTheme.textTertiary)
                         .lineSpacing(2)
@@ -551,7 +551,7 @@ struct SettingsView: View {
             settingRow {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Status")
+                        Text(String(localized: "Status"))
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
                         Text(notificationStatusText)
@@ -571,7 +571,7 @@ struct SettingsView: View {
                 Button {
                     openAppSettings()
                 } label: {
-                    Text("Open System Settings")
+                    Text(String(localized: "Open System Settings"))
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.accent)
                         .frame(maxWidth: .infinity)
@@ -681,14 +681,14 @@ struct SettingsView: View {
 
             settingRow {
                 VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                    Text("Collection Frequency")
+                    Text(String(localized: "Collection Frequency"))
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
                     Picker(String(localized: "Frequency"), selection: $collectionFrequency) {
-                        Text("Power Saving").tag("low")
-                        Text("Standard").tag("normal")
-                        Text("High Frequency").tag("high")
+                        Text(String(localized: "Power Saving")).tag("low")
+                        Text(String(localized: "Standard")).tag("normal")
+                        Text(String(localized: "High Frequency")).tag("high")
                     }
                     .pickerStyle(.segmented)
 
@@ -725,11 +725,11 @@ struct SettingsView: View {
             // 说明
             settingRow {
                 VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                    Text("Connect your OpenClaw Gateway")
+                    Text(String(localized: "Connect your OpenClaw Gateway"))
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
-                    Text("Push health data to your AI Agent for personalized training advice")
+                    Text(String(localized: "Push health data to your AI Agent for personalized training advice"))
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                         .lineSpacing(3)
@@ -745,7 +745,7 @@ struct SettingsView: View {
                             Image(systemName: "checkmark.seal.fill")
                                 .font(.system(size: 14))
                                 .foregroundStyle(PulseTheme.statusGood)
-                            Text("Gateway Connected")
+                            Text(String(localized: "Gateway Connected"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
                         }
@@ -786,7 +786,7 @@ struct SettingsView: View {
                     HStack(spacing: PulseTheme.spacingS) {
                         Image(systemName: "qrcode.viewfinder")
                             .font(.system(size: 16, weight: .medium))
-                        Text(isPaired ? "Scan to Reconnect" : "Scan to Connect")
+                        Text(isPaired ? String(localized: "Scan to Reconnect") : String(localized: "Scan to Connect"))
                             .font(PulseTheme.bodyFont.weight(.medium))
                     }
                     .foregroundStyle(PulseTheme.accent)
@@ -803,7 +803,7 @@ struct SettingsView: View {
                 HStack(spacing: PulseTheme.spacingXS) {
                     Image(systemName: "terminal")
                         .font(.system(size: 11))
-                    Text("Run openclaw pair --qr in terminal")
+                    Text(String(localized: "Run openclaw pair --qr in terminal"))
                         .font(.system(size: 11, weight: .regular, design: .monospaced))
                 }
                 .foregroundStyle(PulseTheme.textTertiary)
@@ -815,7 +815,7 @@ struct SettingsView: View {
                         showGatewayConfig = true
                     }
                 } label: {
-                    Text("Manual Input")
+                    Text(String(localized: "Manual Input"))
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                         .frame(maxWidth: .infinity)
@@ -833,10 +833,10 @@ struct SettingsView: View {
                 settingRow {
                     Toggle(isOn: $openClawEnabled) {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Auto-push Health Data")
+                            Text(String(localized: "Auto-push Health Data"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text("Auto-push every 30 min or on significant changes")
+                            Text(String(localized: "Auto-push every 30 min or on significant changes"))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -853,7 +853,7 @@ struct SettingsView: View {
                 settingRow {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Connection Status")
+                            Text(String(localized: "Connection Status"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
                             Text("\(bridge.connectionStatus.rawValue) · \(bridge.lastSyncDisplay)")
@@ -885,7 +885,7 @@ struct SettingsView: View {
                     Image(systemName: "lock.shield.fill")
                         .font(.system(size: 12))
                         .foregroundStyle(PulseTheme.statusGood)
-                    Text("Data sent directly to your OpenClaw Gateway, no third parties")
+                    Text(String(localized: "Data sent directly to your OpenClaw Gateway, no third parties"))
                         .font(.system(size: 11, weight: .regular, design: .rounded))
                         .foregroundStyle(PulseTheme.textTertiary)
                         .lineSpacing(2)
@@ -934,7 +934,7 @@ struct SettingsView: View {
         VStack(spacing: PulseTheme.spacingS) {
             // Gateway URL
             VStack(alignment: .leading, spacing: 4) {
-                Text("Gateway URL")
+                Text(String(localized: "Gateway URL"))
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
                 TextField("https://your-gateway.example.com", text: $gatewayURL)
@@ -952,7 +952,7 @@ struct SettingsView: View {
 
             // Token（安全输入）
             VStack(alignment: .leading, spacing: 4) {
-                Text("Token")
+                Text(String(localized: "Token"))
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
                 SecureField("Bearer token", text: $gatewayToken)
@@ -967,7 +967,7 @@ struct SettingsView: View {
 
             // Agent ID
             VStack(alignment: .leading, spacing: 4) {
-                Text("Agent ID")
+                Text(String(localized: "Agent ID"))
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
                 TextField(PulseOpenClawConfig.defaultAgentID, text: $gatewayAgentID)
@@ -1058,13 +1058,13 @@ struct SettingsView: View {
 
             settingRow {
                 VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-                    Text("Measurement System")
+                    Text(String(localized: "Measurement System"))
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
                     Picker(String(localized: "Units"), selection: $unitSystem) {
-                        Text("Metric (km, kg)").tag("metric")
-                        Text("Imperial (mi, lb)").tag("imperial")
+                        Text(String(localized: "Metric (km, kg)")).tag("metric")
+                        Text(String(localized: "Imperial (mi, lb)")).tag("imperial")
                     }
                     .pickerStyle(.segmented)
 
@@ -1095,10 +1095,10 @@ struct SettingsView: View {
                 } label: {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(String(localized: "健康目标"))
+                            Text(String(localized: "Health Goals"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text(String(localized: "设定步数、睡眠、训练等每日目标"))
+                            Text(String(localized: "Set daily goals for steps, sleep, training, etc."))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -1126,10 +1126,10 @@ struct SettingsView: View {
                 } label: {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(String(localized: "教练模式"))
+                            Text(String(localized: "Coach Mode"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text(String(localized: "生成健康快照，分享给教练或朋友"))
+                            Text(String(localized: "Generate health snapshot to share with coach or friends"))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -1158,10 +1158,10 @@ struct SettingsView: View {
                 } label: {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(String(localized: "导出健康数据 (CSV)"))
+                            Text(String(localized: "Export Health Data (CSV)"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text(String(localized: "\(allDailySummaries.count) 天数据"))
+                            Text(String(localized: "\(allDailySummaries.count) days of data"))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -1185,10 +1185,10 @@ struct SettingsView: View {
                 } label: {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(String(localized: "完整备份 (JSON)"))
+                            Text(String(localized: "Full Backup (JSON)"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text(String(localized: "所有健康数据、训练记录、目标"))
+                            Text(String(localized: "All health data, workout records, and goals"))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -1346,10 +1346,10 @@ struct SettingsView: View {
                 } label: {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Clear Workout History")
+                            Text(String(localized: "Clear Workout History"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text("\(allWorkoutHistory.count) records stored")
+                            Text(String(localized: "\(allWorkoutHistory.count) records stored"))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -1375,10 +1375,10 @@ struct SettingsView: View {
                 } label: {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Reset Onboarding")
+                            Text(String(localized: "Reset Onboarding"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text("Show welcome guide again on next launch")
+                            Text(String(localized: "Show welcome guide again on next launch"))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -1392,21 +1392,21 @@ struct SettingsView: View {
             }
         }
         .pulseCard()
-        .alert("Clear Workout History?", isPresented: $showClearHistoryAlert) {
-            Button("Cancel", role: .cancel) {}
-            Button("Clear All", role: .destructive) {
+        .alert(String(localized: "Clear Workout History?"), isPresented: $showClearHistoryAlert) {
+            Button(String(localized: "Cancel"), role: .cancel) {}
+            Button(String(localized: "Clear All"), role: .destructive) {
                 clearWorkoutHistory()
             }
         } message: {
-            Text("This will delete all saved workout history from the app. Health data in Apple Health will not be affected.")
+            Text(String(localized: "This will delete all saved workout history from the app. Health data in Apple Health will not be affected."))
         }
-        .alert("Reset Onboarding?", isPresented: $showResetOnboardingAlert) {
-            Button("Cancel", role: .cancel) {}
-            Button("Reset", role: .destructive) {
+        .alert(String(localized: "Reset Onboarding?"), isPresented: $showResetOnboardingAlert) {
+            Button(String(localized: "Cancel"), role: .cancel) {}
+            Button(String(localized: "Reset"), role: .destructive) {
                 onboardingCompleted = false
             }
         } message: {
-            Text("The welcome guide will appear next time you open the app.")
+            Text(String(localized: "The welcome guide will appear next time you open the app."))
         }
     }
 
@@ -1432,10 +1432,10 @@ struct SettingsView: View {
             settingRow {
                 Toggle(isOn: $demoModeEnabled) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Demo Mode")
+                        Text(String(localized: "Demo Mode"))
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("Show UI with simulated data")
+                        Text(String(localized: "Show UI with simulated data"))
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -1455,10 +1455,10 @@ struct SettingsView: View {
             settingRow {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Birth Year")
+                        Text(String(localized: "Birth Year"))
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("Used to calculate your Health Age")
+                        Text(String(localized: "Used to calculate your Health Age"))
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -1480,10 +1480,10 @@ struct SettingsView: View {
             settingRow {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Birth Month")
+                        Text(String(localized: "Birth Month"))
                             .font(PulseTheme.bodyFont)
                             .foregroundStyle(PulseTheme.textPrimary)
-                        Text("For accurate age calculation")
+                        Text(String(localized: "For accurate age calculation"))
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
@@ -1505,7 +1505,7 @@ struct SettingsView: View {
             // 性别
             settingRow {
                 HStack {
-                    Text("Gender")
+                    Text(String(localized: "Gender"))
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
                     Spacer()
@@ -1522,7 +1522,7 @@ struct SettingsView: View {
             // 身高
             settingRow {
                 HStack {
-                    Text("Height")
+                    Text(String(localized: "Height"))
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
                     Spacer()
@@ -1541,7 +1541,7 @@ struct SettingsView: View {
             // 体重
             settingRow {
                 HStack {
-                    Text("Weight")
+                    Text(String(localized: "Weight"))
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
                     Spacer()
@@ -1588,7 +1588,7 @@ struct SettingsView: View {
                             Image(systemName: "lock.shield.fill")
                                 .font(.system(size: 14))
                                 .foregroundStyle(PulseTheme.statusGood)
-                            Text("Privacy Policy")
+                            Text(String(localized: "Privacy Policy"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
                         }
@@ -1615,7 +1615,7 @@ struct SettingsView: View {
                             Image(systemName: "envelope.fill")
                                 .font(.system(size: 14))
                                 .foregroundStyle(PulseTheme.accent)
-                            Text("Send Feedback")
+                            Text(String(localized: "Send Feedback"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
                         }
@@ -1633,7 +1633,7 @@ struct SettingsView: View {
                 Image(systemName: "hand.raised.fill")
                     .font(.system(size: 11))
                     .foregroundStyle(PulseTheme.textTertiary)
-                Text("All data stays on your device. We never collect personal information.")
+                Text(String(localized: "All data stays on your device. We never collect personal information."))
                     .font(.system(size: 11, weight: .regular, design: .rounded))
                     .foregroundStyle(PulseTheme.textTertiary)
                     .lineSpacing(2)

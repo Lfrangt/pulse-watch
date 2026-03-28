@@ -35,7 +35,7 @@ struct HealthAgeDetailView: View {
         }
         .background(PulseTheme.background.ignoresSafeArea())
         .navigationTitle(String(localized: "Health Age"))
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .preferredColorScheme(.dark)
     }

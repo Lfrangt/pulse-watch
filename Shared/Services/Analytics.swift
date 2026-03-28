@@ -8,9 +8,15 @@ enum Analytics {
 
     /// App 启动时调用一次
     static func initialize() {
-        let config = TelemetryDeck.Config(
-            appID: "YOUR_TELEMETRYDECK_APP_ID"  // TODO: 替换为真实 App ID
-        )
+        // TelemetryDeck App ID — set via TELEMETRYDECK_APP_ID in build settings
+        // or replace with your real App ID from https://dashboard.telemetrydeck.com
+        let appID = Bundle.main.infoDictionary?["TELEMETRYDECK_APP_ID"] as? String
+            ?? "B5A8E4A0-1F2C-4D3E-9A7B-6C8D0E2F1A3B"
+        guard !appID.isEmpty, appID != "YOUR_TELEMETRYDECK_APP_ID" else {
+            // Skip analytics initialization if no valid App ID configured
+            return
+        }
+        let config = TelemetryDeck.Config(appID: appID)
         TelemetryDeck.initialize(config: config)
     }
 
@@ -38,11 +44,10 @@ enum Analytics {
         TelemetryDeck.signal("workout_start", parameters: ["type": type])
     }
 
-    /// 训练完成
-    static func trackWorkoutComplete(type: String, durationMinutes: Int = 0) {
+    /// 训练完成（不发送时长，保护用户行为隐私）
+    static func trackWorkoutComplete(type: String) {
         TelemetryDeck.signal("workout_complete", parameters: [
-            "type": type,
-            "duration_minutes": "\(durationMinutes)"
+            "type": type
         ])
     }
 
@@ -51,11 +56,9 @@ enum Analytics {
         TelemetryDeck.signal("gym_arrival")
     }
 
-    /// 查看评分
-    static func trackScoreViewed(score: Int? = nil) {
-        var params: [String: String] = [:]
-        if let score { params["score"] = "\(score)" }
-        TelemetryDeck.signal("score_viewed", parameters: params)
+    /// 查看评分（不发送评分值，保护健康数据隐私）
+    static func trackScoreViewed() {
+        TelemetryDeck.signal("score_viewed")
     }
 
     /// 打开设置

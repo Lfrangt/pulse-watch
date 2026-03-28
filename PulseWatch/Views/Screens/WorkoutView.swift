@@ -63,7 +63,7 @@ struct WorkoutView: View {
                 .padding(.horizontal, PulseTheme.spacingM)
             }
             .background(PulseTheme.background)
-            .navigationTitle("Exercise")
+            .navigationTitle(String(localized: "Exercise"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {

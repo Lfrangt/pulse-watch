@@ -120,10 +120,10 @@ struct HealthAgeDetailView: View {
     }
 
     private func metricRow(_ m: HealthAgeService.MetricScore) -> some View {
-        let isGood = m.ageImpact < -0.3
-        let isBad  = m.ageImpact > 0.3
+        let isGood = m.ageImpact < -0.1
+        let isBad  = m.ageImpact > 0.1
         let rowColor: Color = isGood ? PulseTheme.accentTeal : (isBad ? PulseTheme.activityCoral : PulseTheme.textSecondary)
-        let impactText = abs(m.ageImpact) < 0.3 ? String(localized: "No impact") :
+        let impactText = abs(m.ageImpact) < 0.1 ? String(localized: "No impact") :
             (m.ageImpact < 0 ? String(format: String(localized: "−%.1f yrs"), abs(m.ageImpact))
                              : String(format: String(localized: "+%.1f yrs"), m.ageImpact))
 

@@ -1251,8 +1251,8 @@ struct DashboardView: View {
     }
 
     private func healthAgeMetricRow(_ metric: HealthAgeService.MetricScore) -> some View {
-        let isGood = metric.ageImpact < -0.3
-        let isBad = metric.ageImpact > 0.3
+        let isGood = metric.ageImpact < -0.1
+        let isBad = metric.ageImpact > 0.1
         let color: Color = isGood ? PulseTheme.statusGood : (isBad ? PulseTheme.activityAccent : PulseTheme.textSecondary)
 
         return HStack(alignment: .top, spacing: PulseTheme.spacingS) {

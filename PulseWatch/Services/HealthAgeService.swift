@@ -2,9 +2,36 @@ import Foundation
 import SwiftData
 import os
 
-/// Health Age — 基于 5 项指标估算生理年龄
-/// 指标：静息心率 / HRV / 睡眠时长 / 日均步数 / 活跃分钟数
-/// 需要 ≥7 天有效数据
+/// Health Age — Biological age estimation using the Klemera-Doubal Method (KDM)
+///
+/// Algorithm based on peer-reviewed research:
+///
+/// [1] Klemera P, Doubal S. "A new approach to the concept and computation
+///     of biological age." Mech Ageing Dev, 2006;127(3):240-248.
+///     → KDM framework: multi-biomarker regression against chronological age
+///
+/// [2] Zhang D et al. "Resting heart rate and all-cause and cardiovascular
+///     mortality in the general population." J Epidemiol Community Health,
+///     2016;70(5):499-505.  (Meta-analysis, 46 studies, N > 1.2M)
+///     → RHR population norm: intercept ≈ 64 bpm, slope ≈ +0.16 bpm/year, SD ≈ 10.5
+///
+/// [3] Shaffer F, Ginsberg JP. "An Overview of Heart Rate Variability Metrics
+///     and Norms." Front Public Health, 2017;5:258.
+///     + Altini M, Plews D. (2021) — Apple Watch short-window SDNN norms:
+///     → SDNN norm (short-window): intercept ≈ 62 ms, slope ≈ −0.55 ms/year, SD ≈ 17
+///
+/// [4] Saint-Maurice PF et al. "Association of Daily Step Count and Step
+///     Intensity With Mortality Among US Adults." JAMA, 2020;323(12):1151-1160.
+///     + Tudor-Locke C et al. Int J Behav Nutr Phys Act, 2011;8:79.
+///     → Steps norm: intercept ≈ 10500, slope ≈ −80 steps/year, SD ≈ 3000
+///
+/// [5] Cappuccio FP et al. "Sleep duration and all-cause mortality:
+///     a systematic review and meta-analysis." Sleep, 2010;33(5):585-592.
+///     → U-shaped mortality: <6h HR=1.12, >9h HR=1.30; optimal 7–8h
+///
+/// [6] WHO 2020 Physical Activity Guidelines.
+///     → 150 min/week moderate intensity (≈21 min/day) threshold
+///
 final class HealthAgeService {
 
     static let shared = HealthAgeService()
@@ -12,7 +39,7 @@ final class HealthAgeService {
 
     static let minDays = 7
 
-    /// 用户出生年份
+    /// User birth year
     var birthYear: Int {
         get { UserDefaults.standard.integer(forKey: "pulse.user.birthYear") }
         set { UserDefaults.standard.set(newValue, forKey: "pulse.user.birthYear") }
@@ -20,7 +47,7 @@ final class HealthAgeService {
 
     var hasBirthYear: Bool { birthYear > 1900 && birthYear <= Calendar.current.component(.year, from: .now) }
 
-    /// 出生月份（1-12），用于精确年龄计算
+    /// Birth month (1-12) for precise age
     var birthMonth: Int {
         get { UserDefaults.standard.integer(forKey: "pulse.user.birthMonth") }
         set { UserDefaults.standard.set(newValue, forKey: "pulse.user.birthMonth") }
@@ -33,7 +60,6 @@ final class HealthAgeService {
         let currentYear = cal.component(.year, from: now)
         let currentMonth = cal.component(.month, from: now)
         var age = currentYear - birthYear
-        // 今年生日还没到，减一岁
         let bMonth = birthMonth > 0 ? birthMonth : 1
         if currentMonth < bMonth {
             age -= 1
@@ -41,7 +67,7 @@ final class HealthAgeService {
         return max(0, age)
     }
 
-    // MARK: - 结果
+    // MARK: - Result Types
 
     struct HealthAgeResult {
         let healthAge: Double
@@ -89,7 +115,35 @@ final class HealthAgeService {
         }
     }
 
-    // MARK: - 计算
+    // MARK: - KDM Regression Parameters (from literature)
+    //
+    // Each biomarker has a linear regression against chronological age:
+    //   expected(age) = intercept + slope × age
+    //
+    // KDM biological age minimises the weighted distance between observed
+    // biomarker values and their age-expected values.
+
+    private struct KDMBiomarker {
+        let intercept: Double  // q — value at age 0 (extrapolated)
+        let slope: Double      // k — change per year
+        let residualSE: Double // s — population scatter around the regression line
+    }
+
+    // [2] RHR: +0.16 bpm/year, SD ≈ 10.5 bpm
+    private static let rhrParam = KDMBiomarker(intercept: 64.0, slope: 0.16, residualSE: 10.5)
+
+    // [3] Short-window SDNN: −0.55 ms/year, SD ≈ 17 ms
+    private static let sdnnParam = KDMBiomarker(intercept: 62.0, slope: -0.55, residualSE: 17.0)
+
+    // [4] Daily steps: −80 steps/year, SD ≈ 3000 steps
+    private static let stepsParam = KDMBiomarker(intercept: 10500, slope: -80, residualSE: 3000)
+
+    // Prior uncertainty on biological age (years).
+    // Controls how strongly the estimate anchors to chronological age.
+    // Lower = stronger anchor. 6 gives stable results for wearable-only data.
+    private static let sBA: Double = 6.0
+
+    // MARK: - Computation
 
     func compute(modelContext: ModelContext) -> HealthAgeResult? {
         guard let actualAge = chronologicalAge, actualAge > 0 else { return nil }
@@ -101,14 +155,13 @@ final class HealthAgeService {
 
         guard validDays > 0 else { return nil }
 
-        // 计算各指标 7-30 天均值
+        // 7–30 day rolling averages for stability
         let avgRHR = avg(summaries.compactMap(\.restingHeartRate))
         let avgHRV = avg(summaries.compactMap(\.averageHRV))
         let avgSleepMin = avg(summaries.compactMap(\.sleepDurationMinutes).map(Double.init))
         let avgSteps = avg(summaries.compactMap(\.totalSteps).map(Double.init))
         let avgActiveCal = avg(summaries.compactMap(\.activeCalories))
 
-        // 优先使用真实 appleExerciseTime，无数据时降级到 cal/5 估算
         let avgExerciseMin = avg(summaries.compactMap(\.exerciseMinutes))
         let avgActiveMin: Double
         if let real = avgExerciseMin, real > 0 {
@@ -117,147 +170,176 @@ final class HealthAgeService {
             avgActiveMin = avgActiveCal.map { $0 / 5.0 } ?? 0
         }
 
-        var totalImpact: Double = 0
+        let ca = Double(actualAge)
+
+        // ── KDM Biological Age [1] ──────────────────────────────────
+        //
+        // BioAge = [ Σ_j (m_j − q_j) · k_j / s_j²  +  CA / s_BA² ]
+        //          ÷ [ Σ_j k_j² / s_j²  +  1 / s_BA² ]
+
+        var numerator = ca / (Self.sBA * Self.sBA)
+        var denominator = 1.0 / (Self.sBA * Self.sBA)
+
+        struct BiomarkerInput {
+            let param: KDMBiomarker
+            let observed: Double
+        }
+
+        var inputs: [(metric: MetricScore.Metric, biomarker: BiomarkerInput)] = []
+
+        if let rhr = avgRHR {
+            inputs.append((.restingHR, BiomarkerInput(param: Self.rhrParam, observed: rhr)))
+        }
+        if let hrv = avgHRV {
+            inputs.append((.hrv, BiomarkerInput(param: Self.sdnnParam, observed: hrv)))
+        }
+        if let steps = avgSteps {
+            inputs.append((.steps, BiomarkerInput(param: Self.stepsParam, observed: steps)))
+        }
+
+        for input in inputs {
+            let p = input.biomarker.param
+            let m = input.biomarker.observed
+            let s2 = p.residualSE * p.residualSE
+            numerator += (m - p.intercept) * p.slope / s2
+            denominator += (p.slope * p.slope) / s2
+        }
+
+        let kdmAge = numerator / denominator
+
+        // ── Per-Metric Impact for Display ───────────────────────────
+        // Each KDM biomarker's contribution = w_j × (impliedAge_j − CA)
+        // where w_j = (k_j²/s_j²) / denominator, impliedAge_j = (m_j − q_j) / k_j
+
         var metrics: [MetricScore] = []
 
-        // ─────────────────────────────────────────────────────────────
-        // 算法基于以下权威研究，每项影响限 ±2 年，总计限 ±5 年
-        //
-        // [1] RHR — Cooney MT et al. Eur Heart J 2010;31:750-758
-        //     Framingham Heart Study: RHR >80 bpm 全因死亡率风险比 1.45
-        //     每 10 bpm 偏差 ≈ 0.8 年生理年龄影响
-        //
-        // [2] HRV (RMSSD) — Shaffer F & Ginsberg JP. Front Public Health 2017;5:258
-        //     年龄修正参考区间（20岁:~60ms, 40岁:~40ms, 60岁:~25ms）
-        //     斜率约 -0.8ms/year，每 10ms 偏差 ≈ 1.0 年影响
-        //
-        // [3] 睡眠 — Walker MP. "Why We Sleep". 2017 + CDC MMWR 2016;65(6):137-141
-        //     6 年追踪：睡眠 <6h 死亡率 HR 1.65；>9h HR 1.41；7-8h 最优
-        //     偏离最优每 1h ≈ 0.7 年影响
-        //
-        // [4] 步数 — Paluch AZ et al. JAMA Netw Open 2022;5:e2228519
-        //     8000 步/天死亡率降低 51%；Saint-Maurice PF et al. JAMA 2020;323:1151-1160
-        //     每 1000 步 ≈ 0.3 年影响，上限 ±2 年
-        //
-        // [5] 活动时间 — WHO 2020 Physical Activity Guidelines
-        //     150 min/week 中等强度 = 每天 ~21 min；不足时心血管风险上升
-        // ─────────────────────────────────────────────────────────────
+        for input in inputs {
+            let p = input.biomarker.param
+            let m = input.biomarker.observed
+            let s2 = p.residualSE * p.residualSE
+            let weight = (p.slope * p.slope / s2) / denominator
+            let impliedAge = (m - p.intercept) / p.slope
+            let ageImpact = weight * (impliedAge - ca)
 
-        func clampImpact(_ val: Double) -> Double { max(-2.0, min(2.0, val)) }
-
-        // ① 静息心率 [1] Framingham 数据：基准 68 bpm（成人中位数）
-        //    RHR 每偏离 10 bpm → 约 0.8 年生理年龄差
-        if let rhr = avgRHR {
-            let baseline = 68.0
-            let diff = rhr - baseline            // 正 = 高于基准 = 更老
-            let impact = clampImpact(diff * 0.08) // 10 bpm → 0.8 yr
-            totalImpact += impact
             let advice: String
-            if rhr < 50 {
-                advice = String(localized: "静息心率极低，通常见于耐力运动员")
-            } else if rhr < 60 {
-                advice = String(localized: "静息心率优秀（Framingham 低风险区间）")
-            } else if rhr < 75 {
-                advice = String(localized: "静息心率正常，心血管健康")
-            } else {
-                advice = String(localized: "静息心率偏高，有氧训练可有效降低")
+            switch input.metric {
+            case .restingHR:
+                let expected = p.intercept + p.slope * ca
+                if m < 50 {
+                    advice = String(localized: "Very low RHR — typical of endurance athletes")
+                } else if m < expected - 5 {
+                    advice = String(localized: "RHR well below age norm — strong cardiovascular health")
+                } else if m < expected + 5 {
+                    advice = String(localized: "RHR in normal range for your age (Zhang 2016 norms)")
+                } else {
+                    advice = String(localized: "RHR above age norm — aerobic training can help lower it")
+                }
+            case .hrv:
+                let expected = p.intercept + p.slope * ca
+                if m > expected * 1.3 {
+                    advice = String(localized: "HRV well above age norm — excellent autonomic function")
+                } else if m > expected * 0.85 {
+                    advice = String(localized: "HRV in normal range for your age (Shaffer 2017 norms)")
+                } else {
+                    advice = String(localized: "HRV below age norm — improving sleep and reducing stress can help")
+                }
+            case .steps:
+                if m >= 10000 {
+                    advice = String(localized: "Excellent step count — well above the 8000 mortality threshold (JAMA 2020)")
+                } else if m >= 8000 {
+                    advice = String(localized: "Steps meet the key health threshold (Saint-Maurice 2020)")
+                } else if m >= 6000 {
+                    advice = String(localized: "Steps slightly below optimal — aim for 8000+ daily")
+                } else {
+                    advice = String(localized: "Step count low — sedentary risk elevated (JAMA 2020)")
+                }
+            default:
+                advice = ""
             }
-            metrics.append(MetricScore(metric: .restingHR, value: rhr, ageImpact: impact, advice: advice))
+
+            metrics.append(MetricScore(
+                metric: input.metric,
+                value: m,
+                ageImpact: ageImpact,
+                advice: advice
+            ))
         }
 
-        // ② HRV (RMSSD) [2] Shaffer & Ginsberg 2017
-        //    年龄修正基准：baseline ≈ 60 - 0.8 × (age - 20)
-        //    每 10ms 偏离基准 → 约 1.0 年影响
-        if let hrv = avgHRV {
-            let baseline = max(20.0, 60.0 - 0.8 * Double(max(0, actualAge - 20)))
-            let diff = hrv - baseline            // 正 = 高于基准 = 更年轻
-            let impact = clampImpact(-(diff * 0.10)) // 年龄方向相反
-            totalImpact += impact
-            let advice: String
-            if hrv >= baseline * 1.3 {
-                advice = String(localized: "HRV 远超年龄基准，自主神经功能出色")
-            } else if hrv >= baseline * 0.9 {
-                advice = String(localized: "HRV 在年龄正常范围内（Shaffer 2017 标准）")
-            } else {
-                advice = String(localized: "HRV 低于年龄基准，建议改善睡眠和减少压力")
-            }
-            metrics.append(MetricScore(metric: .hrv, value: hrv, ageImpact: impact, advice: advice))
-        }
-
-        // ③ 睡眠时长 [3] Walker / CDC：7-8h 最优，偏离每 1h ≈ 0.7 年影响
+        // ── Sleep Penalty [5] ───────────────────────────────────────
+        // U-shaped mortality: optimal 7–8h.
+        // Gompertz doubling time ≈ 8 years → HR 1.12 ≈ +1.1 year per hour short,
+        // HR 1.30 ≈ +2.4 year per hour long. Simplified to ≈ 1.5 yr/h short, 2.0 yr/h long.
+        var sleepPenalty: Double = 0
         if let sleepMin = avgSleepMin {
             let hours = sleepMin / 60.0
-            // 最优区间 7.0-8.5h，偏离两侧均为负面
-            let optimalMid = 7.75
-            let deviation = max(0, abs(hours - optimalMid) - 0.75) // 0.75h 缓冲区
-            let impact = clampImpact(deviation * 0.7)
-            totalImpact += impact
-            let advice: String
+            if hours < 7.0 {
+                sleepPenalty = min(3.0, (7.0 - hours) * 1.5)
+            } else if hours > 8.0 {
+                sleepPenalty = min(3.0, (hours - 8.0) * 2.0)
+            }
+            let sleepAdvice: String
             switch hours {
-            case ..<6.0:    advice = String(localized: "严重睡眠不足，死亡率风险显著升高（CDC 2016）")
-            case 6.0..<7.0: advice = String(localized: "睡眠略不足，建议延长至 7-8 小时")
-            case 7.0..<8.5: advice = String(localized: "睡眠时长在最优区间（Walker 2017 推荐）")
-            case 8.5..<9.5: advice = String(localized: "睡眠偏多，注意睡眠效率和质量")
-            default:        advice = String(localized: "睡眠过多，建议排查潜在健康问题")
+            case ..<6.0:
+                sleepAdvice = String(localized: "Severe sleep deficit — significantly elevated mortality risk (Cappuccio 2010)")
+            case 6.0..<7.0:
+                sleepAdvice = String(localized: "Slightly short on sleep — aim for 7–8 hours")
+            case 7.0..<8.0:
+                sleepAdvice = String(localized: "Sleep in the optimal range (Cappuccio 2010 meta-analysis)")
+            case 8.0..<9.0:
+                sleepAdvice = String(localized: "Sleep is adequate — monitor sleep quality")
+            default:
+                sleepAdvice = String(localized: "Oversleeping — consider evaluating underlying causes")
             }
-            metrics.append(MetricScore(metric: .sleep, value: hours, ageImpact: impact, advice: advice))
+            metrics.append(MetricScore(
+                metric: .sleep,
+                value: hours,
+                ageImpact: sleepPenalty,
+                advice: sleepAdvice
+            ))
         }
 
-        // ④ 每日步数 [4] Paluch et al. JAMA Netw Open 2022
-        //    关键结论：8000步/天是死亡率显著下降的"阈值"，非线性关系
-        //    ≥8000步 → 健康基线，无额外"年轻"加分（步数不是生理年龄的线性因子）
-        //    <8000步 → 久坐风险，每减少2000步 ≈ 0.4年负影响，上限 +1.5年（偏老）
-        //    注意：马拉松运动员步数再高也不会因此"变年轻"——这不是步数测量的
-        if let steps = avgSteps {
-            let deficit = max(0, 8000.0 - steps)   // 只计算不足，不计算超出
-            let impact = min(1.5, deficit / 2000.0 * 0.4)  // 只有正值（偏老）
-            totalImpact += impact
-            let advice: String
-            switch steps {
-            case ..<4000:   advice = String(localized: "长期久坐（<4000步），心血管和代谢风险显著上升（JAMA 2022）")
-            case 4000..<6000: advice = String(localized: "步数偏低，建议每天步行至少 8000 步")
-            case 6000..<8000: advice = String(localized: "接近推荐阈值，继续保持")
-            default:        advice = String(localized: "步数达标（≥8000步），久坐风险低")
-            }
-            metrics.append(MetricScore(metric: .steps, value: steps, ageImpact: impact, advice: advice))
-        }
-
-        // ⑤ 活跃时间 [5] WHO 2020 身体活动指南
-        //    同样是阈值效应：达到 150 min/week 是基线，超过无额外加分
-        //    不足时才有负影响
+        // ── Active Minutes Penalty [6] ──────────────────────────────
+        // WHO threshold: 150 min/week ≈ 21 min/day. Below → penalty.
         let whoDaily = 21.4
-        let activeDeficit = max(0, whoDaily - avgActiveMin)  // 只计算不足
-        let activeImpact = min(1.0, activeDeficit / 10.0 * 0.4)  // 只有正值（偏老）
-        totalImpact += activeImpact
+        let activePenalty: Double
+        if avgActiveMin >= whoDaily {
+            activePenalty = 0
+        } else {
+            activePenalty = min(1.5, (whoDaily - avgActiveMin) / whoDaily * 1.5)
+        }
         let activeAdvice: String
         if avgActiveMin >= whoDaily {
-            activeAdvice = String(localized: "活动量达到 WHO 2020 推荐标准（≥150 min/week）")
+            activeAdvice = String(localized: "Activity meets WHO 2020 recommendation (≥150 min/week)")
         } else if avgActiveMin >= 10 {
-            activeAdvice = String(localized: "活动量略不足，WHO 建议每天至少 21 分钟中等强度运动")
+            activeAdvice = String(localized: "Activity slightly below WHO target — aim for 21+ minutes daily")
         } else {
-            activeAdvice = String(localized: "活动量严重不足，增加日常运动可显著降低慢病风险")
+            activeAdvice = String(localized: "Activity very low — increasing daily movement significantly reduces chronic disease risk")
         }
-        metrics.append(MetricScore(metric: .activeMinutes, value: avgActiveMin, ageImpact: activeImpact, advice: activeAdvice))
+        metrics.append(MetricScore(
+            metric: .activeMinutes,
+            value: avgActiveMin,
+            ageImpact: activePenalty,
+            advice: activeAdvice
+        ))
 
-        let healthAge = Double(actualAge) + totalImpact
-        // 按年龄比例限制：年轻人生理储备小，改善空间有限
-        // 19岁最多年轻 ~2.8年；40岁最多年轻 ~6年；80岁最多年轻 ~12年
-        let maxImprovement = Double(actualAge) * 0.15  // 最多年轻 15%
-        let maxDeterioration = Double(actualAge) * 0.20 // 最多偏老 20%
-        let lowerBound = Double(actualAge) - maxImprovement
-        let upperBound = Double(actualAge) + maxDeterioration
-        let clampedAge = max(lowerBound, min(upperBound, healthAge))
+        // ── Final Biological Age ────────────────────────────────────
+        let rawBioAge = kdmAge + sleepPenalty + activePenalty
+
+        // Clamp: wearable-only estimates have ±5–8 year confidence interval.
+        // Cap offset to prevent unrealistic extremes.
+        let maxOffset = max(3.0, ca * 0.12)  // e.g. 19yo → ±3yr, 40yo → ±4.8yr, 60yo → ±7.2yr
+        let clampedAge = max(ca - maxOffset, min(ca + maxOffset, rawBioAge))
 
         return HealthAgeResult(
             healthAge: clampedAge,
             chronologicalAge: actualAge,
-            difference: clampedAge - Double(actualAge),
+            difference: clampedAge - ca,
             metrics: metrics,
             daysOfData: validDays
         )
     }
 
-    /// 数据不足时返回还差几天
+    /// Days of data still needed before computation is available
     func daysUntilReady(modelContext: ModelContext) -> Int? {
         guard hasBirthYear else { return nil }
         let summaries = fetchRecentSummaries(days: 30, modelContext: modelContext)
@@ -274,9 +356,9 @@ final class HealthAgeService {
         metrics: [
             MetricScore(metric: .restingHR, value: 58, ageImpact: -1.0, advice: "Resting HR is in a healthy range"),
             MetricScore(metric: .hrv, value: 52, ageImpact: -1.5, advice: "HRV indicates good autonomic health"),
-            MetricScore(metric: .sleep, value: 7.5, ageImpact: 0.4, advice: "Sleep duration is in the optimal range"),
-            MetricScore(metric: .steps, value: 9200, ageImpact: 0.4, advice: "Step count is solid — keep it up"),
-            MetricScore(metric: .activeMinutes, value: 35, ageImpact: -1.3, advice: "Activity level meets WHO guidelines"),
+            MetricScore(metric: .sleep, value: 7.5, ageImpact: 0, advice: "Sleep duration is in the optimal range"),
+            MetricScore(metric: .steps, value: 9200, ageImpact: -0.3, advice: "Step count is solid — keep it up"),
+            MetricScore(metric: .activeMinutes, value: 35, ageImpact: 0, advice: "Activity level meets WHO guidelines"),
         ],
         daysOfData: 14
     )

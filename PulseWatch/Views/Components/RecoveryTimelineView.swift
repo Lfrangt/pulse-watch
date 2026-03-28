@@ -74,7 +74,7 @@ enum TimelineEventBuilder {
                 icon: "moon.fill",
                 title: String(localized: "Asleep"),
                 detail: "\(sleepHours)h\(sleepMins)m\(deepDetail)",
-                impact: insight.sleepScore >= 70 ? "恢复 +\(min(20, insight.sleepScore / 5))" : "恢复一般",
+                impact: insight.sleepScore >= 70 ? String(localized: "Recovery +\(min(20, insight.sleepScore / 5))") : String(localized: "Fair recovery"),
                 impactPositive: insight.sleepScore >= 50,
                 color: sleepColor
             ))
@@ -83,10 +83,10 @@ enum TimelineEventBuilder {
             let rhrText: String
             let rhrGood: Bool
             if let rhr = hk.latestRestingHR {
-                rhrText = "静息心率 \(Int(rhr))bpm"
+                rhrText = String(localized: "Resting HR \(Int(rhr))bpm")
                 rhrGood = rhr < 70
             } else {
-                rhrText = "静息心率 --"
+                rhrText = String(localized: "Resting HR --")
                 rhrGood = true
             }
 
@@ -95,7 +95,7 @@ enum TimelineEventBuilder {
                 icon: "sunrise.fill",
                 title: String(localized: "Awake"),
                 detail: rhrText,
-                impact: rhrGood ? "恢复良好" : "恢复较弱",
+                impact: rhrGood ? String(localized: "Good recovery") : String(localized: "Weak recovery"),
                 impactPositive: rhrGood,
                 color: rhrGood ? PulseTheme.statusGood : PulseTheme.statusModerate
             ))
@@ -106,7 +106,7 @@ enum TimelineEventBuilder {
                 icon: "moon.fill",
                 title: String(localized: "Sleep"),
                 detail: String(localized: "No sleep data"),
-                impact: "等待同步",
+                impact: String(localized: "Awaiting sync"),
                 impactPositive: true,
                 color: sleepColor
             ))
@@ -135,7 +135,7 @@ enum TimelineEventBuilder {
                 icon: "figure.walk",
                 title: String(localized: "Daily Activity"),
                 detail: "\(stepsText) · \(activeCal) +\(Int(calories))kcal",
-                impact: steps >= 8000 ? "继续加油" : "继续加油",
+                impact: steps >= 8000 ? String(localized: "Keep it up") : String(localized: "Keep moving"),
                 impactPositive: steps >= 5000,
                 color: PulseTheme.accent
             ))
@@ -160,7 +160,7 @@ enum TimelineEventBuilder {
             icon: "heart.text.clipboard",
             title: String(localized: "Current Status"),
             detail: "\(hrvText) · \(adviceText)",
-            impact: currentGood ? "适合训练" : "建议休息",
+            impact: currentGood ? String(localized: "Ready to train") : String(localized: "Rest recommended"),
             impactPositive: currentGood,
             color: PulseTheme.accent,
             isCurrent: true
@@ -507,7 +507,7 @@ private var previewEvents: [TimelineEvent] {
             icon: "moon.fill",
             title: String(localized: "Asleep"),
             detail: String(localized: "Total 7h35m · Deep ~2.1h"),
-            impact: "恢复 +15",
+            impact: String(localized: "Recovery +15"),
             impactPositive: true,
             color: PulseTheme.sleepAccent
         ),
@@ -515,8 +515,8 @@ private var previewEvents: [TimelineEvent] {
             time: wakeTime,
             icon: "sunrise.fill",
             title: String(localized: "Awake"),
-            detail: String(localized: "静息心率 62bpm"),
-            impact: "恢复良好",
+            detail: String(localized: "Resting HR 62bpm"),
+            impact: String(localized: "Good recovery"),
             impactPositive: true,
             color: PulseTheme.statusGood
         ),
@@ -525,7 +525,7 @@ private var previewEvents: [TimelineEvent] {
             icon: "figure.walk",
             title: String(localized: "Daily Activity"),
             detail: String(localized: "3.0k steps · Active calories +120kcal"),
-            impact: "继续加油",
+            impact: String(localized: "Keep it up"),
             impactPositive: true,
             color: PulseTheme.accent
         ),
@@ -534,7 +534,7 @@ private var previewEvents: [TimelineEvent] {
             icon: "heart.text.clipboard",
             title: String(localized: "Current Status"),
             detail: String(localized: "HRV 48ms ↑ · Moderate"),
-            impact: "适合训练",
+            impact: String(localized: "Ready to train"),
             impactPositive: true,
             color: PulseTheme.accent,
             isCurrent: true

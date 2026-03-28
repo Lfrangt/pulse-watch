@@ -432,9 +432,8 @@ struct GymArrivalFlowView: View {
                 }
             }
         }
-        let reason = reasons.isEmpty
-            ? String(format: String(localized: "Readiness %d — %@ intensity recommended"), readinessScore, intensity.rawValue)
-            : reasons.first!
+        let reason = reasons.first
+            ?? String(format: String(localized: "Readiness %d — %@ intensity recommended"), readinessScore, intensity.rawValue)
 
         generatedPlan = GeneratedPlan(
             intensity: intensity,

@@ -356,39 +356,15 @@ final class HealthKitManager {
     }
     
     // MARK: - Daily Score Calculation
-    
+
+    /// Delegates to ScoreEngine's weighted algorithm for consistency across all surfaces
     func calculateDailyScore() -> Int {
-        var score = 50 // baseline
-        
-        // HRV contribution (higher = better, personal baseline matters)
-        if let hrv = latestHRV {
-            if hrv > 60 { score += 15 }
-            else if hrv > 40 { score += 5 }
-            else { score -= 10 }
-        }
-        
-        // Resting HR (lower = better for most people)
-        if let rhr = latestRestingHR {
-            if rhr < 60 { score += 10 }
-            else if rhr < 70 { score += 5 }
-            else if rhr > 80 { score -= 10 }
-        }
-        
-        // Sleep
-        if lastNightSleepMinutes > 420 { score += 15 }        // 7+ hours
-        else if lastNightSleepMinutes > 360 { score += 5 }    // 6+ hours
-        else if lastNightSleepMinutes < 300 { score -= 15 }   // <5 hours
-        
-        // Blood oxygen
-        if let spo2 = latestBloodOxygen {
-            if spo2 >= 96 { score += 5 }
-            else if spo2 < 92 { score -= 15 }
-        }
-        
-        // Activity
-        if todaySteps > 8000 { score += 5 }
-        
-        return max(0, min(100, score))
+        ScoreEngine.calculateScore(
+            hrv: latestHRV,
+            restingHR: latestRestingHR,
+            bloodOxygen: latestBloodOxygen,
+            sleepMinutes: lastNightSleepMinutes
+        )
     }
     
     // MARK: - Weekly Statistics (7-day daily breakdown)

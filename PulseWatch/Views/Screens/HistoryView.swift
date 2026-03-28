@@ -893,9 +893,9 @@ struct HistoryView: View {
             .animation(.easeOut(duration: 1.0), value: chartAnimated)
 
             // Period summary row
-            if candles.count >= 2 {
-                let first = candles.first!.avg
-                let last = candles.last!.avg
+            if candles.count >= 2, let firstCandle = candles.first, let lastCandle = candles.last {
+                let first = firstCandle.avg
+                let last = lastCandle.avg
                 let delta = last - first
                 let pct = first > 0 ? (delta / first) * 100 : 0
                 let isUp = delta >= 0
@@ -1186,11 +1186,13 @@ func aggregateToCandlePoints(from summaries: [(date: Date, value: Double)], grou
         groups[start, default: []].append(item.value)
     }
     return groups.sorted { $0.key < $1.key }.compactMap { (date, values) in
-        guard !values.isEmpty else { return nil }
+        guard !values.isEmpty,
+              let firstVal = values.first, let lastVal = values.last else { return nil }
         let sorted = values.sorted()
+        guard let sortedFirst = sorted.first, let sortedLast = sorted.last else { return nil }
         return CandlePoint(
-            date: date, open: values.first!, close: values.last!,
-            high: sorted.last!, low: sorted.first!,
+            date: date, open: firstVal, close: lastVal,
+            high: sortedLast, low: sortedFirst,
             avg: values.reduce(0, +) / Double(values.count)
         )
     }

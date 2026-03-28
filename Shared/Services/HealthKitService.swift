@@ -553,38 +553,14 @@ final class HealthKitService {
         }
     }
 
-    /// 基于 DailySummary 计算评分
+    /// 基于 DailySummary 计算评分 — delegates to ScoreEngine for consistency
     private func calculateScore(from summary: DailySummary) -> Int {
-        var score = 50
-
-        if let hrv = summary.averageHRV {
-            if hrv > 60 { score += 15 }
-            else if hrv > 40 { score += 5 }
-            else { score -= 10 }
-        }
-
-        if let rhr = summary.restingHeartRate {
-            if rhr < 60 { score += 10 }
-            else if rhr < 70 { score += 5 }
-            else if rhr > 80 { score -= 10 }
-        }
-
-        if let sleep = summary.sleepDurationMinutes {
-            if sleep > 420 { score += 15 }
-            else if sleep > 360 { score += 5 }
-            else if sleep < 300 { score -= 15 }
-        }
-
-        if let spo2 = summary.averageBloodOxygen {
-            if spo2 >= 96 { score += 5 }
-            else if spo2 < 92 { score -= 15 }
-        }
-
-        if let steps = summary.totalSteps, steps > 8000 {
-            score += 5
-        }
-
-        return max(0, min(100, score))
+        ScoreEngine.calculateScore(
+            hrv: summary.averageHRV,
+            restingHR: summary.restingHeartRate,
+            bloodOxygen: summary.averageBloodOxygen,
+            sleepMinutes: summary.sleepDurationMinutes ?? 0
+        )
     }
 
     // MARK: - 锚点持久化

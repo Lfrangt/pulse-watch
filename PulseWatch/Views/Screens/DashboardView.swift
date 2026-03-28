@@ -1137,10 +1137,10 @@ struct DashboardView: View {
 
             // Label
             VStack(alignment: .leading, spacing: 2) {
-                Text("生理年龄")
+                Text(String(localized: "Health Age"))
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.45))
-                Text("\(ageInt) 岁")
+                Text(String(format: String(localized: "%d yrs"), ageInt))
                     .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
             }
@@ -1152,7 +1152,7 @@ struct DashboardView: View {
                 HStack(spacing: 4) {
                     Image(systemName: isYounger ? "arrow.down" : "arrow.up")
                         .font(.system(size: 10, weight: .bold))
-                    Text("\(diffInt) yr \(isYounger ? "更年轻" : "偏老")")
+                    Text(String(format: String(localized: "%d yr %@"), diffInt, isYounger ? String(localized: "younger") : String(localized: "older")))
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                 }
                 .foregroundStyle(accentColor)
@@ -1169,7 +1169,7 @@ struct DashboardView: View {
                 .overlay(RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
                     .stroke(Color.white.opacity(0.06), lineWidth: 0.5))
         )
-        .accessibilityLabel("生理年龄 \(ageInt) 岁")
+        .accessibilityLabel(String(format: String(localized: "Health Age %d years"), ageInt))
     }
 
     private func healthAgeCard(result: HealthAgeService.HealthAgeResult) -> some View {

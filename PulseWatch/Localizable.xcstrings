@@ -4,6 +4,9 @@
     "--" : {
 
     },
+    "-1" : {
+
+    },
     "—" : {
 
     },
@@ -90,9 +93,6 @@
         }
       }
     },
-    "(workout.durationMinutes) min" : {
-
-    },
     "/ %@" : {
 
     },
@@ -134,8 +134,28 @@
         }
       }
     },
+    "%@ / %@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ / %2$@ %3$@"
+          }
+        }
+      }
+    },
     "%@ / 100" : {
 
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
     },
     "%@ × %@" : {
       "localizations" : {
@@ -147,9 +167,6 @@
         }
       }
     },
-    "%@ bpm" : {
-
-    },
     "%@ kcal" : {
 
     },
@@ -157,9 +174,6 @@
 
     },
     "%@ min" : {
-
-    },
-    "%@ records stored" : {
 
     },
     "%@ sets x %@ reps" : {
@@ -171,19 +185,6 @@
           }
         }
       }
-    },
-    "%@ yr %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ yr %2$@"
-          }
-        }
-      }
-    },
-    "%@ 岁" : {
-
     },
     "%@/%@" : {
       "localizations" : {
@@ -219,6 +220,9 @@
       }
     },
     "%@kg" : {
+
+    },
+    "%@m" : {
 
     },
     "%d / 5 sessions" : {
@@ -319,6 +323,9 @@
       }
     },
     "+%@" : {
+
+    },
+    "+1" : {
 
     },
     "~%@%@" : {
@@ -454,9 +461,6 @@
         }
       }
     },
-    "0" : {
-
-    },
     "1 Plate Club" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -571,9 +575,6 @@
       }
     },
     "82" : {
-
-    },
-    "100" : {
 
     },
     "About" : {
@@ -820,9 +821,6 @@
         }
       }
     },
-    "Agent ID" : {
-
-    },
     "AI" : {
 
     },
@@ -869,6 +867,7 @@
       }
     },
     "Alert when resting heart rate is abnormal" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -877,9 +876,6 @@
           }
         }
       }
-    },
-    "All data stays on your device. We never collect personal information." : {
-
     },
     "All Pulse Watch data is stored on your device and never uploaded to any server. Health data is read only from Apple HealthKit for local analysis and training suggestions. We do not collect any personal information." : {
       "extractionState" : "stale",
@@ -924,9 +920,6 @@
           }
         }
       }
-    },
-    "Analysing your data…" : {
-
     },
     "Any new PRs this week? 💪" : {
       "extractionState" : "manual",
@@ -1006,6 +999,7 @@
       }
     },
     "Auto-push every 30 min or on significant changes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1016,6 +1010,7 @@
       }
     },
     "Auto-push Health Data" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1026,6 +1021,7 @@
       }
     },
     "Auto-remind when arriving" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1036,6 +1032,7 @@
       }
     },
     "Auto-remind when you arrive" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1308,9 +1305,6 @@
         }
       }
     },
-    "Birth Month" : {
-
-    },
     "Birth Year" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1523,9 +1517,6 @@
         }
       }
     },
-    "Clear Workout History" : {
-
-    },
     "Close" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1541,6 +1532,7 @@
 
     },
     "Collection Frequency" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1594,6 +1586,7 @@
       }
     },
     "Connect your OpenClaw Gateway" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1637,6 +1630,7 @@
       }
     },
     "Connection Status" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1779,6 +1773,7 @@
       }
     },
     "Daily Health Summary" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1811,6 +1806,7 @@
       }
     },
     "Daily recovery score and training advice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1875,6 +1871,7 @@
       }
     },
     "Data sent directly to your OpenClaw Gateway, no third parties" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2008,6 +2005,7 @@
 
     },
     "Demo Mode" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2333,9 +2331,6 @@
         }
       }
     },
-    "For accurate age calculation" : {
-
-    },
     "Frequency" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2392,6 +2387,7 @@
       }
     },
     "Gateway Connected" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2400,9 +2396,6 @@
           }
         }
       }
-    },
-    "Gateway URL" : {
-
     },
     "Gender" : {
       "extractionState" : "manual",
@@ -2644,6 +2637,7 @@
       }
     },
     "h" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2709,6 +2703,7 @@
       }
     },
     "Heart Rate Alerts" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2761,6 +2756,7 @@
       }
     },
     "High Frequency" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2815,6 +2811,7 @@
       }
     },
     "High Threshold" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -3098,9 +3095,6 @@
           }
         }
       }
-    },
-    "Imperial (mi, lb)" : {
-
     },
     "improves" : {
       "extractionState" : "manual",
@@ -3620,6 +3614,7 @@
       }
     },
     "Low Threshold" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -3663,6 +3658,7 @@
       }
     },
     "Manual Input" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -3704,12 +3700,6 @@
           }
         }
       }
-    },
-    "Measurement System" : {
-
-    },
-    "Metric (km, kg)" : {
-
     },
     "Metrics" : {
       "localizations" : {
@@ -4099,6 +4089,7 @@
       }
     },
     "Notification Time" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4200,6 +4191,7 @@
       }
     },
     "Open System Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4208,6 +4200,9 @@
           }
         }
       }
+    },
+    "OpenClaw AI 记录" : {
+
     },
     "Other" : {
       "extractionState" : "manual",
@@ -4340,6 +4335,7 @@
       }
     },
     "Power Saving" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4373,9 +4369,6 @@
           }
         }
       }
-    },
-    "Privacy Policy" : {
-
     },
     "Profile" : {
       "extractionState" : "manual",
@@ -4411,6 +4404,7 @@
       }
     },
     "pts" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4456,6 +4450,9 @@
     "Pulse" : {
 
     },
+    "PULSE" : {
+
+    },
     "Pulse Watch" : {
 
     },
@@ -4480,6 +4477,9 @@
         }
       }
     },
+    "pulse-watch.app" : {
+
+    },
     "Push" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4503,6 +4503,7 @@
       }
     },
     "Push health data to your AI Agent for personalized training advice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4533,9 +4534,6 @@
           }
         }
       }
-    },
-    "READINESS" : {
-
     },
     "Readiness %d — %@ intensity recommended" : {
       "extractionState" : "manual",
@@ -4668,9 +4666,6 @@
         }
       }
     },
-    "RECOVERY" : {
-
-    },
     "Recovery \\(score)" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4751,10 +4746,8 @@
         }
       }
     },
-    "Remind you when arriving at gym" : {
-
-    },
     "Remove" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4765,9 +4758,6 @@
       }
     },
     "Reps" : {
-
-    },
-    "Reset Onboarding" : {
 
     },
     "Rest" : {
@@ -5079,6 +5069,7 @@
       }
     },
     "Run openclaw pair --qr in terminal" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -5100,6 +5091,7 @@
       }
     },
     "Same alert won't repeat within 1 hour" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -5207,6 +5199,7 @@
       }
     },
     "Search Gym" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -5237,9 +5230,6 @@
           }
         }
       }
-    },
-    "Send Feedback" : {
-
     },
     "Set a new PR 4 weeks in a row" : {
       "extractionState" : "manual",
@@ -5274,6 +5264,7 @@
       }
     },
     "Set Gym Location" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -5407,6 +5398,7 @@
       }
     },
     "Show UI with simulated data" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -5415,9 +5407,6 @@
           }
         }
       }
-    },
-    "Show welcome guide again on next launch" : {
-
     },
     "Skip" : {
       "localizations" : {
@@ -5672,6 +5661,7 @@
       }
     },
     "Standard" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -5715,6 +5705,7 @@
       }
     },
     "Status" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -5800,9 +5791,6 @@
           }
         }
       }
-    },
-    "STRAIN" : {
-
     },
     "Strain %d, Recovery %d" : {
       "extractionState" : "manual",
@@ -5971,9 +5959,6 @@
         }
       }
     },
-    "The welcome guide will appear next time you open the app." : {
-
-    },
     "This action cannot be undone. The original HealthKit data will not be affected." : {
 
     },
@@ -5996,9 +5981,6 @@
           }
         }
       }
-    },
-    "This will delete all saved workout history from the app. Health data in Apple Health will not be affected." : {
-
     },
     "Thu" : {
       "extractionState" : "stale",
@@ -6045,6 +6027,7 @@
       }
     },
     "Today's Insights" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -6085,9 +6068,6 @@
           }
         }
       }
-    },
-    "Token" : {
-
     },
     "Total" : {
 
@@ -6191,6 +6171,7 @@
       }
     },
     "Training Advice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -6265,9 +6246,6 @@
           }
         }
       }
-    },
-    "Training Reminders" : {
-
     },
     "Training Rotation" : {
       "extractionState" : "stale",
@@ -6380,6 +6358,7 @@
       }
     },
     "Use Current Location" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -6992,67 +6971,6 @@
           }
         }
       }
-    },
-    "什么影响生理年龄？" : {
-
-    },
-    "图例" : {
-
-    },
-    "基于 %@ 天数据" : {
-
-    },
-    "实际年龄：" : {
-
-    },
-    "岁" : {
-
-    },
-    "当前读数" : {
-
-    },
-    "恢复 %@" : {
-
-    },
-    "指标详情" : {
-
-    },
-    "显示 %@ 天数据（%@天跨度），积累更多数据后将显示趋势聚合图" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "显示 %1$@ 天数据（%2$@天跨度），积累更多数据后将显示趋势聚合图"
-          }
-        }
-      }
-    },
-    "暂无历史数据" : {
-
-    },
-    "本月概览" : {
-
-    },
-    "正常范围：95% – 100%" : {
-
-    },
-    "步" : {
-
-    },
-    "生理年龄" : {
-
-    },
-    "由 OpenClaw AI 记录" : {
-
-    },
-    "目标 %@ kcal" : {
-
-    },
-    "目标 %@ 步" : {
-
-    },
-    "血氧数据由 Apple Watch 实时测量。持续历史记录将在未来版本中支持。" : {
-
     }
   },
   "version" : "1.0"

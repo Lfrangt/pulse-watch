@@ -25,7 +25,27 @@ struct PulseWatchApp: App {
         do {
             return try ModelContainer(for: schema, configurations: [config])
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            // If migration fails, delete the store and recreate — losing data is better than crashing
+            // This can happen after a schema change in an app update
+            let storeURL = config.url
+            try? FileManager.default.removeItem(at: storeURL)
+            // Also remove the .sqlite-shm and .sqlite-wal files
+            let shmURL = storeURL.deletingPathExtension().appendingPathExtension("sqlite-shm")
+            let walURL = storeURL.deletingPathExtension().appendingPathExtension("sqlite-wal")
+            try? FileManager.default.removeItem(at: shmURL)
+            try? FileManager.default.removeItem(at: walURL)
+
+            do {
+                return try ModelContainer(for: schema, configurations: [config])
+            } catch {
+                // Last resort: in-memory store to avoid crash
+                let memConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+                do {
+                    return try ModelContainer(for: schema, configurations: [memConfig])
+                } catch {
+                    fatalError("Pulse Watch: Failed to create even in-memory ModelContainer: \(error)")
+                }
+            }
         }
     }()
 

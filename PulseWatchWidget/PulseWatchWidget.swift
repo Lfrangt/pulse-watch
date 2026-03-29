@@ -603,7 +603,9 @@ struct MiniSparkline: View {
                         for pt in points {
                             path.addLine(to: pt)
                         }
-                        path.addLine(to: CGPoint(x: points.last!.x, y: geo.size.height))
+                        if let lastPoint = points.last {
+                            path.addLine(to: CGPoint(x: lastPoint.x, y: geo.size.height))
+                        }
                         path.closeSubpath()
                     }
                     .fill(
@@ -884,7 +886,9 @@ struct LargeSparkline: View {
                         for pt in points {
                             path.addLine(to: pt)
                         }
-                        path.addLine(to: CGPoint(x: points.last!.x, y: geo.size.height))
+                        if let lastPoint = points.last {
+                            path.addLine(to: CGPoint(x: lastPoint.x, y: geo.size.height))
+                        }
                         path.closeSubpath()
                     }
                     .fill(

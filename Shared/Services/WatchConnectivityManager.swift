@@ -86,7 +86,9 @@ final class WatchConnectivityManager: NSObject {
         if session.isReachable {
             // Real-time delivery if Watch is active
             session.sendMessage(payload, replyHandler: nil) { error in
+                #if DEBUG
                 print("WC sendMessage error: \(error.localizedDescription)")
+                #endif
                 // Fall back to queued transfer
                 session.transferUserInfo(payload)
             }
@@ -173,7 +175,9 @@ final class WatchConnectivityManager: NSObject {
 
         if session.isReachable {
             session.sendMessage(payload, replyHandler: nil) { error in
+                #if DEBUG
                 print("WC sendHealthSnapshot error: \(error.localizedDescription)")
+                #endif
                 session.transferUserInfo(payload)
             }
         } else {
@@ -270,7 +274,9 @@ extension WatchConnectivityManager: WCSessionDelegate {
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         if let error {
+            #if DEBUG
             print("WC activation error: \(error.localizedDescription)")
+            #endif
             return
         }
 

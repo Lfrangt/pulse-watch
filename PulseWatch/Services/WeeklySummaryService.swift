@@ -116,8 +116,8 @@ final class WeeklySummaryService {
         let now = Date()
 
         // 本周：周一到今天
-        let thisWeekStart = cal.date(from: cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now))!
-        let lastWeekStart = cal.date(byAdding: .weekOfYear, value: -1, to: thisWeekStart)!
+        let thisWeekStart = cal.safeDate(from: cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now))
+        let lastWeekStart = cal.safeDate(byAdding: .weekOfYear, value: -1, to: thisWeekStart)
         let lastWeekEnd = thisWeekStart
 
         // 获取 DailySummary 数据

@@ -315,7 +315,7 @@ final class HealthAgeService {
     // MARK: - Helpers
 
     private func fetchRecentSummaries(days: Int, modelContext: ModelContext) -> [DailySummary] {
-        let cutoff = Calendar.current.date(byAdding: .day, value: -days, to: .now)!
+        let cutoff = Calendar.current.safeDate(byAdding: .day, value: -days, to: .now)
         let descriptor = FetchDescriptor<DailySummary>(
             predicate: #Predicate<DailySummary> { $0.date >= cutoff },
             sortBy: [SortDescriptor(\.date, order: .reverse)]

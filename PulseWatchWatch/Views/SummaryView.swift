@@ -1,8 +1,11 @@
 import SwiftUI
+import os
 
 /// Watch 端摘要视图
 /// 显示完整的每日健康数据：评分仪表盘 + 四项指标卡片 + 操作按钮
 struct SummaryView: View {
+
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "SummaryView")
 
     @State private var healthManager = HealthKitManager.shared
     @State private var connectivity = WatchConnectivityManager.shared
@@ -187,7 +190,7 @@ struct SummaryView: View {
                     HapticManager.alertTriggered()
                 }
             } catch {
-                print("SummaryView HealthKit error: \(error)")
+                logger.error("SummaryView HealthKit error: \(error)")
             }
         }
     }

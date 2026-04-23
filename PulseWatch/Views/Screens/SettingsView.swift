@@ -32,7 +32,7 @@ struct SettingsView: View {
     // MARK: - 状态
 
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
-    @State private var healthManager = HealthKitManager.shared
+    private let healthManager = HealthKitManager.shared
     @State private var showLocationSetup = false
     @State private var showAbout = false
     @State private var isSavingGym = false
@@ -47,6 +47,8 @@ struct SettingsView: View {
     @State private var showImportPicker = false
     @State private var importResult: ImportResult?
 
+    @FocusState private var isNumberFieldFocused: Bool
+
     @Query(filter: #Predicate<SavedLocation> { $0.locationType == "gym" && $0.isActive })
     private var gymLocations: [SavedLocation]
 
@@ -58,6 +60,7 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
+            GeometryReader { geo in
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: PulseTheme.spacingM) {
 
@@ -65,9 +68,9 @@ struct SettingsView: View {
                     morningBriefSection
                         .staggered(index: 0)
 
-                    // 健身房位置
-                    gymSection
-                        .staggered(index: 1)
+                    // 健身房位置（开发中）
+                    // gymSection
+                    //     .staggered(index: 1)
 
                     // 通知权限
                     notificationSection
@@ -125,16 +128,28 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, PulseTheme.spacingM)
                 .padding(.top, PulseTheme.spacingS)
+                .frame(width: geo.size.width)
             }
-            .background(PulseTheme.background)
-            .navigationTitle(String(localized: "Settings"))
-            .navigationBarTitleDisplayMode(.large)
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .background(PulseTheme.background.ignoresSafeArea())
+            .navigationTitle(String(localized: "设置"))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(PulseTheme.background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") { isNumberFieldFocused = false }
+                }
+            }
             .task {
                 await checkNotificationStatus()
                 healthManager.checkAuthorizationStatus()
             }
         }
+        .background(PulseTheme.background.ignoresSafeArea())
     }
 
     // MARK: - Morning Brief 设置
@@ -805,6 +820,8 @@ struct SettingsView: View {
                         .font(.system(size: 11))
                     Text(String(localized: "Run openclaw pair --qr in terminal"))
                         .font(.system(size: 11, weight: .regular, design: .monospaced))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
                 .foregroundStyle(PulseTheme.textTertiary)
                 .padding(.horizontal, PulseTheme.spacingXS)
@@ -1208,10 +1225,10 @@ struct SettingsView: View {
                 } label: {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(String(localized: "生成 PDF 报告"))
+                            Text(String(localized: "Generate PDF Report"))
                                 .font(PulseTheme.bodyFont)
                                 .foregroundStyle(PulseTheme.textPrimary)
-                            Text(String(localized: "上月健康数据的完整 PDF 报告"))
+                            Text(String(localized: "Complete PDF report of last month's health data"))
                                 .font(PulseTheme.captionFont)
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
@@ -1528,6 +1545,7 @@ struct SettingsView: View {
                     Spacer()
                     TextField("cm", value: $heightCm, format: .number)
                         .keyboardType(.decimalPad)
+                        .focused($isNumberFieldFocused)
                         .multilineTextAlignment(.trailing)
                         .font(PulseTheme.bodyFont.weight(.semibold))
                         .foregroundStyle(PulseTheme.textPrimary)
@@ -1547,6 +1565,7 @@ struct SettingsView: View {
                     Spacer()
                     TextField("kg", value: $weightKg, format: .number)
                         .keyboardType(.decimalPad)
+                        .focused($isNumberFieldFocused)
                         .multilineTextAlignment(.trailing)
                         .font(PulseTheme.bodyFont.weight(.semibold))
                         .foregroundStyle(PulseTheme.textPrimary)

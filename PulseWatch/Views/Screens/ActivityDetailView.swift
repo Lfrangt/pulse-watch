@@ -1,12 +1,16 @@
 import SwiftUI
 import Charts
+import os
 
 /// Activity deep-dive — steps, calories, exercise minutes, move goals
 struct ActivityDetailView: View {
 
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "ActivityDetailView")
+
     @State private var healthManager = HealthKitManager.shared
     @State private var chartAppeared = false
     @State private var weekSteps: [(date: Date, steps: Int)] = []
+    @State private var selectedStepDate: Date?
 
     private var steps: Int { healthManager.todaySteps }
     private var calories: Double { healthManager.todayActiveCalories }
@@ -149,15 +153,23 @@ struct ActivityDetailView: View {
                 .font(PulseTheme.headlineFont)
                 .foregroundStyle(PulseTheme.textPrimary)
 
-            Chart(weekSteps, id: \.date) { s in
-                BarMark(
-                    x: .value("Day", s.date, unit: .day),
-                    y: .value("Steps", chartAppeared ? s.steps : 0)
-                )
-                .foregroundStyle(
-                    s.steps >= stepsGoal ? PulseTheme.accentTeal : Color.white.opacity(0.25)
-                )
-                .cornerRadius(4)
+            Chart {
+                ForEach(weekSteps, id: \.date) { s in
+                    BarMark(
+                        x: .value("Day", s.date, unit: .day),
+                        y: .value("Steps", chartAppeared ? s.steps : 0)
+                    )
+                    .foregroundStyle(
+                        s.steps >= stepsGoal ? PulseTheme.accentTeal : Color.white.opacity(0.25)
+                    )
+                    .cornerRadius(4)
+                }
+
+                if let selectedStepDate {
+                    RuleMark(x: .value("Selected", selectedStepDate, unit: .day))
+                        .foregroundStyle(.white.opacity(0.3))
+                        .lineStyle(StrokeStyle(lineWidth: 0.5))
+                }
             }
             .chartXAxis {
                 AxisMarks(values: .stride(by: .day)) { val in
@@ -194,6 +206,54 @@ struct ActivityDetailView: View {
                         }
                         .stroke(PulseTheme.accentTeal.opacity(0.4), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
                     }
+                }
+            }
+            // Selection gesture
+            .chartOverlay { proxy in
+                GeometryReader { geo in
+                    Rectangle().fill(.clear).contentShape(Rectangle())
+                        .gesture(DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                let plotFrame = geo[proxy.plotAreaFrame]
+                                let x = value.location.x - plotFrame.origin.x
+                                guard let date: Date = proxy.value(atX: x) else { return }
+                                let cal = Calendar.current
+                                if let nearest = weekSteps.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+                                    let newDate = cal.startOfDay(for: nearest.date)
+                                    if selectedStepDate != newDate {
+                                        selectedStepDate = newDate
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    }
+                                }
+                            }
+                            .onEnded { _ in
+                                withAnimation(.easeOut(duration: 0.25)) { selectedStepDate = nil }
+                            }
+                        )
+                }
+            }
+            .overlay(alignment: .top) {
+                if let sel = selectedStepDate,
+                   let point = weekSteps.first(where: { Calendar.current.isDate($0.date, inSameDayAs: sel) }) {
+                    let dateFmt: DateFormatter = {
+                        let f = DateFormatter()
+                        f.locale = Locale.current
+                        f.dateFormat = "EEEE, M/d"
+                        return f
+                    }()
+                    VStack(spacing: 2) {
+                        Text(NumberFormatter.localizedString(from: NSNumber(value: point.steps), number: .decimal) + " steps")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white)
+                        Text(dateFmt.string(from: point.date))
+                            .font(.system(size: 11, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .transition(.scale.combined(with: .opacity))
+                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedStepDate)
                 }
             }
             .frame(height: 150)
@@ -278,9 +338,7 @@ struct ActivityDetailView: View {
                 weekSteps = hkData.map { (date: $0.date, steps: Int($0.value)) }
             }
         } catch {
-            #if DEBUG
-            print("Steps weekly fetch error: \(error)")
-            #endif
+            logger.error("Steps weekly fetch error: \(error)")
         }
         withAnimation(.easeInOut(duration: 0.6).delay(0.3)) {
             chartAppeared = true

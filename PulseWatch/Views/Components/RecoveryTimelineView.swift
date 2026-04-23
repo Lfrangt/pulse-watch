@@ -494,12 +494,10 @@ private var previewEvents: [TimelineEvent] {
     let calendar = Calendar.current
     let now = Date()
 
-    let bedtime = calendar.date(bySettingHour: 23, minute: 30, second: 0, of:
-        calendar.date(byAdding: .day, value: -1, to: now)!
-    )!
-
-    let wakeTime = calendar.date(bySettingHour: 7, minute: 5, second: 0, of: now)!
-    let activityTime = calendar.date(bySettingHour: 14, minute: 0, second: 0, of: now)!
+    let yesterday = calendar.safeDate(byAdding: .day, value: -1, to: now)
+    let bedtime = calendar.date(bySettingHour: 23, minute: 30, second: 0, of: yesterday) ?? yesterday
+    let wakeTime = calendar.date(bySettingHour: 7, minute: 5, second: 0, of: now) ?? now
+    let activityTime = calendar.date(bySettingHour: 14, minute: 0, second: 0, of: now) ?? now
 
     return [
         TimelineEvent(

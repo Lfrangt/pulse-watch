@@ -41,7 +41,10 @@ final class DailySummary {
     // 综合评分
     var dailyScore: Int?                // 0-100
 
-    // 更新时间
+    // 压力��分
+    var stressScore: Int?               // 0-100 (0=chill, 100=maxed out)
+
+    // ���新时间
     var lastUpdated: Date
 
     init(date: Date) {

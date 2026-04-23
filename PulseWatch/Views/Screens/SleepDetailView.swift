@@ -4,10 +4,16 @@ import Charts
 /// Premium sleep analysis screen — hypnogram, stage breakdown, insights
 struct SleepDetailView: View {
 
-    @State private var healthManager = HealthKitManager.shared
+    private let healthManager = HealthKitManager.shared
     @State private var samples: [HealthKitManager.SleepSample] = []
     @State private var isLoading = true
     @State private var chartAppeared = false
+    @State private var selectedSleepTime: Date?
+    @State private var selectedWeeklyDate: Date?
+    @State private var weeklySummary: [HealthKitManager.DailySleepSummary] = []
+    @State private var isShowingFallback = false
+    @State private var fallbackDate: Date? = nil
+    @State private var lastNightMissing = false
 
     // Aggregated durations (minutes)
     private var totalMinutes: Int { healthManager.lastNightSleepMinutes }
@@ -21,6 +27,11 @@ struct SleepDetailView: View {
     }
     private var sleepStart: Date? { healthManager.lastNightSleepStart }
     private var sleepEnd: Date? { healthManager.lastNightSleepEnd }
+
+    // Whether there's any sleep data in the past 7 days
+    private var hasAnyWeeklyData: Bool {
+        weeklySummary.contains { $0.totalMinutes > 0 }
+    }
 
     // Colors
     private let deepColor = Color(hex: "1E3A5F")
@@ -50,20 +61,55 @@ struct SleepDetailView: View {
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: PulseTheme.spacingM) {
-                hypnogramChart
+                if totalMinutes == 0 && !hasAnyWeeklyData {
+                    // Truly no data in 7 days
+                    EmptyStateView(
+                        icon: "moon.zzz",
+                        title: String(localized: "No Sleep Data"),
+                        message: String(localized: "Wear your Apple Watch to bed to track sleep.")
+                    )
                     .staggered(index: 0)
+                } else {
+                    // Reminder banner when last night is missing
+                    if lastNightMissing {
+                        watchReminderBanner
+                            .staggered(index: 0)
+                    }
 
-                summaryStatsRow
-                    .staggered(index: 1)
+                    // Fallback date banner
+                    if isShowingFallback, let fbDate = fallbackDate {
+                        fallbackBanner(date: fbDate)
+                            .staggered(index: lastNightMissing ? 1 : 0)
+                    }
 
-                sleepScoreCard
-                    .staggered(index: 2)
+                    let bannerOffset = (lastNightMissing ? 1 : 0) + (isShowingFallback ? 1 : 0)
 
-                stageBreakdownCard
-                    .staggered(index: 3)
+                    if totalMinutes > 0 {
+                        hypnogramChart
+                            .staggered(index: bannerOffset)
 
-                insightsCard
-                    .staggered(index: 4)
+                        summaryStatsRow
+                            .staggered(index: bannerOffset + 1)
+                    }
+
+                    // Weekly sleep chart — always shown when there's any weekly data
+                    if hasAnyWeeklyData {
+                        weeklySleepChart
+                            .staggered(index: bannerOffset + (totalMinutes > 0 ? 2 : 0))
+                    }
+
+                    if totalMinutes > 0 {
+                        let weeklyOffset = hasAnyWeeklyData ? 1 : 0
+                        sleepScoreCard
+                            .staggered(index: bannerOffset + 3 + weeklyOffset)
+
+                        stageBreakdownCard
+                            .staggered(index: bannerOffset + 4 + weeklyOffset)
+
+                        insightsCard
+                            .staggered(index: bannerOffset + 5 + weeklyOffset)
+                    }
+                }
 
                 Spacer(minLength: 60)
             }
@@ -79,19 +125,248 @@ struct SleepDetailView: View {
     // MARK: - Data Loading
 
     private func loadData() async {
-        // Refresh sleep data from HealthKit first
-        _ = try? await healthManager.fetchLastNightSleep()
+        // 1. Try last night (24h)
+        let lastNight = try? await healthManager.fetchLastNightSleep()
+        let lastNightTotal = lastNight?.total ?? 0
 
-        do {
-            let fetched = try await healthManager.fetchSleepSamples()
+        if lastNightTotal == 0 {
+            lastNightMissing = true
+            // 2. Fallback: most recent session within 7 days
+            let fallback = try? await healthManager.fetchMostRecentSleep()
+            if (fallback?.total ?? 0) > 0 {
+                isShowingFallback = true
+                fallbackDate = healthManager.lastNightSleepStart
+                // Fetch hypnogram samples for fallback session
+                let fetched = (try? await healthManager.fetchMostRecentSleepSamples()) ?? []
+                samples = fetched
+            }
+        } else {
+            // Normal path — last night has data
+            lastNightMissing = false
+            let fetched = (try? await healthManager.fetchSleepSamples()) ?? []
             samples = fetched
-        } catch {
-            samples = []
         }
+
+        // 3. Always fetch weekly summary
+        weeklySummary = (try? await healthManager.fetchWeekSleepSummary()) ?? []
+
         isLoading = false
         withAnimation(.easeInOut(duration: 0.8).delay(0.2)) {
             chartAppeared = true
         }
+    }
+
+    // MARK: - Watch Reminder Banner
+
+    private var watchReminderBanner: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "moon.fill")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(PulseTheme.sleepAccent)
+            Text("昨晚没有检测到睡眠，记得戴手表睡觉哦")
+                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .foregroundStyle(PulseTheme.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(PulseTheme.sleepAccent.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(PulseTheme.sleepAccent.opacity(0.15), lineWidth: 1)
+                )
+        )
+    }
+
+    // MARK: - Fallback Date Banner
+
+    private func fallbackBanner(date: Date) -> some View {
+        let formatter: DateFormatter = {
+            let f = DateFormatter()
+            f.locale = Locale.current
+            f.dateFormat = "M月d日"
+            return f
+        }()
+        return HStack(spacing: 8) {
+            Image(systemName: "clock.arrow.circlepath")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(PulseTheme.textTertiary)
+            Text("显示最近一次睡眠记录 (\(formatter.string(from: date)))")
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .foregroundStyle(PulseTheme.textTertiary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(PulseTheme.border.opacity(0.15))
+        )
+    }
+
+    // MARK: - Weekly Sleep Bar Chart
+
+    private var weeklySleepChart: some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+            HStack(spacing: PulseTheme.spacingS) {
+                Image(systemName: "chart.bar.fill")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(PulseTheme.sleepAccent)
+
+                Text(String(localized: "本周睡眠"))
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(PulseTheme.textPrimary)
+
+                Spacer()
+
+                let avgHours = weeklyAverageHours
+                if avgHours > 0 {
+                    Text(String(format: "均 %.1fh", avgHours))
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(PulseTheme.textSecondary)
+                }
+            }
+
+            Chart {
+                ForEach(weeklySummary, id: \.date) { day in
+                    if day.totalMinutes > 0 {
+                        // Total sleep bar (lighter)
+                        BarMark(
+                            x: .value("Date", day.date, unit: .day),
+                            y: .value("Total", Double(day.totalMinutes) / 60.0)
+                        )
+                        .foregroundStyle(PulseTheme.sleepAccent.opacity(0.3))
+                        .cornerRadius(4)
+
+                        // Deep sleep overlay (darker)
+                        BarMark(
+                            x: .value("Date", day.date, unit: .day),
+                            y: .value("Deep", Double(day.deepMinutes) / 60.0)
+                        )
+                        .foregroundStyle(PulseTheme.sleepAccent)
+                        .cornerRadius(4)
+                    } else {
+                        // Empty day — dashed outline placeholder
+                        BarMark(
+                            x: .value("Date", day.date, unit: .day),
+                            y: .value("Placeholder", 0.15)
+                        )
+                        .foregroundStyle(Color.clear)
+                        .annotation(position: .top, spacing: 0) {
+                            RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                .strokeBorder(PulseTheme.border.opacity(0.4), style: StrokeStyle(lineWidth: 1, dash: [3, 2]))
+                                .frame(height: 50)
+                        }
+                    }
+                }
+
+                // 7h reference line
+                RuleMark(y: .value("Target", 7))
+                    .foregroundStyle(PulseTheme.textTertiary.opacity(0.4))
+                    .lineStyle(StrokeStyle(lineWidth: 0.8, dash: [4, 3]))
+                    .annotation(position: .trailing, alignment: .leading) {
+                        Text("7h")
+                            .font(.system(size: 8, design: .rounded))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+
+                if let selectedWeeklyDate {
+                    RuleMark(x: .value("Selected", selectedWeeklyDate, unit: .day))
+                        .foregroundStyle(.white.opacity(0.3))
+                        .lineStyle(StrokeStyle(lineWidth: 0.5))
+                }
+            }
+            .chartYScale(domain: 0...(max(10, weeklyMaxHours + 1)))
+            .chartYAxis {
+                AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { value in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
+                        .foregroundStyle(PulseTheme.border)
+                    AxisValueLabel {
+                        if let v = value.as(Double.self) {
+                            Text(String(format: "%.0fh", v))
+                                .font(.system(size: 9, design: .rounded))
+                                .foregroundStyle(PulseTheme.textTertiary)
+                        }
+                    }
+                }
+            }
+            .chartXAxis {
+                AxisMarks(values: .stride(by: .day, count: 1)) { _ in
+                    AxisValueLabel(format: .dateTime.weekday(.abbreviated).locale(Locale.current))
+                        .font(.system(size: 9))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+            }
+            .chartOverlay { proxy in
+                GeometryReader { geo in
+                    Rectangle().fill(.clear).contentShape(Rectangle())
+                        .gesture(DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                let plotFrame = geo[proxy.plotAreaFrame]
+                                let x = value.location.x - plotFrame.origin.x
+                                guard let date: Date = proxy.value(atX: x) else { return }
+                                let cal = Calendar.current
+                                if let nearest = weeklySummary.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+                                    let newDate = cal.startOfDay(for: nearest.date)
+                                    if selectedWeeklyDate != newDate {
+                                        selectedWeeklyDate = newDate
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    }
+                                }
+                            }
+                            .onEnded { _ in
+                                withAnimation(.easeOut(duration: 0.25)) { selectedWeeklyDate = nil }
+                            }
+                        )
+                }
+            }
+            .overlay(alignment: .top) {
+                if let sel = selectedWeeklyDate,
+                   let day = weeklySummary.first(where: { Calendar.current.isDate($0.date, inSameDayAs: sel) }) {
+                    let weekdayFmt: DateFormatter = {
+                        let f = DateFormatter()
+                        f.locale = Locale.current
+                        f.dateFormat = "EEEE"
+                        return f
+                    }()
+                    VStack(spacing: 2) {
+                        if day.totalMinutes > 0 {
+                            Text(String(format: "%.1fh / %.1fh deep", Double(day.totalMinutes) / 60.0, Double(day.deepMinutes) / 60.0))
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                        } else {
+                            Text("无数据")
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.7))
+                        }
+                        Text(weekdayFmt.string(from: day.date))
+                            .font(.system(size: 11, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .transition(.scale.combined(with: .opacity))
+                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedWeeklyDate)
+                }
+            }
+            .frame(height: 150)
+        }
+        .pulseCard()
+    }
+
+    private var weeklyAverageHours: Double {
+        let daysWithData = weeklySummary.filter { $0.totalMinutes > 0 }
+        guard !daysWithData.isEmpty else { return 0 }
+        let total = daysWithData.map(\.totalMinutes).reduce(0, +)
+        return Double(total) / Double(daysWithData.count) / 60.0
+    }
+
+    private var weeklyMaxHours: Double {
+        let maxMinutes = weeklySummary.map(\.totalMinutes).max() ?? 0
+        return Double(maxMinutes) / 60.0
     }
 
     // MARK: - 1. Hypnogram Chart
@@ -102,23 +377,31 @@ struct SleepDetailView: View {
                 .font(PulseTheme.headlineFont)
                 .foregroundStyle(PulseTheme.textPrimary)
 
-            Chart(samples) { sample in
-                RectangleMark(
-                    xStart: .value("Start", sample.start),
-                    xEnd: .value("End", sample.end),
-                    yStart: .value("StageBottom", stageY(sample.stage)),
-                    yEnd: .value("StageTop", stageY(sample.stage) + 1)
-                )
-                .foregroundStyle(stageColor(sample.stage))
-                .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
-                .opacity(chartAppeared ? 1 : 0)
+            Chart {
+                ForEach(samples) { sample in
+                    RectangleMark(
+                        xStart: .value("Start", sample.start),
+                        xEnd: .value("End", sample.end),
+                        yStart: .value("StageBottom", stageY(sample.stage)),
+                        yEnd: .value("StageTop", stageY(sample.stage) + 1)
+                    )
+                    .foregroundStyle(stageColor(sample.stage))
+                    .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
+                    .opacity(chartAppeared ? 1 : 0)
+                }
+
+                if let selected = selectedSleepTime {
+                    RuleMark(x: .value("Selected", selected))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
+                }
             }
+            .chartXScale(domain: (samples.map(\.start).min() ?? Date())...(samples.map(\.end).max() ?? Date()))
             .chartXAxis {
-                AxisMarks(values: .stride(by: .hour, count: 1)) { value in
-                    AxisValueLabel(format: .dateTime.hour(.defaultDigits(amPM: .omitted)).minute())
+                AxisMarks(values: .automatic(desiredCount: 4)) { _ in
+                    AxisValueLabel(format: .dateTime.hour(.defaultDigits(amPM: .abbreviated)).locale(Locale.current))
+                        .font(.system(size: 9))
                         .foregroundStyle(PulseTheme.textTertiary)
-                    AxisGridLine()
-                        .foregroundStyle(PulseTheme.border.opacity(0.3))
                 }
             }
             .chartYAxis {
@@ -137,6 +420,39 @@ struct SleepDetailView: View {
             .chartYScale(domain: -0.2...4.2)
             .chartPlotStyle { plot in
                 plot.frame(height: 180)
+            }
+            .chartOverlay { proxy in
+                GeometryReader { geo in
+                    Rectangle()
+                        .fill(Color.clear)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { drag in
+                                    let origin = geo[proxy.plotFrame!].origin
+                                    let x = drag.location.x - origin.x
+                                    if let date: Date = proxy.value(atX: x) {
+                                        if date != selectedSleepTime {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                        selectedSleepTime = date
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) {
+                                        selectedSleepTime = nil
+                                    }
+                                }
+                        )
+                }
+            }
+            .overlay(alignment: .top) {
+                if let selected = selectedSleepTime,
+                   let stage = samples.first(where: { selected >= $0.start && selected < $0.end }) {
+                    sleepTooltip(stage: stage.stage, time: selected)
+                        .transition(.scale(scale: 0.8).combined(with: .opacity))
+                        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selectedSleepTime)
+                }
             }
 
             // Bedtime / Wake labels
@@ -181,6 +497,33 @@ struct SleepDetailView: View {
         case .core: return coreColor
         case .awake: return awakeColor
         }
+    }
+
+    private func stageName(_ stage: HealthKitManager.SleepStage) -> String {
+        switch stage {
+        case .deep: return String(localized: "Deep")
+        case .core: return String(localized: "Core")
+        case .rem: return "REM"
+        case .awake: return String(localized: "Awake")
+        }
+    }
+
+    private func sleepTooltip(stage: HealthKitManager.SleepStage, time: Date) -> some View {
+        VStack(spacing: 4) {
+            Text(stageName(stage))
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.white)
+            Text(time.formatted(.dateTime.hour().minute().locale(Locale.current)))
+                .font(.system(size: 12))
+                .foregroundStyle(.white.opacity(0.7))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+        )
     }
 
     // MARK: - 2. Summary Stats Row
@@ -370,6 +713,9 @@ struct SleepDetailView: View {
             return String(localized: "暂无本周睡眠趋势数据")
         }
         let hours = String(format: "%.1f", Double(totalMinutes) / 60)
+        if isShowingFallback {
+            return String(localized: "最近一次睡眠 \(hours)h")
+        }
         return String(localized: "昨晚睡眠 \(hours)h")
     }
 

@@ -154,7 +154,7 @@ struct HealthAgeDetailView: View {
                         .lineLimit(2)
                 }
             }
-            .padding(14)
+            .padding(PulseTheme.spacingM)
 
             // Impact bar
             HStack(spacing: 8) {

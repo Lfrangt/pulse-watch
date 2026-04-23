@@ -105,7 +105,7 @@ struct GoalProgressCard: View {
             return Double(todaySummary?.dailyScore ?? 0)
         case .workoutCount:
             // 本周训练次数
-            let weekStart = Calendar.current.date(from: Calendar.current.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today))!
+            let weekStart = Calendar.current.safeDate(from: Calendar.current.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today))
             return Double(allWorkouts.filter { $0.startDate >= weekStart }.count)
         case .none:
             return 0

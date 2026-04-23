@@ -167,6 +167,9 @@
         }
       }
     },
+    "%@ bpm" : {
+
+    },
     "%@ kcal" : {
 
     },
@@ -176,12 +179,25 @@
     "%@ min" : {
 
     },
+    "%@ ms" : {
+
+    },
     "%@ sets x %@ reps" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ sets x %2$@ reps"
+          }
+        }
+      }
+    },
+    "%@: %@ kg" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@ kg"
           }
         }
       }
@@ -256,7 +272,8 @@
             "value" : "%d 分钟"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "%d selected" : {
       "extractionState" : "manual",
@@ -347,7 +364,8 @@
             "value" : "约 %d 分钟"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "☀️ Good Morning, Pulse" : {
       "extractionState" : "stale",
@@ -1564,6 +1582,17 @@
         }
       }
     },
+    "Complete PDF report of last month's health data" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上月健康数据完整 PDF 报告"
+          }
+        }
+      }
+    },
     "Confirm" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2404,6 +2433,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "性别"
+          }
+        }
+      }
+    },
+    "Generate PDF Report" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "生成 PDF 报告"
           }
         }
       }
@@ -3999,6 +4039,17 @@
         }
       }
     },
+    "No Monthly Report" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无月度报告"
+          }
+        }
+      }
+    },
     "No muscle groups tagged yet" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4021,12 +4072,34 @@
         }
       }
     },
+    "No Sleep Data" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无睡眠数据"
+          }
+        }
+      }
+    },
     "No timeline data yet" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "暂无时间线数据"
+          }
+        }
+      }
+    },
+    "No Training Events" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无训练计划"
           }
         }
       }
@@ -4753,6 +4826,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "移除"
+          }
+        }
+      }
+    },
+    "Reports generate after one month of data." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "积累一个月数据后自动生成报告。"
           }
         }
       }
@@ -5671,6 +5755,17 @@
         }
       }
     },
+    "Start a workout to see your training calendar." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始运动后这里会显示训练日历。"
+          }
+        }
+      }
+    },
     "Start Timer" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6542,6 +6637,17 @@
         }
       }
     },
+    "Wear your Apple Watch to bed to track sleep." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "戴着 Apple Watch 入睡即可记录睡眠。"
+          }
+        }
+      }
+    },
     "Wear your watch for %d more days to unlock" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6971,6 +7077,15 @@
           }
         }
       }
+    },
+    "无数据" : {
+
+    },
+    "昨晚没有检测到睡眠，记得戴手表睡觉哦" : {
+
+    },
+    "显示最近一次睡眠记录 (%@)" : {
+
     }
   },
   "version" : "1.0"

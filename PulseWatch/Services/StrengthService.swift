@@ -114,6 +114,7 @@ final class StrengthService {
             let ratio = best1RM / bodyweightKg
 
             let thresholds = type.thresholds
+            guard thresholds.count >= 4 else { continue }
             let level: StrengthLevel
             let nextLevelKg: Double?
 

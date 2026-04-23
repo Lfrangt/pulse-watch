@@ -1,8 +1,11 @@
 import SwiftUI
 import HealthKit
+import os
 
 /// Watch face — glance and go. Minimal, warm, alive.
 struct WatchHomeView: View {
+
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "WatchHomeView")
 
     @State private var connectivity = WatchConnectivityManager.shared
     @State private var healthManager = HealthKitManager.shared
@@ -263,7 +266,7 @@ struct WatchHomeView: View {
                     HapticManager.alertTriggered()
                 }
             } catch {
-                print("Watch HealthKit error: \(error)")
+                logger.error("Watch HealthKit error: \(error)")
             }
         }
     }

@@ -17,6 +17,8 @@ struct StrengthView: View {
     @State private var celebrationAchievement: AchievementService.Achievement?
     @State private var showCelebration = false
     @State private var pbTimelineRange: PBRange = .all
+    @State private var selectedLiftDate: Date?
+    @State private var selectedPBDate: Date?
 
     enum PBRange: String, CaseIterable { case week = "7D", month = "30D", quarter = "90D", all = "All" }
 
@@ -239,31 +241,39 @@ struct StrengthView: View {
                 }
             }
 
-            Chart(sorted, id: \.id) { record in
-                LineMark(
-                    x: .value("Date", record.date),
-                    y: .value("Weight", record.estimated1RM)
-                )
-                .foregroundStyle(color)
-                .interpolationMethod(.catmullRom)
-                .lineStyle(StrokeStyle(lineWidth: 2.5))
+            Chart {
+                ForEach(sorted, id: \.id) { record in
+                    LineMark(
+                        x: .value("Date", record.date),
+                        y: .value("Weight", record.estimated1RM)
+                    )
+                    .foregroundStyle(color)
+                    .interpolationMethod(.catmullRom)
+                    .lineStyle(StrokeStyle(lineWidth: 2.5))
 
-                AreaMark(
-                    x: .value("Date", record.date),
-                    y: .value("Weight", record.estimated1RM)
-                )
-                .foregroundStyle(
-                    LinearGradient(colors: [color.opacity(0.15), color.opacity(0.02)],
-                                   startPoint: .top, endPoint: .bottom)
-                )
-                .interpolationMethod(.catmullRom)
+                    AreaMark(
+                        x: .value("Date", record.date),
+                        y: .value("Weight", record.estimated1RM)
+                    )
+                    .foregroundStyle(
+                        LinearGradient(colors: [color.opacity(0.15), color.opacity(0.02)],
+                                       startPoint: .top, endPoint: .bottom)
+                    )
+                    .interpolationMethod(.catmullRom)
 
-                PointMark(
-                    x: .value("Date", record.date),
-                    y: .value("Weight", record.estimated1RM)
-                )
-                .foregroundStyle(color)
-                .symbolSize(24)
+                    PointMark(
+                        x: .value("Date", record.date),
+                        y: .value("Weight", record.estimated1RM)
+                    )
+                    .foregroundStyle(color)
+                    .symbolSize(24)
+                }
+
+                if let selected = selectedLiftDate {
+                    RuleMark(x: .value("Selected", selected))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
+                }
             }
             .chartYAxis {
                 AxisMarks(position: .leading) { _ in
@@ -280,8 +290,101 @@ struct StrengthView: View {
                 }
             }
             .frame(height: 160)
+            .chartOverlay { proxy in
+                GeometryReader { geo in
+                    Rectangle()
+                        .fill(Color.clear)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { drag in
+                                    let origin = geo[proxy.plotFrame!].origin
+                                    let x = drag.location.x - origin.x
+                                    if let date: Date = proxy.value(atX: x) {
+                                        // Snap to nearest data point
+                                        let nearest = sorted.min(by: {
+                                            abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date))
+                                        })
+                                        let snapped = nearest?.date ?? date
+                                        if snapped != selectedLiftDate {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                        selectedLiftDate = snapped
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) {
+                                        selectedLiftDate = nil
+                                    }
+                                }
+                        )
+                }
+            }
+            .overlay(alignment: .top) {
+                if let selected = selectedLiftDate,
+                   let record = sorted.min(by: {
+                       abs($0.date.timeIntervalSince(selected)) < abs($1.date.timeIntervalSince(selected))
+                   }) {
+                    liftTooltip(weight: record.estimated1RM, date: record.date)
+                        .transition(.scale(scale: 0.8).combined(with: .opacity))
+                        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selectedLiftDate)
+                }
+            }
         }
         .pulseCard()
+    }
+
+    // MARK: - Chart Tooltips
+
+    private func liftTooltip(weight: Double, date: Date) -> some View {
+        VStack(spacing: 4) {
+            Text(String(format: "%.0f kg", weight))
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.white)
+            Text(date.formatted(.dateTime.month(.abbreviated).day().locale(Locale.current)))
+                .font(.system(size: 12))
+                .foregroundStyle(.white.opacity(0.7))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+        )
+    }
+
+    private func pbTooltip(date: Date, records: [StrengthRecord]) -> some View {
+        // Find closest record per lift type within a 1-day window
+        let threshold: TimeInterval = 86400
+        let lines: [(String, Double, Color)] = StrengthService.LiftType.allCases.compactMap { type in
+            let typeRecords = records.filter { $0.liftType == type.rawValue }
+            guard let closest = typeRecords.min(by: {
+                abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date))
+            }), abs(closest.date.timeIntervalSince(date)) < threshold else { return nil }
+            return (type.label, closest.estimated1RM, Color(hex: type.color))
+        }
+
+        return VStack(alignment: .leading, spacing: 4) {
+            ForEach(lines, id: \.0) { label, value, color in
+                HStack(spacing: 6) {
+                    Circle().fill(color).frame(width: 6, height: 6)
+                    Text("\(label): \(String(format: "%.0f", value)) kg")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+            }
+            Text(date.formatted(.dateTime.month(.abbreviated).day().locale(Locale.current)))
+                .font(.system(size: 11))
+                .foregroundStyle(.white.opacity(0.7))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+        )
     }
 
     // MARK: - 填写 Profile 提示
@@ -304,6 +407,9 @@ struct StrengthView: View {
     }
 
     // MARK: - 历史记录
+
+    @State private var recordToDelete: StrengthRecord?
+    @State private var showDeleteConfirmation = false
 
     private var historySection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
@@ -337,9 +443,34 @@ struct StrengthView: View {
                             .background(Capsule().fill(PulseTheme.statusModerate.opacity(0.15)))
                     }
                 }
+                .contextMenu {
+                    Button(role: .destructive) {
+                        recordToDelete = record
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
             }
         }
         .pulseCard()
+        .confirmationDialog(
+            "Delete this record?",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                if let record = recordToDelete {
+                    withAnimation {
+                        modelContext.delete(record)
+                    }
+                }
+                recordToDelete = nil
+            }
+            Button("Cancel", role: .cancel) {
+                recordToDelete = nil
+            }
+        }
     }
 
     // MARK: - PB 成长时间线（三线合一）
@@ -390,6 +521,12 @@ struct StrengthView: View {
                         }
                     }
                 }
+
+                if let selected = selectedPBDate {
+                    RuleMark(x: .value("Selected", selected))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
+                }
             }
             .chartYAxis {
                 AxisMarks(position: .leading) { _ in
@@ -414,6 +551,43 @@ struct StrengthView: View {
             ])
             .chartLegend(.visible)
             .frame(height: 200)
+            .chartOverlay { proxy in
+                GeometryReader { geo in
+                    Rectangle()
+                        .fill(Color.clear)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { drag in
+                                    let origin = geo[proxy.plotFrame!].origin
+                                    let x = drag.location.x - origin.x
+                                    if let date: Date = proxy.value(atX: x) {
+                                        // Snap to nearest data point across all series
+                                        let nearest = filteredRecords.min(by: {
+                                            abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date))
+                                        })
+                                        let snapped = nearest?.date ?? date
+                                        if snapped != selectedPBDate {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                        selectedPBDate = snapped
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) {
+                                        selectedPBDate = nil
+                                    }
+                                }
+                        )
+                }
+            }
+            .overlay(alignment: .top) {
+                if let selected = selectedPBDate {
+                    pbTooltip(date: selected, records: filteredRecords)
+                        .transition(.scale(scale: 0.8).combined(with: .opacity))
+                        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selectedPBDate)
+                }
+            }
         }
         .pulseCard()
     }
@@ -716,10 +890,18 @@ struct AddStrengthRecordView: View {
             .navigationTitle(String(localized: "Add Lift"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .scrollDismissesKeyboard(.interactively)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button(String(localized: "Cancel")) { dismiss() }
                         .foregroundStyle(PulseTheme.textSecondary)
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    }
+                    .foregroundStyle(PulseTheme.accent)
                 }
             }
         }

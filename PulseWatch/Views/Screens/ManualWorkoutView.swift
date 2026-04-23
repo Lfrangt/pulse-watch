@@ -1,8 +1,11 @@
 import SwiftUI
 import SwiftData
+import os
 
 /// 手动添加训练记录页面
 struct ManualWorkoutView: View {
+
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "ManualWorkoutView")
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -258,13 +261,9 @@ struct ManualWorkoutView: View {
         modelContext.insert(entry)
         do {
             try modelContext.save()
-            #if DEBUG
-            print("✅ WorkoutHistoryEntry saved: \(entry.activityName), uuid=\(entry.hkWorkoutUUID ?? "nil")")
-            #endif
+            logger.info("WorkoutHistoryEntry saved: \(entry.activityName, privacy: .public), uuid=\(entry.hkWorkoutUUID ?? "nil", privacy: .public)")
         } catch {
-            #if DEBUG
-            print("❌ Save failed: \(error)")
-            #endif
+            logger.error("Save failed: \(error)")
         }
     }
 }

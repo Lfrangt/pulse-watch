@@ -1,11 +1,14 @@
 import SwiftUI
 import SwiftData
+import os
 
 /// Main iPhone screen — the daily command center
 struct HomeView: View {
 
-    @State private var healthManager = HealthKitManager.shared
-    @State private var connectivityManager = WatchConnectivityManager.shared
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "HomeView")
+
+    private let healthManager = HealthKitManager.shared
+    private let connectivityManager = WatchConnectivityManager.shared
     @State private var isLoading = true
     @State private var brief: ScoreEngine.DailyBrief?
     @State private var showLocationSetup = false
@@ -214,9 +217,8 @@ struct HomeView: View {
 
     private var dateString: String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateStyle = .medium
         formatter.locale = Locale.current
+        formatter.dateStyle = .medium
         return formatter.string(from: .now)
     }
 
@@ -253,9 +255,7 @@ struct HomeView: View {
                 )
             }
         } catch {
-            #if DEBUG
-            print("Load error: \(error)")
-            #endif
+            logger.error("Load error: \(error)")
         }
 
         isLoading = false

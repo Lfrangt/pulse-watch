@@ -1,9 +1,12 @@
 import SwiftUI
 import SwiftData
 import HealthKit
+import os
 
 /// Tab: 运动记录 — 从 HealthKit 读取 HKWorkout，展示心率区间分布
 struct WorkoutView: View {
+
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "WorkoutView")
 
     @State private var workouts: [HKWorkout] = []
     @State private var heartRateZones: [UUID: [HeartRateZone]] = [:]
@@ -460,7 +463,7 @@ struct WorkoutView: View {
                 activeDays: activeDays
             )
         } catch {
-            print("Workout fetch error: \(error)")
+            logger.error("Workout fetch error: \(error)")
         }
 
         isLoading = false
@@ -510,9 +513,7 @@ struct WorkoutView: View {
 
             heartRateZones[workout.uuid] = zones
         } catch {
-            #if DEBUG
-            print("HR zone fetch error: \(error)")
-            #endif
+            logger.error("HR zone fetch error: \(error)")
         }
     }
 
@@ -734,7 +735,7 @@ struct WorkoutView: View {
             return String(localized: "Yesterday ") + timeString(date)
         } else {
             let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "zh_CN")
+            formatter.locale = Locale.current
             formatter.dateFormat = "M/d EEE"
             return formatter.string(from: date)
         }

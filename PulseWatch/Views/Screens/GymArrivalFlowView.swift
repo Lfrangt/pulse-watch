@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Combine
 
 /// 健身房到达 → 选部位 → AI 训练计划 → 开始计时 → 完成记录
 /// 4 步完整智能健身启动流程
@@ -19,7 +20,6 @@ struct GymArrivalFlowView: View {
     @State private var generatedPlan: GeneratedPlan?
     @State private var timerRunning = false
     @State private var elapsedSeconds: Int = 0
-    @State private var timer: Timer?
     @State private var showStrengthPrompt = false
 
     // External context
@@ -64,6 +64,10 @@ struct GymArrivalFlowView: View {
                 }
             }
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+                guard timerRunning else { return }
+                elapsedSeconds += 1
+            }
         }
     }
 
@@ -243,7 +247,8 @@ struct GymArrivalFlowView: View {
                 // Buttons
                 VStack(spacing: PulseTheme.spacingM) {
                     Button {
-                        startTimer()
+                        elapsedSeconds = 0
+                        timerRunning = true
                         withAnimation { step = .training }
                     } label: {
                         HStack {
@@ -332,7 +337,7 @@ struct GymArrivalFlowView: View {
 
             // End button
             Button {
-                stopTimer()
+                timerRunning = false
                 withAnimation { step = .complete }
             } label: {
                 HStack {
@@ -488,21 +493,7 @@ struct GymArrivalFlowView: View {
         }
     }
 
-    // MARK: - Timer
-
-    private func startTimer() {
-        elapsedSeconds = 0
-        timerRunning = true
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            elapsedSeconds += 1
-        }
-    }
-
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-        timerRunning = false
-    }
+    // MARK: - Timer (declarative via .onReceive in body)
 
     private func formatTime(_ seconds: Int) -> String {
         let m = seconds / 60

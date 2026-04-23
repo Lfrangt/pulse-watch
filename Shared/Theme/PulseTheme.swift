@@ -1,42 +1,48 @@
 import SwiftUI
 
 // MARK: - Pulse Design System
-// ui2.0: Biometric Minimalism — deep charcoal + electric teal/violet/coral
-// Stitch AI generated, 2026-03-19
+// ui3.0: Editorial Dark — Rewired + Bevel hybrid, glass morphism
+// Warm whites, glass cards, premium typography
 
 enum PulseTheme {
 
     // MARK: - Colors
-    // Biometric Minimalism — cold precision, data-forward
+    // Editorial Dark — warm whites, glass surfaces
 
     /// Deep black background
     static let background = Color(hex: "0A0A0A")
 
-    /// Elevated surface
-    static let surface = Color(hex: "1A1A1A")
+    /// Elevated surface — subtle glass
+    static let surface = Color(.sRGB, red: 1, green: 1, blue: 1, opacity: 0.03)
 
-    /// Secondary surface
-    static let surface2 = Color(hex: "242424")
+    /// Secondary surface — slightly more visible
+    static let surface2 = Color(.sRGB, red: 1, green: 1, blue: 1, opacity: 0.05)
 
-    /// Card background
-    static let cardBackground = Color(hex: "1A1A1A")
+    /// Card background — glass-like transparency
+    static let cardBackground = Color(.sRGB, red: 1, green: 1, blue: 1, opacity: 0.02)
 
     /// Elevated card (active/pressed)
-    static let cardElevated = Color(hex: "242424")
+    static let cardElevated = Color(.sRGB, red: 1, green: 1, blue: 1, opacity: 0.05)
 
-    /// Subtle cool border
-    static let border = Color(hex: "3A494A")
+    /// Subtle glass border
+    static let border = Color(.sRGB, red: 1, green: 1, blue: 1, opacity: 0.07)
 
-    /// Primary text — pure white
-    static let textPrimary = Color(hex: "FFFFFF")
+    /// Primary text — warm white (not pure #FFF)
+    static let textPrimary = Color(.sRGB, red: 245/255, green: 245/255, blue: 240/255, opacity: 1.0)
 
-    /// Secondary text — neutral gray
-    static let textSecondary = Color(hex: "A0A0A0")
+    /// Secondary text — warm white at 60%
+    static let textSecondary = Color(.sRGB, red: 245/255, green: 245/255, blue: 240/255, opacity: 0.6)
 
-    /// Tertiary text — dim
-    static let textTertiary = Color(hex: "9AABAC")
+    /// Tertiary text — warm white at 40%
+    static let textTertiary = Color(.sRGB, red: 245/255, green: 245/255, blue: 240/255, opacity: 0.4)
+
+    /// Quaternary text — warm white at 20% (labels, dividers)
+    static let textQuaternary = Color(.sRGB, red: 245/255, green: 245/255, blue: 240/255, opacity: 0.2)
 
     // MARK: - Accent Colors
+    // DESIGN RULE: Accent colors are PUNCTUATION ONLY.
+    // Use them for: 6px status dots, 1px borders/glows, small text labels, icon tints.
+    // NEVER use as large background fills. Keep them small and intentional.
 
     /// TriScore primary / accent — electric teal
     static let accentTeal = Color(hex: "00F5FF")
@@ -49,25 +55,28 @@ enum PulseTheme {
 
     // MARK: - Status Colors
 
-    /// Good / recovered — electric teal
-    static let statusGood = Color(hex: "00F5FF")
+    /// Good / recovered — Rewired lime
+    static let statusGood = Color(hex: "BFFF00")
 
-    /// Warning / moderate — gold
-    static let statusWarning = Color(hex: "FFD700")
+    /// Warning / moderate — muted amber
+    static let statusWarning = Color(hex: "E0A850")
 
     /// Moderate / okay — soft violet
     static let statusModerate = Color(hex: "BF94FF")
 
-    /// Poor / needs rest — coral red
-    static let statusPoor = Color(hex: "FF6B6B")
+    /// Poor / needs rest — Rewired orange
+    static let statusPoor = Color(hex: "FF6B00")
 
     /// Legacy aliases
     static let accent = accentTeal
     static let sleepAccent = sleepViolet
     static let activityAccent = activityCoral
 
+    /// Positive state accent — Rewired lime
+    static let positiveGreen = Color(hex: "BFFF00")
+
     /// Subtle highlight for active states
-    static let warmHighlight = Color(hex: "1A2A2A")
+    static let warmHighlight = Color(.sRGB, red: 1, green: 1, blue: 1, opacity: 0.04)
 
     // MARK: - Semantic Colors
 
@@ -82,15 +91,14 @@ enum PulseTheme {
 
     // MARK: - Gradients
 
-    /// Hero section gradient (teal atmospheric)
+    /// Hero section gradient — subtle, editorial
     static let heroGradient = LinearGradient(
         stops: [
-            .init(color: Color(hex: "0A1628"), location: 0),
-            .init(color: Color(hex: "0F2A3D"), location: 0.25),
-            .init(color: Color(hex: "134E5E"), location: 0.45),
-            .init(color: Color(hex: "0D3B4A"), location: 0.65),
-            .init(color: Color(hex: "0A1A24"), location: 0.85),
-            .init(color: Color.black, location: 1.0),
+            .init(color: Color(hex: "0A0F14"), location: 0),
+            .init(color: Color(hex: "0C1A22"), location: 0.3),
+            .init(color: Color(hex: "0E2029"), location: 0.5),
+            .init(color: Color(hex: "0B1419"), location: 0.7),
+            .init(color: Color(hex: "0A0A0A"), location: 1.0),
         ],
         startPoint: .top,
         endPoint: .bottom
@@ -117,14 +125,18 @@ enum PulseTheme {
     }
 
     // MARK: - Typography
+    // Premium hierarchy: heavy rounded numbers, clean body, uppercase captions
 
-    static let titleFont: Font = .system(size: 28, weight: .semibold, design: .rounded)
-    static let headlineFont: Font = .system(size: 18, weight: .medium, design: .rounded)
-    static let bodyFont: Font = .system(size: 15, weight: .regular, design: .rounded)
-    static let captionFont: Font = .system(size: 13, weight: .regular, design: .rounded)
-    static let scoreFont: Font = .system(size: 48, weight: .bold, design: .rounded)
-    static let metricFont: Font = .system(size: 22, weight: .semibold, design: .rounded)
-    static let metricLabelFont: Font = .system(size: 12, weight: .medium, design: .rounded)
+    static let titleFont: Font = .system(size: 28, weight: .bold, design: .rounded)
+    static let headlineFont: Font = .system(size: 18, weight: .semibold, design: .rounded)
+    static let bodyFont: Font = .system(size: 15, weight: .regular, design: .default)
+    static let captionFont: Font = .system(size: 11, weight: .semibold, design: .default)
+    static let scoreFont: Font = .system(size: 52, weight: .heavy, design: .rounded)
+    static let metricFont: Font = .system(size: 24, weight: .bold, design: .rounded)
+    static let metricLabelFont: Font = .system(size: 11, weight: .semibold, design: .default)
+
+    /// Caption letter spacing for ALL CAPS labels (use with .tracking())
+    static let captionTracking: CGFloat = 1.5
 
     // MARK: - Spacing
 
@@ -142,8 +154,31 @@ enum PulseTheme {
 
     // MARK: - Shadows
 
-    static let cardShadow: Color = .black.opacity(0.35)
-    static let glowShadow: Color = accent.opacity(0.15)
+    static let cardShadow: Color = .black.opacity(0.15)
+    static let glowShadow: Color = accent.opacity(0.10)
+
+    // MARK: - Animation Presets
+    // DESIGN RULE: No bounce. Critically damped or easeOut only.
+
+    static let animationFast: Animation = .easeOut(duration: 0.2)
+    static let animationNormal: Animation = .easeOut(duration: 0.3)
+    static let animationSlow: Animation = .easeOut(duration: 0.4)
+    static let animationBreathing: Animation = .easeInOut(duration: 4).repeatForever(autoreverses: true)
+
+    // MARK: - Heart Rate Zone Colors
+
+    static let zoneRest = Color(hex: "3B82F6")       // Zone 1 — Rest
+    static let zoneFatBurn = Color(hex: "22C55E")     // Zone 2 — Fat Burn
+    static let zoneCardio = Color(hex: "EAB308")      // Zone 3 — Cardio
+    static let zonePeak = Color(hex: "F97316")        // Zone 4 — Peak
+    static let zoneMax = Color(hex: "EF4444")         // Zone 5 — Max
+
+    static let zoneColors: [Color] = [zoneRest, zoneFatBurn, zoneCardio, zonePeak, zoneMax]
+
+    // MARK: - Muscle Status Colors
+
+    static let muscleHealthy = Color(hex: "7FC75C")
+    static let muscleFatigued = Color(hex: "C75C5C")
 
     // MARK: - Helpers
 
@@ -175,15 +210,33 @@ struct PulseCardStyle: ViewModifier {
         content
             .padding(padding)
             .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .fill(PulseTheme.cardBackground)
-                    .shadow(color: PulseTheme.cardShadow, radius: 16, y: 6)
+                ZStack {
+                    // Glass fill — rgba(255,255,255,0.02)
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                        .fill(PulseTheme.cardBackground)
+                    // Inner top highlight — glass rim light, white 5% at top fading to clear at 30%
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                stops: [
+                                    .init(color: Color.white.opacity(0.05), location: 0),
+                                    .init(color: Color.clear, location: 0.3)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                }
             )
-            .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous))
+            // Noise texture overlay — subtle grain
+            .modifier(NoiseTexture(opacity: 0.03))
+            // 1px glass border — rgba(255,255,255,0.07)
             .overlay(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
+                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                    .stroke(PulseTheme.border, lineWidth: 1)
             )
+            // NO drop shadow — glass floats without it
     }
 }
 
@@ -204,7 +257,8 @@ struct StaggeredAppear: ViewModifier {
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 20)
             .onAppear {
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(Double(index) * 0.08)) {
+                // Critically damped — no bounce, no overshoot
+                withAnimation(.easeOut(duration: 0.35).delay(Double(index) * 0.08)) {
                     appeared = true
                 }
             }
@@ -214,6 +268,37 @@ struct StaggeredAppear: ViewModifier {
 extension View {
     func staggered(index: Int) -> some View {
         modifier(StaggeredAppear(index: index))
+    }
+}
+
+// MARK: - Noise Texture Overlay
+
+struct NoiseTexture: ViewModifier {
+    var opacity: Double = 0.03
+
+    func body(content: Content) -> some View {
+        content.overlay(
+            Canvas { context, size in
+                let count = Int(size.width * size.height * 0.01)
+                for _ in 0..<count {
+                    let x = Double.random(in: 0...size.width)
+                    let y = Double.random(in: 0...size.height)
+                    context.fill(
+                        Path(ellipseIn: CGRect(x: x, y: y, width: 1, height: 1)),
+                        with: .color(.white)
+                    )
+                }
+            }
+            .blendMode(.overlay)
+            .opacity(opacity)
+            .allowsHitTesting(false)
+        )
+    }
+}
+
+extension View {
+    func noiseTexture(opacity: Double = 0.03) -> some View {
+        modifier(NoiseTexture(opacity: opacity))
     }
 }
 
@@ -232,7 +317,23 @@ struct PulseButtonStyle: ButtonStyle {
                     .shadow(color: PulseTheme.accent.opacity(0.3), radius: configuration.isPressed ? 4 : 8, y: configuration.isPressed ? 2 : 4)
             )
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: configuration.isPressed)
+            .animation(.spring(response: 0.3, dampingFraction: 1.0), value: configuration.isPressed)
+    }
+}
+
+// MARK: - Secondary Button Style
+
+struct PulseSecondaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(PulseTheme.bodyFont.weight(.medium))
+            .foregroundColor(PulseTheme.accent)
+            .padding(.horizontal, PulseTheme.spacingL)
+            .padding(.vertical, PulseTheme.spacingS)
+            .background(PulseTheme.accent.opacity(0.12))
+            .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous))
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(PulseTheme.animationFast, value: configuration.isPressed)
     }
 }
 

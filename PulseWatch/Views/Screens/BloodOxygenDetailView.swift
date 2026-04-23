@@ -3,7 +3,7 @@ import Charts
 import SwiftData
 
 struct BloodOxygenDetailView: View {
-    @State private var healthManager = HealthKitManager.shared
+    private let healthManager = HealthKitManager.shared
     @Query(sort: \DailySummary.date, order: .reverse) private var summaries: [DailySummary]
 
     private var spo2: Double { healthManager.latestBloodOxygen ?? 0 }

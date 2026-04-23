@@ -87,13 +87,22 @@ struct TrainingCalendarView: View {
                             .staggered(index: 2)
                     }
 
-                    // 月度统计
-                    monthlyStatsCard
+                    if allWorkouts.isEmpty && allHKWorkouts.isEmpty {
+                        EmptyStateView(
+                            icon: "calendar",
+                            title: String(localized: "No Training Events"),
+                            message: String(localized: "Start a workout to see your training calendar.")
+                        )
                         .staggered(index: 3)
+                    } else {
+                        // 月度统计
+                        monthlyStatsCard
+                            .staggered(index: 3)
 
-                    // 分类图例
-                    categoryLegend
-                        .staggered(index: 4)
+                        // 分类图例
+                        categoryLegend
+                            .staggered(index: 4)
+                    }
 
                     Spacer(minLength: 60)
                 }
@@ -153,7 +162,7 @@ struct TrainingCalendarView: View {
     /// 当前月份的标题字符串，例如 "2026年3月"
     private var monthYearString: String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.locale = Locale.current
         formatter.dateFormat = "yyyy MMM"
         return formatter.string(from: currentMonth)
     }
@@ -217,7 +226,7 @@ struct TrainingCalendarView: View {
             let dayDate = dateForDay(item.day)
             let workouts = workoutsForDate(dayDate)
             let hasWorkout = hasAnyWorkout(dayDate)
-            let isSelected = selectedDate != nil && calendar.isDate(dayDate, inSameDayAs: selectedDate!)
+            let isSelected = selectedDate.map { calendar.isDate(dayDate, inSameDayAs: $0) } ?? false
             let isToday = calendar.isDateInToday(dayDate)
             let workoutColor = hasWorkout ? primaryCategoryColor(dayDate) : Color.clear
 
@@ -451,7 +460,7 @@ struct TrainingCalendarView: View {
     /// 日期详情标题，例如 "3月14日 周六"
     private func dayDetailTitle(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.locale = Locale.current
         formatter.dateFormat = "MMM d, EEEE"
         return formatter.string(from: date)
     }
@@ -498,10 +507,10 @@ struct TrainingCalendarView: View {
 
                 // 最常练部位
                 statItem(
-                    value: topCategory != nil ? categoryLabel(for: topCategory!.key) : "—",
+                    value: topCategory.map { categoryLabel(for: $0.key) } ?? "—",
                     label: String(localized: "Top Muscle"),
                     icon: "figure.strengthtraining.traditional",
-                    color: topCategory != nil ? categoryColor(for: topCategory!.key) : PulseTheme.textTertiary
+                    color: topCategory.map { categoryColor(for: $0.key) } ?? PulseTheme.textTertiary
                 )
 
                 // 分隔线

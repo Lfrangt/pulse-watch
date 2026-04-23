@@ -5,7 +5,7 @@ import SwiftUI
 
 /// 从 App Group UserDefaults 读取 OpenClawBridge 写入的健康数据
 enum WidgetDataProvider {
-    static let appGroupID = "group.com.abundra.pulse.shared"
+    static let appGroupID = "group.com.hallidai.pulse.shared"
 
     static var defaults: UserDefaults? {
         UserDefaults(suiteName: appGroupID)
@@ -191,7 +191,7 @@ struct PulseWidgetProvider: TimelineProvider {
         let data = WidgetDataProvider.loadHealthStatus()
         let entry = PulseWidgetEntry(date: .now, data: data)
         // 每 30 分钟刷新
-        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 30, to: .now)!
+        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 30, to: .now) ?? Date().addingTimeInterval(1800)
         completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
     }
 }

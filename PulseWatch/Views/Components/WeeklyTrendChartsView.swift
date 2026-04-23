@@ -9,6 +9,11 @@ struct WeeklyTrendChartsView: View {
     let summaries: [DailySummary]
     let demoMode: Bool
 
+    // Interactive chart selection state
+    @State private var selectedHRDate: Date?
+    @State private var selectedHRVDate: Date?
+    @State private var selectedSleepDate: Date?
+
     /// 过滤出最近7天的数据
     private var recentSummaries: [DailySummary] {
         let startDate = Calendar.current.date(byAdding: .day, value: -7, to: .now)!
@@ -205,6 +210,12 @@ struct WeeklyTrendChartsView: View {
                         )
                         .interpolationMethod(.catmullRom)
                     }
+
+                    if let selectedHRDate {
+                        RuleMark(x: .value("Selected", selectedHRDate))
+                            .foregroundStyle(.white.opacity(0.3))
+                            .lineStyle(StrokeStyle(lineWidth: 0.5))
+                    }
                 }
                 .chartYAxis {
                     AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { value in
@@ -220,6 +231,53 @@ struct WeeklyTrendChartsView: View {
                         AxisValueLabel(format: .dateTime.weekday(.abbreviated))
                             .font(.system(size: 9))
                             .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .chartOverlay { proxy in
+                    GeometryReader { geo in
+                        Rectangle().fill(.clear).contentShape(Rectangle())
+                            .gesture(DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let plotFrame = geo[proxy.plotAreaFrame]
+                                    let x = value.location.x - plotFrame.origin.x
+                                    guard let date: Date = proxy.value(atX: x) else { return }
+                                    let cal = Calendar.current
+                                    if let nearest = hrData.min(by: { abs($0.0.timeIntervalSince(date)) < abs($1.0.timeIntervalSince(date)) }) {
+                                        let newDate = cal.startOfDay(for: nearest.0)
+                                        if selectedHRDate != newDate {
+                                            selectedHRDate = newDate
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) { selectedHRDate = nil }
+                                }
+                            )
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let sel = selectedHRDate,
+                       let point = hrData.first(where: { Calendar.current.isDate($0.0, inSameDayAs: sel) }) {
+                        let weekdayFmt: DateFormatter = {
+                            let f = DateFormatter()
+                            f.locale = Locale.current
+                            f.dateFormat = "EEEE"
+                            return f
+                        }()
+                        VStack(spacing: 2) {
+                            Text("\(Int(point.1)) bpm")
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                            Text(weekdayFmt.string(from: point.0))
+                                .font(.system(size: 11, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.7))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .transition(.scale.combined(with: .opacity))
+                        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedHRDate)
                     }
                 }
                 .frame(height: 120)
@@ -249,32 +307,40 @@ struct WeeklyTrendChartsView: View {
             if hrvData.isEmpty {
                 miniEmptyPlaceholder
             } else {
-                Chart(hrvData, id: \.0) { item in
-                    LineMark(
-                        x: .value("Date", item.0),
-                        y: .value("HRV", item.1)
-                    )
-                    .foregroundStyle(PulseTheme.accent)
-                    .interpolationMethod(.catmullRom)
-                    .lineStyle(StrokeStyle(lineWidth: 2))
-                    .symbol {
-                        Circle()
-                            .fill(PulseTheme.accent)
-                            .frame(width: 4, height: 4)
+                Chart {
+                    ForEach(hrvData, id: \.0) { item in
+                        LineMark(
+                            x: .value("Date", item.0),
+                            y: .value("HRV", item.1)
+                        )
+                        .foregroundStyle(PulseTheme.accent)
+                        .interpolationMethod(.catmullRom)
+                        .lineStyle(StrokeStyle(lineWidth: 2))
+                        .symbol {
+                            Circle()
+                                .fill(PulseTheme.accent)
+                                .frame(width: 4, height: 4)
+                        }
+
+                        AreaMark(
+                            x: .value("Date", item.0),
+                            y: .value("HRV", item.1)
+                        )
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [PulseTheme.accent.opacity(0.15), PulseTheme.accent.opacity(0.02)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .interpolationMethod(.catmullRom)
                     }
 
-                    AreaMark(
-                        x: .value("Date", item.0),
-                        y: .value("HRV", item.1)
-                    )
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [PulseTheme.accent.opacity(0.15), PulseTheme.accent.opacity(0.02)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .interpolationMethod(.catmullRom)
+                    if let selectedHRVDate {
+                        RuleMark(x: .value("Selected", selectedHRVDate))
+                            .foregroundStyle(.white.opacity(0.3))
+                            .lineStyle(StrokeStyle(lineWidth: 0.5))
+                    }
                 }
                 .chartYAxis {
                     AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { value in
@@ -294,6 +360,53 @@ struct WeeklyTrendChartsView: View {
                         AxisValueLabel(format: .dateTime.weekday(.abbreviated))
                             .font(.system(size: 9))
                             .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .chartOverlay { proxy in
+                    GeometryReader { geo in
+                        Rectangle().fill(.clear).contentShape(Rectangle())
+                            .gesture(DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let plotFrame = geo[proxy.plotAreaFrame]
+                                    let x = value.location.x - plotFrame.origin.x
+                                    guard let date: Date = proxy.value(atX: x) else { return }
+                                    let cal = Calendar.current
+                                    if let nearest = hrvData.min(by: { abs($0.0.timeIntervalSince(date)) < abs($1.0.timeIntervalSince(date)) }) {
+                                        let newDate = cal.startOfDay(for: nearest.0)
+                                        if selectedHRVDate != newDate {
+                                            selectedHRVDate = newDate
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) { selectedHRVDate = nil }
+                                }
+                            )
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let sel = selectedHRVDate,
+                       let point = hrvData.first(where: { Calendar.current.isDate($0.0, inSameDayAs: sel) }) {
+                        let weekdayFmt: DateFormatter = {
+                            let f = DateFormatter()
+                            f.locale = Locale.current
+                            f.dateFormat = "EEEE"
+                            return f
+                        }()
+                        VStack(spacing: 2) {
+                            Text("\(Int(point.1)) ms")
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                            Text(weekdayFmt.string(from: point.0))
+                                .font(.system(size: 11, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.7))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .transition(.scale.combined(with: .opacity))
+                        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedHRVDate)
                     }
                 }
                 .frame(height: 120)
@@ -351,6 +464,12 @@ struct WeeklyTrendChartsView: View {
                                 .font(.system(size: 8, design: .rounded))
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
+
+                    if let selectedSleepDate {
+                        RuleMark(x: .value("Selected", selectedSleepDate, unit: .day))
+                            .foregroundStyle(.white.opacity(0.3))
+                            .lineStyle(StrokeStyle(lineWidth: 0.5))
+                    }
                 }
                 .chartYAxis {
                     AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { value in
@@ -370,6 +489,53 @@ struct WeeklyTrendChartsView: View {
                         AxisValueLabel(format: .dateTime.weekday(.abbreviated))
                             .font(.system(size: 9))
                             .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .chartOverlay { proxy in
+                    GeometryReader { geo in
+                        Rectangle().fill(.clear).contentShape(Rectangle())
+                            .gesture(DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let plotFrame = geo[proxy.plotAreaFrame]
+                                    let x = value.location.x - plotFrame.origin.x
+                                    guard let date: Date = proxy.value(atX: x) else { return }
+                                    let cal = Calendar.current
+                                    if let nearest = sleepData.min(by: { abs($0.0.timeIntervalSince(date)) < abs($1.0.timeIntervalSince(date)) }) {
+                                        let newDate = cal.startOfDay(for: nearest.0)
+                                        if selectedSleepDate != newDate {
+                                            selectedSleepDate = newDate
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) { selectedSleepDate = nil }
+                                }
+                            )
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let sel = selectedSleepDate,
+                       let point = sleepData.first(where: { Calendar.current.isDate($0.0, inSameDayAs: sel) }) {
+                        let weekdayFmt: DateFormatter = {
+                            let f = DateFormatter()
+                            f.locale = Locale.current
+                            f.dateFormat = "EEEE"
+                            return f
+                        }()
+                        VStack(spacing: 2) {
+                            Text(String(format: "%.1fh / %.1fh deep", point.1, point.2))
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                            Text(weekdayFmt.string(from: point.0))
+                                .font(.system(size: 11, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.7))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .transition(.scale.combined(with: .opacity))
+                        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedSleepDate)
                     }
                 }
                 .frame(height: 120)

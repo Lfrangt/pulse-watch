@@ -1,6 +1,7 @@
 import Foundation
 import HealthKit
 import WatchKit
+import os
 
 /// Watch 训练 Session 管理器
 /// 使用 HKWorkoutSession + HKLiveWorkoutBuilder 实时采集心率、卡路里、时长
@@ -8,6 +9,8 @@ import WatchKit
 final class WorkoutSessionManager: NSObject {
 
     static let shared = WorkoutSessionManager()
+
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "WorkoutSessionManager")
 
     // MARK: - 训练状态
 
@@ -132,7 +135,7 @@ final class WorkoutSessionManager: NSObject {
             session = try HKWorkoutSession(healthStore: healthStore, configuration: config)
             builder = session?.associatedWorkoutBuilder()
         } catch {
-            print("WorkoutSession 创建失败: \(error)")
+            logger.error("WorkoutSession 创建失败: \(error)")
             return
         }
 
@@ -213,7 +216,7 @@ final class WorkoutSessionManager: NSObject {
         builder?.endCollection(withEnd: Date()) { [weak self] _, _ in
             self?.builder?.finishWorkout { _, error in
                 if let error {
-                    print("保存 workout 失败: \(error)")
+                    self?.logger.error("保存 workout 失败: \(error)")
                 }
             }
         }
@@ -308,7 +311,7 @@ extension WorkoutSessionManager: HKWorkoutSessionDelegate {
         _ workoutSession: HKWorkoutSession,
         didFailWithError error: Error
     ) {
-        print("WorkoutSession 错误: \(error)")
+        logger.error("WorkoutSession 错误: \(error)")
     }
 }
 

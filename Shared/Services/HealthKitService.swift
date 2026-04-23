@@ -346,7 +346,7 @@ final class HealthKitService {
         let context = container.mainContext
         let dateString = DailySummary.dateFormatter.string(from: date)
         let startOfDay = Calendar.current.startOfDay(for: date)
-        let endOfDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
+        let endOfDay = Calendar.current.safeDate(byAdding: .day, value: 1, to: startOfDay)
 
         // 查找或创建当天的 DailySummary
         let predicate = #Predicate<DailySummary> { $0.dateString == dateString }
@@ -442,8 +442,16 @@ final class HealthKitService {
             summary.coreSleepMinutes = Int(coreRecords.map(\.value).reduce(0, +))
         }
 
-        // 计算每日评分
+        // ��算每日评分
         summary.dailyScore = calculateScore(from: summary)
+
+        // 计算压力���分
+        summary.stressScore = HealthKitManager.calculateStressScore(
+            hrv: summary.averageHRV,
+            restingHR: summary.restingHeartRate,
+            sleepMinutes: summary.sleepDurationMinutes
+        )
+
         summary.lastUpdated = .now
 
         do {

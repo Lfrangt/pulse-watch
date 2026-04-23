@@ -1,11 +1,14 @@
 import Foundation
 import CoreLocation
+import os
 
 /// Manages geofencing and location-based triggers
 @Observable
 final class LocationManager: NSObject, CLLocationManagerDelegate {
 
     static let shared = LocationManager()
+
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "LocationManager")
 
     private let manager = CLLocationManager()
 
@@ -151,9 +154,7 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        #if DEBUG
-        print("Location error: \(error.localizedDescription)")
-        #endif
+        logger.error("Location error: \(error.localizedDescription, privacy: .public)")
     }
 }
 

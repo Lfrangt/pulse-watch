@@ -16,8 +16,8 @@ final class PDFReportService {
         strengthRecords: [StrengthRecord]
     ) throws -> URL {
         let cal = Calendar.current
-        let thisMonthStart = cal.date(from: cal.dateComponents([.year, .month], from: .now))!
-        let lastMonthStart = cal.date(byAdding: .month, value: -1, to: thisMonthStart)!
+        let thisMonthStart = cal.safeDate(from: cal.dateComponents([.year, .month], from: .now))
+        let lastMonthStart = cal.safeDate(byAdding: .month, value: -1, to: thisMonthStart)
 
         let monthSummaries = summaries
             .filter { $0.date >= lastMonthStart && $0.date < thisMonthStart }

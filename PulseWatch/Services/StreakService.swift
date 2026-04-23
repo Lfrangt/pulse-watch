@@ -42,7 +42,7 @@ final class StreakService {
         let hasDataToday = queryHasData(on: today, modelContext: modelContext)
 
         if hasDataToday {
-            let yesterday = dateString(for: Calendar.current.date(byAdding: .day, value: -1, to: .now)!)
+            let yesterday = dateString(for: Calendar.current.safeDate(byAdding: .day, value: -1, to: .now))
             let hadDataYesterday = (lastStreakDate == yesterday) || queryHasData(on: yesterday, modelContext: modelContext)
 
             if hadDataYesterday || lastStreakDate.isEmpty {
@@ -63,7 +63,7 @@ final class StreakService {
 
         } else {
             // No data yet today — check if yesterday's streak is broken
-            let yesterday = dateString(for: Calendar.current.date(byAdding: .day, value: -1, to: .now)!)
+            let yesterday = dateString(for: Calendar.current.safeDate(byAdding: .day, value: -1, to: .now))
             if lastStreakDate != yesterday && !lastStreakDate.isEmpty {
                 // missed yesterday → reset
                 currentStreak = 0

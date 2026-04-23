@@ -27,7 +27,11 @@ struct PulseWatchWatchApp: App {
                 return try ModelContainer(for: schema, configurations: [config])
             } catch {
                 let memConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-                return try! ModelContainer(for: schema, configurations: [memConfig])
+                do {
+                    return try ModelContainer(for: schema, configurations: [memConfig])
+                } catch {
+                    fatalError("Pulse Watch: Failed to create even in-memory ModelContainer: \(error)")
+                }
             }
         }
     }()

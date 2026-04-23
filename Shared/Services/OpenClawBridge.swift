@@ -748,7 +748,7 @@ final class OpenClawBridge {
 
     // MARK: - App Group (Widget 兼容)
 
-    private static let appGroupID = "group.com.abundra.pulse.shared"
+    private static let appGroupID = "group.com.hallidai.pulse.shared"
 
     /// 写入 health_sync JSON 文件到 App Group 容器，供 CLI 工具读取
     private func writeHealthSyncFile(_ json: String) {

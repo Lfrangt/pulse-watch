@@ -3,8 +3,9 @@ import Charts
 import SwiftData
 
 struct CaloriesDetailView: View {
-    @State private var healthManager = HealthKitManager.shared
+    private let healthManager = HealthKitManager.shared
     @Query(sort: \DailySummary.date, order: .reverse) private var summaries: [DailySummary]
+    @State private var selectedCalDate: Date?
 
     private var active: Double { healthManager.todayActiveCalories }
     private var goal: Double { 400 }
@@ -82,16 +83,70 @@ struct CaloriesDetailView: View {
         return VStack(alignment: .leading, spacing: 10) {
             sectionHeader(String(localized: "14-Day Calorie Trend"), icon: "flame.fill")
             if data.isEmpty { emptyHint } else {
-                Chart(data, id: \.date) { item in
-                    BarMark(x: .value("Date", item.date, unit: .day), y: .value("Cal", item.cal), width: .ratio(0.6))
-                        .foregroundStyle(item.cal >= goal ? PulseTheme.accentTeal.opacity(0.8) : PulseTheme.activityCoral.opacity(0.6))
-                        .cornerRadius(4)
+                Chart {
+                    ForEach(data, id: \.date) { item in
+                        BarMark(x: .value("Date", item.date, unit: .day), y: .value("Cal", item.cal), width: .ratio(0.6))
+                            .foregroundStyle(item.cal >= goal ? PulseTheme.accentTeal.opacity(0.8) : PulseTheme.activityCoral.opacity(0.6))
+                            .cornerRadius(4)
+                    }
                     RuleMark(y: .value("Goal", goal))
                         .foregroundStyle(PulseTheme.accentTeal.opacity(0.4))
                         .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                    if let selectedCalDate {
+                        RuleMark(x: .value("Selected", selectedCalDate, unit: .day))
+                            .foregroundStyle(.white.opacity(0.3))
+                            .lineStyle(StrokeStyle(lineWidth: 0.5))
+                    }
                 }
                 .chartXAxis { AxisMarks(values: .stride(by: .day, count: 2)) { _ in AxisValueLabel(format: .dateTime.month(.defaultDigits).day()).font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.4)) } }
                 .chartYAxis { AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { _ in AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4])).foregroundStyle(Color.white.opacity(0.07)); AxisValueLabel().font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.4)) } }
+                .chartOverlay { proxy in
+                    GeometryReader { geo in
+                        Rectangle().fill(.clear).contentShape(Rectangle())
+                            .gesture(DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let plotFrame = geo[proxy.plotAreaFrame]
+                                    let x = value.location.x - plotFrame.origin.x
+                                    guard let date: Date = proxy.value(atX: x) else { return }
+                                    let cal = Calendar.current
+                                    if let nearest = data.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+                                        let newDate = cal.startOfDay(for: nearest.date)
+                                        if selectedCalDate != newDate {
+                                            selectedCalDate = newDate
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) { selectedCalDate = nil }
+                                }
+                            )
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let sel = selectedCalDate,
+                       let point = data.first(where: { Calendar.current.isDate($0.date, inSameDayAs: sel) }) {
+                        let dateFmt: DateFormatter = {
+                            let f = DateFormatter()
+                            f.locale = Locale.current
+                            f.dateFormat = "EEEE, M/d"
+                            return f
+                        }()
+                        VStack(spacing: 2) {
+                            Text("\(Int(point.cal)) kcal")
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                            Text(dateFmt.string(from: point.date))
+                                .font(.system(size: 11, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.7))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .transition(.scale.combined(with: .opacity))
+                        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedCalDate)
+                    }
+                }
                 .frame(height: 160)
             }
         }

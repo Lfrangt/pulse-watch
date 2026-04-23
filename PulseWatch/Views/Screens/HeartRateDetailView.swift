@@ -4,7 +4,7 @@ import Charts
 /// Heart Rate deep-dive — current, resting, zones context
 struct HeartRateDetailView: View {
 
-    @State private var healthManager = HealthKitManager.shared
+    private let healthManager = HealthKitManager.shared
     @State private var chartAppeared = false
 
     private var current: Double { healthManager.latestHeartRate ?? 0 }
@@ -39,15 +39,15 @@ struct HeartRateDetailView: View {
     }
 
     private let zones: [Zone] = [
-        .init(name: "Zone 1", range: "50–60%", color: Color(hex: "4FC3F7"),
+        .init(name: "Zone 1", range: "50–60%", color: PulseTheme.zoneRest,
               description: String(localized: "Recovery — walking, gentle movement")),
-        .init(name: "Zone 2", range: "60–70%", color: Color(hex: "81C784"),
+        .init(name: "Zone 2", range: "60–70%", color: PulseTheme.zoneFatBurn,
               description: String(localized: "Base endurance — conversational pace")),
-        .init(name: "Zone 3", range: "70–80%", color: Color(hex: "FFD54F"),
+        .init(name: "Zone 3", range: "70–80%", color: PulseTheme.zoneCardio,
               description: String(localized: "Aerobic — moderate effort, slightly breathless")),
-        .init(name: "Zone 4", range: "80–90%", color: Color(hex: "FF8A65"),
+        .init(name: "Zone 4", range: "80–90%", color: PulseTheme.zonePeak,
               description: String(localized: "Threshold — hard effort, building lactate")),
-        .init(name: "Zone 5", range: "90–100%", color: Color(hex: "EF5350"),
+        .init(name: "Zone 5", range: "90–100%", color: PulseTheme.zoneMax,
               description: String(localized: "Max effort — short sprints only")),
     ]
 

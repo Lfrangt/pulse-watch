@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - Shared Data Key
 
 enum PulseSharedData {
-    static let suiteName = "group.com.abundra.pulse"
+    static let suiteName = "group.com.hallidai.pulse.shared"
     static let scoreKey = "pulse.score"
     static let headlineKey = "pulse.headline"
     static let heartRateKey = "pulse.heartRate"

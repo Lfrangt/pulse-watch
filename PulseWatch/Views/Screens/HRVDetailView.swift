@@ -69,43 +69,43 @@ struct HRVDetailView: View {
     // MARK: - Hero
 
     private var heroCard: some View {
-        HStack(alignment: .center, spacing: 0) {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text("\(Int(currentHRV))")
-                        .font(.system(size: 56, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                    Text("ms")
-                        .font(.system(size: 18, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
-                        .offset(y: 4)
-                }
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            HStack {
                 Text("HRV · " + String(localized: "Last reading"))
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .pulseEyebrow()
+                Spacer()
+                Text(status)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(statusColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: PulseTheme.radiusXS, style: .continuous)
+                            .stroke(statusColor, lineWidth: PulseTheme.hairline)
+                    )
             }
 
-            Spacer()
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text("\(Int(currentHRV))")
+                    .font(PulseTheme.metricLFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                Text("ms")
+                    .font(PulseTheme.unitFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
 
-            VStack(alignment: .trailing, spacing: 8) {
-                Text(status)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(statusColor)
-                    .multilineTextAlignment(.trailing)
-                    .fixedSize(horizontal: false, vertical: true)
+                Spacer()
 
                 if !weekSamples.isEmpty {
                     VStack(alignment: .trailing, spacing: 2) {
                         Text(String(format: "%.0f ms", avg7day))
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .font(PulseTheme.metricSFont)
                             .foregroundStyle(PulseTheme.textPrimary)
                         Text(String(localized: "7-day avg"))
-                            .font(.system(size: 11, design: .rounded))
+                            .font(PulseTheme.monoFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
                 }
             }
-            .frame(maxWidth: 140)
         }
         .padding(PulseTheme.spacingL)
         .background(cardBg)
@@ -116,8 +116,7 @@ struct HRVDetailView: View {
     private var trendCard: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             Text(String(localized: "7-Day Trend"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
 
             Chart {
                 ForEach(weekSamples, id: \.date) { s in
@@ -154,7 +153,7 @@ struct HRVDetailView: View {
 
                 if let selectedTrendDate {
                     RuleMark(x: .value("Selected", selectedTrendDate))
-                        .foregroundStyle(.white.opacity(0.3))
+                        .foregroundStyle(PulseTheme.textTertiary)
                         .lineStyle(StrokeStyle(lineWidth: 0.5))
                 }
             }
@@ -172,7 +171,7 @@ struct HRVDetailView: View {
             .chartYAxis {
                 AxisMarks { val in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
-                        .foregroundStyle(Color.white.opacity(0.06))
+                        .foregroundStyle(PulseTheme.highlight)
                     AxisValueLabel {
                         if let v = val.as(Double.self) {
                             Text("\(Int(v))")
@@ -217,10 +216,10 @@ struct HRVDetailView: View {
                     VStack(spacing: 2) {
                         Text("\(Int(point.value)) ms")
                             .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(PulseTheme.textPrimary)
                         Text(dateFmt.string(from: point.date))
                             .font(.system(size: 11, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.7))
+                            .foregroundStyle(PulseTheme.textSecondary)
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
@@ -235,7 +234,7 @@ struct HRVDetailView: View {
             // Avg baseline
             HStack {
                 Rectangle()
-                    .fill(Color.white.opacity(0.25))
+                    .fill(PulseTheme.highlight)
                     .frame(width: 16, height: 1)
                 Text(String(format: String(localized: "Avg %.0f ms"), avg7day))
                     .font(.system(size: 11, design: .rounded))
@@ -251,8 +250,7 @@ struct HRVDetailView: View {
     private var explainerCard: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             Text(String(localized: "What is HRV?"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
 
             ForEach(explainerPoints, id: \.title) { point in
                 HStack(alignment: .top, spacing: 12) {
@@ -295,10 +293,10 @@ struct HRVDetailView: View {
 
     private var cardBg: some View {
         RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-            .fill(Color.white.opacity(0.04))
+            .fill(PulseTheme.cardBackground)
             .overlay(
                 RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                    .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
             )
     }
 

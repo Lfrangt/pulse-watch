@@ -18,7 +18,7 @@ struct NutritionView: View {
                     Circle()
                         .fill(
                             RadialGradient(
-                                colors: [Color(hex: "FF9F43").opacity(0.15), Color.clear],
+                                colors: [PulseTheme.statusWarning.opacity(0.15), Color.clear],
                                 center: .center,
                                 startRadius: 20,
                                 endRadius: 100
@@ -31,18 +31,18 @@ struct NutritionView: View {
                     // Icon circle
                     ZStack {
                         Circle()
-                            .fill(Color.white.opacity(0.04))
+                            .fill(PulseTheme.highlight)
                             .frame(width: 120, height: 120)
                             .overlay(
                                 Circle()
-                                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                                    .stroke(PulseTheme.highlight, lineWidth: 1)
                             )
 
                         Image(systemName: "fork.knife")
                             .font(.system(size: 44, weight: .medium))
                             .foregroundStyle(
                                 LinearGradient(
-                                    colors: [Color(hex: "FF9F43"), Color(hex: "FF6B6B")],
+                                    colors: [PulseTheme.statusWarning, PulseTheme.activityCoral],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
@@ -69,15 +69,15 @@ struct NutritionView: View {
                         .font(.system(size: 12, weight: .bold, design: .rounded))
                         .tracking(1.2)
                         .textCase(.uppercase)
-                        .foregroundStyle(Color(hex: "FF9F43"))
+                        .foregroundStyle(PulseTheme.statusWarning)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 6)
                         .background(
                             Capsule()
-                                .fill(Color(hex: "FF9F43").opacity(0.12))
+                                .fill(PulseTheme.statusWarning.opacity(0.12))
                                 .overlay(
                                     Capsule()
-                                        .stroke(Color(hex: "FF9F43").opacity(0.25), lineWidth: 0.5)
+                                        .stroke(PulseTheme.statusWarning.opacity(0.25), lineWidth: 0.5)
                                 )
                         )
                         .padding(.top, 4)
@@ -95,29 +95,29 @@ struct NutritionView: View {
                             label: String(localized: "Protein"),
                             percentage: 35,
                             grams: "142g",
-                            color: Color(hex: "FF6B6B")
+                            color: PulseTheme.activityCoral
                         )
                         macroCircle(
                             label: String(localized: "Carbs"),
                             percentage: 45,
                             grams: "225g",
-                            color: Color(hex: "FFD700")
+                            color: PulseTheme.statusWarning
                         )
                         macroCircle(
                             label: String(localized: "Fat"),
                             percentage: 20,
                             grams: "67g",
-                            color: Color(hex: "BF94FF")
+                            color: PulseTheme.sleepViolet
                         )
                     }
                 }
                 .padding(PulseTheme.spacingL)
                 .background(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                        .fill(Color.white.opacity(0.03))
+                        .fill(PulseTheme.highlight)
                         .overlay(
                             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                                .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                                .stroke(PulseTheme.highlight, lineWidth: 0.5)
                         )
                 )
                 .overlay(alignment: .topTrailing) {
@@ -128,7 +128,7 @@ struct NutritionView: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
                         .background(
-                            Capsule().fill(Color.white.opacity(0.06))
+                            Capsule().fill(PulseTheme.highlight)
                         )
                         .padding(12)
                 }
@@ -143,10 +143,10 @@ struct NutritionView: View {
                 .padding(PulseTheme.spacingL)
                 .background(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                        .fill(Color.white.opacity(0.03))
+                        .fill(PulseTheme.highlight)
                         .overlay(
                             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                                .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                                .stroke(PulseTheme.highlight, lineWidth: 0.5)
                         )
                 )
                 .padding(.horizontal, PulseTheme.spacingM)
@@ -207,12 +207,12 @@ struct NutritionView: View {
         HStack(spacing: 14) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(Color(hex: "FF9F43").opacity(0.1))
+                    .fill(PulseTheme.statusWarning.opacity(0.1))
                     .frame(width: 32, height: 32)
 
                 Image(systemName: icon)
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(Color(hex: "FF9F43"))
+                    .foregroundStyle(PulseTheme.statusWarning)
             }
 
             Text(text)

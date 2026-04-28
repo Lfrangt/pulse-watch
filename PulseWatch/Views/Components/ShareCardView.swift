@@ -93,7 +93,7 @@ struct ShareCardView: View {
 
             // Noise texture simulation — subtle grain
             Rectangle()
-                .fill(.white.opacity(0.01))
+                .fill(PulseTheme.highlight)
         }
     }
 
@@ -138,7 +138,7 @@ struct ShareCardView: View {
     private var dateLabel: some View {
         Text(formattedDate)
             .font(.system(size: 14, weight: .medium, design: .rounded))
-            .foregroundStyle(.white.opacity(0.45))
+            .foregroundStyle(PulseTheme.textTertiary)
     }
 
     // MARK: - Workout Header
@@ -164,7 +164,7 @@ struct ShareCardView: View {
 
             Text(workoutName)
                 .font(.system(size: ratio == .story ? 26 : 20, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
         }
     }
 
@@ -204,10 +204,10 @@ struct ShareCardView: View {
         .padding(.horizontal, 16)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
     }
@@ -220,14 +220,14 @@ struct ShareCardView: View {
 
             Text(value)
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(PulseTheme.textPrimary)
         }
         .frame(maxWidth: .infinity)
     }
 
     private var metricDivider: some View {
         Rectangle()
-            .fill(Color.white.opacity(0.08))
+            .fill(PulseTheme.highlight)
             .frame(width: 0.5, height: 32)
     }
 
@@ -237,7 +237,7 @@ struct ShareCardView: View {
         VStack(alignment: .leading, spacing: ratio == .story ? 10 : 7) {
             Text(String(localized: "Heart Rate Zones"))
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(PulseTheme.textTertiary)
                 .padding(.bottom, 2)
 
             ForEach(heartRateZones) { zone in
@@ -268,7 +268,7 @@ struct ShareCardView: View {
 
                     Text("\(Int(zone.percentage * 100))%")
                         .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.4))
+                        .foregroundStyle(PulseTheme.textTertiary)
                         .frame(width: 32, alignment: .trailing)
                 }
             }
@@ -276,10 +276,10 @@ struct ShareCardView: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Color.white.opacity(0.03))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(Color.white.opacity(0.05), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
     }
@@ -295,7 +295,7 @@ struct ShareCardView: View {
                         .foregroundStyle(PulseTheme.activityAccent.opacity(0.8))
                     Text(String(localized: "Avg") + " \(avg) bpm")
                         .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(PulseTheme.textSecondary)
                 }
             }
 
@@ -306,7 +306,7 @@ struct ShareCardView: View {
                         .foregroundStyle(PulseTheme.activityAccent)
                     Text(String(localized: "Max") + " \(max) bpm")
                         .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(PulseTheme.textSecondary)
                 }
             }
         }
@@ -323,7 +323,7 @@ struct ShareCardView: View {
 
             Text("Tracked with Pulse Watch")
                 .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.3))
+                .foregroundStyle(PulseTheme.textTertiary)
         }
     }
 

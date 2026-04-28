@@ -110,7 +110,7 @@ struct StressDetailView: View {
             ZStack {
                 // Track
                 Circle()
-                    .stroke(Color.white.opacity(0.08), lineWidth: 8)
+                    .stroke(PulseTheme.highlight, lineWidth: 8)
                     .frame(width: 160, height: 160)
 
                 // Progress arc
@@ -133,7 +133,7 @@ struct StressDetailView: View {
                 VStack(spacing: 4) {
                     Text("\(stressScore)")
                         .font(.system(size: 48, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PulseTheme.textPrimary)
                         .contentTransition(.numericText())
 
                     Text(String(localized: "Stress"))
@@ -169,8 +169,7 @@ struct StressDetailView: View {
     private var factorsCard: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             Text(String(localized: "Contributing Factors"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
 
             factorBar(
                 icon: "waveform.path.ecg",
@@ -185,7 +184,7 @@ struct StressDetailView: View {
                 label: String(localized: "Resting HR"),
                 value: rhrStress,
                 detail: healthManager.latestRestingHR.map { String(format: "%.0f bpm", $0) } ?? "--",
-                color: Color(hex: "FF6B6B")
+                color: PulseTheme.activityCoral
             )
 
             factorBar(
@@ -229,7 +228,7 @@ struct StressDetailView: View {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4, style: .continuous)
-                        .fill(Color.white.opacity(0.06))
+                        .fill(PulseTheme.highlight)
                         .frame(height: 6)
 
                     RoundedRectangle(cornerRadius: 4, style: .continuous)
@@ -245,8 +244,8 @@ struct StressDetailView: View {
     private func stressBarColor(_ value: Double) -> Color {
         switch value {
         case 0..<35:  return Color(hex: "00F5FF")  // teal — low stress
-        case 35..<65: return Color(hex: "FFD700")   // amber — moderate
-        default:      return Color(hex: "FF6B6B")   // coral — high
+        case 35..<65: return PulseTheme.statusWarning   // amber — moderate
+        default:      return PulseTheme.activityCoral   // coral — high
         }
     }
 
@@ -255,8 +254,7 @@ struct StressDetailView: View {
     private var trendCard: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             Text(String(localized: "7-Day Trend"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
 
             Chart {
                 ForEach(weekData, id: \.date) { item in
@@ -290,7 +288,7 @@ struct StressDetailView: View {
 
                 if let selectedTrendDate {
                     RuleMark(x: .value("Selected", selectedTrendDate))
-                        .foregroundStyle(.white.opacity(0.3))
+                        .foregroundStyle(PulseTheme.textTertiary)
                         .lineStyle(StrokeStyle(lineWidth: 0.5))
                 }
             }
@@ -309,7 +307,7 @@ struct StressDetailView: View {
             .chartYAxis {
                 AxisMarks(values: [0, 25, 50, 75, 100]) { val in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
-                        .foregroundStyle(Color.white.opacity(0.06))
+                        .foregroundStyle(PulseTheme.highlight)
                     AxisValueLabel {
                         if let v = val.as(Int.self) {
                             Text("\(v)")
@@ -353,10 +351,10 @@ struct StressDetailView: View {
                     VStack(spacing: 2) {
                         Text("\(point.score)")
                             .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(PulseTheme.textPrimary)
                         Text(dateFmt.string(from: point.date))
                             .font(.system(size: 11, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.7))
+                            .foregroundStyle(PulseTheme.textSecondary)
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
@@ -391,8 +389,7 @@ struct StressDetailView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(stressLevel.color)
                 Text(String(localized: "Energy Bank"))
-                    .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .pulseEyebrow()
             }
 
             Text(stressLevel.energyAdvice)
@@ -407,7 +404,7 @@ struct StressDetailView: View {
                     RoundedRectangle(cornerRadius: 3, style: .continuous)
                         .fill(stressScore <= threshold
                               ? Color(hex: "00F5FF").opacity(0.8)
-                              : Color.white.opacity(0.08))
+                              : PulseTheme.highlight)
                         .frame(height: 8)
                 }
             }
@@ -430,10 +427,10 @@ struct StressDetailView: View {
 
     private var cardBg: some View {
         RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-            .fill(Color.white.opacity(0.04))
+            .fill(PulseTheme.highlight)
             .overlay(
                 RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                    .stroke(PulseTheme.highlight, lineWidth: 0.5)
             )
     }
 }
@@ -470,8 +467,8 @@ enum StressLevel {
     var color: Color {
         switch self {
         case .low:      return Color(hex: "00F5FF")  // teal
-        case .moderate: return Color(hex: "FFD700")   // amber
-        case .high:     return Color(hex: "FF6B6B")   // coral
+        case .moderate: return PulseTheme.statusWarning   // amber
+        case .high:     return PulseTheme.activityCoral   // coral
         }
     }
 

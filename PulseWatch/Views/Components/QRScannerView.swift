@@ -24,7 +24,7 @@ struct QRScannerView: View {
                         .foregroundStyle(.gray)
                     Text("Camera access needed to scan QR code")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PulseTheme.textPrimary)
                     Button("Open Settings") {
                         if let url = URL(string: UIApplication.openSettingsURLString) {
                             UIApplication.shared.open(url)
@@ -48,7 +48,7 @@ struct QRScannerView: View {
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.system(size: 30))
-                            .foregroundStyle(.white.opacity(0.8))
+                            .foregroundStyle(PulseTheme.textSecondary)
                     }
                     .padding()
                 }
@@ -57,7 +57,7 @@ struct QRScannerView: View {
 
                 // 扫描框
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .strokeBorder(.white.opacity(0.6), lineWidth: 2)
+                    .strokeBorder(PulseTheme.textSecondary, lineWidth: 2)
                     .frame(width: 250, height: 250)
                     .overlay {
                         if scanned {
@@ -85,7 +85,7 @@ struct QRScannerView: View {
                         if !scanned {
                             Text("Open PulseWatch Settings on your Mac to get the QR code")
                                 .font(.system(size: 13))
-                                .foregroundStyle(.white.opacity(0.5))
+                                .foregroundStyle(PulseTheme.textTertiary)
                                 .multilineTextAlignment(.center)
                         }
                     }

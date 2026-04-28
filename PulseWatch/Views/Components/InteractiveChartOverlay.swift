@@ -45,7 +45,7 @@ struct InteractiveChartOverlay<T, Label: View, Sublabel: View>: ViewModifier {
                             let point = data[idx]
                             if let xPos = proxy.position(forX: point[keyPath: xValue]) {
                                 Rectangle()
-                                    .fill(Color.white.opacity(0.4))
+                                    .fill(PulseTheme.highlight)
                                     .frame(width: 0.5)
                                     .position(x: xPos, y: plotFrame.midY)
                                     .frame(height: plotFrame.height)
@@ -87,10 +87,10 @@ struct InteractiveChartOverlay<T, Label: View, Sublabel: View>: ViewModifier {
         VStack(spacing: 2) {
             label(point)
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
             sublabel(point)
                 .font(.system(size: 12, weight: .regular, design: .rounded))
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(PulseTheme.textSecondary)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 7)
@@ -99,7 +99,7 @@ struct InteractiveChartOverlay<T, Label: View, Sublabel: View>: ViewModifier {
                 .fill(.ultraThinMaterial)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
     }

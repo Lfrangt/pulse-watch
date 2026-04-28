@@ -213,7 +213,7 @@ struct WeeklyTrendChartsView: View {
 
                     if let selectedHRDate {
                         RuleMark(x: .value("Selected", selectedHRDate))
-                            .foregroundStyle(.white.opacity(0.3))
+                            .foregroundStyle(PulseTheme.textTertiary)
                             .lineStyle(StrokeStyle(lineWidth: 0.5))
                     }
                 }
@@ -268,10 +268,10 @@ struct WeeklyTrendChartsView: View {
                         VStack(spacing: 2) {
                             Text("\(Int(point.1)) bpm")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PulseTheme.textPrimary)
                             Text(weekdayFmt.string(from: point.0))
                                 .font(.system(size: 11, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.7))
+                                .foregroundStyle(PulseTheme.textSecondary)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -338,7 +338,7 @@ struct WeeklyTrendChartsView: View {
 
                     if let selectedHRVDate {
                         RuleMark(x: .value("Selected", selectedHRVDate))
-                            .foregroundStyle(.white.opacity(0.3))
+                            .foregroundStyle(PulseTheme.textTertiary)
                             .lineStyle(StrokeStyle(lineWidth: 0.5))
                     }
                 }
@@ -397,10 +397,10 @@ struct WeeklyTrendChartsView: View {
                         VStack(spacing: 2) {
                             Text("\(Int(point.1)) ms")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PulseTheme.textPrimary)
                             Text(weekdayFmt.string(from: point.0))
                                 .font(.system(size: 11, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.7))
+                                .foregroundStyle(PulseTheme.textSecondary)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -467,7 +467,7 @@ struct WeeklyTrendChartsView: View {
 
                     if let selectedSleepDate {
                         RuleMark(x: .value("Selected", selectedSleepDate, unit: .day))
-                            .foregroundStyle(.white.opacity(0.3))
+                            .foregroundStyle(PulseTheme.textTertiary)
                             .lineStyle(StrokeStyle(lineWidth: 0.5))
                     }
                 }
@@ -526,10 +526,10 @@ struct WeeklyTrendChartsView: View {
                         VStack(spacing: 2) {
                             Text(String(format: "%.1fh / %.1fh deep", point.1, point.2))
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PulseTheme.textPrimary)
                             Text(weekdayFmt.string(from: point.0))
                                 .font(.system(size: 11, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.7))
+                                .foregroundStyle(PulseTheme.textSecondary)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)

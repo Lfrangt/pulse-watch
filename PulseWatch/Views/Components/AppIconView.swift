@@ -31,8 +31,8 @@ struct AppIconView: View {
     private var innerGlow: RadialGradient {
         RadialGradient(
             colors: [
-                Color.white.opacity(0.15),
-                Color.white.opacity(0.03),
+                PulseTheme.highlight,
+                PulseTheme.highlight,
                 Color.clear
             ],
             center: .init(x: 0.35, y: 0.3),
@@ -67,8 +67,8 @@ struct AppIconView: View {
                 Path(roundedRect: bgRect, cornerSize: .zero),
                 with: .radialGradient(
                     Gradient(colors: [
-                        Color.white.opacity(0.18),
-                        Color.white.opacity(0.02),
+                        PulseTheme.highlight,
+                        PulseTheme.highlight,
                         Color.clear
                     ]),
                     center: CGPoint(x: s * 0.35, y: s * 0.3),
@@ -92,7 +92,7 @@ struct AppIconView: View {
 
             context.stroke(
                 ringPath,
-                with: .color(Color.white.opacity(0.85)),
+                with: .color(PulseTheme.highlight),
                 lineWidth: ringLineWidth
             )
 
@@ -145,7 +145,7 @@ struct AppIconView: View {
 
             context.stroke(
                 pulsePath,
-                with: .color(Color.white.opacity(0.95)),
+                with: .color(PulseTheme.highlight),
                 style: StrokeStyle(lineWidth: pulseLineWidth, lineCap: .round, lineJoin: .round)
             )
 

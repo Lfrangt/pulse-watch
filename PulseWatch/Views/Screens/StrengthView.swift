@@ -271,7 +271,7 @@ struct StrengthView: View {
 
                 if let selected = selectedLiftDate {
                     RuleMark(x: .value("Selected", selected))
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(PulseTheme.textSecondary)
                         .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
                 }
             }
@@ -340,10 +340,10 @@ struct StrengthView: View {
         VStack(spacing: 4) {
             Text(String(format: "%.0f kg", weight))
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
             Text(date.formatted(.dateTime.month(.abbreviated).day().locale(Locale.current)))
                 .font(.system(size: 12))
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(PulseTheme.textSecondary)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
@@ -371,12 +371,12 @@ struct StrengthView: View {
                     Circle().fill(color).frame(width: 6, height: 6)
                     Text("\(label): \(String(format: "%.0f", value)) kg")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PulseTheme.textPrimary)
                 }
             }
             Text(date.formatted(.dateTime.month(.abbreviated).day().locale(Locale.current)))
                 .font(.system(size: 11))
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(PulseTheme.textSecondary)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
@@ -524,7 +524,7 @@ struct StrengthView: View {
 
                 if let selected = selectedPBDate {
                     RuleMark(x: .value("Selected", selected))
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(PulseTheme.textSecondary)
                         .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
                 }
             }
@@ -547,7 +547,7 @@ struct StrengthView: View {
             .chartForegroundStyleScale([
                 StrengthService.LiftType.squat.label: PulseTheme.statusGood,
                 StrengthService.LiftType.bench.label: PulseTheme.activityAccent,
-                StrengthService.LiftType.deadlift.label: Color(hex: "5C7BC7"),
+                StrengthService.LiftType.deadlift.label: PulseTheme.hrvBlue,
             ])
             .chartLegend(.visible)
             .frame(height: 200)
@@ -740,21 +740,21 @@ private struct ShareStrengthCard: View {
         VStack(spacing: 24) {
             Text("My Strength Progress")
                 .font(.system(size: 22, weight: .bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
 
             HStack(spacing: 20) {
                 liftStat("SQ", squat, PulseTheme.statusGood)
                 liftStat("BP", bench, PulseTheme.activityAccent)
-                liftStat("DL", deadlift, Color(hex: "5C7BC7"))
+                liftStat("DL", deadlift, PulseTheme.hrvBlue)
             }
 
             VStack(spacing: 4) {
                 Text("Total")
                     .font(.system(size: 14))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(PulseTheme.textSecondary)
                 Text(String(format: "%.0f kg", total))
                     .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
                 if !level.isEmpty {
                     Text(level)
                         .font(.system(size: 14, weight: .medium))
@@ -764,7 +764,7 @@ private struct ShareStrengthCard: View {
 
             Text("Tracked with Pulse Watch")
                 .font(.system(size: 11))
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(PulseTheme.textTertiary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
@@ -780,10 +780,10 @@ private struct ShareStrengthCard: View {
                 .foregroundStyle(color)
             Text(String(format: "%.0f", value))
                 .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
             Text("kg")
                 .font(.system(size: 12))
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(PulseTheme.textTertiary)
         }
     }
 }
@@ -875,7 +875,7 @@ struct AddStrengthRecordView: View {
                     Button { save() } label: {
                         Text("Save Record")
                             .font(PulseTheme.bodyFont.weight(.semibold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(PulseTheme.textPrimary)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
                             .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(PulseTheme.accent))

@@ -33,11 +33,12 @@ struct SleepDetailView: View {
         weeklySummary.contains { $0.totalMinutes > 0 }
     }
 
-    // Colors
-    private let deepColor = Color(hex: "1E3A5F")
-    private let remColor = PulseTheme.sleepAccent // BF94FF
-    private let coreColor = Color(hex: "4A6FA5")
-    private let awakeColor = Color.white.opacity(0.2)
+    // Sleep stage colors — Clinical: grayscale hierarchy by depth
+    // Deep = textPrimary (darkest), REM = textSecondary, Core = textTertiary, Awake = textQuaternary
+    private let deepColor = PulseTheme.textPrimary
+    private let remColor = PulseTheme.textSecondary
+    private let coreColor = PulseTheme.textTertiary
+    private let awakeColor = PulseTheme.textQuaternary
 
     // Sleep score (simple heuristic)
     private var sleepScore: Int {
@@ -274,7 +275,7 @@ struct SleepDetailView: View {
 
                 if let selectedWeeklyDate {
                     RuleMark(x: .value("Selected", selectedWeeklyDate, unit: .day))
-                        .foregroundStyle(.white.opacity(0.3))
+                        .foregroundStyle(PulseTheme.textTertiary)
                         .lineStyle(StrokeStyle(lineWidth: 0.5))
                 }
             }
@@ -335,15 +336,15 @@ struct SleepDetailView: View {
                         if day.totalMinutes > 0 {
                             Text(String(format: "%.1fh / %.1fh deep", Double(day.totalMinutes) / 60.0, Double(day.deepMinutes) / 60.0))
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PulseTheme.textPrimary)
                         } else {
                             Text("无数据")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.7))
+                                .foregroundStyle(PulseTheme.textSecondary)
                         }
                         Text(weekdayFmt.string(from: day.date))
                             .font(.system(size: 11, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.7))
+                            .foregroundStyle(PulseTheme.textSecondary)
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
@@ -374,8 +375,7 @@ struct SleepDetailView: View {
     private var hypnogramChart: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
             Text(String(localized: "Sleep Stages"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
 
             Chart {
                 ForEach(samples) { sample in
@@ -392,7 +392,7 @@ struct SleepDetailView: View {
 
                 if let selected = selectedSleepTime {
                     RuleMark(x: .value("Selected", selected))
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(PulseTheme.textSecondary)
                         .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
                 }
             }
@@ -512,10 +512,10 @@ struct SleepDetailView: View {
         VStack(spacing: 4) {
             Text(stageName(stage))
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
             Text(time.formatted(.dateTime.hour().minute().locale(Locale.current)))
                 .font(.system(size: 12))
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(PulseTheme.textSecondary)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
@@ -612,45 +612,53 @@ struct SleepDetailView: View {
     // MARK: - 4. Stage Breakdown
 
     private var stageBreakdownCard: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+        VStack(alignment: .leading, spacing: 0) {
             Text(String(localized: "Stage Breakdown"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
+                .padding(.bottom, PulseTheme.spacingM)
 
-            stageRow(name: String(localized: "Deep"), minutes: deepMinutes, color: deepColor)
-            stageRow(name: "REM", minutes: remMinutes, color: remColor)
-            stageRow(name: String(localized: "Core"), minutes: coreMinutes, color: coreColor)
-            stageRow(name: String(localized: "Awake"), minutes: awakeMinutes, color: awakeColor)
+            stageRow(name: String(localized: "Deep"), minutes: deepMinutes, color: deepColor, isFirst: true)
+            stageRow(name: "REM", minutes: remMinutes, color: remColor, isFirst: false)
+            stageRow(name: String(localized: "Core"), minutes: coreMinutes, color: coreColor, isFirst: false)
+            stageRow(name: String(localized: "Awake"), minutes: awakeMinutes, color: awakeColor, isFirst: false)
         }
         .pulseCard()
     }
 
-    private func stageRow(name: String, minutes: Int, color: Color) -> some View {
+    private func stageRow(name: String, minutes: Int, color: Color, isFirst: Bool) -> some View {
         let windowMinutes = max(1, totalMinutes + awakeMinutes)
-        let fraction = CGFloat(minutes) / CGFloat(windowMinutes)
+        let pct = Int(round(Double(minutes) / Double(windowMinutes) * 100))
 
-        return HStack(spacing: PulseTheme.spacingS) {
-            Circle()
+        return HStack(spacing: 14) {
+            // Hairline swatch (Clinical: 4×32 vertical bar)
+            RoundedRectangle(cornerRadius: 1, style: .continuous)
                 .fill(color)
-                .frame(width: 10, height: 10)
+                .frame(width: 4, height: 32)
 
-            Text(name)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(PulseTheme.textPrimary)
-                .frame(width: 50, alignment: .leading)
-
-            Text(formatDuration(minutes))
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(PulseTheme.textSecondary)
-                .frame(width: 56, alignment: .trailing)
-
-            GeometryReader { geo in
-                RoundedRectangle(cornerRadius: 4, style: .continuous)
-                    .fill(color)
-                    .frame(width: chartAppeared ? geo.size.width * fraction : 0)
-                    .animation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.4), value: chartAppeared)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(name)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(PulseTheme.textPrimary)
             }
-            .frame(height: 8)
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(formatDuration(minutes))
+                    .font(PulseTheme.metricSFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                Text("\(pct)%")
+                    .font(PulseTheme.monoFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+        }
+        .padding(.vertical, 14)
+        .overlay(alignment: .top) {
+            if !isFirst {
+                Rectangle()
+                    .fill(PulseTheme.border)
+                    .frame(height: PulseTheme.hairline)
+            }
         }
     }
 
@@ -659,8 +667,7 @@ struct SleepDetailView: View {
     private var insightsCard: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             Text(String(localized: "Insights"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
 
             insightRow(icon: "moon.stars.fill", text: sleepLatencyInsight)
             insightRow(icon: "bolt.fill", text: deepSleepInsight)

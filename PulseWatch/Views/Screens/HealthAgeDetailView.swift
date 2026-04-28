@@ -48,10 +48,10 @@ struct HealthAgeDetailView: View {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text("\(Int(result.healthAge.rounded()))")
                     .font(.system(size: 72, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
                 Text(String(localized: "yrs"))
                     .font(.system(size: 28, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(PulseTheme.textSecondary)
                     .offset(y: -8)
             }
 
@@ -74,13 +74,13 @@ struct HealthAgeDetailView: View {
             // Actual age row
             HStack(spacing: 4) {
                 Text(String(localized: "Actual age:"))
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(PulseTheme.textTertiary)
                 Text(String(format: String(localized: "%d yrs"), result.chronologicalAge))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(PulseTheme.textSecondary)
                 Text("·")
-                    .foregroundStyle(.white.opacity(0.2))
+                    .foregroundStyle(PulseTheme.textQuaternary)
                 Text(String(format: String(localized: "Based on %d days"), result.daysOfData))
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(PulseTheme.textTertiary)
             }
             .font(.system(size: 13, design: .rounded))
         }
@@ -142,7 +142,7 @@ struct HealthAgeDetailView: View {
                     HStack {
                         Text(localizedMetricLabel(m.metric))
                             .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(PulseTheme.textPrimary)
                         Spacer()
                         Text(formatValue(m))
                             .font(.system(size: 14, weight: .bold, design: .rounded))
@@ -150,7 +150,7 @@ struct HealthAgeDetailView: View {
                     }
                     Text(m.advice)
                         .font(.system(size: 12))
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(PulseTheme.textTertiary)
                         .lineLimit(2)
                 }
             }
@@ -161,7 +161,7 @@ struct HealthAgeDetailView: View {
                 Spacer().frame(width: 48)
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
-                        Capsule().fill(Color.white.opacity(0.06)).frame(height: 3)
+                        Capsule().fill(PulseTheme.highlight).frame(height: 3)
                         Capsule()
                             .fill(rowColor.opacity(0.7))
                             .frame(width: geo.size.width * min(CGFloat(abs(m.ageImpact)) / 3.0, 1.0), height: 3)
@@ -178,10 +178,10 @@ struct HealthAgeDetailView: View {
         }
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
     }
@@ -202,17 +202,17 @@ struct HealthAgeDetailView: View {
                        text: String(localized: "7–8 hours of sleep per night supports cellular repair and metabolism"))
                 tipRow(icon: "figure.run", color: PulseTheme.accentTeal,
                        text: String(localized: "8000+ daily steps significantly reduces all-cause mortality"))
-                tipRow(icon: "info.circle", color: .white.opacity(0.4),
+                tipRow(icon: "info.circle", color: PulseTheme.textTertiary,
                        text: String(localized: "Estimated from population norms — for reference only, not a medical diagnosis"))
             }
         }
         .padding(PulseTheme.spacingM)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
     }
@@ -226,7 +226,7 @@ struct HealthAgeDetailView: View {
                 .padding(.top, 1)
             Text(text)
                 .font(.system(size: 13))
-                .foregroundStyle(.white.opacity(0.65))
+                .foregroundStyle(PulseTheme.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }

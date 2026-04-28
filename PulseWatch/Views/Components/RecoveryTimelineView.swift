@@ -356,7 +356,7 @@ struct TimelineNodeView: View {
                     Circle()
                         .fill(
                             RadialGradient(
-                                colors: [.white.opacity(0.3), .clear],
+                                colors: [PulseTheme.textTertiary, .clear],
                                 center: .topLeading,
                                 startRadius: 0,
                                 endRadius: nodeSize / 2

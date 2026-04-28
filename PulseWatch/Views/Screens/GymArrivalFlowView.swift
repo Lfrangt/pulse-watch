@@ -105,7 +105,7 @@ struct GymArrivalFlowView: View {
                 } label: {
                     Text("Start Training")
                         .font(PulseTheme.bodyFont.weight(.semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PulseTheme.textPrimary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                         .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(PulseTheme.accent))
@@ -190,7 +190,7 @@ struct GymArrivalFlowView: View {
             } label: {
                 Text(String(format: String(localized: "Continue (%d selected)"), selectedGroups.count))
                     .font(PulseTheme.bodyFont.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM)
@@ -256,7 +256,7 @@ struct GymArrivalFlowView: View {
                             Text("Start Timer")
                         }
                         .font(PulseTheme.bodyFont.weight(.semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PulseTheme.textPrimary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                         .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(PulseTheme.accent))
@@ -345,7 +345,7 @@ struct GymArrivalFlowView: View {
                     Text("End Workout")
                 }
                 .font(PulseTheme.bodyFont.weight(.semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(PulseTheme.activityAccent))
@@ -396,7 +396,7 @@ struct GymArrivalFlowView: View {
             } label: {
                 Text("Done")
                     .font(PulseTheme.bodyFont.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(PulseTheme.accent))

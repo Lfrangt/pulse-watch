@@ -154,7 +154,7 @@ struct WorkoutView: View {
             .padding(PulseTheme.spacingM)
             .background(
                 RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .fill(Color.white.opacity(0.04))
+                    .fill(PulseTheme.highlight)
                     .overlay(RoundedRectangle(cornerRadius: PulseTheme.radiusM).stroke(PulseTheme.accentTeal.opacity(0.2), lineWidth: 0.5))
             )
         }

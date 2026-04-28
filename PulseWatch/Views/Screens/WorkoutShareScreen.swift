@@ -87,7 +87,7 @@ struct WorkoutShareScreen: View {
                     .padding(.vertical, 10)
                     .background(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(selectedRatio == r ? Color.white.opacity(0.08) : Color.clear)
+                            .fill(selectedRatio == r ? PulseTheme.highlight : Color.clear)
                     )
                 }
                 .buttonStyle(.plain)

@@ -44,7 +44,7 @@ enum MuscleGroup: String, CaseIterable, Codable, Identifiable {
     var color: Color {
         switch self {
         case .chest:     return Color(hex: "C75C5C")
-        case .back:      return Color(hex: "5C7BC7")
+        case .back:      return PulseTheme.hrvBlue
         case .legs:      return Color(hex: "7FC75C")
         case .shoulders: return Color(hex: "C7A05C")
         case .arms:      return Color(hex: "C75C9E")

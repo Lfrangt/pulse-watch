@@ -47,10 +47,10 @@ struct BloodOxygenDetailView: View {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(spo2 > 0 ? "\(Int(spo2))" : "--")
                     .font(.system(size: 64, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
                 Text("%")
                     .font(.system(size: 28, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(PulseTheme.textTertiary)
                     .offset(y: -8)
             }
             Text(statusLabel)
@@ -60,7 +60,7 @@ struct BloodOxygenDetailView: View {
                 .background(Capsule().fill(statusColor.opacity(0.13)))
             Text(String(localized: "Normal range: 95% – 100%"))
                 .font(.system(size: 12, design: .rounded))
-                .foregroundStyle(.white.opacity(0.35))
+                .foregroundStyle(PulseTheme.textTertiary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 24).padding(.horizontal, PulseTheme.spacingM)
@@ -85,14 +85,14 @@ struct BloodOxygenDetailView: View {
             VStack(spacing: 8) {
                 HStack {
                     Text(String(localized: "Current Reading"))
-                        .font(.system(size: 13)).foregroundStyle(.white.opacity(0.45))
+                        .font(.system(size: 13)).foregroundStyle(PulseTheme.textTertiary)
                     Spacer()
                     Text(spo2 > 0 ? "\(Int(spo2))%" : "--")
                         .font(.system(size: 15, weight: .bold, design: .rounded))
                         .foregroundStyle(statusColor)
                 }
                 Text(String(localized: "Blood oxygen is measured in real-time by Apple Watch. Continuous history will be supported in a future update."))
-                    .font(.system(size: 12)).foregroundStyle(.white.opacity(0.35))
+                    .font(.system(size: 12)).foregroundStyle(PulseTheme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -102,7 +102,7 @@ struct BloodOxygenDetailView: View {
     private var rangeCard: some View {
         let ranges: [(String, String, Color)] = [
             ("98% – 100%", String(localized: "Excellent — red blood cells fully oxygenated"), PulseTheme.accentTeal),
-            ("95% – 97%",  String(localized: "Normal range — no concern"), .white.opacity(0.6)),
+            ("95% – 97%",  String(localized: "Normal range — no concern"), PulseTheme.textSecondary),
             ("93% – 94%",  String(localized: "Low — try deep breathing and rest"), PulseTheme.statusWarning),
             ("< 93%",      String(localized: "Abnormal — consider medical attention"), PulseTheme.activityCoral),
         ]
@@ -112,8 +112,8 @@ struct BloodOxygenDetailView: View {
                 HStack(spacing: 12) {
                     Capsule().fill(range.2).frame(width: 4, height: 36)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(range.0).font(.system(size: 14, weight: .semibold, design: .rounded)).foregroundStyle(.white)
-                        Text(range.1).font(.system(size: 12)).foregroundStyle(.white.opacity(0.5))
+                        Text(range.0).font(.system(size: 14, weight: .semibold, design: .rounded)).foregroundStyle(PulseTheme.textPrimary)
+                        Text(range.1).font(.system(size: 12)).foregroundStyle(PulseTheme.textTertiary)
                     }
                 }
             }
@@ -140,12 +140,12 @@ struct BloodOxygenDetailView: View {
     private func tipRow(_ text: String) -> some View {
         HStack(alignment: .top, spacing: 8) {
             Circle().fill(statusColor.opacity(0.5)).frame(width: 5, height: 5).padding(.top, 5)
-            Text(text).font(.system(size: 13)).foregroundStyle(.white.opacity(0.65)).fixedSize(horizontal: false, vertical: true)
+            Text(text).font(.system(size: 13)).foregroundStyle(PulseTheme.textSecondary).fixedSize(horizontal: false, vertical: true)
         }
     }
     private var glassCard: some View {
         RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-            .fill(Color.white.opacity(0.04))
-            .overlay(RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous).stroke(Color.white.opacity(0.06), lineWidth: 0.5))
+            .fill(PulseTheme.highlight)
+            .overlay(RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous).stroke(PulseTheme.highlight, lineWidth: 0.5))
     }
 }

@@ -69,8 +69,7 @@ struct ActivityDetailView: View {
         VStack(spacing: PulseTheme.spacingM) {
             HStack {
                 Text(String(localized: "Today's Goals"))
-                    .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .pulseEyebrow()
                 Spacer()
                 Text(activityStatus)
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -127,7 +126,7 @@ struct ActivityDetailView: View {
                         .foregroundStyle(color)
                     Text(value)
                         .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PulseTheme.textPrimary)
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
                 }
@@ -150,8 +149,7 @@ struct ActivityDetailView: View {
     private var stepsChartCard: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             Text(String(localized: "Steps · 7 Days"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
 
             Chart {
                 ForEach(weekSteps, id: \.date) { s in
@@ -160,14 +158,14 @@ struct ActivityDetailView: View {
                         y: .value("Steps", chartAppeared ? s.steps : 0)
                     )
                     .foregroundStyle(
-                        s.steps >= stepsGoal ? PulseTheme.accentTeal : Color.white.opacity(0.25)
+                        s.steps >= stepsGoal ? PulseTheme.accentTeal : PulseTheme.highlight
                     )
                     .cornerRadius(4)
                 }
 
                 if let selectedStepDate {
                     RuleMark(x: .value("Selected", selectedStepDate, unit: .day))
-                        .foregroundStyle(.white.opacity(0.3))
+                        .foregroundStyle(PulseTheme.textTertiary)
                         .lineStyle(StrokeStyle(lineWidth: 0.5))
                 }
             }
@@ -185,7 +183,7 @@ struct ActivityDetailView: View {
             .chartYAxis {
                 AxisMarks { val in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
-                        .foregroundStyle(Color.white.opacity(0.06))
+                        .foregroundStyle(PulseTheme.highlight)
                     AxisValueLabel {
                         if let v = val.as(Int.self) {
                             Text(v >= 1000 ? "\(v/1000)k" : "\(v)")
@@ -244,10 +242,10 @@ struct ActivityDetailView: View {
                     VStack(spacing: 2) {
                         Text(NumberFormatter.localizedString(from: NSNumber(value: point.steps), number: .decimal) + " steps")
                             .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(PulseTheme.textPrimary)
                         Text(dateFmt.string(from: point.date))
                             .font(.system(size: 11, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.7))
+                            .foregroundStyle(PulseTheme.textSecondary)
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
@@ -296,7 +294,7 @@ struct ActivityDetailView: View {
             HStack(alignment: .firstTextBaseline, spacing: 3) {
                 Text(value)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
                 if !unit.isEmpty {
@@ -313,20 +311,20 @@ struct ActivityDetailView: View {
         .padding(PulseTheme.spacingM)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
     }
 
     private var cardBg: some View {
         RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-            .fill(Color.white.opacity(0.04))
+            .fill(PulseTheme.highlight)
             .overlay(
                 RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                    .stroke(PulseTheme.highlight, lineWidth: 0.5)
             )
     }
 

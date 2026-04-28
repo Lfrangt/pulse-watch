@@ -230,7 +230,7 @@ struct ManualWorkoutView: View {
         } label: {
             Text("Save Workout")
                 .font(PulseTheme.bodyFont.weight(.semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(

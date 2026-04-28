@@ -51,7 +51,7 @@ struct HealthSnapshotShareCard: View {
                     Spacer()
                     Text(Date.now, format: .dateTime.month(.abbreviated).day())
                         .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(PulseTheme.textTertiary)
                 }
 
                 Spacer()
@@ -60,7 +60,7 @@ struct HealthSnapshotShareCard: View {
                 VStack(spacing: 8) {
                     Text("\(score)")
                         .font(.system(size: ratio == .story ? 72 : 56, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PulseTheme.textPrimary)
 
                     Text(PulseTheme.statusLabel(for: score))
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -93,7 +93,7 @@ struct HealthSnapshotShareCard: View {
                 // 水印
                 Text("pulse-watch.app")
                     .font(.system(size: 9, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.25))
+                    .foregroundStyle(PulseTheme.textQuaternary)
             }
             .padding(24)
         }
@@ -107,11 +107,11 @@ struct HealthSnapshotShareCard: View {
                 .foregroundStyle(color)
             Text(value)
                 .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
             if !unit.isEmpty {
                 Text(unit)
                     .font(.system(size: 9, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(PulseTheme.textTertiary)
             }
         }
         .frame(maxWidth: .infinity)

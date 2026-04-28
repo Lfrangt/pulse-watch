@@ -198,7 +198,7 @@ struct MonthlyReportView: View {
                             if score > 0 {
                                 Text("\(score)")
                                     .font(.system(size: 7, weight: .bold, design: .rounded))
-                                    .foregroundStyle(.white.opacity(0.8))
+                                    .foregroundStyle(PulseTheme.textSecondary)
                             }
                         }
                 }

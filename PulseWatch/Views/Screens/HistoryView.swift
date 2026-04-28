@@ -352,7 +352,7 @@ struct HistoryView: View {
 
                     if let selectedScoreDate {
                         RuleMark(x: .value("Selected", selectedScoreDate))
-                            .foregroundStyle(.white.opacity(0.3))
+                            .foregroundStyle(PulseTheme.textTertiary)
                             .lineStyle(StrokeStyle(lineWidth: 0.5))
                     }
                 }
@@ -406,10 +406,10 @@ struct HistoryView: View {
                         VStack(spacing: 2) {
                             Text("\(point.score)")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PulseTheme.textPrimary)
                             Text(dateFmt.string(from: point.date))
                                 .font(.system(size: 11, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.7))
+                                .foregroundStyle(PulseTheme.textSecondary)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -491,7 +491,7 @@ struct HistoryView: View {
 
                     if let selectedHRDate {
                         RuleMark(x: .value("Selected", selectedHRDate))
-                            .foregroundStyle(.white.opacity(0.3))
+                            .foregroundStyle(PulseTheme.textTertiary)
                             .lineStyle(StrokeStyle(lineWidth: 0.5))
                     }
                 }
@@ -531,10 +531,10 @@ struct HistoryView: View {
                         VStack(spacing: 2) {
                             Text("\(Int(point.resting)) bpm")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PulseTheme.textPrimary)
                             Text(dateFmt.string(from: point.date))
                                 .font(.system(size: 11, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.7))
+                                .foregroundStyle(PulseTheme.textSecondary)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -569,7 +569,7 @@ struct HistoryView: View {
         let prevHRVs = previousPeriodSummaries.compactMap(\.averageHRV)
         let prevAvgHRV2 = prevHRVs.isEmpty ? nil : prevHRVs.reduce(0,+) / Double(prevHRVs.count)
         let hrvDelta = deltaPct(cur: curAvgHRV, prev: prevAvgHRV2)
-        let hrvColor = Color(hex: "5C7BC7")  // 蓝色系
+        let hrvColor = PulseTheme.hrvBlue  // 蓝色系
 
         let hrvInsight: String? = {
             guard let cur = curAvgHRV else { return nil }
@@ -607,7 +607,7 @@ struct HistoryView: View {
 
                     if let selectedHRVDate {
                         RuleMark(x: .value("Selected", selectedHRVDate))
-                            .foregroundStyle(.white.opacity(0.3))
+                            .foregroundStyle(PulseTheme.textTertiary)
                             .lineStyle(StrokeStyle(lineWidth: 0.5))
                     }
                 }
@@ -647,10 +647,10 @@ struct HistoryView: View {
                         VStack(spacing: 2) {
                             Text("\(Int(point.value)) ms")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PulseTheme.textPrimary)
                             Text(dateFmt.string(from: point.date))
                                 .font(.system(size: 11, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.7))
+                                .foregroundStyle(PulseTheme.textSecondary)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -702,7 +702,7 @@ struct HistoryView: View {
         return chartCard(
             icon: "moon.fill",
             title: String(localized: "Sleep"),
-            color: Color(hex: "4B3D8F"),
+            color: PulseTheme.sleepViolet,
             currentValue: latestSleep,
             changeText: sleepDelta2?.0,
             changePositive: sleepDelta2?.1 ?? true,
@@ -745,7 +745,7 @@ struct HistoryView: View {
 
                     if let selectedSleepDate {
                         RuleMark(x: .value("Selected", selectedSleepDate, unit: .day))
-                            .foregroundStyle(.white.opacity(0.3))
+                            .foregroundStyle(PulseTheme.textTertiary)
                             .lineStyle(StrokeStyle(lineWidth: 0.5))
                     }
                 }
@@ -803,10 +803,10 @@ struct HistoryView: View {
                         VStack(spacing: 2) {
                             Text(String(format: "%.1fh (deep %.1fh)", point.hours, point.deep))
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PulseTheme.textPrimary)
                             Text(dateFmt.string(from: point.date))
                                 .font(.system(size: 11, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.7))
+                                .foregroundStyle(PulseTheme.textSecondary)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -854,7 +854,7 @@ struct HistoryView: View {
         }()
 
         let stressColor: Color = {
-            guard let score = latestStress else { return Color(hex: "FFD700") }
+            guard let score = latestStress else { return PulseTheme.statusWarning }
             return StressLevel.from(score: score).color
         }()
 
@@ -897,7 +897,7 @@ struct HistoryView: View {
 
                     if let selectedStressDate {
                         RuleMark(x: .value("Selected", selectedStressDate))
-                            .foregroundStyle(.white.opacity(0.3))
+                            .foregroundStyle(PulseTheme.textTertiary)
                             .lineStyle(StrokeStyle(lineWidth: 0.5))
                     }
                 }
@@ -952,10 +952,10 @@ struct HistoryView: View {
                         VStack(spacing: 2) {
                             Text("\(point.score)")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PulseTheme.textPrimary)
                             Text(dateFmt.string(from: point.date))
                                 .font(.system(size: 11, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.7))
+                                .foregroundStyle(PulseTheme.textSecondary)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -1153,7 +1153,7 @@ struct HistoryView: View {
 
                 if let selectedVal = selectedDate.wrappedValue {
                     RuleMark(x: .value("Selected", selectedVal))
-                        .foregroundStyle(.white.opacity(0.3))
+                        .foregroundStyle(PulseTheme.textTertiary)
                         .lineStyle(StrokeStyle(lineWidth: 0.5))
                 }
             }
@@ -1161,17 +1161,17 @@ struct HistoryView: View {
             .chartYAxis {
                 AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { _ in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
-                        .foregroundStyle(Color.white.opacity(0.07))
+                        .foregroundStyle(PulseTheme.highlight)
                     AxisValueLabel()
                         .font(.system(size: 9, design: .rounded))
-                        .foregroundStyle(Color.white.opacity(0.4))
+                        .foregroundStyle(PulseTheme.highlight)
                 }
             }
             .chartXAxis {
                 AxisMarks(values: .automatic(desiredCount: 4)) { _ in
                     AxisValueLabel(format: .dateTime.month(.abbreviated).day())
                         .font(.system(size: 9))
-                        .foregroundStyle(Color.white.opacity(0.4))
+                        .foregroundStyle(PulseTheme.highlight)
                 }
             }
             .chartOverlay { proxy in
@@ -1208,10 +1208,10 @@ struct HistoryView: View {
                     VStack(spacing: 2) {
                         Text(String(format: "%.1f %@", point.value, yLabel))
                             .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(PulseTheme.textPrimary)
                         Text(dateFmt.string(from: point.date))
                             .font(.system(size: 11, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.7))
+                            .foregroundStyle(PulseTheme.textSecondary)
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
@@ -1270,17 +1270,17 @@ struct HistoryView: View {
             .chartYAxis {
                 AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { _ in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
-                        .foregroundStyle(Color.white.opacity(0.07))
+                        .foregroundStyle(PulseTheme.highlight)
                     AxisValueLabel()
                         .font(.system(size: 9, design: .rounded))
-                        .foregroundStyle(Color.white.opacity(0.4))
+                        .foregroundStyle(PulseTheme.highlight)
                 }
             }
             .chartXAxis {
                 AxisMarks(values: .automatic(desiredCount: 4)) { _ in
                     AxisValueLabel(format: .dateTime.month(.abbreviated).day())
                         .font(.system(size: 9))
-                        .foregroundStyle(Color.white.opacity(0.4))
+                        .foregroundStyle(PulseTheme.highlight)
                 }
             }
             .frame(height: 180)
@@ -1304,7 +1304,7 @@ struct HistoryView: View {
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
                     Text(selectedRange == .month ? String(localized: "vs 30 days ago") : String(localized: "vs 90 days ago"))
                         .font(.system(size: 11, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.4))
+                        .foregroundStyle(PulseTheme.textTertiary)
                 }
                 .foregroundStyle(color)
                 .padding(.leading, 4)
@@ -1367,7 +1367,7 @@ struct HistoryView: View {
             if let insight {
                 Text(insight)
                     .font(.system(size: 13, weight: .regular))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(PulseTheme.textSecondary)
                     .lineSpacing(2)
             }
 
@@ -1376,10 +1376,10 @@ struct HistoryView: View {
         .padding(PulseTheme.spacingM)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                        .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
     }
@@ -1503,10 +1503,10 @@ struct HistoryView: View {
         .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.05))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
         .accessibilityLabel(title)
@@ -1621,8 +1621,8 @@ struct CandlestickChartView: View {
     var body: some View {
         if candles.isEmpty {
             VStack(spacing: 8) {
-                Image(systemName: "chart.bar.xaxis").font(.system(size: 24)).foregroundStyle(Color.white.opacity(0.15))
-                Text("Not enough data yet").font(.system(size: 12)).foregroundStyle(Color.white.opacity(0.25))
+                Image(systemName: "chart.bar.xaxis").font(.system(size: 24)).foregroundStyle(PulseTheme.highlight)
+                Text("Not enough data yet").font(.system(size: 12)).foregroundStyle(PulseTheme.highlight)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if useFallback {
@@ -1638,8 +1638,8 @@ struct CandlestickChartView: View {
                         .lineStyle(StrokeStyle(lineWidth: 2))
                 }
             }
-            .chartXAxis { AxisMarks { _ in AxisValueLabel(format: .dateTime.month(.abbreviated)).font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.4)) } }
-            .chartYAxis { AxisMarks(position: .leading) { _ in AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4])).foregroundStyle(Color.white.opacity(0.06)); AxisValueLabel().font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.4)) } }
+            .chartXAxis { AxisMarks { _ in AxisValueLabel(format: .dateTime.month(.abbreviated)).font(.system(size: 9)).foregroundStyle(PulseTheme.highlight) } }
+            .chartYAxis { AxisMarks(position: .leading) { _ in AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4])).foregroundStyle(PulseTheme.highlight); AxisValueLabel().font(.system(size: 9)).foregroundStyle(PulseTheme.highlight) } }
             .frame(maxWidth: .infinity)
             .frame(height: 160)
         } else {
@@ -1669,12 +1669,12 @@ struct CandlestickChartView: View {
                         let val = minVal + (maxVal - minVal) * Double(steps - i) / Double(steps)
                         Group {
                             Rectangle()
-                                .fill(Color.white.opacity(i == 0 || i == steps ? 0.0 : 0.05))
+                                .fill(PulseTheme.highlight)
                                 .frame(width: chartW, height: 0.5)
                                 .offset(x: padding, y: h * pct)
                             Text("\(Int(val))\(yLabel)")
                                 .font(.system(size: 9, design: .rounded))
-                                .foregroundStyle(Color.white.opacity(0.3))
+                                .foregroundStyle(PulseTheme.highlight)
                                 .frame(width: padding - 4, alignment: .trailing)
                                 .offset(x: 0, y: h * pct - 7)
                         }
@@ -1759,10 +1759,10 @@ struct CandlestickChartView: View {
                     let sel = candles[i]
                     HStack(spacing: 12) {
                         Text(sel.date, format: .dateTime.month().day())
-                            .foregroundStyle(.white.opacity(0.5))
+                            .foregroundStyle(PulseTheme.textTertiary)
                         Text("↑\(Int(sel.high))\(yLabel)").foregroundStyle(color)
-                        Text("↓\(Int(sel.low))\(yLabel)").foregroundStyle(.white.opacity(0.5))
-                        Text("~\(Int(sel.avg))\(yLabel)").foregroundStyle(.white.opacity(0.8))
+                        Text("↓\(Int(sel.low))\(yLabel)").foregroundStyle(PulseTheme.textTertiary)
+                        Text("~\(Int(sel.avg))\(yLabel)").foregroundStyle(PulseTheme.textSecondary)
                     }
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .padding(.horizontal, 12).padding(.vertical, 7)

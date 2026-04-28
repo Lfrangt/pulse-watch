@@ -74,26 +74,76 @@ struct DashboardView: View {
                         // BELOW HERO — cards with padding
                         VStack(spacing: 24) {
 
+                            // ── JSX Today.jsx layout ──────────────────────
+
+                            // Vitals grid — HRV / RHR / SpO2 / Steps
+                            if hasAnyMetric {
+                                VitalsGrid(
+                                    hrv: currentHRV,
+                                    restingHR: healthManager.latestRestingHR,
+                                    spo2: currentBloodOxygen,
+                                    steps: currentSteps > 0 ? currentSteps : nil
+                                )
+                                .staggered(index: 2)
+                            }
+
+                            // Sleep band — Last Night
+                            if healthManager.lastNightSleepMinutes > 0 {
+                                NavigationLink(destination: SleepDetailView()) {
+                                    SleepBandCard(
+                                        totalMinutes: healthManager.lastNightSleepMinutes,
+                                        deepMinutes: healthManager.lastNightDeepSleepMinutes,
+                                        remMinutes: healthManager.lastNightREMSleepMinutes,
+                                        coreMinutes: max(0, healthManager.lastNightSleepMinutes
+                                                              - healthManager.lastNightDeepSleepMinutes
+                                                              - healthManager.lastNightREMSleepMinutes),
+                                        awakeMinutes: 0,
+                                        bedTime: healthManager.lastNightSleepStart,
+                                        wakeTime: healthManager.lastNightSleepEnd
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                                .staggered(index: 3)
+                            }
+
+                            // Training suggestion
+                            if let plan = brief?.trainingPlan, plan.targetMuscleGroup != "rest" {
+                                SuggestionCard(
+                                    intensity: plan.intensity.rawValue,
+                                    intensityColor: intensityColor(for: plan.intensity),
+                                    workoutTitle: workoutTitle(for: plan),
+                                    subtitle: plan.reason,
+                                    exercises: plan.suggestedExercises.map { ex in
+                                        SuggestionCard.Exercise(
+                                            name: ex.name,
+                                            sets: "\(ex.sets) × \(ex.reps)",
+                                            weight: ex.suggestedWeight.map { String(format: "%.0f kg", $0) } ?? ""
+                                        )
+                                    }
+                                )
+                                .staggered(index: 4)
+                            }
+
+                            // 7-day readiness chart
+                            WeeklyReadinessChart(scores: sevenDayAllScores())
+                                .staggered(index: 5)
+
+                            // ── Pulse-specific extras (below JSX layout) ──
+
                             // Energy Bank
                             energyBankCard
-                                .staggered(index: 2)
-
-                            // Metrics grid
-                            if hasAnyMetric {
-                                metricsGrid
-                                    .staggered(index: 3)
-                            }
+                                .staggered(index: 6)
 
                             // Nutrition — coming soon teaser
                             nutritionCard
-                                .staggered(index: 4)
+                                .staggered(index: 7)
 
-                            // Weekly trends
+                            // Weekly trends (legacy chart — keep for now)
                             WeeklyTrendChartsView(
                                 summaries: allSummaries,
                                 demoMode: demoMode
                             )
-                            .staggered(index: 4)
+                            .staggered(index: 7)
 
                             // Health Age — compact, tap to detail
                             if let result = healthAgeResult {
@@ -101,21 +151,12 @@ struct DashboardView: View {
                                     healthAgeCardCompact(result: result)
                                 }
                                 .buttonStyle(.plain)
-                                .staggered(index: 5)
+                                .staggered(index: 8)
                             }
 
                             // Recovery timeline
                             recoveryTimelineSection
-                                .staggered(index: 6)
-
-                            // Training advice
-                            if let advice = insight?.trainingAdvice {
-                                trainingAdviceCard(advice: advice)
-                                    .staggered(index: 6)
-                            } else if let plan = brief?.trainingPlan, plan.targetMuscleGroup != "rest" {
-                                TrainingCard(plan: plan)
-                                    .staggered(index: 6)
-                            }
+                                .staggered(index: 9)
 
                             // Goal progress
                             GoalProgressCard()
@@ -233,7 +274,7 @@ struct DashboardView: View {
             }
 
             // 7-day sparkline
-            ReadinessSparkline(scores: sevenDayScores(currentScore: score))
+            ReadinessSparkline(todayScore: score, priorScores: sevenDayPriorScores())
 
             // Headline + insight
             if !headline.isEmpty {
@@ -285,15 +326,39 @@ struct DashboardView: View {
             )
     }
 
-    private func sevenDayScores(currentScore: Int) -> [Int] {
+    /// Six prior days, oldest → most recent. nil for days without data.
+    private func sevenDayPriorScores() -> [Int?] {
         let cal = Calendar.current
         let today = cal.startOfDay(for: .now)
-        let last7 = (0..<7).reversed().compactMap { offset -> Int? in
+        return (1...6).reversed().map { offset -> Int? in
             guard let d = cal.date(byAdding: .day, value: -offset, to: today) else { return nil }
-            if cal.isDate(d, inSameDayAs: today) { return currentScore }
             return allSummaries.first { cal.isDate($0.date, inSameDayAs: d) }?.dailyScore
         }
-        return last7
+    }
+
+    /// All 7 days including today, oldest → most recent.
+    private func sevenDayAllScores() -> [Int?] {
+        sevenDayPriorScores() + [brief?.score]
+    }
+
+    private func intensityColor(for intensity: TrainingPlan.Intensity) -> Color {
+        switch intensity {
+        case .light:    return PulseTheme.statusGood
+        case .moderate: return PulseTheme.accent
+        case .heavy:    return PulseTheme.statusWarning
+        }
+    }
+
+    private func workoutTitle(for plan: TrainingPlan) -> String {
+        switch plan.targetMuscleGroup.lowercased() {
+        case "chest":     return String(localized: "Push — Chest & Triceps")
+        case "back":      return String(localized: "Pull — Back & Biceps")
+        case "legs":      return String(localized: "Legs — Quads, Hams & Glutes")
+        case "shoulders": return String(localized: "Shoulders & Core")
+        case "arms":      return String(localized: "Arms — Biceps & Triceps")
+        case "core":      return String(localized: "Core & Mobility")
+        default:          return plan.targetMuscleGroup.capitalized
+        }
     }
 
     private func sevenDayBaseline() -> Int? {

@@ -1,3 +1,4 @@
+#if os(iOS)
 import UIKit
 import SwiftData
 
@@ -316,3 +317,4 @@ final class PDFReportService {
                         color: .black, alignment: .left) + 4
     }
 }
+#endif

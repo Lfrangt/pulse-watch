@@ -57,6 +57,7 @@
 		498127E8B00AEB853D9D0313 /* WorkoutHistoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318D4E52322D0508EEC75361 /* WorkoutHistoryDetailView.swift */; };
 		4A6365C02853DEA90A19D208 /* ScoreEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C689D7ED34748CC72C57C9D /* ScoreEngine.swift */; };
 		4A88CB8CC9ADE27277ED8A92 /* ScoreEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C689D7ED34748CC72C57C9D /* ScoreEngine.swift */; };
+		4DCE1C39532A5832858E381C /* ReadinessSparkline.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0603FF2A61E99D82B443535 /* ReadinessSparkline.swift */; };
 		515988C37B829EAE6F38104B /* WorkoutTrackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD42A291856B9B4DCE954001 /* WorkoutTrackingView.swift */; };
 		527C0ED007B68F5D72EB14FA /* PulseWatchWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 69563E71C80C1C903EAB9E81 /* PulseWatchWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		54A8592294B61933B0B714CA /* InteractiveChartOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69127DAF601919E92EB120F6 /* InteractiveChartOverlay.swift */; };
@@ -325,6 +326,7 @@
 		CF79FB4DE1FF6C33541719F6 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		D01195020D34743F50D83026 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		D0586343BF113608113C25B9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		D0603FF2A61E99D82B443535 /* ReadinessSparkline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadinessSparkline.swift; sourceTree = "<group>"; };
 		D4FD59A72CE05A8315F63437 /* SleepDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDetailView.swift; sourceTree = "<group>"; };
 		D6BBF3968BD1F9038B30E966 /* CaloriesDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaloriesDetailView.swift; sourceTree = "<group>"; };
 		D78EF6591F143A435A280533 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
@@ -593,6 +595,7 @@
 				69127DAF601919E92EB120F6 /* InteractiveChartOverlay.swift */,
 				9B8AF5335F8330E76B283777 /* LaunchScreenView.swift */,
 				BCB4D5F51FF5C4DC019D609B /* QRScannerView.swift */,
+				D0603FF2A61E99D82B443535 /* ReadinessSparkline.swift */,
 				363204A6CBD545ECC1DD5485 /* RecoveryTimelineView.swift */,
 				137D4F7F2B9141C04B4C6D30 /* ShareCardView.swift */,
 				CB91463719D9CE6B82F0FEBB /* StatusCard.swift */,
@@ -1011,6 +1014,7 @@
 				12558EC881A90A97E59B9616 /* PulseTheme.swift in Sources */,
 				0A32C25CCAE11724202F6D11 /* PulseWatchApp.swift in Sources */,
 				FD2CAFAC652D279BEA76F3EF /* QRScannerView.swift in Sources */,
+				4DCE1C39532A5832858E381C /* ReadinessSparkline.swift in Sources */,
 				BD2DF800197AAA403C5EE3DA /* RecoveryTimelineView.swift in Sources */,
 				E67D1F3094B4C15C9455AA7E /* ReviewRequestManager.swift in Sources */,
 				002A230E4A7CD0D02D998554 /* SafeMath.swift in Sources */,

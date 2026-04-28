@@ -18,9 +18,7 @@ struct DashboardView: View {
     @State private var showGymPrompt = false
     @State private var breathe = false
 
-    // 圆环动画状态
     @State private var animatedScore: Int = 0
-    @State private var ringProgress: CGFloat = 0
     @State private var ringAnimated = false
 
     // 演示模式时间线事件
@@ -44,27 +42,9 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
-                // ── Full-bleed gradient behind everything (extends into safe area)
-                LinearGradient(
-                    stops: [
-                        .init(color: Color(hex: "0D4A5C"), location: 0),
-                        .init(color: Color(hex: "0A3347"), location: 0.15),
-                        .init(color: Color(hex: "071E2E"), location: 0.3),
-                        .init(color: PulseTheme.background, location: 0.5),
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-
-                // Subtle radial glow
-                RadialGradient(
-                    colors: [Color(hex: "1ADFFF").opacity(0.12), Color.clear],
-                    center: .init(x: 0.5, y: 0.12),
-                    startRadius: 10,
-                    endRadius: 300
-                )
-                .ignoresSafeArea()
+                // Clinical: flat surface, no gradient, no glow
+                PulseTheme.background
+                    .ignoresSafeArea()
 
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 0) {
@@ -211,94 +191,120 @@ struct DashboardView: View {
         .preferredColorScheme(.dark)
     }
 
-    // MARK: - Hero Section (Oura-style full bleed)
-
-    /// Arc width computed from screen width
-    private var arcWidth: CGFloat { UIScreen.main.bounds.width - 60 }
+    // MARK: - Hero Section — Clinical ReadinessCard
+    // 72pt big number, eyebrow label, status chip, 7-day sparkline. No ring.
 
     private func heroSection(score: Int, headline: String) -> some View {
-        VStack(spacing: 0) {
-
-            // ── Score discs row (Oura's top circle grid)
-            if let tri = triScore {
-                ouraScoreDiscRow(
-                    total: score,
-                    sleep: tri.sleep.score,
-                    activity: tri.activity.score,
-                    readiness: tri.readiness.score
-                )
-            } else {
-                ouraScoreDiscRow(total: score, sleep: nil, activity: nil, readiness: nil)
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            // Top row: eyebrow + status chip
+            HStack {
+                Text(String(localized: "Readiness"))
+                    .pulseEyebrow()
+                Spacer()
+                statusChip(for: score)
             }
 
-            Spacer().frame(height: 12)
+            // Big number + delta
+            HStack(alignment: .firstTextBaseline, spacing: PulseTheme.spacingS) {
+                Text("\(animatedScore)")
+                    .font(PulseTheme.metricXLFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                    .contentTransition(.numericText())
 
-            // ── Wide arc gauge (Oura's sweeping 180° arc)
-            ZStack {
-                // Track
-                wideArcTrack()
-                    .stroke(Color.white.opacity(0.10),
-                            style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                    .frame(width: arcWidth, height: arcWidth / 2 + 10)
+                Text("/ 100")
+                    .font(PulseTheme.calloutFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
 
-                // Progress
-                wideArcTrack()
-                    .trim(from: 0, to: ringProgress)
-                    .stroke(Color.white,
-                            style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                    .frame(width: arcWidth, height: arcWidth / 2 + 10)
+                Spacer()
 
-                // Score number — dominant visual
-                VStack(spacing: 6) {
-                    Text("\(animatedScore)")
-                        .font(.system(size: 72, weight: .bold, design: .default))
-                        .foregroundStyle(.white)
-                        .contentTransition(.numericText())
-
-                    Text(String(localized: "READINESS"))
-                        .font(.system(size: 10, weight: .medium, design: .monospaced))
-                        .tracking(4.5)
-                        .foregroundStyle(.white.opacity(0.4))
+                let baseline = sevenDayBaseline()
+                VStack(alignment: .trailing, spacing: 2) {
+                    if let baseline {
+                        let diff = score - baseline
+                        Text(diff >= 0 ? "+\(diff) vs 7-day avg" : "\(diff) vs 7-day avg")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(diff >= 0 ? PulseTheme.statusGood : PulseTheme.statusPoor)
+                            .monospacedDigit()
+                        Text("baseline \(baseline)")
+                            .font(PulseTheme.monoFont)
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
                 }
-                .offset(y: 4)
             }
-            .frame(maxWidth: .infinity)
-            .onAppear {
-                guard !ringAnimated else { return }
-                ringAnimated = true
-                withAnimation(.spring(response: 0.35, dampingFraction: 1.0).delay(0.3)) {
-                    ringProgress = CGFloat(score) / 100.0
+
+            // 7-day sparkline
+            ReadinessSparkline(scores: sevenDayScores(currentScore: score))
+
+            // Headline + insight
+            if !headline.isEmpty {
+                VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
+                    Text(headline)
+                        .font(PulseTheme.title2Font)
+                        .foregroundStyle(PulseTheme.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let insight = brief?.insight {
+                        Text(insight)
+                            .font(PulseTheme.calloutFont)
+                            .foregroundStyle(PulseTheme.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineSpacing(2)
+                    }
                 }
-                animateScoreCounter(to: score)
+                .padding(.top, PulseTheme.spacingXS)
             }
-
-            Spacer().frame(height: 12)
-
-            // ── Headline
-            Text(headline)
-                .font(.system(size: 24, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.9))
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal, 32)
-
-            Spacer().frame(height: 8)
-
-            // ── Sub-headline
-            if let insight = brief?.insight {
-                Text(insight)
-                    .font(.system(size: 13, weight: .regular))
-                    .foregroundStyle(.white.opacity(0.5))
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(3)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, 40)
-            }
-
-            Spacer().frame(height: 20)
+        }
+        .pulseCard(padding: PulseTheme.spacingL)
+        .padding(.horizontal, PulseTheme.spacingM)
+        .padding(.top, PulseTheme.spacingS)
+        .onAppear {
+            guard !ringAnimated else { return }
+            ringAnimated = true
+            animateScoreCounter(to: score)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(localized: "Recovery Score \(score), \(headline)"))
+    }
+
+    private func statusChip(for score: Int) -> some View {
+        let label: String
+        let color: Color
+        switch score {
+        case 0..<40:  label = String(localized: "Poor");     color = PulseTheme.statusPoor
+        case 40..<70: label = String(localized: "Moderate"); color = PulseTheme.statusModerate
+        case 70..<85: label = String(localized: "Good");     color = PulseTheme.statusGood
+        default:      label = String(localized: "Peak");     color = PulseTheme.statusGood
+        }
+        return Text(label)
+            .font(.system(size: 12, weight: .medium))
+            .foregroundStyle(color)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .overlay(
+                RoundedRectangle(cornerRadius: PulseTheme.radiusXS, style: .continuous)
+                    .stroke(color, lineWidth: PulseTheme.hairline)
+            )
+    }
+
+    private func sevenDayScores(currentScore: Int) -> [Int] {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: .now)
+        let last7 = (0..<7).reversed().compactMap { offset -> Int? in
+            guard let d = cal.date(byAdding: .day, value: -offset, to: today) else { return nil }
+            if cal.isDate(d, inSameDayAs: today) { return currentScore }
+            return allSummaries.first { cal.isDate($0.date, inSameDayAs: d) }?.dailyScore
+        }
+        return last7
+    }
+
+    private func sevenDayBaseline() -> Int? {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: .now)
+        let prior6 = (1...6).compactMap { offset -> Int? in
+            guard let d = cal.date(byAdding: .day, value: -offset, to: today) else { return nil }
+            return allSummaries.first { cal.isDate($0.date, inSameDayAs: d) }?.dailyScore
+        }
+        guard !prior6.isEmpty else { return nil }
+        return prior6.reduce(0, +) / prior6.count
     }
 
     // MARK: - Oura Score Disc Row
@@ -325,7 +331,7 @@ struct DashboardView: View {
                 .buttonStyle(.plain)
             } else if let hr = currentHeartRate {
                 NavigationLink(destination: HeartRateDetailView()) {
-                    ouraScoreDisc(icon: "heart.fill", iconColor: Color(hex: "FF6B6B"), label: String(localized: "心率"), value: Int(hr), unit: "bpm")
+                    ouraScoreDisc(icon: "heart.fill", iconColor: PulseTheme.activityCoral, label: String(localized: "心率"), value: Int(hr), unit: "bpm")
                 }
                 .buttonStyle(.plain)
             }
@@ -343,39 +349,31 @@ struct DashboardView: View {
         .padding(.horizontal, 8)
     }
 
-    private func ouraScoreDisc(icon: String, iconColor: Color = .white, label: String, value: Int, unit: String = "") -> some View {
-        VStack(spacing: 5) {
-            Image(systemName: icon)
-                .font(.system(size: 12))
-                .foregroundStyle(iconColor.opacity(0.7))
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
+    private func ouraScoreDisc(icon: String, iconColor: Color = PulseTheme.textPrimary, label: String, value: Int, unit: String = "") -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .pulseEyebrow()
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
                 Text("\(value)")
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .font(PulseTheme.metricSFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
                 if !unit.isEmpty {
                     Text(unit)
-                        .font(.system(size: 10, weight: .medium, design: .monospaced))
-                        .foregroundStyle(.white.opacity(0.4))
+                        .font(PulseTheme.unitFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
                 }
             }
-            Text(label)
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .foregroundStyle(.white.opacity(0.35))
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 14)
-        .background(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color.white.opacity(0.05))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(PulseTheme.spacingM)
+        .background(PulseTheme.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
         )
         .padding(.horizontal, 4)
         .accessibilityLabel("\(label) \(value) \(unit)")
-    }
-
-    // MARK: - Wide Arc (Oura's sweeping 180° gauge)
-
-    private func wideArcTrack() -> some Shape {
-        Arc(startAngle: .degrees(180), endAngle: .degrees(360), clockwise: false)
     }
 
     // MARK: - Score Pills Row
@@ -390,7 +388,7 @@ struct DashboardView: View {
                 scorePill(icon: "flame.fill", label: "Activity", value: activity, color: PulseTheme.activityAccent)
             }
             if let readiness {
-                scorePill(icon: "heart.fill", label: "Ready", value: readiness, color: .white.opacity(0.7))
+                scorePill(icon: "heart.fill", label: "Ready", value: readiness, color: PulseTheme.textSecondary)
             }
         }
     }
@@ -402,13 +400,13 @@ struct DashboardView: View {
                 .foregroundStyle(color)
             Text("\(value)")
                 .font(.system(size: 12, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
         .background(
             Capsule()
-                .fill(Color.white.opacity(0.06))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     Capsule()
                         .stroke(color.opacity(0.3), lineWidth: 0.5)
@@ -461,9 +459,9 @@ struct DashboardView: View {
         let y = sin(radians) * radius
 
         return Circle()
-            .fill(.white)
+            .fill(PulseTheme.textPrimary)
             .frame(width: 8, height: 8)
-            .shadow(color: .white.opacity(0.6), radius: 4)
+            .shadow(color: PulseTheme.textSecondary, radius: 4)
             .offset(x: x, y: y)
     }
 
@@ -523,11 +521,11 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
                 // Mini bar
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
-                        Capsule().fill(Color.white.opacity(0.08)).frame(height: 3)
+                        Capsule().fill(PulseTheme.highlight).frame(height: 3)
                         Capsule()
                             .fill(LinearGradient(colors: [iconColor.opacity(0.6), iconColor], startPoint: .leading, endPoint: .trailing))
                             .frame(width: geo.size.width * CGFloat(score) / 100, height: 3)
@@ -536,7 +534,7 @@ struct DashboardView: View {
                 .frame(height: 3)
                 Text("\(score) / 100")
                     .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(PulseTheme.textTertiary)
             }
 
             Spacer()
@@ -551,16 +549,16 @@ struct DashboardView: View {
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.2))
+                .foregroundStyle(PulseTheme.textQuaternary)
         }
         .padding(.horizontal, PulseTheme.spacingM)
         .padding(.vertical, 14)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
         .accessibilityElement(children: .ignore)
@@ -579,8 +577,8 @@ struct DashboardView: View {
 
     private func ouraStatusColor(for score: Int) -> Color {
         switch score {
-        case 0..<40: return PulseTheme.activityAccent
-        case 40..<70: return Color(hex: "FFD700")
+        case 0..<40: return PulseTheme.statusPoor
+        case 40..<70: return PulseTheme.statusWarning
         default: return PulseTheme.statusGood
         }
     }
@@ -656,10 +654,7 @@ struct DashboardView: View {
             // Header
             HStack {
                 Text(String(localized: "Today's Insights"))
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .tracking(1.2)
-                    .foregroundStyle(PulseTheme.textTertiary)
-                    .textCase(.uppercase)
+                    .pulseEyebrow()
                 Spacer()
             }
 
@@ -679,23 +674,23 @@ struct DashboardView: View {
 
                     Text(text)
                         .font(.system(size: 14, weight: .regular, design: .rounded))
-                        .foregroundStyle(Color.white.opacity(0.75))
+                        .foregroundStyle(PulseTheme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                         .lineSpacing(3)
                 }
                 if idx < min(insights.prefix(3).count, 3) - 1 {
                     Divider()
-                        .background(Color.white.opacity(0.06))
+                        .background(PulseTheme.highlight)
                 }
             }
         }
         .padding(PulseTheme.spacingM)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
         .accessibilityElement(children: .combine)
@@ -773,7 +768,7 @@ struct DashboardView: View {
 
                     Text(String(localized: "Your energy today"))
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.35))
+                        .foregroundStyle(PulseTheme.textTertiary)
                 }
 
                 Spacer()
@@ -788,11 +783,11 @@ struct DashboardView: View {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     Capsule()
-                        .fill(Color.white.opacity(0.06))
+                        .fill(PulseTheme.highlight)
                         .frame(height: 4)
 
                     Capsule()
-                        .fill(Color.white.opacity(0.35))
+                        .fill(PulseTheme.textTertiary)
                         .frame(width: geo.size.width * CGFloat(level) / 100, height: 4)
                         .animation(.easeOut(duration: 0.3), value: level)
                 }
@@ -803,21 +798,21 @@ struct DashboardView: View {
             HStack(spacing: 8) {
                 Image(systemName: rec.icon)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(PulseTheme.textTertiary)
 
                 Text(rec.text)
                     .font(.system(size: 13, weight: .regular, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(PulseTheme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(18)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.03))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
         .accessibilityElement(children: .ignore)
@@ -839,24 +834,12 @@ struct DashboardView: View {
                 // Icon
                 ZStack {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: [Color(hex: "FF9F43").opacity(0.15), Color(hex: "FF6B6B").opacity(0.1)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
+                        .fill(PulseTheme.accentSoft)
                         .frame(width: 44, height: 44)
 
                     Image(systemName: "fork.knife")
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [Color(hex: "FF9F43"), Color(hex: "FF6B6B")],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
+                        .foregroundStyle(PulseTheme.accent)
                 }
 
                 // Text
@@ -869,11 +852,11 @@ struct DashboardView: View {
                         Text(String(localized: "Soon"))
                             .font(.system(size: 9, weight: .bold, design: .rounded))
                             .textCase(.uppercase)
-                            .foregroundStyle(Color(hex: "FF9F43"))
+                            .foregroundStyle(PulseTheme.accent)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(
-                                Capsule().fill(Color(hex: "FF9F43").opacity(0.12))
+                                Capsule().fill(PulseTheme.accentSoft)
                             )
                     }
 
@@ -891,10 +874,10 @@ struct DashboardView: View {
             .padding(PulseTheme.spacingM)
             .background(
                 RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .fill(Color.white.opacity(0.04))
+                    .fill(PulseTheme.highlight)
                     .overlay(
                         RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                            .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                            .stroke(PulseTheme.highlight, lineWidth: 0.5)
                     )
             )
         }
@@ -967,7 +950,7 @@ struct DashboardView: View {
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .shadow(color: PulseTheme.cardShadow, radius: 12, y: 4)
         )
         .overlay(
@@ -1081,63 +1064,44 @@ struct DashboardView: View {
     }
 
     private func metricTile(icon: String, label: String, value: String, unit: String, color: Color, trend: MetricStatus, animated: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Top row: icon circle + label
-            HStack(spacing: 0) {
-                ZStack {
-                    Circle()
-                        .fill(color.opacity(0.12))
-                        .frame(width: 28, height: 28)
-                    Image(systemName: icon)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(color)
-                        .symbolEffect(.pulse, options: .repeating, isActive: animated)
-                }
+        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+            // Eyebrow label
+            Text(label)
+                .pulseEyebrow()
 
-                Spacer()
-
-                // Navigate hint
-                Image(systemName: "arrow.up.right")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.25))
-            }
-
-            // Value
-            HStack(alignment: .firstTextBaseline, spacing: 3) {
+            // Metric value + unit
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(value)
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .font(PulseTheme.metricMFont)
                     .foregroundStyle(PulseTheme.textPrimary)
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
 
                 if !unit.isEmpty {
                     Text(unit)
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .font(PulseTheme.unitFont)
                         .foregroundStyle(PulseTheme.textTertiary)
-                        .offset(y: 1)
                 }
             }
             .opacity(value == "--" ? 0.4 : 1.0)
 
-            // Label + trend dot
-            HStack(spacing: 6) {
-                Text(label)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.4))
+            // Status dot
+            HStack(spacing: 4) {
                 Circle()
                     .fill(trend.color)
                     .frame(width: 6, height: 6)
+                Image(systemName: trend.arrow)
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(trend.color)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(18)
-        .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.04))
-        )
+        .padding(PulseTheme.spacingM)
+        .background(PulseTheme.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
@@ -1170,8 +1134,7 @@ struct DashboardView: View {
 
             VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
                 Text(String(localized: "Training Advice"))
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .pulseEyebrow()
 
                 Text(advice.label)
                     .font(PulseTheme.headlineFont)
@@ -1302,7 +1265,7 @@ struct DashboardView: View {
         .padding(PulseTheme.spacingL)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(format: String(localized: "Strain %d, Recovery %d"), strain, recovery))
@@ -1332,10 +1295,10 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(String(localized: "Health Age"))
                     .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.45))
+                    .foregroundStyle(PulseTheme.textTertiary)
                 Text(String(format: String(localized: "%d yrs"), ageInt))
                     .font(.system(size: 17, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
             }
 
             Spacer()
@@ -1358,9 +1321,9 @@ struct DashboardView: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .stroke(Color.white.opacity(0.06), lineWidth: 0.5))
+                    .stroke(PulseTheme.highlight, lineWidth: 0.5))
         )
         .accessibilityLabel(String(format: String(localized: "Health Age %d years"), ageInt))
     }
@@ -1413,14 +1376,14 @@ struct DashboardView: View {
 
                     Image(systemName: healthAgeExpanded ? "chevron.up" : "chevron.down")
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(.white.opacity(0.2))
+                        .foregroundStyle(PulseTheme.textQuaternary)
                         .padding(.leading, 8)
                 }
                 .padding(PulseTheme.spacingM)
 
                 // Expanded detail
                 if healthAgeExpanded {
-                    Divider().background(Color.white.opacity(0.06))
+                    Divider().background(PulseTheme.highlight)
                     VStack(spacing: PulseTheme.spacingS) {
                         ForEach(result.metrics, id: \.metric) { metric in
                             healthAgeMetricRow(metric)
@@ -1431,10 +1394,10 @@ struct DashboardView: View {
             }
             .background(
                 RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .fill(Color.white.opacity(0.04))
+                    .fill(PulseTheme.highlight)
                     .overlay(
                         RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                            .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                            .stroke(PulseTheme.highlight, lineWidth: 0.5)
                     )
             )
         }
@@ -1657,36 +1620,19 @@ struct DashboardView: View {
             )
     }
 
-    /// Loading state — same teal hero background so no black flash
     private var heroLoadingPlaceholder: some View {
-        ZStack {
-            LinearGradient(
-                stops: [
-                    .init(color: Color(hex: "0D4A5C"), location: 0),
-                    .init(color: Color(hex: "071E2E"), location: 0.7),
-                    .init(color: PulseTheme.background, location: 1.0),
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea(edges: .top)
-            VStack(spacing: 16) {
-                Spacer()
-                ProgressView()
-                    .tint(PulseTheme.accentTeal)
-                    .scaleEffect(1.3)
-                Text(String(localized: "Analysing your data…"))
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.4))
-                Spacer()
-            }
+        VStack(spacing: 16) {
+            Spacer()
+            ProgressView()
+                .tint(PulseTheme.accent)
+                .scaleEffect(1.3)
+            Text(String(localized: "Analysing your data…"))
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(PulseTheme.textTertiary)
+            Spacer()
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 370)
-        .overlay(alignment: .bottom) {
-            LinearGradient(colors: [Color.clear, PulseTheme.background], startPoint: .top, endPoint: .bottom)
-                .frame(height: 60)
-        }
+        .frame(height: 280)
     }
 
     private var hasGymLocation: Bool {

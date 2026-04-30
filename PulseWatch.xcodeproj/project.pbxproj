@@ -112,6 +112,8 @@
 		A848F19B9CF36C91EB57209B /* AchievementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30868A1A98666A631BA6A7F8 /* AchievementService.swift */; };
 		A85956F0D9882C577AB59B48 /* DailySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8941CCC61662258ECB2889D /* DailySummary.swift */; };
 		A9714CDFB1468C3DDE53F7F1 /* WeeklyReadinessChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F297F858023F9D4A0AE185 /* WeeklyReadinessChart.swift */; };
+		ABF4390E812DF3D7D30C109F /* PeriodSummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA3D9602451607CE03733E1 /* PeriodSummaryCard.swift */; };
+		AEBA55D9DC17F68EF78083F3 /* TrendCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485B7C8B6F1DEC440F13CBF2 /* TrendCard.swift */; };
 		B12CC726298E718F0B1E05E6 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C93FB5DBBD7437C3C0479A6 /* LocationManager.swift */; };
 		B5ED7024F9B238411C09D52F /* ManualWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72994B83705B3F92B49C10BA /* ManualWorkoutView.swift */; };
 		B8309BE064408AD0D10AA380 /* SleepBandCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CECB68A7A361DCA30DD99A4 /* SleepBandCard.swift */; };
@@ -237,6 +239,7 @@
 		1C93FB5DBBD7437C3C0479A6 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		1D094A4CFEA51DAFEC7F2C90 /* StreakService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakService.swift; sourceTree = "<group>"; };
 		1D8C1678E009592879DFAACC /* WorkoutHistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutHistoryEntry.swift; sourceTree = "<group>"; };
+		1DA3D9602451607CE03733E1 /* PeriodSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeriodSummaryCard.swift; sourceTree = "<group>"; };
 		1FC0FB323CC07A566343AF60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		235512B3D31E2D0BC98BB07D /* GoalProgressCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalProgressCard.swift; sourceTree = "<group>"; };
 		25E6B3D42FD5FB29F60F2106 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -260,6 +263,7 @@
 		40CF488F3812F04028B08EB9 /* PulseThemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseThemeTests.swift; sourceTree = "<group>"; };
 		423E402954856FBC1F53AFD4 /* HealthRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthRecord.swift; sourceTree = "<group>"; };
 		448F93975172D1B5FF12A497 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		485B7C8B6F1DEC440F13CBF2 /* TrendCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendCard.swift; sourceTree = "<group>"; };
 		4B2419844320303B3DCDD6FC /* StressDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StressDetailView.swift; sourceTree = "<group>"; };
 		4DB44D514AD89CA6515F60D4 /* AppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconView.swift; sourceTree = "<group>"; };
 		4DDBF626179003B208FE3E27 /* SubnetScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubnetScanner.swift; sourceTree = "<group>"; };
@@ -602,6 +606,7 @@
 				7862909C858BE840DA19BBF3 /* HealthSnapshotShareCard.swift */,
 				69127DAF601919E92EB120F6 /* InteractiveChartOverlay.swift */,
 				9B8AF5335F8330E76B283777 /* LaunchScreenView.swift */,
+				1DA3D9602451607CE03733E1 /* PeriodSummaryCard.swift */,
 				BCB4D5F51FF5C4DC019D609B /* QRScannerView.swift */,
 				D0603FF2A61E99D82B443535 /* ReadinessSparkline.swift */,
 				363204A6CBD545ECC1DD5485 /* RecoveryTimelineView.swift */,
@@ -609,6 +614,7 @@
 				2CECB68A7A361DCA30DD99A4 /* SleepBandCard.swift */,
 				CB91463719D9CE6B82F0FEBB /* StatusCard.swift */,
 				2A03A5045772C91FE0325CD0 /* SuggestionCard.swift */,
+				485B7C8B6F1DEC440F13CBF2 /* TrendCard.swift */,
 				DAF228A88E3AB4AF5B33FA5A /* VitalsGrid.swift */,
 				C3F297F858023F9D4A0AE185 /* WeeklyReadinessChart.swift */,
 				7AABD9FC7852F24503F7C8EB /* WeeklyTrendChartsView.swift */,
@@ -1023,6 +1029,7 @@
 				F080EB92336B15BFD06A027C /* OnboardingView.swift in Sources */,
 				214BA964157D8EAE4C312067 /* OpenClawBridge.swift in Sources */,
 				70C148C93D3F6A174302641C /* PDFReportService.swift in Sources */,
+				ABF4390E812DF3D7D30C109F /* PeriodSummaryCard.swift in Sources */,
 				12558EC881A90A97E59B9616 /* PulseTheme.swift in Sources */,
 				0A32C25CCAE11724202F6D11 /* PulseWatchApp.swift in Sources */,
 				FD2CAFAC652D279BEA76F3EF /* QRScannerView.swift in Sources */,
@@ -1047,6 +1054,7 @@
 				E3472A3FA9AE15A8E5F7D667 /* SuggestionCard.swift in Sources */,
 				D749651C64A3488B31717FCB /* TrainingCalendarView.swift in Sources */,
 				1C8BD31947E7BB68B5F027D7 /* TrainingChallenge.swift in Sources */,
+				AEBA55D9DC17F68EF78083F3 /* TrendCard.swift in Sources */,
 				02E94068995C4273F5D887B4 /* TriScoreService.swift in Sources */,
 				16C5EDE82DE8C8BDFC34F23A /* VitalsGrid.swift in Sources */,
 				2C424EF36C7A4E94C959B5D6 /* WatchConnectivityManager.swift in Sources */,

@@ -21,69 +21,92 @@ struct HistoryView: View {
     var body: some View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: PulseTheme.spacingM) {
-                    // 快捷入口
-                    shortcutButtons
-                        .staggered(index: 0)
+                VStack(spacing: 0) {
+                    // Custom header — eyebrow + title (mirrors Trends.jsx header)
+                    clinicalHeader
+                        .padding(.horizontal, 20)
+                        .padding(.top, 12)
+                        .padding(.bottom, 8)
 
-                    // 时间范围切换
-                    rangePicker
-                        .staggered(index: 0)
+                    // p-segmented control
+                    clinicalRangePicker
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 8)
 
-                    // 时段摘要对比
-                    periodSummaryCard
-                        .staggered(index: 1)
+                    // Card stack — matches JSX 16pt horizontal padding + 12pt gap
+                    VStack(spacing: 12) {
+                        // 时段摘要对比 — 3-up clinical
+                        clinicalPeriodSummary
+                            .staggered(index: 0)
 
-                    // 数据不足提示
-                    if dataInsufficient {
-                        insufficientDataHint
+                        // 数据不足提示
+                        if dataInsufficient {
+                            insufficientDataHint
+                                .staggered(index: 0)
+                        }
+
+                        // Readiness trend
+                        readinessTrendCard
                             .staggered(index: 1)
+
+                        // HRV trend
+                        hrvTrendCardClinical
+                            .staggered(index: 2)
+
+                        // Resting HR trend
+                        restingHRTrendCard
+                            .staggered(index: 3)
+
+                        // Sleep trend
+                        sleepTrendCardClinical
+                            .staggered(index: 4)
+
+                        // Stress trend (Pulse-only, not in JSX — kept for parity with v1 features)
+                        stressTrendCardClinical
+                            .staggered(index: 5)
+
+                        // Weekly Report teaser — clickable, matches JSX WeeklyReportTeaser
+                        weeklyReportTeaserCard
+                            .staggered(index: 6)
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
 
-                    // 评分趋势
-                    scoreTrendChart
-                        .staggered(index: 2)
+                    // "MORE FROM PULSE" eyebrow divider
+                    moreFromPulseDivider
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
+                        .padding(.bottom, 16)
 
-                    // 心率趋势
-                    heartRateTrendChart
-                        .staggered(index: 3)
+                    // Below-the-fold: Pulse-specific content
+                    VStack(spacing: PulseTheme.spacingM) {
+                        // 快捷入口
+                        shortcutButtons
+                            .staggered(index: 7)
 
-                    // HRV 趋势
-                    hrvTrendChart
-                        .staggered(index: 4)
+                        // 周报对比明细
+                        weeklyReportCard
+                            .staggered(index: 8)
 
-                    // 睡眠趋势
-                    sleepTrendChart
-                        .staggered(index: 5)
+                        // 查看完整周报按钮
+                        weeklyReportButton
+                            .staggered(index: 8)
 
-                    // 压力趋势
-                    stressTrendChart
-                        .staggered(index: 5)
+                        // 肌群恢复关联洞察
+                        MuscleInsightsCard(workouts: allWorkouts, summaries: allSummaries)
+                            .staggered(index: 9)
 
-                    // 周报对比
-                    weeklyReportCard
-                        .staggered(index: 6)
+                        // Analytics Pro 入口
+                        analyticsProSection
+                            .staggered(index: 10)
 
-                    // 查看完整周报按钮
-                    weeklyReportButton
-                        .staggered(index: 6)
-
-                    // 肌群恢复关联洞察
-                    MuscleInsightsCard(workouts: allWorkouts, summaries: allSummaries)
-                        .staggered(index: 7)
-
-                    // Analytics Pro 入口
-                    analyticsProSection
-                        .staggered(index: 8)
-
-                    Spacer(minLength: 60)
+                        Spacer(minLength: 60)
+                    }
+                    .padding(.horizontal, PulseTheme.spacingM)
                 }
-                .padding(.horizontal, PulseTheme.spacingM)
-                .padding(.top, PulseTheme.spacingS)
             }
             .background(PulseTheme.background)
-            .navigationTitle(String(localized: "Historical Trends"))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarHidden(true)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .sheet(isPresented: $showWeeklyReport) {
                 WeeklyReportView()
@@ -112,6 +135,344 @@ struct HistoryView: View {
                     chartAnimated = true
                 }
             }
+        }
+    }
+
+    // MARK: - Clinical header (mirrors Trends.jsx header)
+
+    private var clinicalHeader: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(rangeEyebrowText)
+                .pulseEyebrow()
+            Text(String(localized: "Trends"))
+                .font(.system(size: 32, weight: .bold, design: .rounded))
+                .foregroundStyle(PulseTheme.textPrimary)
+                .tracking(-0.5)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var rangeEyebrowText: String {
+        switch selectedRange {
+        case .week:    return String(localized: "Last 7 days")
+        case .month:   return String(localized: "Last 30 days")
+        case .quarter: return String(localized: "Last 90 days")
+        case .all:     return String(localized: "All time")
+        }
+    }
+
+    private var rangeComparisonSuffix: String {
+        switch selectedRange {
+        case .week:    return String(localized: "vs prev 7d")
+        case .month:   return String(localized: "vs prev 30d")
+        case .quarter: return String(localized: "vs prev 90d")
+        case .all:     return String(localized: "vs prev")
+        }
+    }
+
+    // MARK: - p-segmented range picker (clinical)
+
+    private var clinicalRangePicker: some View {
+        HStack(spacing: 2) {
+            ForEach(TimeRange.allCases, id: \.self) { range in
+                Button {
+                    withAnimation(.easeOut(duration: 0.18)) {
+                        selectedRange = range
+                    }
+                } label: {
+                    Text(range.rawValue)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(selectedRange == range ? PulseTheme.textPrimary : PulseTheme.textSecondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 6)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .fill(selectedRange == range ? PulseTheme.surface : Color.clear)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .stroke(selectedRange == range ? PulseTheme.border : Color.clear, lineWidth: PulseTheme.hairline)
+                                )
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(2)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                .fill(PulseTheme.divider)
+        )
+    }
+
+    // MARK: - Clinical period summary (3-up)
+
+    private var clinicalPeriodSummary: some View {
+        let current = filteredSummaries
+        let previous = previousPeriodSummaries
+
+        let curScore = avgScoreInt(current)
+        let prevScore = avgScoreInt(previous)
+        let curHRV = avgHRVDouble(current)
+        let prevHRV = avgHRVDouble(previous)
+        let curSleep = avgSleepHours(current)
+        let prevSleep = avgSleepHours(previous)
+
+        // Format values
+        let scoreVal = curScore.map { "\($0)" } ?? "—"
+        let hrvVal = curHRV.map { String(format: "%.0f", $0) } ?? "—"
+        let sleepVal = curSleep.map { String(format: "%.1fh", $0) } ?? "—"
+
+        // Format deltas — round + signed
+        let scoreDelta = formatIntDelta(cur: curScore.map(Double.init), prev: prevScore.map(Double.init))
+        let hrvDelta = formatIntDelta(cur: curHRV, prev: prevHRV)
+        let sleepDelta = formatHourDelta(cur: curSleep, prev: prevSleep)
+
+        // For sleep, "more sleep" might be considered good but we follow JSX where −0.2h is rendered tertiary (negative=textTertiary).
+        let scoreGood = (curScore ?? 0) >= (prevScore ?? 0)
+        let hrvGood = (curHRV ?? 0) >= (prevHRV ?? 0)
+        let sleepGood = (curSleep ?? 0) >= (prevSleep ?? 0)
+
+        return PeriodSummaryCard(cells: [
+            PeriodSummaryCell(label: String(localized: "Avg score"), value: scoreVal, delta: scoreDelta, isGoodDelta: scoreGood),
+            PeriodSummaryCell(label: String(localized: "Avg HRV"), value: hrvVal, delta: hrvDelta, isGoodDelta: hrvGood),
+            PeriodSummaryCell(label: String(localized: "Avg sleep"), value: sleepVal, delta: sleepDelta, isGoodDelta: sleepGood)
+        ])
+    }
+
+    // MARK: - Clinical TrendCards (5)
+
+    private var readinessTrendCard: some View {
+        let scores = filteredSummaries.compactMap(\.dailyScore).map(Double.init)
+        let prevScores = previousPeriodSummaries.compactMap(\.dailyScore).map(Double.init)
+        let curAvg = scores.isEmpty ? nil : scores.reduce(0, +) / Double(scores.count)
+        let prevAvg = prevScores.isEmpty ? nil : prevScores.reduce(0, +) / Double(prevScores.count)
+
+        return TrendCard(
+            label: String(localized: "Readiness"),
+            metric: curAvg.map { "\(Int($0))" } ?? "—",
+            unit: String(localized: "avg"),
+            delta: clinicalDeltaString(cur: curAvg, prev: prevAvg, format: "%.0f"),
+            deltaIsGood: clinicalDeltaIsGood(cur: curAvg, prev: prevAvg, higherIsBetter: true),
+            scores: scores
+        )
+    }
+
+    private var hrvTrendCardClinical: some View {
+        let scores = filteredSummaries.compactMap(\.averageHRV)
+        let prev = previousPeriodSummaries.compactMap(\.averageHRV)
+        let curAvg = scores.isEmpty ? nil : scores.reduce(0, +) / Double(scores.count)
+        let prevAvg = prev.isEmpty ? nil : prev.reduce(0, +) / Double(prev.count)
+
+        return TrendCard(
+            label: String(localized: "HRV"),
+            metric: curAvg.map { "\(Int($0))" } ?? "—",
+            unit: String(localized: "ms avg"),
+            delta: clinicalDeltaString(cur: curAvg, prev: prevAvg, format: "%.0f"),
+            deltaIsGood: clinicalDeltaIsGood(cur: curAvg, prev: prevAvg, higherIsBetter: true),
+            scores: scores
+        )
+    }
+
+    private var restingHRTrendCard: some View {
+        let scores = filteredSummaries.compactMap(\.restingHeartRate)
+        let prev = previousPeriodSummaries.compactMap(\.restingHeartRate)
+        let curAvg = scores.isEmpty ? nil : scores.reduce(0, +) / Double(scores.count)
+        let prevAvg = prev.isEmpty ? nil : prev.reduce(0, +) / Double(prev.count)
+
+        return TrendCard(
+            label: String(localized: "Resting HR"),
+            metric: curAvg.map { "\(Int($0))" } ?? "—",
+            unit: String(localized: "bpm avg"),
+            delta: clinicalDeltaString(cur: curAvg, prev: prevAvg, format: "%.0f"),
+            // Lower resting HR = better
+            deltaIsGood: clinicalDeltaIsGood(cur: curAvg, prev: prevAvg, higherIsBetter: false),
+            scores: scores
+        )
+    }
+
+    private var sleepTrendCardClinical: some View {
+        // Sleep displayed as "7h 18m" with hour-decimal trend chart underneath
+        let durationsMins = filteredSummaries.compactMap(\.sleepDurationMinutes).map(Double.init)
+        let prev = previousPeriodSummaries.compactMap(\.sleepDurationMinutes).map(Double.init)
+        let curAvgMin = durationsMins.isEmpty ? nil : durationsMins.reduce(0, +) / Double(durationsMins.count)
+        let prevAvgMin = prev.isEmpty ? nil : prev.reduce(0, +) / Double(prev.count)
+
+        let metricText: String = {
+            guard let m = curAvgMin else { return "—" }
+            let h = Int(m / 60)
+            let mins = Int(m.truncatingRemainder(dividingBy: 60))
+            return "\(h)h \(mins)m"
+        }()
+
+        // Delta in hours (signed)
+        let deltaText: String = {
+            guard let c = curAvgMin, let p = prevAvgMin, p > 0 else { return "—" }
+            let diffH = (c - p) / 60.0
+            if abs(diffH) < 0.05 { return String(localized: "no change \(rangeComparisonSuffix)") }
+            let sign = diffH > 0 ? "+" : "−"
+            return "\(sign)\(String(format: "%.1f", abs(diffH)))h \(rangeComparisonSuffix)"
+        }()
+
+        return TrendCard(
+            label: String(localized: "Sleep"),
+            metric: metricText,
+            unit: String(localized: "avg"),
+            delta: deltaText,
+            // More sleep = generally better; mirrors JSX where −0.2h was negative-good (tertiary)
+            deltaIsGood: clinicalDeltaIsGood(cur: curAvgMin, prev: prevAvgMin, higherIsBetter: true),
+            // Chart shows hours per day
+            scores: durationsMins.map { $0 / 60.0 }
+        )
+    }
+
+    private var stressTrendCardClinical: some View {
+        let scores = filteredSummaries.compactMap(\.stressScore).map(Double.init)
+        let prev = previousPeriodSummaries.compactMap(\.stressScore).map(Double.init)
+        let curAvg = scores.isEmpty ? nil : scores.reduce(0, +) / Double(scores.count)
+        let prevAvg = prev.isEmpty ? nil : prev.reduce(0, +) / Double(prev.count)
+
+        return TrendCard(
+            label: String(localized: "Stress"),
+            metric: curAvg.map { "\(Int($0))" } ?? "—",
+            unit: String(localized: "avg"),
+            delta: clinicalDeltaString(cur: curAvg, prev: prevAvg, format: "%.0f"),
+            // Lower stress = better
+            deltaIsGood: clinicalDeltaIsGood(cur: curAvg, prev: prevAvg, higherIsBetter: false),
+            scores: scores
+        )
+    }
+
+    // MARK: - Weekly Report Teaser (clinical)
+
+    private var weeklyReportTeaserCard: some View {
+        Button {
+            showWeeklyReport = true
+        } label: {
+            HStack(spacing: 14) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(String(localized: "Weekly Report"))
+                        .pulseEyebrow()
+                    Text(currentWeekRangeText)
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .foregroundStyle(PulseTheme.textPrimary)
+                        .padding(.top, 2)
+                    Text(currentWeekSummaryText)
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+            .pulseCard(padding: 20)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var currentWeekRangeText: String {
+        let cal = Calendar.current
+        let now = Date()
+        let weekday = cal.component(.weekday, from: now)
+        let daysSinceMonday = (weekday + 5) % 7
+        guard let monday = cal.date(byAdding: .day, value: -daysSinceMonday, to: cal.startOfDay(for: now)),
+              let sunday = cal.date(byAdding: .day, value: 6, to: monday) else {
+            return String(localized: "This week")
+        }
+        let f = DateFormatter()
+        f.locale = Locale.current
+        f.dateFormat = "MMM d"
+        return String(format: String(localized: "Week of %@ – %@"), f.string(from: monday), f.string(from: sunday))
+    }
+
+    private var currentWeekSummaryText: String {
+        let weekWorkouts = allWorkouts.filter {
+            let cal = Calendar.current
+            let now = Date()
+            let weekday = cal.component(.weekday, from: now)
+            let daysSinceMonday = (weekday + 5) % 7
+            guard let monday = cal.date(byAdding: .day, value: -daysSinceMonday, to: cal.startOfDay(for: now)) else { return false }
+            return $0.startDate >= monday
+        }
+        if weekWorkouts.isEmpty {
+            return String(localized: "No workouts logged yet this week")
+        }
+        let count = weekWorkouts.count
+        return String(format: String(localized: "%d workout(s) this week"), count)
+    }
+
+    // MARK: - "MORE FROM PULSE" divider
+
+    private var moreFromPulseDivider: some View {
+        HStack(spacing: 12) {
+            Rectangle()
+                .fill(PulseTheme.divider)
+                .frame(height: PulseTheme.hairline)
+                .frame(maxWidth: .infinity)
+            Text(String(localized: "More from Pulse"))
+                .pulseEyebrow()
+            Rectangle()
+                .fill(PulseTheme.divider)
+                .frame(height: PulseTheme.hairline)
+                .frame(maxWidth: .infinity)
+        }
+    }
+
+    // MARK: - Clinical aggregation helpers
+
+    private func avgScoreInt(_ summaries: [DailySummary]) -> Int? {
+        let scores = summaries.compactMap(\.dailyScore)
+        guard !scores.isEmpty else { return nil }
+        return scores.reduce(0, +) / scores.count
+    }
+
+    private func avgHRVDouble(_ summaries: [DailySummary]) -> Double? {
+        let vals = summaries.compactMap(\.averageHRV)
+        guard !vals.isEmpty else { return nil }
+        return vals.reduce(0, +) / Double(vals.count)
+    }
+
+    private func avgSleepHours(_ summaries: [DailySummary]) -> Double? {
+        let vals = summaries.compactMap(\.sleepDurationMinutes).map { Double($0) / 60.0 }
+        guard !vals.isEmpty else { return nil }
+        return vals.reduce(0, +) / Double(vals.count)
+    }
+
+    /// "+3" / "−6" / "—". Used by PeriodSummary cells (just the number).
+    private func formatIntDelta(cur: Double?, prev: Double?) -> String {
+        guard let c = cur, let p = prev else { return "—" }
+        let diff = c - p
+        if abs(diff) < 0.5 { return "0" }
+        let sign = diff > 0 ? "+" : "−"
+        return "\(sign)\(String(format: "%.0f", abs(diff)))"
+    }
+
+    /// "−0.2" / "+0.4" / "—". Used by sleep PeriodSummary cell.
+    private func formatHourDelta(cur: Double?, prev: Double?) -> String {
+        guard let c = cur, let p = prev else { return "—" }
+        let diff = c - p
+        if abs(diff) < 0.05 { return "0.0" }
+        let sign = diff > 0 ? "+" : "−"
+        return "\(sign)\(String(format: "%.1f", abs(diff)))"
+    }
+
+    /// "+3 vs prev 30d" / "−1 vs prev 30d" / "—". Used by TrendCard delta lines.
+    private func clinicalDeltaString(cur: Double?, prev: Double?, format: String) -> String {
+        guard let c = cur, let p = prev else { return "—" }
+        let diff = c - p
+        if abs(diff) < 0.5 { return String(localized: "no change \(rangeComparisonSuffix)") }
+        let sign = diff > 0 ? "+" : "−"
+        return "\(sign)\(String(format: format, abs(diff))) \(rangeComparisonSuffix)"
+    }
+
+    private func clinicalDeltaIsGood(cur: Double?, prev: Double?, higherIsBetter: Bool) -> Bool {
+        guard let c = cur, let p = prev else { return true }
+        let diff = c - p
+        if higherIsBetter {
+            return diff >= 0
+        } else {
+            return diff <= 0
         }
     }
 

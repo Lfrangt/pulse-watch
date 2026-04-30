@@ -1,6 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    " " : {
+
+    },
+    " %@" : {
+
+    },
     "--" : {
 
     },
@@ -569,6 +575,9 @@
           }
         }
       }
+    },
+    "7-Day Readiness" : {
+
     },
     "7h" : {
 
@@ -2683,7 +2692,6 @@
       }
     },
     "h" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -3418,6 +3426,9 @@
         }
       }
     },
+    "Last Night" : {
+
+    },
     "Last night \\(hoursNow)h\\(minsNow)m, well below your avg \\(hoursAvg)h\\(minsAvg)m" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3669,6 +3680,9 @@
           }
         }
       }
+    },
+    "m" : {
+
     },
     "Maintain your pace, focus on recovery and nutrition" : {
       "extractionState" : "stale",

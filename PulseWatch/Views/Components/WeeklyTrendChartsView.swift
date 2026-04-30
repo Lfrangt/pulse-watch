@@ -139,24 +139,20 @@ struct WeeklyTrendChartsView: View {
                 .frame(height: 40)
                 
                 // 占位符线条
-                Path { path in
-                    let points: [CGPoint] = [
-                        CGPoint(x: 0, y: 30),
-                        CGPoint(x: 40, y: 20),
-                        CGPoint(x: 80, y: 35),
-                        CGPoint(x: 120, y: 15),
-                        CGPoint(x: 160, y: 25)
-                    ]
-                    
-                    if let first = points.first {
-                        path.move(to: first)
-                        for point in points.dropFirst() {
-                            path.addLine(to: point)
+                GeometryReader { geo in
+                    let w = geo.size.width
+                    Path { path in
+                        let xs: [CGFloat] = [0, 0.25, 0.5, 0.75, 1.0]
+                        let ys: [CGFloat] = [30, 20, 35, 15, 25]
+                        path.move(to: CGPoint(x: xs[0] * w, y: ys[0]))
+                        for i in 1..<xs.count {
+                            path.addLine(to: CGPoint(x: xs[i] * w, y: ys[i]))
                         }
                     }
+                    .stroke(PulseTheme.border.opacity(0.4),
+                            style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
                 }
-                .stroke(PulseTheme.border.opacity(0.4), style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
-                .frame(width: 160, height: 40)
+                .frame(height: 40)
             }
         }
         .accessibilityHidden(true)

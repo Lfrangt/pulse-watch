@@ -50,6 +50,7 @@ struct DashboardView: View {
                     VStack(spacing: 0) {
                         // HEADER — date eyebrow + Today title (matches Today.jsx)
                         dashboardHeader
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 20)
                             .padding(.top, 12)
                             .padding(.bottom, 8)
@@ -214,11 +215,14 @@ struct DashboardView: View {
 
                             Spacer(minLength: 16)
                         }
+                        .frame(maxWidth: .infinity)
                         .padding(.horizontal, PulseTheme.spacingM)
                         .padding(.bottom, 8)
                     }
+                    .frame(maxWidth: .infinity)
                 }
                 .scrollContentBackground(.hidden)
+                .scrollIndicators(.hidden)
             } // end ZStack
             .toolbar(.hidden, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)

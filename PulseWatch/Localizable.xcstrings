@@ -38,6 +38,9 @@
         }
       }
     },
+    ":" : {
+
+    },
     ": " : {
       "extractionState" : "stale",
       "localizations" : {
@@ -132,16 +135,6 @@
     },
     "%@" : {
 
-    },
-    "%@ · %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ · %2$@"
-          }
-        }
-      }
     },
     "%@ / %@ %@" : {
       "localizations" : {
@@ -2289,6 +2282,7 @@
       }
     },
     "Exercise" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2779,6 +2773,7 @@
       }
     },
     "Heart Rate Zone" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4037,6 +4032,9 @@
         }
       }
     },
+    "No data yet" : {
+
+    },
     "No heart rate data — wear your Apple Watch" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4125,6 +4123,7 @@
       }
     },
     "No workout records yet" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4294,7 +4293,7 @@
         }
       }
     },
-    "OpenClaw AI 记录" : {
+    "openclaw pair --qr" : {
 
     },
     "Other" : {
@@ -5930,6 +5929,7 @@
       }
     },
     "Strength" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -6088,6 +6088,7 @@
       }
     },
     "This Week's Exercise" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -7084,9 +7085,6 @@
         }
       }
     },
-    "Your workout records will appear here.\nSupports running, cycling, swimming, strength training, and more." : {
-
-    },
     "Your workout records will appear here.\\nSupports running, cycling, swimming, strength training, and more." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -7097,6 +7095,9 @@
           }
         }
       }
+    },
+    "Z%@" : {
+
     },
     "无数据" : {
 

@@ -48,6 +48,12 @@ struct DashboardView: View {
 
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 0) {
+                        // HEADER — date eyebrow + Today title (matches Today.jsx)
+                        dashboardHeader
+                            .padding(.horizontal, 20)
+                            .padding(.top, 12)
+                            .padding(.bottom, 8)
+
                         // HERO — content-driven height, no GeometryReader
                         if let brief {
                             heroSection(score: brief.score, headline: brief.headline)
@@ -128,7 +134,21 @@ struct DashboardView: View {
                             WeeklyReadinessChart(scores: sevenDayAllScores())
                                 .staggered(index: 5)
 
-                            // ── Pulse-specific extras (below JSX layout) ──
+                            // ── Pulse-specific extras divider ─────────────
+
+                            HStack(spacing: 12) {
+                                Rectangle()
+                                    .fill(PulseTheme.border)
+                                    .frame(height: PulseTheme.hairline)
+                                Text(String(localized: "More from Pulse"))
+                                    .pulseEyebrow()
+                                    .layoutPriority(1)
+                                Rectangle()
+                                    .fill(PulseTheme.border)
+                                    .frame(height: PulseTheme.hairline)
+                            }
+                            .padding(.top, 8)
+                            .staggered(index: 6)
 
                             // Energy Bank
                             energyBankCard
@@ -230,6 +250,36 @@ struct DashboardView: View {
             }
         }
         .preferredColorScheme(.dark)
+    }
+
+    // MARK: - Dashboard Header — date eyebrow + Today title (Today.jsx pattern)
+
+    private var dashboardHeader: some View {
+        HStack(alignment: .bottom) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(headerDateString)
+                    .pulseEyebrow()
+                Text(String(localized: "Today"))
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundStyle(PulseTheme.textPrimary)
+            }
+            Spacer()
+            Button {
+                // Tap = scroll to top / refresh
+            } label: {
+                Image(systemName: "clock")
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundStyle(PulseTheme.textSecondary)
+                    .frame(width: 32, height: 32)
+            }
+        }
+    }
+
+    private var headerDateString: String {
+        let fmt = DateFormatter()
+        fmt.locale = .current
+        fmt.dateFormat = "EEE · MMM d"
+        return fmt.string(from: .now)
     }
 
     // MARK: - Hero Section — Clinical ReadinessCard

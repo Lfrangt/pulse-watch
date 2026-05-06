@@ -2129,7 +2129,7 @@ struct CandlestickChartView: View {
                     .padding(.horizontal, 12).padding(.vertical, 7)
                     .background(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(Color(hex: "1C2A30").opacity(0.97))
+                            .fill(PulseTheme.cardElevated.opacity(0.97))
                             .overlay(RoundedRectangle(cornerRadius: 10).stroke(color.opacity(0.3), lineWidth: 0.5))
                     )
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))

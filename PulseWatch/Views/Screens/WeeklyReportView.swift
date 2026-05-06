@@ -122,7 +122,7 @@ struct WeeklyReportView: View {
                     LinearGradient(
                         colors: [
                             PulseTheme.cardBackground,
-                            Color(hex: "1C1915"),
+                            PulseTheme.cardElevated,
                             PulseTheme.cardBackground
                         ],
                         startPoint: .topLeading,

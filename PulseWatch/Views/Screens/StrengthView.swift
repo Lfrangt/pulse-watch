@@ -126,7 +126,7 @@ struct StrengthView: View {
                         .foregroundStyle(PulseTheme.textPrimary)
                     Text(a.totalLevel.label)
                         .font(PulseTheme.captionFont)
-                        .foregroundStyle(Color(hex: a.totalLevel.color))
+                        .foregroundStyle(a.totalLevel.pulseColor)
                 }
                 Spacer()
                 ZStack {
@@ -135,7 +135,7 @@ struct StrengthView: View {
                         .frame(width: 64, height: 64)
                     Circle()
                         .trim(from: 0, to: CGFloat(a.totalScore) / 100)
-                        .stroke(Color(hex: a.totalLevel.color), style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                        .stroke(a.totalLevel.pulseColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
                         .frame(width: 64, height: 64)
                         .rotationEffect(.degrees(-90))
                     Text("\(a.totalScore)")
@@ -163,7 +163,7 @@ struct StrengthView: View {
     // MARK: - 单项评估卡片
 
     private func liftCard(_ lift: StrengthService.LiftAssessment) -> some View {
-        let color = Color(hex: lift.liftType.color)
+        let color = lift.liftType.pulseColor
 
         return HStack(spacing: PulseTheme.spacingM) {
             // Icon
@@ -202,10 +202,10 @@ struct StrengthView: View {
             // Level badge
             Text(lift.level.label)
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Color(hex: lift.level.color))
+                .foregroundStyle(lift.level.pulseColor)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
-                .background(Capsule().fill(Color(hex: lift.level.color).opacity(0.15)))
+                .background(Capsule().fill(lift.level.pulseColor.opacity(0.15)))
         }
         .pulseCard()
     }
@@ -223,7 +223,7 @@ struct StrengthView: View {
 
     private func trendChart(type: StrengthService.LiftType, records: [StrengthRecord]) -> some View {
         let sorted = records.sorted { $0.date < $1.date }
-        let color = Color(hex: type.color)
+        let color = type.pulseColor
 
         return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
             HStack {
@@ -362,7 +362,7 @@ struct StrengthView: View {
             guard let closest = typeRecords.min(by: {
                 abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date))
             }), abs(closest.date.timeIntervalSince(date)) < threshold else { return nil }
-            return (type.label, closest.estimated1RM, Color(hex: type.color))
+            return (type.label, closest.estimated1RM, type.pulseColor)
         }
 
         return VStack(alignment: .leading, spacing: 4) {
@@ -421,7 +421,7 @@ struct StrengthView: View {
                 let type = StrengthService.LiftType(rawValue: record.liftType) ?? .squat
                 HStack(spacing: PulseTheme.spacingS) {
                     Circle()
-                        .fill(Color(hex: type.color))
+                        .fill(type.pulseColor)
                         .frame(width: 8, height: 8)
                     Text(type.label)
                         .font(PulseTheme.captionFont)
@@ -498,7 +498,7 @@ struct StrengthView: View {
                 ForEach(StrengthService.LiftType.allCases) { type in
                     let recs = filteredRecords.filter { $0.liftType == type.rawValue }
                         .sorted { $0.date < $1.date }
-                    let color = Color(hex: type.color)
+                    let color = type.pulseColor
 
                     ForEach(recs, id: \.id) { r in
                         LineMark(
@@ -768,7 +768,7 @@ private struct ShareStrengthCard: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
-            LinearGradient(colors: [Color(hex: "1A1715"), Color(hex: "0D0C0B")],
+            LinearGradient(colors: [PulseTheme.cardElevated, PulseTheme.background],
                            startPoint: .top, endPoint: .bottom)
         )
     }
@@ -818,7 +818,7 @@ struct AddStrengthRecordView: View {
                                     VStack(spacing: 4) {
                                         Image(systemName: type.icon)
                                             .font(.system(size: 20))
-                                            .foregroundStyle(selected ? Color(hex: type.color) : PulseTheme.textTertiary)
+                                            .foregroundStyle(selected ? type.pulseColor : PulseTheme.textTertiary)
                                         Text(type.label)
                                             .font(.system(size: 10, weight: selected ? .semibold : .regular))
                                             .foregroundStyle(selected ? PulseTheme.textPrimary : PulseTheme.textTertiary)
@@ -826,8 +826,8 @@ struct AddStrengthRecordView: View {
                                     }
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 12)
-                                    .background(RoundedRectangle(cornerRadius: 10).fill(selected ? Color(hex: type.color).opacity(0.12) : PulseTheme.surface))
-                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(selected ? Color(hex: type.color).opacity(0.5) : .clear, lineWidth: 1))
+                                    .background(RoundedRectangle(cornerRadius: 10).fill(selected ? type.pulseColor.opacity(0.12) : PulseTheme.surface))
+                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(selected ? type.pulseColor.opacity(0.5) : .clear, lineWidth: 1))
                                 }
                                 .buttonStyle(.plain)
                             }

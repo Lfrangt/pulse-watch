@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import SwiftUI
 import os
 
 /// Strain Score — 当日运动负荷评分 (0-100)
@@ -119,6 +120,14 @@ final class StrainScoreService {
             case .light:    return "7FC75C"  // green
             case .moderate: return "D4A056"  // yellow
             case .intense:  return "C75C5C"  // red
+            }
+        }
+
+        var pulseColor: Color {
+            switch self {
+            case .light:    return PulseTheme.statusGood
+            case .moderate: return PulseTheme.statusWarning
+            case .intense:  return PulseTheme.statusPoor
             }
         }
     }

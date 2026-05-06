@@ -553,7 +553,7 @@ struct SleepDetailView: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color(hex: "111111"))
+                .fill(PulseTheme.surface)
         )
     }
 

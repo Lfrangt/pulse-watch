@@ -243,7 +243,7 @@ struct StressDetailView: View {
 
     private func stressBarColor(_ value: Double) -> Color {
         switch value {
-        case 0..<35:  return Color(hex: "00F5FF")  // teal — low stress
+        case 0..<35:  return PulseTheme.accent  // teal — low stress
         case 35..<65: return PulseTheme.statusWarning   // amber — moderate
         default:      return PulseTheme.activityCoral   // coral — high
         }
@@ -403,7 +403,7 @@ struct StressDetailView: View {
                     let threshold = (4 - i) * 20 // 80, 60, 40, 20, 0
                     RoundedRectangle(cornerRadius: 3, style: .continuous)
                         .fill(stressScore <= threshold
-                              ? Color(hex: "00F5FF").opacity(0.8)
+                              ? PulseTheme.accent.opacity(0.8)
                               : PulseTheme.highlight)
                         .frame(height: 8)
                 }
@@ -466,7 +466,7 @@ enum StressLevel {
 
     var color: Color {
         switch self {
-        case .low:      return Color(hex: "00F5FF")  // teal
+        case .low:      return PulseTheme.accent  // teal
         case .moderate: return PulseTheme.statusWarning   // amber
         case .high:     return PulseTheme.activityCoral   // coral
         }

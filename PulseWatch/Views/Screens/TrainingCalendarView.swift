@@ -36,13 +36,13 @@ struct TrainingCalendarView: View {
     private func categoryColor(for category: String) -> Color {
         switch category.lowercased() {
         case "chest", "shoulders":
-            return Color(hex: "5B8DEF")   // Push — 蓝色
+            return PulseTheme.trendBlue   // Push — 蓝色
         case "back":
             return PulseTheme.statusGood   // Pull — 绿色
         case "legs":
             return PulseTheme.statusModerate   // 腿 — 琥珀色
         case "arms":
-            return Color(hex: "C9A96E")   // 手臂 — 金色
+            return PulseTheme.statusWarning   // 手臂 — 金色
         case "cardio":
             return PulseTheme.activityAccent   // 有氧 — 红色
         default:
@@ -305,7 +305,7 @@ struct TrainingCalendarView: View {
             // HK 训练（Apple Watch 同步）
             ForEach(Array(hkWorkouts.enumerated()), id: \.offset) { _, hk in
                 HStack(spacing: PulseTheme.spacingS) {
-                    Circle().fill(Color(hex: WorkoutActivityHelper.colorHex(for: hk.activityType))).frame(width: 8, height: 8)
+                    Circle().fill(WorkoutActivityHelper.pulseColor(for: hk.activityType)).frame(width: 8, height: 8)
                     VStack(alignment: .leading, spacing: 2) {
                         HStack {
                             Text(hk.activityName)
@@ -554,10 +554,10 @@ struct TrainingCalendarView: View {
 
     private var categoryLegend: some View {
         let legends: [(String, String, Color)] = [
-            (String(localized: "Push (Chest/Shoulders)"), "chest",   Color(hex: "5B8DEF")),
+            (String(localized: "Push (Chest/Shoulders)"), "chest",   PulseTheme.trendBlue),
             (String(localized: "Pull (Back)"),   "back",    PulseTheme.statusGood),
             (String(localized: "Legs"),        "legs",    PulseTheme.statusModerate),
-            (String(localized: "Arms"),      "arms",    Color(hex: "C9A96E")),
+            (String(localized: "Arms"),      "arms",    PulseTheme.statusWarning),
             (String(localized: "Cardio"),      "cardio",  PulseTheme.activityAccent),
         ]
 
@@ -649,7 +649,7 @@ struct TrainingCalendarView: View {
     /// 主要训练颜色（优先手动记录，其次 HK）
     private func primaryCategoryColor(_ date: Date) -> Color {
         if let w = workoutsForDate(date)?.first { return categoryColor(for: w.category) }
-        if let hk = hkWorkoutsForDate(date).first { return Color(hex: WorkoutActivityHelper.colorHex(for: hk.activityType)) }
+        if let hk = hkWorkoutsForDate(date).first { return WorkoutActivityHelper.pulseColor(for: hk.activityType) }
         return .clear
     }
 

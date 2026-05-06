@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import SwiftUI
 import os
 
 /// 力量三大项评估服务
@@ -41,6 +42,14 @@ final class StrengthService {
             }
         }
 
+        var pulseColor: Color {
+            switch self {
+            case .squat:    return PulseTheme.activityCoral
+            case .bench:    return PulseTheme.trendBlue
+            case .deadlift: return PulseTheme.statusGood
+            }
+        }
+
         /// 体重倍数阈值 [beginner, intermediate, advanced, elite]
         var thresholds: [Double] {
             switch self {
@@ -77,6 +86,15 @@ final class StrengthService {
             case .intermediate: return "D4A056"
             case .advanced:     return "5CC7C1"
             case .elite:        return "C75CC7"
+            }
+        }
+
+        var pulseColor: Color {
+            switch self {
+            case .beginner:     return PulseTheme.textTertiary
+            case .intermediate: return PulseTheme.statusWarning
+            case .advanced:     return PulseTheme.accent
+            case .elite:        return PulseTheme.statusModerate
             }
         }
     }

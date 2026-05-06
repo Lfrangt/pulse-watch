@@ -244,19 +244,19 @@ struct ShareCardView: View {
                 HStack(spacing: 8) {
                     Text(zone.name)
                         .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: zone.colorHex))
+                        .foregroundStyle(zone.pulseColor)
                         .frame(width: 52, alignment: .leading)
 
                     // Bar
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
                             RoundedRectangle(cornerRadius: 3, style: .continuous)
-                                .fill(Color(hex: zone.colorHex).opacity(0.12))
+                                .fill(zone.pulseColor.opacity(0.12))
 
                             RoundedRectangle(cornerRadius: 3, style: .continuous)
                                 .fill(
                                     LinearGradient(
-                                        colors: [Color(hex: zone.colorHex).opacity(0.7), Color(hex: zone.colorHex)],
+                                        colors: [zone.pulseColor.opacity(0.7), zone.pulseColor],
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
@@ -369,6 +369,16 @@ struct ShareHRZone: Identifiable {
     let name: String
     let percentage: Double      // 0.0 ~ 1.0
     let colorHex: String
+
+    var pulseColor: Color {
+        let lc = name.lowercased()
+        if lc.contains("warm") || lc.contains("热身") { return PulseTheme.zoneRest }
+        if lc.contains("fat") || lc.contains("燃")   { return PulseTheme.zoneFatBurn }
+        if lc.contains("cardio") || lc.contains("心肺") { return PulseTheme.zoneCardio }
+        if lc.contains("anaerob") || lc.contains("无氧") { return PulseTheme.zonePeak }
+        if lc.contains("peak") || lc.contains("峰")  { return PulseTheme.zoneMax }
+        return PulseTheme.accent
+    }
 }
 
 // MARK: - ShareSheet

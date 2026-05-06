@@ -18,7 +18,7 @@ struct GymArrivalView: View {
                 ZStack {
                     // Pulsing ring
                     Circle()
-                        .stroke(Color(hex: "C9A96E").opacity(0.3), lineWidth: 2)
+                        .stroke(PulseTheme.accent.opacity(0.3), lineWidth: 2)
                         .frame(width: 56, height: 56)
                         .scaleEffect(pulseScale)
                         .opacity(2.0 - Double(pulseScale))
@@ -26,30 +26,30 @@ struct GymArrivalView: View {
                     // Icon
                     ZStack {
                         Circle()
-                            .fill(Color(hex: "C9A96E").opacity(0.15))
+                            .fill(PulseTheme.accent.opacity(0.15))
                             .frame(width: 48, height: 48)
 
                         Image(systemName: "dumbbell.fill")
                             .font(.system(size: 22))
-                            .foregroundStyle(Color(hex: "C9A96E"))
+                            .foregroundStyle(PulseTheme.accent)
                     }
                     .scaleEffect(appeared ? 1.0 : 0.5)
                 }
 
                 Text("At the Gym?")
                     .font(.system(size: 17, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Color(hex: "F5F0EB"))
+                    .foregroundStyle(PulseTheme.textPrimary)
 
                 if let plan = trainingPlan {
                     VStack(spacing: 4) {
                         Text("Suggested: \(localizedGroup(plan.targetMuscleGroup))")
                             .font(.system(size: 13, weight: .medium, design: .rounded))
-                            .foregroundStyle(Color(hex: "9A938C"))
+                            .foregroundStyle(PulseTheme.textSecondary)
 
                         if !plan.reason.isEmpty {
                             Text(plan.reason)
                                 .font(.system(size: 11, design: .rounded))
-                                .foregroundStyle(Color(hex: "5C564F"))
+                                .foregroundStyle(PulseTheme.textTertiary)
                         }
                     }
                 }
@@ -58,13 +58,13 @@ struct GymArrivalView: View {
                 Button(action: onStartWorkout) {
                     Label("Start Workout", systemImage: "play.fill")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Color(hex: "0D0C0B"))
+                        .foregroundStyle(PulseTheme.background)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 11)
                         .background(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(Color(hex: "C9A96E"))
-                                .shadow(color: Color(hex: "C9A96E").opacity(0.3), radius: 8, y: 3)
+                                .fill(PulseTheme.accent)
+                                .shadow(color: PulseTheme.accent.opacity(0.3), radius: 8, y: 3)
                         )
                 }
                 .buttonStyle(.plain)
@@ -72,13 +72,13 @@ struct GymArrivalView: View {
                 // Dismiss
                 Button("Skip", action: onDismiss)
                     .font(.system(size: 13, design: .rounded))
-                    .foregroundStyle(Color(hex: "5C564F"))
+                    .foregroundStyle(PulseTheme.textTertiary)
             }
             .padding(.horizontal, 8)
         }
         .containerBackground(
             LinearGradient(
-                colors: [Color(hex: "0D0C0B"), Color(hex: "111010")],
+                colors: [PulseTheme.background, PulseTheme.surface],
                 startPoint: .top,
                 endPoint: .bottom
             ),

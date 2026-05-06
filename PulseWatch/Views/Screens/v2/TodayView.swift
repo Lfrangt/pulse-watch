@@ -248,18 +248,18 @@ struct TodayView: View {
                     GridItem(.flexible(), spacing: DS.Spacing.s),
                     GridItem(.flexible(), spacing: DS.Spacing.s)
                 ], spacing: DS.Spacing.s) {
-                    NavigationLink { HRVDetailView() } label: { hrvVitalChip }
+                    NavigationLink { VitalDetailView(metric: .hrv) } label: { hrvVitalChip }
                         .buttonStyle(.plain)
-                    NavigationLink { HeartRateDetailView() } label: { rhrVitalChip }
+                    NavigationLink { VitalDetailView(metric: .restingHR) } label: { rhrVitalChip }
                         .buttonStyle(.plain)
-                    NavigationLink { SleepDetailView() } label: { sleepVitalChip }
+                    NavigationLink { VitalDetailView(metric: .sleep) } label: { sleepVitalChip }
                         .buttonStyle(.plain)
-                    NavigationLink { BloodOxygenDetailView() } label: { spo2VitalChip }
+                    NavigationLink { VitalDetailView(metric: .bloodOxygen) } label: { spo2VitalChip }
                         .buttonStyle(.plain)
-                    NavigationLink { StressDetailView() } label: { stressVitalChip }
+                    NavigationLink { VitalDetailView(metric: .stress) } label: { stressVitalChip }
                         .buttonStyle(.plain)
                     if let result = healthAgeResult {
-                        NavigationLink { HealthAgeDetailView(result: result) } label: { healthAgeVitalChip(result: result) }
+                        NavigationLink { VitalDetailView(metric: .healthAge) } label: { healthAgeVitalChip(result: result) }
                             .buttonStyle(.plain)
                     } else {
                         healthAgeVitalChipEmpty
@@ -373,7 +373,7 @@ struct TodayView: View {
                     title: String(localized: "Sleep"),
                     sub: sleepDurationLabel
                 )
-                NavigationLink { SleepDetailView() } label: {
+                NavigationLink { VitalDetailView(metric: .sleep) } label: {
                     Card {
                         SleepBand(stages: sleepStages)
                     }
@@ -623,7 +623,7 @@ struct TodayView: View {
                     title: String(localized: "Health Age"),
                     sub: result.difference < 0 ? String(localized: "Younger") : (result.difference > 0 ? String(localized: "Older") : String(localized: "On par"))
                 )
-                NavigationLink { HealthAgeDetailView(result: result) } label: {
+                NavigationLink { VitalDetailView(metric: .healthAge) } label: {
                     Card {
                         HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.m) {
                             BigNum(value: "\(Int(result.healthAge.rounded()))", unit: "y", size: .display3)

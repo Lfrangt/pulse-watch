@@ -54,15 +54,15 @@
 | `WorkoutView.swift`               | REPLACE | S03 Workout Live  | pending |
 | `ManualWorkoutView.swift`         | REPLACE | S03 manual variant| pending |
 | `WorkoutShareScreen.swift`        | KEEP-MIGRATE | re-tokenize  | pending |
-| `HRVDetailView.swift`             | REPLACE | S02 metric=hrv    | pending |
-| `HeartRateDetailView.swift`       | REPLACE | S02 metric=hr     | pending |
-| `BloodOxygenDetailView.swift`     | REPLACE | S02 metric=spo2   | pending |
-| `SleepDetailView.swift`           | REPLACE | S02 metric=sleep  | pending |
-| `StepsDetailView.swift`           | REPLACE | S02 metric=steps  | pending |
-| `StressDetailView.swift`          | REPLACE | S02 metric=stress | pending |
-| `CaloriesDetailView.swift`        | REPLACE | S02 metric=cal    | pending |
-| `HealthAgeDetailView.swift`       | REPLACE | S02 metric=age    | pending |
-| `ActivityDetailView.swift`        | REPLACE | S02 metric=activity | pending |
+| `HRVDetailView.swift`             | REPLACE | S02 metric=hrv    | done    |
+| `HeartRateDetailView.swift`       | REPLACE | S02 metric=hr     | done    |
+| `BloodOxygenDetailView.swift`     | REPLACE | S02 metric=spo2   | done    |
+| `SleepDetailView.swift`           | REPLACE | S02 metric=sleep  | done    |
+| `StepsDetailView.swift`           | REPLACE | S02 metric=steps  | done    |
+| `StressDetailView.swift`          | REPLACE | S02 metric=stress | done    |
+| `CaloriesDetailView.swift`        | REPLACE | S02 metric=cal    | done    |
+| `HealthAgeDetailView.swift`       | REPLACE | S02 metric=age    | done    |
+| `ActivityDetailView.swift`        | REPLACE | S02 metric=activity | done    |
 | `AnomalyTimelineView.swift`       | REPLACE | folded into S07   | pending |
 | `CorrelationInsightsView.swift`   | REPLACE | folded into S07   | pending |
 | `WeeklyReportView.swift`          | REPLACE | S07 Reports week  | pending |

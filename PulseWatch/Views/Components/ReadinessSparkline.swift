@@ -30,7 +30,7 @@ struct ReadinessSparkline: View {
                         if let score {
                             let normalized = CGFloat(score) / CGFloat(maxScore)
                             RoundedRectangle(cornerRadius: 1, style: .continuous)
-                                .fill(isToday ? PulseTheme.textPrimary : PulseTheme.textTertiary.opacity(0.55))
+                                .fill(isToday ? PulseTheme.accent : PulseTheme.textTertiary.opacity(0.45))
                                 .frame(width: barWidth,
                                        height: max(geo.size.height * normalized, 2))
                         } else {

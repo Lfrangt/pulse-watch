@@ -42,12 +42,12 @@ enum PulseTheme {
     // MARK: - Surfaces
 
     static let background       = dyn(light: 0xF7F6F2, dark: 0x000000)
-    static let surface          = dyn(light: 0xFFFFFF, dark: 0x0E0E0E)
-    static let surface2         = dyn(light: 0xFFFFFF, dark: 0x141414)
-    static let cardBackground   = dyn(light: 0xFFFFFF, dark: 0x0E0E0E)
-    static let cardElevated     = dyn(light: 0xFBFAF7, dark: 0x1A1A1A)
-    static let border           = dyn(light: 0xE8E5DC, dark: 0x1F1F1F)
-    static let borderStrong     = dyn(light: 0xD4CFC0, dark: 0x2A2A2A)
+    static let surface          = dyn(light: 0xFFFFFF, dark: 0x141414)
+    static let surface2         = dyn(light: 0xFFFFFF, dark: 0x1A1A1A)
+    static let cardBackground   = dyn(light: 0xFFFFFF, dark: 0x141414)
+    static let cardElevated     = dyn(light: 0xFBFAF7, dark: 0x1F1F1F)
+    static let border           = dyn(light: 0xE8E5DC, dark: 0x2A2A2A)
+    static let borderStrong     = dyn(light: 0xD4CFC0, dark: 0x363636)
     static let divider          = dyn(light: 0xEFECE4, dark: 0x171717)
     static let highlight        = dynA(light: (0x000000, 0.03), dark: (0xFFFFFF, 0.04))
     static let warmHighlight    = highlight
@@ -74,16 +74,20 @@ enum PulseTheme {
     static let statusPoor       = dyn(light: 0xC43E28, dark: 0xF07A5F)
     static let statusModerate   = dyn(light: 0x6B5FC2, dark: 0xA898F5)
 
-    // MARK: - Extended semantic
+    // MARK: - Legacy multi-color aliases — all retired to single accent
+    // v2 Clinical: data is decoration; semantic distinction lives in icon + label,
+    // not color. These tokens stay name-compatible so views compile, but every
+    // chart / metric / decorative usage now resolves to the single teal accent.
+    // Real status semantics (statusGood / Warning / Poor / Moderate) stay below.
 
-    static let sleepViolet      = dyn(light: 0x6B5FC2, dark: 0xA898F5)
-    static let activityCoral    = dyn(light: 0xD14343, dark: 0xF07A82)
+    static let sleepViolet      = accent
+    static let activityCoral    = accent
     static let positiveGreen    = statusGood
-    static let sleepAccent      = sleepViolet
-    static let activityAccent   = activityCoral
-    static let trendBlue        = dyn(light: 0x4A6FA5, dark: 0x6FA8DC)
+    static let sleepAccent      = accent
+    static let activityAccent   = accent
+    static let trendBlue        = accent
     static let hrvBlue          = accent
-    static let chartPurple      = sleepViolet
+    static let chartPurple      = accent
 
     // MARK: - Heart Rate Zones (Z1 → Z5)
 

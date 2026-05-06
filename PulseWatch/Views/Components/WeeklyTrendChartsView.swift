@@ -171,7 +171,7 @@ struct WeeklyTrendChartsView: View {
             chartHeader(
                 icon: "heart.fill",
                 title: String(localized: "静息心率"),
-                color: PulseTheme.activityAccent,
+                color: PulseTheme.accent,
                 summary: hrData.isEmpty ? nil : restingHRSummary(hrData)
             )
 
@@ -184,12 +184,12 @@ struct WeeklyTrendChartsView: View {
                             x: .value("Date", item.0),
                             y: .value("Resting HR", item.1)
                         )
-                        .foregroundStyle(PulseTheme.activityAccent)
+                        .foregroundStyle(PulseTheme.accent)
                         .interpolationMethod(.catmullRom)
                         .lineStyle(StrokeStyle(lineWidth: 2))
                         .symbol {
                             Circle()
-                                .fill(PulseTheme.activityAccent)
+                                .fill(PulseTheme.accent)
                                 .frame(width: 4, height: 4)
                         }
 
@@ -199,7 +199,7 @@ struct WeeklyTrendChartsView: View {
                         )
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [PulseTheme.activityAccent.opacity(0.15), PulseTheme.activityAccent.opacity(0.02)],
+                                colors: [PulseTheme.accent.opacity(0.15), PulseTheme.accent.opacity(0.02)],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
@@ -425,7 +425,7 @@ struct WeeklyTrendChartsView: View {
             chartHeader(
                 icon: "moon.fill",
                 title: String(localized: "Sleep"),
-                color: PulseTheme.sleepAccent,
+                color: PulseTheme.accent,
                 summary: sleepData.isEmpty ? nil : sleepSummary(sleepData)
             )
 
@@ -439,7 +439,7 @@ struct WeeklyTrendChartsView: View {
                             x: .value("Date", item.0, unit: .day),
                             y: .value("Total", item.1)
                         )
-                        .foregroundStyle(PulseTheme.sleepAccent.opacity(0.3))
+                        .foregroundStyle(PulseTheme.accent.opacity(0.3))
                         .cornerRadius(4)
 
                         // 深睡 — 深色柱叠加
@@ -447,7 +447,7 @@ struct WeeklyTrendChartsView: View {
                             x: .value("Date", item.0, unit: .day),
                             y: .value("Deep", item.2)
                         )
-                        .foregroundStyle(PulseTheme.sleepAccent)
+                        .foregroundStyle(PulseTheme.accent)
                         .cornerRadius(4)
                     }
 

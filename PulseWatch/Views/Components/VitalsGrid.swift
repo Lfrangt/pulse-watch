@@ -27,7 +27,7 @@ struct VitalsGrid: View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 VitalCell(
-                    label: "HRV",
+                    label: String(localized: "HRV"),
                     value: formatHRV(hrv),
                     unit: "ms",
                     delta: hrvDelta,
@@ -37,7 +37,7 @@ struct VitalsGrid: View {
                 .frame(maxWidth: .infinity)
 
                 VitalCell(
-                    label: "Resting HR",
+                    label: String(localized: "Resting HR"),
                     value: formatBPM(restingHR),
                     unit: "bpm",
                     delta: restingHRDelta,
@@ -54,7 +54,7 @@ struct VitalsGrid: View {
 
             HStack(spacing: 0) {
                 VitalCell(
-                    label: "SpO₂",
+                    label: String(localized: "SpO₂"),
                     value: formatSpO2(spo2),
                     unit: "%",
                     delta: spo2Delta,
@@ -64,7 +64,7 @@ struct VitalsGrid: View {
                 .frame(maxWidth: .infinity)
 
                 VitalCell(
-                    label: "Steps",
+                    label: String(localized: "Steps"),
                     value: formatSteps(steps),
                     unit: "",
                     delta: stepsDelta,

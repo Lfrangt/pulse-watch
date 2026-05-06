@@ -15,7 +15,7 @@ settings:
     SWIFT_VERSION: "5.9"
     MARKETING_VERSION: "1.0.0"
     CURRENT_PROJECT_VERSION: 1
-    DEVELOPMENT_TEAM: WRH82M8L9U
+    DEVELOPMENT_TEAM: AV25N53237
     CODE_SIGN_STYLE: Automatic
 
 targets:
@@ -38,7 +38,9 @@ targets:
         NSHealthShareUsageDescription: "Pulse needs to read your health data to generate daily readiness scores and training insights. All data is stored on your device only."
         NSHealthUpdateUsageDescription: "Pulse needs to record your workout data to track your training progress."
         NSLocationAlwaysAndWhenInUseUsageDescription: "Pulse uses your location to detect when you arrive at the gym and suggest training plans. Location data is never uploaded to any server."
+        NSLocalNetworkUsageDescription: "Pulse scans your local network to discover and connect to your OpenClaw AI coach gateway."
         NSLocationWhenInUseUsageDescription: "Pulse uses your location to save your frequent places for smart reminders."
+        TELEMETRYDECK_APP_ID: "$(TELEMETRYDECK_APP_ID)"
         ITSAppUsesNonExemptEncryption: false
         LSRequiresIPhoneOS: true
         UILaunchScreen:
@@ -51,16 +53,19 @@ targets:
           - location
           - processing
           - fetch
-          - health-update
-          - remote-notification
         BGTaskSchedulerPermittedIdentifiers:
           - com.abundra.pulse.morning-brief-refresh
+          - com.abundra.pulse.health-sync
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse
         CODE_SIGN_ENTITLEMENTS: PulseWatch/App/PulseWatch.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TARGETED_DEVICE_FAMILY: "1"
+        TELEMETRYDECK_APP_ID: "$(TELEMETRYDECK_APP_ID)"
+      configs:
+        Release:
+          TELEMETRYDECK_APP_ID: B5A8E4A0-1F2C-4D3E-9A7B-6C8D0E2F1A3B
     dependencies:
       - target: PulseWatchWidget
       - package: TelemetryDeck
@@ -71,7 +76,7 @@ targets:
         com.apple.developer.healthkit: true
         com.apple.developer.healthkit.access: []
         com.apple.security.application-groups:
-          - group.com.abundra.pulse.shared
+          - group.com.hallidai.pulse.shared
 
   PulseWatchWidget:
     type: app-extension
@@ -97,7 +102,7 @@ targets:
       path: PulseWatchWidget/PulseWatchWidget.entitlements
       properties:
         com.apple.security.application-groups:
-          - group.com.abundra.pulse.shared
+          - group.com.hallidai.pulse.shared
 
   PulseWatchWatch:
     type: application
@@ -124,7 +129,23 @@ targets:
         com.apple.developer.healthkit: true
         com.apple.developer.healthkit.access: []
         com.apple.security.application-groups:
-          - group.com.abundra.pulse.shared
+          - group.com.hallidai.pulse.shared
+
+  PulseWatchTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: PulseWatchTests
+    info:
+      path: PulseWatchTests/Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.abundra.pulse.tests
+        TARGETED_DEVICE_FAMILY: "1"
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: 1
+    dependencies:
+      - target: PulseWatch
 
   PulseWatchUITests:
     type: bundle.ui-testing
@@ -174,12 +195,14 @@ schemes:
     build:
       targets:
         PulseWatch: all
+        PulseWatchTests: [test]
         PulseWatchUITests: [test]
     run:
       config: Debug
     test:
       config: Debug
       targets:
+        - PulseWatchTests
         - PulseWatchUITests
 
   PulseWatchWatch:

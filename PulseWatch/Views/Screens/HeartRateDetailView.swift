@@ -4,7 +4,7 @@ import Charts
 /// Heart Rate deep-dive — current, resting, zones context
 struct HeartRateDetailView: View {
 
-    @State private var healthManager = HealthKitManager.shared
+    private let healthManager = HealthKitManager.shared
     @State private var chartAppeared = false
 
     private var current: Double { healthManager.latestHeartRate ?? 0 }
@@ -39,15 +39,15 @@ struct HeartRateDetailView: View {
     }
 
     private let zones: [Zone] = [
-        .init(name: "Zone 1", range: "50–60%", color: Color(hex: "4FC3F7"),
+        .init(name: "Zone 1", range: "50–60%", color: PulseTheme.zoneRest,
               description: String(localized: "Recovery — walking, gentle movement")),
-        .init(name: "Zone 2", range: "60–70%", color: Color(hex: "81C784"),
+        .init(name: "Zone 2", range: "60–70%", color: PulseTheme.zoneFatBurn,
               description: String(localized: "Base endurance — conversational pace")),
-        .init(name: "Zone 3", range: "70–80%", color: Color(hex: "FFD54F"),
+        .init(name: "Zone 3", range: "70–80%", color: PulseTheme.zoneCardio,
               description: String(localized: "Aerobic — moderate effort, slightly breathless")),
-        .init(name: "Zone 4", range: "80–90%", color: Color(hex: "FF8A65"),
+        .init(name: "Zone 4", range: "80–90%", color: PulseTheme.zonePeak,
               description: String(localized: "Threshold — hard effort, building lactate")),
-        .init(name: "Zone 5", range: "90–100%", color: Color(hex: "EF5350"),
+        .init(name: "Zone 5", range: "90–100%", color: PulseTheme.zoneMax,
               description: String(localized: "Max effort — short sprints only")),
     ]
 
@@ -83,7 +83,7 @@ struct HeartRateDetailView: View {
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text("\(Int(current))")
                         .font(.system(size: 56, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PulseTheme.textPrimary)
                     Text("bpm")
                         .font(.system(size: 18, weight: .medium, design: .rounded))
                         .foregroundStyle(PulseTheme.textTertiary)
@@ -122,8 +122,7 @@ struct HeartRateDetailView: View {
     private var zonesCard: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             Text(String(localized: "Heart Rate Zones"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
 
             ForEach(zones) { zone in
                 HStack(spacing: 12) {
@@ -136,7 +135,7 @@ struct HeartRateDetailView: View {
                         HStack(spacing: 6) {
                             Text(zone.name)
                                 .font(.system(size: 13, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(PulseTheme.textPrimary)
                             Text(zone.range)
                                 .font(.system(size: 11, weight: .medium, design: .rounded))
                                 .foregroundStyle(zone.color)
@@ -153,7 +152,7 @@ struct HeartRateDetailView: View {
                 .padding(.vertical, 4)
 
                 if zone.id != zones.last?.id {
-                    Divider().background(Color.white.opacity(0.06))
+                    Divider().background(PulseTheme.highlight)
                 }
             }
         }
@@ -166,17 +165,16 @@ struct HeartRateDetailView: View {
     private var tipsCard: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             Text(String(localized: "Training Tips"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
 
             tipRow(icon: "bed.double.fill", color: PulseTheme.sleepAccent,
                    title: String(localized: "Lower resting HR = better fitness"),
                    body: String(localized: "Elite athletes often have resting HR of 40-50 bpm. Consistent Zone 2 training reduces it over months."))
-            Divider().background(Color.white.opacity(0.06))
+            Divider().background(PulseTheme.highlight)
             tipRow(icon: "chart.line.uptrend.xyaxis", color: PulseTheme.accentTeal,
                    title: String(localized: "80/20 rule"),
                    body: String(localized: "80% of training should be Zone 1-2 (easy). Only 20% hard. Most people train too hard too often."))
-            Divider().background(Color.white.opacity(0.06))
+            Divider().background(PulseTheme.highlight)
             tipRow(icon: "heart.fill", color: PulseTheme.statusPoor,
                    title: String(localized: "Max HR = 220 − age (rough guide)"),
                    body: String(localized: "Use this to estimate your zone thresholds. A lab lactate test gives the most accurate result."))
@@ -207,10 +205,10 @@ struct HeartRateDetailView: View {
 
     private var cardBg: some View {
         RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-            .fill(Color.white.opacity(0.04))
+            .fill(PulseTheme.highlight)
             .overlay(
                 RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                    .stroke(PulseTheme.highlight, lineWidth: 0.5)
             )
     }
 }

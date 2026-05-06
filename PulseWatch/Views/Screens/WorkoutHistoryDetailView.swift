@@ -89,7 +89,7 @@ struct WorkoutHistoryDetailView: View {
     // MARK: - 头部卡片
 
     private var headerCard: some View {
-        let color = Color(hex: entry.activityColor)
+        let color = entry.pulseActivityColor
 
         return VStack(spacing: PulseTheme.spacingM) {
             // 大图标
@@ -119,7 +119,7 @@ struct WorkoutHistoryDetailView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "cpu.fill")
                             .font(.system(size: 10))
-                        Text("由 OpenClaw AI 记录")
+                        Text(String(localized: "Recorded by OpenClaw AI"))
                             .font(.system(size: 11, weight: .medium, design: .rounded))
                     }
                     .foregroundStyle(PulseTheme.accentTeal)
@@ -267,17 +267,17 @@ struct WorkoutHistoryDetailView: View {
                 HStack(spacing: PulseTheme.spacingS) {
                     Text(zone.name)
                         .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: zone.colorHex))
+                        .foregroundStyle(zone.pulseColor)
                         .frame(width: 60, alignment: .leading)
 
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
                             RoundedRectangle(cornerRadius: 4, style: .continuous)
-                                .fill(Color(hex: zone.colorHex).opacity(0.15))
+                                .fill(zone.pulseColor.opacity(0.15))
                                 .frame(maxWidth: .infinity)
 
                             RoundedRectangle(cornerRadius: 4, style: .continuous)
-                                .fill(Color(hex: zone.colorHex))
+                                .fill(zone.pulseColor)
                                 .frame(width: max(4, geo.size.width * zone.percentage))
                         }
                     }
@@ -470,7 +470,8 @@ struct WorkoutHistoryDetailView: View {
     private func formatFullDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale.current
-        formatter.dateFormat = "yyyy年M月d日 EEEE HH:mm"
+        formatter.dateStyle = .full
+        formatter.timeStyle = .short
         return formatter.string(from: date)
     }
 

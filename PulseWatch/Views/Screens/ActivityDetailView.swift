@@ -1,12 +1,16 @@
 import SwiftUI
 import Charts
+import os
 
 /// Activity deep-dive — steps, calories, exercise minutes, move goals
 struct ActivityDetailView: View {
 
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "ActivityDetailView")
+
     @State private var healthManager = HealthKitManager.shared
     @State private var chartAppeared = false
     @State private var weekSteps: [(date: Date, steps: Int)] = []
+    @State private var selectedStepDate: Date?
 
     private var steps: Int { healthManager.todaySteps }
     private var calories: Double { healthManager.todayActiveCalories }
@@ -65,8 +69,7 @@ struct ActivityDetailView: View {
         VStack(spacing: PulseTheme.spacingM) {
             HStack {
                 Text(String(localized: "Today's Goals"))
-                    .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .pulseEyebrow()
                 Spacer()
                 Text(activityStatus)
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -123,7 +126,7 @@ struct ActivityDetailView: View {
                         .foregroundStyle(color)
                     Text(value)
                         .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(PulseTheme.textPrimary)
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
                 }
@@ -146,18 +149,25 @@ struct ActivityDetailView: View {
     private var stepsChartCard: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             Text(String(localized: "Steps · 7 Days"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
 
-            Chart(weekSteps, id: \.date) { s in
-                BarMark(
-                    x: .value("Day", s.date, unit: .day),
-                    y: .value("Steps", chartAppeared ? s.steps : 0)
-                )
-                .foregroundStyle(
-                    s.steps >= stepsGoal ? PulseTheme.accentTeal : Color.white.opacity(0.25)
-                )
-                .cornerRadius(4)
+            Chart {
+                ForEach(weekSteps, id: \.date) { s in
+                    BarMark(
+                        x: .value("Day", s.date, unit: .day),
+                        y: .value("Steps", chartAppeared ? s.steps : 0)
+                    )
+                    .foregroundStyle(
+                        s.steps >= stepsGoal ? PulseTheme.accentTeal : PulseTheme.highlight
+                    )
+                    .cornerRadius(4)
+                }
+
+                if let selectedStepDate {
+                    RuleMark(x: .value("Selected", selectedStepDate, unit: .day))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                        .lineStyle(StrokeStyle(lineWidth: 0.5))
+                }
             }
             .chartXAxis {
                 AxisMarks(values: .stride(by: .day)) { val in
@@ -173,7 +183,7 @@ struct ActivityDetailView: View {
             .chartYAxis {
                 AxisMarks { val in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
-                        .foregroundStyle(Color.white.opacity(0.06))
+                        .foregroundStyle(PulseTheme.highlight)
                     AxisValueLabel {
                         if let v = val.as(Int.self) {
                             Text(v >= 1000 ? "\(v/1000)k" : "\(v)")
@@ -194,6 +204,54 @@ struct ActivityDetailView: View {
                         }
                         .stroke(PulseTheme.accentTeal.opacity(0.4), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
                     }
+                }
+            }
+            // Selection gesture
+            .chartOverlay { proxy in
+                GeometryReader { geo in
+                    Rectangle().fill(.clear).contentShape(Rectangle())
+                        .gesture(DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                let plotFrame = geo[proxy.plotAreaFrame]
+                                let x = value.location.x - plotFrame.origin.x
+                                guard let date: Date = proxy.value(atX: x) else { return }
+                                let cal = Calendar.current
+                                if let nearest = weekSteps.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+                                    let newDate = cal.startOfDay(for: nearest.date)
+                                    if selectedStepDate != newDate {
+                                        selectedStepDate = newDate
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    }
+                                }
+                            }
+                            .onEnded { _ in
+                                withAnimation(.easeOut(duration: 0.25)) { selectedStepDate = nil }
+                            }
+                        )
+                }
+            }
+            .overlay(alignment: .top) {
+                if let sel = selectedStepDate,
+                   let point = weekSteps.first(where: { Calendar.current.isDate($0.date, inSameDayAs: sel) }) {
+                    let dateFmt: DateFormatter = {
+                        let f = DateFormatter()
+                        f.locale = Locale.current
+                        f.dateFormat = "EEEE, M/d"
+                        return f
+                    }()
+                    VStack(spacing: 2) {
+                        Text(NumberFormatter.localizedString(from: NSNumber(value: point.steps), number: .decimal) + " steps")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text(dateFmt.string(from: point.date))
+                            .font(.system(size: 11, design: .rounded))
+                            .foregroundStyle(PulseTheme.textSecondary)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .transition(.scale.combined(with: .opacity))
+                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedStepDate)
                 }
             }
             .frame(height: 150)
@@ -236,7 +294,7 @@ struct ActivityDetailView: View {
             HStack(alignment: .firstTextBaseline, spacing: 3) {
                 Text(value)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
                 if !unit.isEmpty {
@@ -253,36 +311,33 @@ struct ActivityDetailView: View {
         .padding(PulseTheme.spacingM)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
     }
 
     private var cardBg: some View {
         RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-            .fill(Color.white.opacity(0.04))
+            .fill(PulseTheme.highlight)
             .overlay(
                 RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                    .stroke(PulseTheme.highlight, lineWidth: 0.5)
             )
     }
 
     private func loadData() async {
-        let calendar = Calendar.current
-        var results: [(date: Date, steps: Int)] = []
-        for daysAgo in (0..<7).reversed() {
-            if let date = calendar.date(byAdding: .day, value: -daysAgo, to: .now) {
-                if daysAgo == 0 {
-                    results.append((date: date, steps: steps))
-                } else {
-                    results.append((date: date, steps: Int.random(in: 3000...13000)))
-                }
+        // Fetch 7-day daily steps from HealthKit (auto-deduplicated across sources)
+        do {
+            let hkData = try await healthManager.fetchWeeklySteps()
+            if !hkData.isEmpty {
+                weekSteps = hkData.map { (date: $0.date, steps: Int($0.value)) }
             }
+        } catch {
+            logger.error("Steps weekly fetch error: \(error)")
         }
-        weekSteps = results
         withAnimation(.easeInOut(duration: 0.6).delay(0.3)) {
             chartAppeared = true
         }

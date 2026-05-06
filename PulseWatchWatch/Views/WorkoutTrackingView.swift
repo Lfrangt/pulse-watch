@@ -1,83 +1,79 @@
 import SwiftUI
 import HealthKit
 
-/// 训练进行中 + 训练结束摘要界面
+/// Active workout + post-workout summary — Clinical Live + Result screens.
+/// Layout per WatchApp.jsx WatchLive: eyebrow type · set, big HR metric,
+/// 5-tick zone bar, hairline divider, ELAPSED / KCAL bottom row.
+/// Per WatchApp.jsx WatchResult: SESSION COMPLETE eyebrow, title,
+/// 2x2 hairline-divided metric grid, full-width Done button.
 struct WorkoutTrackingView: View {
 
     @State private var manager = WorkoutSessionManager.shared
     @State private var appeared = false
 
-    /// 初始运动类型（从外部传入）
     var initialType: WorkoutSessionManager.WorkoutType = .strength
-
-    /// 关闭回调
     var onClose: () -> Void = {}
 
     var body: some View {
         Group {
             switch manager.state {
             case .idle:
-                // 选择运动类型
-                workoutPicker
+                pickerScreen
             case .running, .paused:
-                activeWorkoutView
+                liveScreen
             case .ended:
-                workoutSummary
+                summaryScreen
             }
         }
-        .containerBackground(
-            LinearGradient(
-                colors: [Color(hex: "0D0C0B"), Color(hex: "111010")],
-                startPoint: .top,
-                endPoint: .bottom
-            ),
-            for: .navigation
-        )
+        .containerBackground(PulseTheme.background, for: .navigation)
         .onAppear {
             if manager.state == .idle {
-                // 自动开始
                 manager.startWorkout(type: initialType)
             }
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+            withAnimation(.easeOut(duration: 0.35)) {
                 appeared = true
             }
         }
     }
 
-    // MARK: - 运动类型选择器
+    // MARK: - Picker (only shown if state stays idle)
 
-    private var workoutPicker: some View {
+    private var pickerScreen: some View {
         ScrollView {
-            VStack(spacing: 10) {
-                Text("Choose Workout")
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Choose")
+                    .font(.system(size: 8, weight: .semibold))
+                    .tracking(0.8)
+                    .textCase(.uppercase)
+                    .foregroundStyle(PulseTheme.textTertiary)
+                    .padding(.bottom, 4)
 
                 ForEach(WorkoutSessionManager.WorkoutType.allCases, id: \.label) { type in
                     Button {
                         manager.startWorkout(type: type)
                     } label: {
-                        HStack(spacing: 8) {
+                        HStack(spacing: 10) {
                             Image(systemName: type.icon)
-                                .font(.system(size: 16))
-                                .foregroundStyle(PulseTheme.accent)
-                                .frame(width: 28)
-
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(PulseTheme.textSecondary)
+                                .frame(width: 18)
                             Text(type.label)
-                                .font(.system(size: 14, weight: .medium, design: .rounded))
+                                .font(.system(size: 12, weight: .medium))
                                 .foregroundStyle(PulseTheme.textPrimary)
-
                             Spacer()
-
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 10))
+                            Image(systemName: "arrow.right")
+                                .font(.system(size: 10, weight: .medium))
                                 .foregroundStyle(PulseTheme.textTertiary)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 10)
                         .background(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 .fill(PulseTheme.cardBackground)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
                         )
                     }
                     .buttonStyle(.plain)
@@ -87,296 +83,294 @@ struct WorkoutTrackingView: View {
         }
     }
 
-    // MARK: - 训练进行中
+    // MARK: - Live
 
-    private var activeWorkoutView: some View {
+    private var liveScreen: some View {
         ScrollView {
-            VStack(spacing: 8) {
-                // 运动类型图标
-                workoutTypeIcon
-                    .opacity(appeared ? 1 : 0)
+            VStack(alignment: .leading, spacing: 0) {
 
-                // 大号心率
-                heartRateDisplay
-                    .opacity(appeared ? 1 : 0)
+                // Eyebrow row: TYPE · SET / TIMER
+                liveTopStrip
+                    .padding(.top, 2)
 
-                // 心率区间指示条
-                heartRateZoneBar
-                    .opacity(appeared ? 1 : 0)
+                // Hero HR + zone label
+                liveHero
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 6)
 
-                // 时长 + 卡路里
-                metricsRow
-                    .opacity(appeared ? 1 : 0)
+                // 5-tick zone bar
+                zoneTicks
+                    .padding(.top, 10)
+                    .padding(.horizontal, 2)
 
-                // 控制按钮
+                Spacer(minLength: 14)
+
+                // Hairline + ELAPSED / KCAL
+                liveBottomStats
+                    .padding(.top, 10)
+                    .overlay(alignment: .top) {
+                        Rectangle()
+                            .fill(PulseTheme.border)
+                            .frame(height: PulseTheme.hairline)
+                    }
+
+                // Controls (pause / stop)
                 controlButtons
-                    .padding(.top, 4)
+                    .padding(.top, 10)
             }
             .padding(.horizontal, 4)
         }
     }
 
-    // MARK: - 运动类型图标
-
-    private var workoutTypeIcon: some View {
-        let type = WorkoutSessionManager.WorkoutType.allCases.first {
-            $0.activityType == manager.currentWorkoutType
-        } ?? .strength
-
-        return HStack(spacing: 4) {
-            Image(systemName: type.icon)
-                .font(.system(size: 11))
-                .foregroundStyle(PulseTheme.accent)
-            Text(type.label)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(PulseTheme.textSecondary)
+    private var liveTopStrip: some View {
+        HStack {
+            Text(currentTypeLabel)
+                .font(.system(size: 9, weight: .semibold))
+                .tracking(1.4)
+                .textCase(.uppercase)
+                .foregroundStyle(PulseTheme.textTertiary)
+            Spacer()
+            Text(stateLabel)
+                .font(.system(size: 9, weight: .regular, design: .monospaced))
+                .foregroundStyle(PulseTheme.textTertiary)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 3)
-        .background(
-            Capsule().fill(PulseTheme.cardBackground)
-        )
     }
 
-    // MARK: - 心率显示
-
-    private var heartRateDisplay: some View {
+    private var liveHero: some View {
         VStack(spacing: 2) {
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Image(systemName: "heart.fill")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color(hex: manager.currentZone.color))
-                    .symbolEffect(.pulse, options: .repeating, isActive: manager.state == .running)
+            Text(manager.heartRate > 0 ? "\(Int(manager.heartRate))" : "--")
+                .font(.system(size: 52, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .kerning(-1.4)
+                .foregroundStyle(PulseTheme.textPrimary)
+                .contentTransition(.numericText())
+                .animation(.easeOut(duration: 0.25), value: Int(manager.heartRate))
 
-                Text(manager.heartRate > 0 ? "\(Int(manager.heartRate))" : "--")
-                    .font(.system(size: 42, weight: .bold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
-                    .contentTransition(.numericText())
-                    .animation(.spring(response: 0.3), value: Int(manager.heartRate))
-
-                Text("bpm")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
-            }
-
-            Text(manager.currentZone.label)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundStyle(Color(hex: manager.currentZone.color))
+            Text("BPM · \(manager.currentZone.label.uppercased())")
+                .font(.system(size: 9, weight: .medium))
+                .tracking(1.0)
+                .foregroundStyle(PulseTheme.textTertiary)
         }
     }
 
-    // MARK: - 心率区间指示条
-
-    private var heartRateZoneBar: some View {
-        GeometryReader { geo in
-            HStack(spacing: 2) {
-                ForEach(WorkoutSessionManager.HeartRateZone.allCases, id: \.rawValue) { zone in
-                    let isActive = zone == manager.currentZone
-                    RoundedRectangle(cornerRadius: 3)
-                        .fill(Color(hex: zone.color).opacity(isActive ? 1.0 : 0.25))
-                        .frame(height: isActive ? 8 : 5)
-                        .animation(.spring(response: 0.3), value: manager.currentZone)
-                }
+    private var zoneTicks: some View {
+        HStack(spacing: 3) {
+            ForEach(WorkoutSessionManager.HeartRateZone.allCases, id: \.rawValue) { zone in
+                let isActive = zone == manager.currentZone
+                RoundedRectangle(cornerRadius: 2, style: .continuous)
+                    .fill(isActive ? PulseTheme.textPrimary : PulseTheme.border)
+                    .frame(height: 4)
             }
         }
-        .frame(height: 8)
-        .padding(.horizontal, 8)
     }
 
-    // MARK: - 时长 & 卡路里
-
-    private var metricsRow: some View {
-        HStack(spacing: 16) {
-            // 时长
-            VStack(spacing: 1) {
-                Text(manager.formattedDuration)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
-                    .monospacedDigit()
-                Text("Duration")
-                    .font(.system(size: 10, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
-            }
-
-            // 分隔
-            Rectangle()
-                .fill(PulseTheme.border)
-                .frame(width: 1, height: 24)
-
-            // 卡路里
-            VStack(spacing: 1) {
-                Text(manager.formattedCalories)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
-                    .contentTransition(.numericText())
-                Text("kcal")
-                    .font(.system(size: 10, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
-            }
+    private var liveBottomStats: some View {
+        HStack(alignment: .firstTextBaseline) {
+            statBlock(label: "ELAPSED", value: manager.formattedDuration, alignment: .leading)
+            Spacer()
+            statBlock(label: "KCAL", value: manager.formattedCalories, alignment: .trailing)
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(PulseTheme.cardBackground)
-        )
     }
 
-    // MARK: - 控制按钮
+    private func statBlock(label: String, value: String, alignment: HorizontalAlignment) -> some View {
+        VStack(alignment: alignment, spacing: 2) {
+            Text(label)
+                .font(.system(size: 8, weight: .semibold))
+                .tracking(1.0)
+                .foregroundStyle(PulseTheme.textTertiary)
+            Text(value)
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(PulseTheme.textPrimary)
+        }
+    }
+
+    // MARK: - Controls
 
     private var controlButtons: some View {
-        HStack(spacing: 12) {
-            // 暂停/恢复
+        HStack(spacing: 10) {
             Button {
                 manager.togglePause()
             } label: {
                 Image(systemName: manager.state == .paused ? "play.fill" : "pause.fill")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(PulseTheme.textPrimary)
-                    .frame(width: 48, height: 48)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
                     .background(
-                        Circle().fill(PulseTheme.cardElevated)
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(PulseTheme.cardBackground)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
                     )
             }
             .buttonStyle(.plain)
 
-            // 结束
             Button {
                 manager.endWorkout()
             } label: {
                 Image(systemName: "stop.fill")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Color(hex: "0D0C0B"))
-                    .frame(width: 48, height: 48)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(PulseTheme.background)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
                     .background(
-                        Circle().fill(PulseTheme.activityAccent)
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(PulseTheme.textPrimary)
                     )
             }
             .buttonStyle(.plain)
         }
     }
 
-    // MARK: - 训练结束摘要
+    // MARK: - Summary (Result)
 
-    private var workoutSummary: some View {
+    private var summaryScreen: some View {
         ScrollView {
-            VStack(spacing: 12) {
-                // 标题
-                VStack(spacing: 4) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 28))
-                        .foregroundStyle(PulseTheme.statusGood)
+            VStack(alignment: .leading, spacing: 0) {
 
-                    Text("Workout Complete")
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
-                }
+                // Eyebrow + title
+                Text("Session complete")
+                    .font(.system(size: 9, weight: .semibold))
+                    .tracking(2.0)
+                    .textCase(.uppercase)
+                    .foregroundStyle(PulseTheme.textTertiary)
+                    .padding(.top, 2)
 
-                // 统计数据
+                Text(currentTypeLabel)
+                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .foregroundStyle(PulseTheme.textPrimary)
+                    .padding(.top, 4)
+
+                // 2x2 grid hemmed by hairline rules top + bottom
                 summaryGrid
+                    .padding(.top, 12)
+                    .overlay(alignment: .top) {
+                        Rectangle()
+                            .fill(PulseTheme.border)
+                            .frame(height: PulseTheme.hairline)
+                    }
+                    .overlay(alignment: .bottom) {
+                        Rectangle()
+                            .fill(PulseTheme.border)
+                            .frame(height: PulseTheme.hairline)
+                    }
+                    .padding(.bottom, 12)
 
-                // 心率区间分布
+                // Zone distribution
                 zoneDistribution
+                    .padding(.top, 4)
 
-                // 保存按钮
+                Spacer(minLength: 14)
+
+                // Done button — full-width inverted
                 Button {
                     manager.reset()
                     onClose()
                 } label: {
                     Text("Done")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Color(hex: "0D0C0B"))
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(PulseTheme.background)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 11)
                         .background(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(PulseTheme.accent)
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .fill(PulseTheme.textPrimary)
                         )
                 }
                 .buttonStyle(.plain)
+                .padding(.top, 14)
             }
             .padding(.horizontal, 4)
         }
     }
 
-    // MARK: - 摘要网格
-
     private var summaryGrid: some View {
-        let items: [(String, String, String, String)] = [
-            ("clock", String(localized: "Duration"), manager.formattedDuration, "9A938C"),
-            ("heart.fill", String(localized: "Avg Heart Rate"), "\(Int(manager.averageHeartRate))", "C75C5C"),
-            ("heart.fill", String(localized: "Max Heart Rate"), "\(Int(manager.maxHeartRateRecorded))", "9B3D3D"),
-            ("flame.fill", String(localized: "Active kcal"), manager.formattedCalories, "D4A056"),
+        let items: [(String, String)] = [
+            ("TIME",   manager.formattedDuration),
+            ("KCAL",   manager.formattedCalories),
+            ("AVG HR", "\(Int(manager.averageHeartRate))"),
+            ("MAX",    "\(Int(manager.maxHeartRateRecorded))"),
         ]
 
         return LazyVGrid(
-            columns: [GridItem(.flexible()), GridItem(.flexible())],
-            spacing: 8
+            columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)],
+            spacing: 10
         ) {
-            ForEach(items, id: \.1) { icon, label, value, color in
-                VStack(spacing: 3) {
-                    Image(systemName: icon)
-                        .font(.system(size: 12))
-                        .foregroundStyle(Color(hex: color))
-                    Text(value)
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
+            ForEach(items, id: \.0) { label, value in
+                VStack(alignment: .leading, spacing: 3) {
                     Text(label)
-                        .font(.system(size: 9, design: .rounded))
+                        .font(.system(size: 8, weight: .semibold))
+                        .tracking(1.0)
                         .foregroundStyle(PulseTheme.textTertiary)
+                    Text(value)
+                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(PulseTheme.textPrimary)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
-                .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(PulseTheme.cardBackground)
-                )
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
+        .padding(.vertical, 10)
     }
-
-    // MARK: - 心率区间分布
 
     private var zoneDistribution: some View {
         let totalSeconds = max(manager.elapsedSeconds, 1)
 
-        return VStack(alignment: .leading, spacing: 6) {
-            Text("Heart Rate Zone")
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(PulseTheme.textSecondary)
+        return VStack(alignment: .leading, spacing: 8) {
+            Text("Zone time")
+                .font(.system(size: 8, weight: .semibold))
+                .tracking(1.0)
+                .textCase(.uppercase)
+                .foregroundStyle(PulseTheme.textTertiary)
 
             ForEach(WorkoutSessionManager.HeartRateZone.allCases, id: \.rawValue) { zone in
                 let seconds = manager.zoneSeconds[zone] ?? 0
                 let pct = Double(seconds) / Double(totalSeconds)
 
-                HStack(spacing: 6) {
-                    Text(zone.label)
-                        .font(.system(size: 9, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: zone.color))
-                        .frame(width: 24, alignment: .leading)
+                HStack(spacing: 8) {
+                    Text("Z\(zone.rawValue)")
+                        .font(.system(size: 9, weight: .medium, design: .monospaced))
+                        .foregroundStyle(PulseTheme.textSecondary)
+                        .frame(width: 16, alignment: .leading)
 
                     GeometryReader { geo in
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(Color(hex: zone.color))
-                            .frame(width: max(geo.size.width * pct, 2))
+                        ZStack(alignment: .leading) {
+                            RoundedRectangle(cornerRadius: 1)
+                                .fill(PulseTheme.border)
+                                .frame(height: 3)
+                            RoundedRectangle(cornerRadius: 1)
+                                .fill(PulseTheme.textPrimary)
+                                .frame(width: max(geo.size.width * pct, pct > 0 ? 2 : 0), height: 3)
+                        }
                     }
-                    .frame(height: 6)
+                    .frame(height: 3)
 
                     Text(formatZoneTime(seconds))
-                        .font(.system(size: 9, design: .rounded))
+                        .font(.system(size: 9, weight: .regular, design: .monospaced))
                         .foregroundStyle(PulseTheme.textTertiary)
                         .frame(width: 30, alignment: .trailing)
                 }
             }
         }
-        .padding(10)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(PulseTheme.cardBackground)
-        )
     }
 
-    // MARK: - 工具
+    // MARK: - Helpers
+
+    private var currentTypeLabel: String {
+        let type = WorkoutSessionManager.WorkoutType.allCases.first {
+            $0.activityType == manager.currentWorkoutType
+        } ?? .strength
+        return type.label
+    }
+
+    private var stateLabel: String {
+        // Mirror "SET 3/4" style position with elapsed timer.
+        if manager.state == .paused { return "PAUSED" }
+        return manager.formattedDuration
+    }
 
     private func formatZoneTime(_ seconds: Int) -> String {
         let m = seconds / 60

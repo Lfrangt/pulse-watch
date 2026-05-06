@@ -16,27 +16,64 @@ metadata:
 
 ## 数据源
 
-Pulse Watch 通过 OpenClaw Bridge 共享健康数据。用以下方式获取：
+Pulse Watch app 通过 OpenClaw Gateway HTTP API 定期推送健康数据。数据以 `[HEALTH_DATA]...[/HEALTH_DATA]` 标签包裹的 JSON 到达。
+
+### 收到健康数据时 — 必须保存
+
+**重要**：当你收到包含 `[HEALTH_DATA]` 标签的消息时，在回复 JSON 之前，**先执行 bash 命令**将数据保存到本地文件：
 
 ```bash
-# 读取最新健康状态
-defaults read group.com.abundra.pulse.shared pulse.healthStatus 2>/dev/null | python3 -c "import sys,json; print(json.dumps(json.loads(sys.stdin.read()), indent=2, ensure_ascii=False))"
+mkdir -p ~/.pulse
+cat > ~/.pulse/health-data.json << 'HEALTH_EOF'
+（把 [HEALTH_DATA] 和 [/HEALTH_DATA] 之间的完整 JSON 粘贴在这里）
+HEALTH_EOF
 ```
 
-数据格式：
+这样其他 session 也能读取最新数据。保存完成后再回复正常的 JSON 建议。
+
+### 读取健康数据
+
+```bash
+cat ~/.pulse/health-data.json 2>/dev/null | python3 -c "import sys,json; print(json.dumps(json.load(sys.stdin), indent=2, ensure_ascii=False))"
+```
+
+如果文件不存在，说明 app 还没有推送过数据，或者之前的 sync 没有保存。告诉用户打开 Pulse Watch app 手动点同步按钮（🔄）。
+
+### 数据格式（health_sync）
+
+App 推送的是 health_sync 格式：
 ```json
 {
-  "score": 72,
-  "headline": "状态不错",
-  "heartRate": 68,
-  "restingHR": 62,
-  "hrv": 45,
-  "steps": 8230,
-  "sleepHours": 7.2,
-  "trainingAdvice": "moderate",
-  "insights": ["HRV 趋势上升", "睡眠质量良好"]
+  "type": "health_sync",
+  "date": "2026-03-27",
+  "metrics": {
+    "heartRate": {"resting": 62, "average": 68},
+    "hrv": {"average": 45},
+    "sleep": {"totalMinutes": 432, "deepMinutes": 90, "remMinutes": 120, "lightMinutes": 222},
+    "activity": {"steps": 8230, "activeCalories": 350},
+    "recoveryScore": 72,
+    "weekTrend": {
+      "scoreTrend": "improving",
+      "hrvTrend": "stable",
+      "sleepTrend": "improving",
+      "dailyScores": [{"date": "2026-03-21", "score": 65}, ...]
+    }
+  },
+  "workouts": [...],
+  "dailyHistory": [
+    {"date": "2026-03-26", "score": 70, "restingHeartRate": 63, "hrv": 42, "steps": 7500, "sleep": {"totalMinutes": 410}}
+  ]
 }
 ```
+
+从 metrics 中提取关键指标：
+- **恢复评分**: `metrics.recoveryScore`
+- **静息心率**: `metrics.heartRate.resting`
+- **HRV**: `metrics.hrv.average`
+- **睡眠时长**: `metrics.sleep.totalMinutes`（分钟）
+- **步数**: `metrics.activity.steps`
+- **周趋势**: `metrics.weekTrend`
+- **过去 7 天**: `dailyHistory` 数组
 
 ## 核心能力
 

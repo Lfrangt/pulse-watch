@@ -1,31 +1,33 @@
 import SwiftUI
 
-// MARK: - Launch Screen（启动画面）
-// 纯色暖调背景 + "Pulse" 标题 + "by Abundra" 副标题
+// MARK: - Launch Screen
+// Dark atmospheric background matching the app's teal-accented dark theme
 
 struct LaunchScreenView: View {
     var body: some View {
         ZStack {
-            // 暖色渐变背景
-            LinearGradient(
+            PulseTheme.background
+                .ignoresSafeArea()
+
+            RadialGradient(
                 colors: [
-                    Color(hex: "B8894A"),
-                    Color(hex: "9A6B3A"),
-                    Color(hex: "8B4A3A"),
+                    PulseTheme.accentTeal.opacity(0.06),
+                    Color.clear
                 ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
+                center: .center,
+                startRadius: 20,
+                endRadius: 200
             )
             .ignoresSafeArea()
 
-            VStack(spacing: 8) {
+            VStack(spacing: PulseTheme.spacingS) {
                 Text("Pulse")
                     .font(.system(size: 42, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
 
                 Text("by Abundra")
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .font(PulseTheme.bodyFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
             }
         }
     }

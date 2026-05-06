@@ -17,6 +17,8 @@ struct StrengthView: View {
     @State private var celebrationAchievement: AchievementService.Achievement?
     @State private var showCelebration = false
     @State private var pbTimelineRange: PBRange = .all
+    @State private var selectedLiftDate: Date?
+    @State private var selectedPBDate: Date?
 
     enum PBRange: String, CaseIterable { case week = "7D", month = "30D", quarter = "90D", all = "All" }
 
@@ -73,7 +75,7 @@ struct StrengthView: View {
             .padding(.top, PulseTheme.spacingS)
         }
         .background(PulseTheme.background)
-        .navigationTitle("Strength")
+        .navigationTitle(String(localized: "Strength"))
         .navigationBarTitleDisplayMode(.large)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
@@ -124,7 +126,7 @@ struct StrengthView: View {
                         .foregroundStyle(PulseTheme.textPrimary)
                     Text(a.totalLevel.label)
                         .font(PulseTheme.captionFont)
-                        .foregroundStyle(Color(hex: a.totalLevel.color))
+                        .foregroundStyle(a.totalLevel.pulseColor)
                 }
                 Spacer()
                 ZStack {
@@ -133,7 +135,7 @@ struct StrengthView: View {
                         .frame(width: 64, height: 64)
                     Circle()
                         .trim(from: 0, to: CGFloat(a.totalScore) / 100)
-                        .stroke(Color(hex: a.totalLevel.color), style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                        .stroke(a.totalLevel.pulseColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
                         .frame(width: 64, height: 64)
                         .rotationEffect(.degrees(-90))
                     Text("\(a.totalScore)")
@@ -161,7 +163,7 @@ struct StrengthView: View {
     // MARK: - 单项评估卡片
 
     private func liftCard(_ lift: StrengthService.LiftAssessment) -> some View {
-        let color = Color(hex: lift.liftType.color)
+        let color = lift.liftType.pulseColor
 
         return HStack(spacing: PulseTheme.spacingM) {
             // Icon
@@ -200,10 +202,10 @@ struct StrengthView: View {
             // Level badge
             Text(lift.level.label)
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Color(hex: lift.level.color))
+                .foregroundStyle(lift.level.pulseColor)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
-                .background(Capsule().fill(Color(hex: lift.level.color).opacity(0.15)))
+                .background(Capsule().fill(lift.level.pulseColor.opacity(0.15)))
         }
         .pulseCard()
     }
@@ -221,7 +223,7 @@ struct StrengthView: View {
 
     private func trendChart(type: StrengthService.LiftType, records: [StrengthRecord]) -> some View {
         let sorted = records.sorted { $0.date < $1.date }
-        let color = Color(hex: type.color)
+        let color = type.pulseColor
 
         return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
             HStack {
@@ -239,31 +241,39 @@ struct StrengthView: View {
                 }
             }
 
-            Chart(sorted, id: \.id) { record in
-                LineMark(
-                    x: .value("Date", record.date),
-                    y: .value("Weight", record.estimated1RM)
-                )
-                .foregroundStyle(color)
-                .interpolationMethod(.catmullRom)
-                .lineStyle(StrokeStyle(lineWidth: 2.5))
+            Chart {
+                ForEach(sorted, id: \.id) { record in
+                    LineMark(
+                        x: .value("Date", record.date),
+                        y: .value("Weight", record.estimated1RM)
+                    )
+                    .foregroundStyle(color)
+                    .interpolationMethod(.catmullRom)
+                    .lineStyle(StrokeStyle(lineWidth: 2.5))
 
-                AreaMark(
-                    x: .value("Date", record.date),
-                    y: .value("Weight", record.estimated1RM)
-                )
-                .foregroundStyle(
-                    LinearGradient(colors: [color.opacity(0.15), color.opacity(0.02)],
-                                   startPoint: .top, endPoint: .bottom)
-                )
-                .interpolationMethod(.catmullRom)
+                    AreaMark(
+                        x: .value("Date", record.date),
+                        y: .value("Weight", record.estimated1RM)
+                    )
+                    .foregroundStyle(
+                        LinearGradient(colors: [color.opacity(0.15), color.opacity(0.02)],
+                                       startPoint: .top, endPoint: .bottom)
+                    )
+                    .interpolationMethod(.catmullRom)
 
-                PointMark(
-                    x: .value("Date", record.date),
-                    y: .value("Weight", record.estimated1RM)
-                )
-                .foregroundStyle(color)
-                .symbolSize(24)
+                    PointMark(
+                        x: .value("Date", record.date),
+                        y: .value("Weight", record.estimated1RM)
+                    )
+                    .foregroundStyle(color)
+                    .symbolSize(24)
+                }
+
+                if let selected = selectedLiftDate {
+                    RuleMark(x: .value("Selected", selected))
+                        .foregroundStyle(PulseTheme.textSecondary)
+                        .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
+                }
             }
             .chartYAxis {
                 AxisMarks(position: .leading) { _ in
@@ -280,8 +290,101 @@ struct StrengthView: View {
                 }
             }
             .frame(height: 160)
+            .chartOverlay { proxy in
+                GeometryReader { geo in
+                    Rectangle()
+                        .fill(Color.clear)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { drag in
+                                    let origin = geo[proxy.plotFrame!].origin
+                                    let x = drag.location.x - origin.x
+                                    if let date: Date = proxy.value(atX: x) {
+                                        // Snap to nearest data point
+                                        let nearest = sorted.min(by: {
+                                            abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date))
+                                        })
+                                        let snapped = nearest?.date ?? date
+                                        if snapped != selectedLiftDate {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                        selectedLiftDate = snapped
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) {
+                                        selectedLiftDate = nil
+                                    }
+                                }
+                        )
+                }
+            }
+            .overlay(alignment: .top) {
+                if let selected = selectedLiftDate,
+                   let record = sorted.min(by: {
+                       abs($0.date.timeIntervalSince(selected)) < abs($1.date.timeIntervalSince(selected))
+                   }) {
+                    liftTooltip(weight: record.estimated1RM, date: record.date)
+                        .transition(.scale(scale: 0.8).combined(with: .opacity))
+                        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selectedLiftDate)
+                }
+            }
         }
         .pulseCard()
+    }
+
+    // MARK: - Chart Tooltips
+
+    private func liftTooltip(weight: Double, date: Date) -> some View {
+        VStack(spacing: 4) {
+            Text(String(format: "%.0f kg", weight))
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(PulseTheme.textPrimary)
+            Text(date.formatted(.dateTime.month(.abbreviated).day().locale(Locale.current)))
+                .font(.system(size: 12))
+                .foregroundStyle(PulseTheme.textSecondary)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+        )
+    }
+
+    private func pbTooltip(date: Date, records: [StrengthRecord]) -> some View {
+        // Find closest record per lift type within a 1-day window
+        let threshold: TimeInterval = 86400
+        let lines: [(String, Double, Color)] = StrengthService.LiftType.allCases.compactMap { type in
+            let typeRecords = records.filter { $0.liftType == type.rawValue }
+            guard let closest = typeRecords.min(by: {
+                abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date))
+            }), abs(closest.date.timeIntervalSince(date)) < threshold else { return nil }
+            return (type.label, closest.estimated1RM, type.pulseColor)
+        }
+
+        return VStack(alignment: .leading, spacing: 4) {
+            ForEach(lines, id: \.0) { label, value, color in
+                HStack(spacing: 6) {
+                    Circle().fill(color).frame(width: 6, height: 6)
+                    Text("\(label): \(String(format: "%.0f", value)) kg")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(PulseTheme.textPrimary)
+                }
+            }
+            Text(date.formatted(.dateTime.month(.abbreviated).day().locale(Locale.current)))
+                .font(.system(size: 11))
+                .foregroundStyle(PulseTheme.textSecondary)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+        )
     }
 
     // MARK: - 填写 Profile 提示
@@ -305,6 +408,9 @@ struct StrengthView: View {
 
     // MARK: - 历史记录
 
+    @State private var recordToDelete: StrengthRecord?
+    @State private var showDeleteConfirmation = false
+
     private var historySection: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
             Text("Recent Records")
@@ -315,7 +421,7 @@ struct StrengthView: View {
                 let type = StrengthService.LiftType(rawValue: record.liftType) ?? .squat
                 HStack(spacing: PulseTheme.spacingS) {
                     Circle()
-                        .fill(Color(hex: type.color))
+                        .fill(type.pulseColor)
                         .frame(width: 8, height: 8)
                     Text(type.label)
                         .font(PulseTheme.captionFont)
@@ -337,9 +443,34 @@ struct StrengthView: View {
                             .background(Capsule().fill(PulseTheme.statusModerate.opacity(0.15)))
                     }
                 }
+                .contextMenu {
+                    Button(role: .destructive) {
+                        recordToDelete = record
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
             }
         }
         .pulseCard()
+        .confirmationDialog(
+            "Delete this record?",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                if let record = recordToDelete {
+                    withAnimation {
+                        modelContext.delete(record)
+                    }
+                }
+                recordToDelete = nil
+            }
+            Button("Cancel", role: .cancel) {
+                recordToDelete = nil
+            }
+        }
     }
 
     // MARK: - PB 成长时间线（三线合一）
@@ -367,7 +498,7 @@ struct StrengthView: View {
                 ForEach(StrengthService.LiftType.allCases) { type in
                     let recs = filteredRecords.filter { $0.liftType == type.rawValue }
                         .sorted { $0.date < $1.date }
-                    let color = Color(hex: type.color)
+                    let color = type.pulseColor
 
                     ForEach(recs, id: \.id) { r in
                         LineMark(
@@ -390,6 +521,12 @@ struct StrengthView: View {
                         }
                     }
                 }
+
+                if let selected = selectedPBDate {
+                    RuleMark(x: .value("Selected", selected))
+                        .foregroundStyle(PulseTheme.textSecondary)
+                        .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
+                }
             }
             .chartYAxis {
                 AxisMarks(position: .leading) { _ in
@@ -410,10 +547,47 @@ struct StrengthView: View {
             .chartForegroundStyleScale([
                 StrengthService.LiftType.squat.label: PulseTheme.statusGood,
                 StrengthService.LiftType.bench.label: PulseTheme.activityAccent,
-                StrengthService.LiftType.deadlift.label: Color(hex: "5C7BC7"),
+                StrengthService.LiftType.deadlift.label: PulseTheme.hrvBlue,
             ])
             .chartLegend(.visible)
             .frame(height: 200)
+            .chartOverlay { proxy in
+                GeometryReader { geo in
+                    Rectangle()
+                        .fill(Color.clear)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { drag in
+                                    let origin = geo[proxy.plotFrame!].origin
+                                    let x = drag.location.x - origin.x
+                                    if let date: Date = proxy.value(atX: x) {
+                                        // Snap to nearest data point across all series
+                                        let nearest = filteredRecords.min(by: {
+                                            abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date))
+                                        })
+                                        let snapped = nearest?.date ?? date
+                                        if snapped != selectedPBDate {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                        selectedPBDate = snapped
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) {
+                                        selectedPBDate = nil
+                                    }
+                                }
+                        )
+                }
+            }
+            .overlay(alignment: .top) {
+                if let selected = selectedPBDate {
+                    pbTooltip(date: selected, records: filteredRecords)
+                        .transition(.scale(scale: 0.8).combined(with: .opacity))
+                        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selectedPBDate)
+                }
+            }
         }
         .pulseCard()
     }
@@ -566,21 +740,21 @@ private struct ShareStrengthCard: View {
         VStack(spacing: 24) {
             Text("My Strength Progress")
                 .font(.system(size: 22, weight: .bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
 
             HStack(spacing: 20) {
                 liftStat("SQ", squat, PulseTheme.statusGood)
                 liftStat("BP", bench, PulseTheme.activityAccent)
-                liftStat("DL", deadlift, Color(hex: "5C7BC7"))
+                liftStat("DL", deadlift, PulseTheme.hrvBlue)
             }
 
             VStack(spacing: 4) {
                 Text("Total")
                     .font(.system(size: 14))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(PulseTheme.textSecondary)
                 Text(String(format: "%.0f kg", total))
                     .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
                 if !level.isEmpty {
                     Text(level)
                         .font(.system(size: 14, weight: .medium))
@@ -590,11 +764,11 @@ private struct ShareStrengthCard: View {
 
             Text("Tracked with Pulse Watch")
                 .font(.system(size: 11))
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(PulseTheme.textTertiary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
-            LinearGradient(colors: [Color(hex: "1A1715"), Color(hex: "0D0C0B")],
+            LinearGradient(colors: [PulseTheme.cardElevated, PulseTheme.background],
                            startPoint: .top, endPoint: .bottom)
         )
     }
@@ -606,10 +780,10 @@ private struct ShareStrengthCard: View {
                 .foregroundStyle(color)
             Text(String(format: "%.0f", value))
                 .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
             Text("kg")
                 .font(.system(size: 12))
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(PulseTheme.textTertiary)
         }
     }
 }
@@ -644,7 +818,7 @@ struct AddStrengthRecordView: View {
                                     VStack(spacing: 4) {
                                         Image(systemName: type.icon)
                                             .font(.system(size: 20))
-                                            .foregroundStyle(selected ? Color(hex: type.color) : PulseTheme.textTertiary)
+                                            .foregroundStyle(selected ? type.pulseColor : PulseTheme.textTertiary)
                                         Text(type.label)
                                             .font(.system(size: 10, weight: selected ? .semibold : .regular))
                                             .foregroundStyle(selected ? PulseTheme.textPrimary : PulseTheme.textTertiary)
@@ -652,8 +826,8 @@ struct AddStrengthRecordView: View {
                                     }
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 12)
-                                    .background(RoundedRectangle(cornerRadius: 10).fill(selected ? Color(hex: type.color).opacity(0.12) : PulseTheme.surface))
-                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(selected ? Color(hex: type.color).opacity(0.5) : .clear, lineWidth: 1))
+                                    .background(RoundedRectangle(cornerRadius: 10).fill(selected ? type.pulseColor.opacity(0.12) : PulseTheme.surface))
+                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(selected ? type.pulseColor.opacity(0.5) : .clear, lineWidth: 1))
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -701,7 +875,7 @@ struct AddStrengthRecordView: View {
                     Button { save() } label: {
                         Text("Save Record")
                             .font(PulseTheme.bodyFont.weight(.semibold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(PulseTheme.textPrimary)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
                             .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(PulseTheme.accent))
@@ -713,13 +887,21 @@ struct AddStrengthRecordView: View {
                 .padding(.top, PulseTheme.spacingM)
             }
             .background(PulseTheme.background)
-            .navigationTitle("Add Lift")
+            .navigationTitle(String(localized: "Add Lift"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .scrollDismissesKeyboard(.interactively)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button(String(localized: "Cancel")) { dismiss() }
                         .foregroundStyle(PulseTheme.textSecondary)
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    }
+                    .foregroundStyle(PulseTheme.accent)
                 }
             }
         }

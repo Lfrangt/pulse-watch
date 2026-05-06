@@ -29,12 +29,12 @@ struct WeeklyReportView: View {
                 .padding(.top, PulseTheme.spacingS)
             }
             .background(PulseTheme.background)
-            .navigationTitle("Weekly Report")
+            .navigationTitle(String(localized: "Weekly Report"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button(String(localized: "Done")) { dismiss() }
                         .foregroundStyle(PulseTheme.accent)
                 }
             }
@@ -83,9 +83,8 @@ struct WeeklyReportView: View {
         }
 
         let fmt = DateFormatter()
-        fmt.locale = Locale(identifier: "zh_CN")
-        fmt.dateStyle = .medium
         fmt.locale = Locale.current
+        fmt.dateStyle = .medium
 
         return "\(fmt.string(from: monday)) - \(fmt.string(from: sunday))"
     }
@@ -123,7 +122,7 @@ struct WeeklyReportView: View {
                     LinearGradient(
                         colors: [
                             PulseTheme.cardBackground,
-                            Color(hex: "1C1915"),
+                            PulseTheme.cardElevated,
                             PulseTheme.cardBackground
                         ],
                         startPoint: .topLeading,
@@ -649,7 +648,7 @@ struct WeeklyReportView: View {
            let worstDay = summaries.filter({ $0.dailyScore != nil }).min(by: { ($0.dailyScore ?? 0) < ($1.dailyScore ?? 0) }) {
 
             let fmt = DateFormatter()
-            fmt.locale = Locale(identifier: "zh_CN")
+            fmt.locale = Locale.current
             fmt.dateFormat = "EEEE"
 
             let bestLabel = fmt.string(from: bestDay.date)

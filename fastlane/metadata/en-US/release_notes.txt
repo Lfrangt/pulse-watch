@@ -1,12 +1,17 @@
-What's New in v1.1:
+Welcome to Pulse 1.0 — your AI fitness coach for Apple Watch.
 
-• Strength Training — Track squat, bench press, and deadlift. Auto PR detection, 1RM estimation, and bodyweight-ratio strength level assessment.
-• Health Age — Your biological age estimated from 5 health metrics. See if your body is younger or older than your real age.
-• Sleep / Activity / Readiness Scores — Three independent scores with tap-to-expand factor breakdown.
-• Strain Score — Daily workout load calculated from heart rate zones, paired with Recovery for overtrain warnings.
-• Weekly Summary — Sunday 9 AM notification with your week's average score, workouts, and resting HR trend.
-• Streak System — Daily health tracking streak with milestone celebrations at 7/30/100/365 days.
-• Muscle Group Tags — Tag workouts by muscle group. Get personal recovery insights after 5+ sessions.
-• Manual Workout Entry — Add workouts directly from iPhone when you forget your Watch.
-• Trend Charts — 7D / 30D / 90D time windows with period-over-period comparisons.
-• Morning Brief Upgrade — Score + sleep + streak + training advice in one notification.
+What's in this release:
+
+• Daily Coach — Score-banded actionable advice on the dashboard, citing your sleep, RHR, and HRV. Tap "Today's Coach" to see what your body needs.
+• AI Coach (DeepSeek) — Optional cloud AI for personalized training advice. One-tap enable in Settings with full data-flow disclosure.
+• Apple Watch confidence indicator — Hero card shows data source + completeness so you know how trusted today's score is.
+• Daily readiness score (0–100) — Combined recovery from sleep, HRV, RHR, and activity.
+• Strength training — Squat / bench / deadlift with auto-PR detection and bodyweight-ratio level assessment.
+• Health Age — Biological age estimated from 5 metrics.
+• Sleep, Activity, Strain & Recovery scores — Independent scores with tap-to-expand factor breakdown.
+• Weekly trends — 7-day rolling charts for HR, HRV, sleep with interactive drill-in.
+• Morning Brief notification — Score + sleep + training advice every morning.
+• Streak system — Daily tracking streak with milestones at 7 / 30 / 100 / 365 days.
+• Apple Watch complications, Home Screen + Lock Screen widgets.
+• Manual workout entry, gym arrival auto-detection (PPL rotation suggestions).
+• Privacy first — All health data on-device by default. AI Coach is opt-in.

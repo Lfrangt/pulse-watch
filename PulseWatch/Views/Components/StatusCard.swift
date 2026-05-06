@@ -244,8 +244,8 @@ struct TrainingCard: View {
                 // Intensity badge
                 Text(plan.intensity.rawValue)
                     .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
+                    .padding(.horizontal, PulseTheme.spacingS)
+                    .padding(.vertical, PulseTheme.spacingXS + 1)
                     .background(
                         Capsule()
                             .fill(intensityColor.opacity(0.15))

@@ -24,7 +24,7 @@ struct WorkoutHistoryListView: View {
                 }
             }
             .background(PulseTheme.background)
-            .navigationTitle("Workout History")
+            .navigationTitle(String(localized: "Workout History"))
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
@@ -180,7 +180,7 @@ struct WorkoutHistoryListView: View {
     // MARK: - 训练行
 
     private func workoutRow(_ entry: WorkoutHistoryEntry) -> some View {
-        let color = Color(hex: entry.activityColor)
+        let color = entry.pulseActivityColor
 
         return HStack(spacing: PulseTheme.spacingM) {
             // 运动类型 icon
@@ -266,10 +266,10 @@ struct WorkoutHistoryListView: View {
                     let level = StrainScoreService.StrainLevel(score: strain)
                     Text("\(strain)")
                         .font(.system(size: 13, weight: .bold, design: .rounded))
-                        .foregroundStyle(Color(hex: level.color))
+                        .foregroundStyle(level.pulseColor)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Capsule().fill(Color(hex: level.color).opacity(0.15)))
+                        .background(Capsule().fill(level.pulseColor.opacity(0.15)))
                 }
 
                 Text(formatDuration(entry.durationMinutes))

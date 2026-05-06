@@ -9,71 +9,104 @@ struct HistoryView: View {
     @State private var showWeeklyReport = false
     @State private var showMonthlyReport = false
     @State private var chartAnimated = false
+    @State private var selectedScoreDate: Date?
+    @State private var selectedHRDate: Date?
+    @State private var selectedHRVDate: Date?
+    @State private var selectedSleepDate: Date?
+    @State private var selectedStressDate: Date?
+    @State private var selectedRangeDate: Date?
     @Query(sort: \DailySummary.date, order: .forward) private var allSummaries: [DailySummary]
     @Query(sort: \WorkoutHistoryEntry.startDate, order: .reverse) private var allWorkouts: [WorkoutHistoryEntry]
 
     var body: some View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: PulseTheme.spacingM) {
-                    // 快捷入口
-                    shortcutButtons
-                        .staggered(index: 0)
+                VStack(spacing: 0) {
+                    // Custom header — eyebrow + title (mirrors Trends.jsx header)
+                    clinicalHeader
+                        .padding(.horizontal, 20)
+                        .padding(.top, 12)
+                        .padding(.bottom, 8)
 
-                    // 时间范围切换
-                    rangePicker
-                        .staggered(index: 0)
+                    // p-segmented control
+                    clinicalRangePicker
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 8)
 
-                    // 时段摘要对比
-                    periodSummaryCard
-                        .staggered(index: 1)
+                    // Card stack — matches JSX 16pt horizontal padding + 12pt gap
+                    VStack(spacing: 12) {
+                        // 时段摘要对比 — 3-up clinical
+                        clinicalPeriodSummary
+                            .staggered(index: 0)
 
-                    // 数据不足提示
-                    if dataInsufficient {
-                        insufficientDataHint
+                        // 数据不足提示
+                        if dataInsufficient {
+                            insufficientDataHint
+                                .staggered(index: 0)
+                        }
+
+                        // Readiness trend
+                        readinessTrendCard
                             .staggered(index: 1)
+
+                        // HRV trend
+                        hrvTrendCardClinical
+                            .staggered(index: 2)
+
+                        // Resting HR trend
+                        restingHRTrendCard
+                            .staggered(index: 3)
+
+                        // Sleep trend
+                        sleepTrendCardClinical
+                            .staggered(index: 4)
+
+                        // Stress trend (Pulse-only, not in JSX — kept for parity with v1 features)
+                        stressTrendCardClinical
+                            .staggered(index: 5)
+
+                        // Weekly Report teaser — clickable, matches JSX WeeklyReportTeaser
+                        weeklyReportTeaserCard
+                            .staggered(index: 6)
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
 
-                    // 评分趋势
-                    scoreTrendChart
-                        .staggered(index: 2)
+                    // "MORE FROM PULSE" eyebrow divider
+                    moreFromPulseDivider
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
+                        .padding(.bottom, 16)
 
-                    // 心率趋势
-                    heartRateTrendChart
-                        .staggered(index: 3)
+                    // Below-the-fold: Pulse-specific content
+                    VStack(spacing: PulseTheme.spacingM) {
+                        // 快捷入口
+                        shortcutButtons
+                            .staggered(index: 7)
 
-                    // HRV 趋势
-                    hrvTrendChart
-                        .staggered(index: 4)
+                        // 周报对比明细
+                        weeklyReportCard
+                            .staggered(index: 8)
 
-                    // 睡眠趋势
-                    sleepTrendChart
-                        .staggered(index: 5)
+                        // 查看完整周报按钮
+                        weeklyReportButton
+                            .staggered(index: 8)
 
-                    // 周报对比
-                    weeklyReportCard
-                        .staggered(index: 5)
+                        // 肌群恢复关联洞察
+                        MuscleInsightsCard(workouts: allWorkouts, summaries: allSummaries)
+                            .staggered(index: 9)
 
-                    // 查看完整周报按钮
-                    weeklyReportButton
-                        .staggered(index: 6)
+                        // Analytics Pro 入口
+                        analyticsProSection
+                            .staggered(index: 10)
 
-                    // 肌群恢复关联洞察
-                    MuscleInsightsCard(workouts: allWorkouts, summaries: allSummaries)
-                        .staggered(index: 7)
-
-                    // Analytics Pro 入口
-                    analyticsProSection
-                        .staggered(index: 8)
-
-                    Spacer(minLength: 60)
+                        Spacer(minLength: 60)
+                    }
+                    .padding(.horizontal, PulseTheme.spacingM)
                 }
-                .padding(.horizontal, PulseTheme.spacingM)
-                .padding(.top, PulseTheme.spacingS)
             }
             .background(PulseTheme.background)
-            .navigationTitle("Historical Trends")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarHidden(true)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .sheet(isPresented: $showWeeklyReport) {
                 WeeklyReportView()
@@ -91,7 +124,7 @@ struct HistoryView: View {
                 }
                 // In-App Review: 查看趋势图时检查是否有 7 天完整数据
                 let calendar = Calendar.current
-                let sevenDaysAgo = calendar.startOfDay(for: calendar.date(byAdding: .day, value: -7, to: .now)!)
+                let sevenDaysAgo = calendar.startOfDay(for: calendar.safeDate(byAdding: .day, value: -7, to: .now))
                 let recentWithScores = allSummaries.filter { $0.date >= sevenDaysAgo && $0.dailyScore != nil }
                 let hasSevenDayData = recentWithScores.count >= 7
                 ReviewRequestManager.shared.recordTrendsViewed(hasSevenDayData: hasSevenDayData)
@@ -102,6 +135,344 @@ struct HistoryView: View {
                     chartAnimated = true
                 }
             }
+        }
+    }
+
+    // MARK: - Clinical header (mirrors Trends.jsx header)
+
+    private var clinicalHeader: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(rangeEyebrowText)
+                .pulseEyebrow()
+            Text(String(localized: "Trends"))
+                .font(.system(size: 32, weight: .bold, design: .rounded))
+                .foregroundStyle(PulseTheme.textPrimary)
+                .tracking(-0.5)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var rangeEyebrowText: String {
+        switch selectedRange {
+        case .week:    return String(localized: "Last 7 days")
+        case .month:   return String(localized: "Last 30 days")
+        case .quarter: return String(localized: "Last 90 days")
+        case .all:     return String(localized: "All time")
+        }
+    }
+
+    private var rangeComparisonSuffix: String {
+        switch selectedRange {
+        case .week:    return String(localized: "vs prev 7d")
+        case .month:   return String(localized: "vs prev 30d")
+        case .quarter: return String(localized: "vs prev 90d")
+        case .all:     return String(localized: "vs prev")
+        }
+    }
+
+    // MARK: - p-segmented range picker (clinical)
+
+    private var clinicalRangePicker: some View {
+        HStack(spacing: 2) {
+            ForEach(TimeRange.allCases, id: \.self) { range in
+                Button {
+                    withAnimation(.easeOut(duration: 0.18)) {
+                        selectedRange = range
+                    }
+                } label: {
+                    Text(range.rawValue)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(selectedRange == range ? PulseTheme.textPrimary : PulseTheme.textSecondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 6)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .fill(selectedRange == range ? PulseTheme.surface : Color.clear)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .stroke(selectedRange == range ? PulseTheme.border : Color.clear, lineWidth: PulseTheme.hairline)
+                                )
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(2)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                .fill(PulseTheme.divider)
+        )
+    }
+
+    // MARK: - Clinical period summary (3-up)
+
+    private var clinicalPeriodSummary: some View {
+        let current = filteredSummaries
+        let previous = previousPeriodSummaries
+
+        let curScore = avgScoreInt(current)
+        let prevScore = avgScoreInt(previous)
+        let curHRV = avgHRVDouble(current)
+        let prevHRV = avgHRVDouble(previous)
+        let curSleep = avgSleepHours(current)
+        let prevSleep = avgSleepHours(previous)
+
+        // Format values
+        let scoreVal = curScore.map { "\($0)" } ?? "—"
+        let hrvVal = curHRV.map { String(format: "%.0f", $0) } ?? "—"
+        let sleepVal = curSleep.map { String(format: "%.1fh", $0) } ?? "—"
+
+        // Format deltas — round + signed
+        let scoreDelta = formatIntDelta(cur: curScore.map(Double.init), prev: prevScore.map(Double.init))
+        let hrvDelta = formatIntDelta(cur: curHRV, prev: prevHRV)
+        let sleepDelta = formatHourDelta(cur: curSleep, prev: prevSleep)
+
+        // For sleep, "more sleep" might be considered good but we follow JSX where −0.2h is rendered tertiary (negative=textTertiary).
+        let scoreGood = (curScore ?? 0) >= (prevScore ?? 0)
+        let hrvGood = (curHRV ?? 0) >= (prevHRV ?? 0)
+        let sleepGood = (curSleep ?? 0) >= (prevSleep ?? 0)
+
+        return PeriodSummaryCard(cells: [
+            PeriodSummaryCell(label: String(localized: "Avg score"), value: scoreVal, delta: scoreDelta, isGoodDelta: scoreGood),
+            PeriodSummaryCell(label: String(localized: "Avg HRV"), value: hrvVal, delta: hrvDelta, isGoodDelta: hrvGood),
+            PeriodSummaryCell(label: String(localized: "Avg sleep"), value: sleepVal, delta: sleepDelta, isGoodDelta: sleepGood)
+        ])
+    }
+
+    // MARK: - Clinical TrendCards (5)
+
+    private var readinessTrendCard: some View {
+        let scores = filteredSummaries.compactMap(\.dailyScore).map(Double.init)
+        let prevScores = previousPeriodSummaries.compactMap(\.dailyScore).map(Double.init)
+        let curAvg = scores.isEmpty ? nil : scores.reduce(0, +) / Double(scores.count)
+        let prevAvg = prevScores.isEmpty ? nil : prevScores.reduce(0, +) / Double(prevScores.count)
+
+        return TrendCard(
+            label: String(localized: "Readiness"),
+            metric: curAvg.map { "\(Int($0))" } ?? "—",
+            unit: String(localized: "avg"),
+            delta: clinicalDeltaString(cur: curAvg, prev: prevAvg, format: "%.0f"),
+            deltaIsGood: clinicalDeltaIsGood(cur: curAvg, prev: prevAvg, higherIsBetter: true),
+            scores: scores
+        )
+    }
+
+    private var hrvTrendCardClinical: some View {
+        let scores = filteredSummaries.compactMap(\.averageHRV)
+        let prev = previousPeriodSummaries.compactMap(\.averageHRV)
+        let curAvg = scores.isEmpty ? nil : scores.reduce(0, +) / Double(scores.count)
+        let prevAvg = prev.isEmpty ? nil : prev.reduce(0, +) / Double(prev.count)
+
+        return TrendCard(
+            label: String(localized: "HRV"),
+            metric: curAvg.map { "\(Int($0))" } ?? "—",
+            unit: String(localized: "ms avg"),
+            delta: clinicalDeltaString(cur: curAvg, prev: prevAvg, format: "%.0f"),
+            deltaIsGood: clinicalDeltaIsGood(cur: curAvg, prev: prevAvg, higherIsBetter: true),
+            scores: scores
+        )
+    }
+
+    private var restingHRTrendCard: some View {
+        let scores = filteredSummaries.compactMap(\.restingHeartRate)
+        let prev = previousPeriodSummaries.compactMap(\.restingHeartRate)
+        let curAvg = scores.isEmpty ? nil : scores.reduce(0, +) / Double(scores.count)
+        let prevAvg = prev.isEmpty ? nil : prev.reduce(0, +) / Double(prev.count)
+
+        return TrendCard(
+            label: String(localized: "Resting HR"),
+            metric: curAvg.map { "\(Int($0))" } ?? "—",
+            unit: String(localized: "bpm avg"),
+            delta: clinicalDeltaString(cur: curAvg, prev: prevAvg, format: "%.0f"),
+            // Lower resting HR = better
+            deltaIsGood: clinicalDeltaIsGood(cur: curAvg, prev: prevAvg, higherIsBetter: false),
+            scores: scores
+        )
+    }
+
+    private var sleepTrendCardClinical: some View {
+        // Sleep displayed as "7h 18m" with hour-decimal trend chart underneath
+        let durationsMins = filteredSummaries.compactMap(\.sleepDurationMinutes).map(Double.init)
+        let prev = previousPeriodSummaries.compactMap(\.sleepDurationMinutes).map(Double.init)
+        let curAvgMin = durationsMins.isEmpty ? nil : durationsMins.reduce(0, +) / Double(durationsMins.count)
+        let prevAvgMin = prev.isEmpty ? nil : prev.reduce(0, +) / Double(prev.count)
+
+        let metricText: String = {
+            guard let m = curAvgMin else { return "—" }
+            let h = Int(m / 60)
+            let mins = Int(m.truncatingRemainder(dividingBy: 60))
+            return "\(h)h \(mins)m"
+        }()
+
+        // Delta in hours (signed)
+        let deltaText: String = {
+            guard let c = curAvgMin, let p = prevAvgMin, p > 0 else { return "—" }
+            let diffH = (c - p) / 60.0
+            if abs(diffH) < 0.05 { return String(localized: "no change \(rangeComparisonSuffix)") }
+            let sign = diffH > 0 ? "+" : "−"
+            return "\(sign)\(String(format: "%.1f", abs(diffH)))h \(rangeComparisonSuffix)"
+        }()
+
+        return TrendCard(
+            label: String(localized: "Sleep"),
+            metric: metricText,
+            unit: String(localized: "avg"),
+            delta: deltaText,
+            // More sleep = generally better; mirrors JSX where −0.2h was negative-good (tertiary)
+            deltaIsGood: clinicalDeltaIsGood(cur: curAvgMin, prev: prevAvgMin, higherIsBetter: true),
+            // Chart shows hours per day
+            scores: durationsMins.map { $0 / 60.0 }
+        )
+    }
+
+    private var stressTrendCardClinical: some View {
+        let scores = filteredSummaries.compactMap(\.stressScore).map(Double.init)
+        let prev = previousPeriodSummaries.compactMap(\.stressScore).map(Double.init)
+        let curAvg = scores.isEmpty ? nil : scores.reduce(0, +) / Double(scores.count)
+        let prevAvg = prev.isEmpty ? nil : prev.reduce(0, +) / Double(prev.count)
+
+        return TrendCard(
+            label: String(localized: "Stress"),
+            metric: curAvg.map { "\(Int($0))" } ?? "—",
+            unit: String(localized: "avg"),
+            delta: clinicalDeltaString(cur: curAvg, prev: prevAvg, format: "%.0f"),
+            // Lower stress = better
+            deltaIsGood: clinicalDeltaIsGood(cur: curAvg, prev: prevAvg, higherIsBetter: false),
+            scores: scores
+        )
+    }
+
+    // MARK: - Weekly Report Teaser (clinical)
+
+    private var weeklyReportTeaserCard: some View {
+        Button {
+            showWeeklyReport = true
+        } label: {
+            HStack(spacing: 14) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(String(localized: "Weekly Report"))
+                        .pulseEyebrow()
+                    Text(currentWeekRangeText)
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .foregroundStyle(PulseTheme.textPrimary)
+                        .padding(.top, 2)
+                    Text(currentWeekSummaryText)
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(PulseTheme.textTertiary)
+            }
+            .pulseCard(padding: 20)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var currentWeekRangeText: String {
+        let cal = Calendar.current
+        let now = Date()
+        let weekday = cal.component(.weekday, from: now)
+        let daysSinceMonday = (weekday + 5) % 7
+        guard let monday = cal.date(byAdding: .day, value: -daysSinceMonday, to: cal.startOfDay(for: now)),
+              let sunday = cal.date(byAdding: .day, value: 6, to: monday) else {
+            return String(localized: "This week")
+        }
+        let f = DateFormatter()
+        f.locale = Locale.current
+        f.dateFormat = "MMM d"
+        return String(format: String(localized: "Week of %@ – %@"), f.string(from: monday), f.string(from: sunday))
+    }
+
+    private var currentWeekSummaryText: String {
+        let weekWorkouts = allWorkouts.filter {
+            let cal = Calendar.current
+            let now = Date()
+            let weekday = cal.component(.weekday, from: now)
+            let daysSinceMonday = (weekday + 5) % 7
+            guard let monday = cal.date(byAdding: .day, value: -daysSinceMonday, to: cal.startOfDay(for: now)) else { return false }
+            return $0.startDate >= monday
+        }
+        if weekWorkouts.isEmpty {
+            return String(localized: "No workouts logged yet this week")
+        }
+        let count = weekWorkouts.count
+        return String(format: String(localized: "%d workout(s) this week"), count)
+    }
+
+    // MARK: - "MORE FROM PULSE" divider
+
+    private var moreFromPulseDivider: some View {
+        HStack(spacing: 12) {
+            Rectangle()
+                .fill(PulseTheme.divider)
+                .frame(height: PulseTheme.hairline)
+                .frame(maxWidth: .infinity)
+            Text(String(localized: "More from Pulse"))
+                .pulseEyebrow()
+            Rectangle()
+                .fill(PulseTheme.divider)
+                .frame(height: PulseTheme.hairline)
+                .frame(maxWidth: .infinity)
+        }
+    }
+
+    // MARK: - Clinical aggregation helpers
+
+    private func avgScoreInt(_ summaries: [DailySummary]) -> Int? {
+        let scores = summaries.compactMap(\.dailyScore)
+        guard !scores.isEmpty else { return nil }
+        return scores.reduce(0, +) / scores.count
+    }
+
+    private func avgHRVDouble(_ summaries: [DailySummary]) -> Double? {
+        let vals = summaries.compactMap(\.averageHRV)
+        guard !vals.isEmpty else { return nil }
+        return vals.reduce(0, +) / Double(vals.count)
+    }
+
+    private func avgSleepHours(_ summaries: [DailySummary]) -> Double? {
+        let vals = summaries.compactMap(\.sleepDurationMinutes).map { Double($0) / 60.0 }
+        guard !vals.isEmpty else { return nil }
+        return vals.reduce(0, +) / Double(vals.count)
+    }
+
+    /// "+3" / "−6" / "—". Used by PeriodSummary cells (just the number).
+    private func formatIntDelta(cur: Double?, prev: Double?) -> String {
+        guard let c = cur, let p = prev else { return "—" }
+        let diff = c - p
+        if abs(diff) < 0.5 { return "0" }
+        let sign = diff > 0 ? "+" : "−"
+        return "\(sign)\(String(format: "%.0f", abs(diff)))"
+    }
+
+    /// "−0.2" / "+0.4" / "—". Used by sleep PeriodSummary cell.
+    private func formatHourDelta(cur: Double?, prev: Double?) -> String {
+        guard let c = cur, let p = prev else { return "—" }
+        let diff = c - p
+        if abs(diff) < 0.05 { return "0.0" }
+        let sign = diff > 0 ? "+" : "−"
+        return "\(sign)\(String(format: "%.1f", abs(diff)))"
+    }
+
+    /// "+3 vs prev 30d" / "−1 vs prev 30d" / "—". Used by TrendCard delta lines.
+    private func clinicalDeltaString(cur: Double?, prev: Double?, format: String) -> String {
+        guard let c = cur, let p = prev else { return "—" }
+        let diff = c - p
+        if abs(diff) < 0.5 { return String(localized: "no change \(rangeComparisonSuffix)") }
+        let sign = diff > 0 ? "+" : "−"
+        return "\(sign)\(String(format: format, abs(diff))) \(rangeComparisonSuffix)"
+    }
+
+    private func clinicalDeltaIsGood(cur: Double?, prev: Double?, higherIsBetter: Bool) -> Bool {
+        guard let c = cur, let p = prev else { return true }
+        let diff = c - p
+        if higherIsBetter {
+            return diff >= 0
+        } else {
+            return diff <= 0
         }
     }
 
@@ -150,7 +521,7 @@ struct HistoryView: View {
     // MARK: - 数据过滤
 
     private var filteredSummaries: [DailySummary] {
-        let startDate = Calendar.current.date(byAdding: .day, value: -selectedRange.days, to: .now)!
+        let startDate = Calendar.current.safeDate(byAdding: .day, value: -selectedRange.days, to: .now)
         let startOfDay = Calendar.current.startOfDay(for: startDate)
         let raw = allSummaries.filter { $0.date >= startOfDay }
         return raw
@@ -159,8 +530,8 @@ struct HistoryView: View {
     /// 上一个同等时段的数据（用于对比）
     private var previousPeriodSummaries: [DailySummary] {
         let days = selectedRange.days
-        let periodEnd = Calendar.current.date(byAdding: .day, value: -days, to: .now)!
-        let periodStart = Calendar.current.date(byAdding: .day, value: -days * 2, to: .now)!
+        let periodEnd = Calendar.current.safeDate(byAdding: .day, value: -days, to: .now)
+        let periodStart = Calendar.current.safeDate(byAdding: .day, value: -days * 2, to: .now)
         return allSummaries.filter { $0.date >= periodStart && $0.date < periodEnd }
     }
 
@@ -323,6 +694,7 @@ struct HistoryView: View {
                     .foregroundStyle(PulseTheme.accentTeal)
                     .interpolationMethod(.catmullRom)
                     .lineStyle(StrokeStyle(lineWidth: 2))
+                    .symbolSize(chartAnimated ? 25 : 0)
                     .symbol {
                         Circle()
                             .fill(PulseTheme.accentTeal)
@@ -334,10 +706,16 @@ struct HistoryView: View {
                         y: .value("Score", item.score)
                     )
                     .foregroundStyle(LinearGradient(
-                        colors: [PulseTheme.accentTeal.opacity(0.2), PulseTheme.accentTeal.opacity(0.02)],
+                        colors: [PulseTheme.accentTeal.opacity(chartAnimated ? 0.2 : 0), PulseTheme.accentTeal.opacity(0.02)],
                         startPoint: .top, endPoint: .bottom
                     ))
                     .interpolationMethod(.catmullRom)
+
+                    if let selectedScoreDate {
+                        RuleMark(x: .value("Selected", selectedScoreDate))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                            .lineStyle(StrokeStyle(lineWidth: 0.5))
+                    }
                 }
                 .chartYAxis {
                     AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { value in
@@ -355,19 +733,61 @@ struct HistoryView: View {
                             .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
                     }
                 }
+                .chartOverlay { proxy in
+                    GeometryReader { geo in
+                        Rectangle().fill(.clear).contentShape(Rectangle())
+                            .gesture(DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let plotFrame = geo[proxy.plotAreaFrame]
+                                    let x = value.location.x - plotFrame.origin.x
+                                    guard let date: Date = proxy.value(atX: x) else { return }
+                                    if let nearest = data.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+                                        let newDate = Calendar.current.startOfDay(for: nearest.date)
+                                        if selectedScoreDate != newDate {
+                                            selectedScoreDate = newDate
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) { selectedScoreDate = nil }
+                                }
+                            )
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let sel = selectedScoreDate,
+                       let point = data.first(where: { Calendar.current.isDate($0.date, inSameDayAs: sel) }) {
+                        let dateFmt: DateFormatter = {
+                            let f = DateFormatter()
+                            f.locale = Locale.current
+                            f.dateFormat = "M/d EEEE"
+                            return f
+                        }()
+                        VStack(spacing: 2) {
+                            Text("\(point.score)")
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(dateFmt.string(from: point.date))
+                                .font(.system(size: 11, design: .rounded))
+                                .foregroundStyle(PulseTheme.textSecondary)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .transition(.scale.combined(with: .opacity))
+                        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedScoreDate)
+                    }
+                }
                 .frame(height: 180)
                 .opacity(chartAnimated ? 1 : 0)
-                .animation(.easeOut(duration: 1.0), value: chartAnimated)
+                .animation(.spring(response: 0.8, dampingFraction: 0.7), value: chartAnimated)
             } else {
-                // 30D / 90D — try weekly/monthly candles, fallback to daily line
-                let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
+                // 30D / 90D — weekly averages as line chart
                 let rawData = data.map { (date: $0.date, value: Double($0.score)) }
-                let candles = aggregateToCandlePoints(from: rawData, groupBy: groupBy)
-                if candles.count >= 3 {
-                    rangeBarChart(candles: candles, color: PulseTheme.accentTeal, yLabel: "")
-                } else if !rawData.isEmpty {
-                    // 数据不足以聚合 — 直接展示每日折线
-                    dailyLineChart(data: rawData, color: PulseTheme.accentTeal, yLabel: "")
+                let weekly = aggregateWeeklyAverage(from: rawData)
+                if !weekly.isEmpty {
+                    dailyLineChart(data: weekly, color: PulseTheme.accentTeal, yLabel: "", selectedDate: $selectedScoreDate)
                 } else {
                     emptyChartPlaceholder
                 }
@@ -424,22 +844,72 @@ struct HistoryView: View {
                     LineMark(x: .value("Date", item.date), y: .value("RHR", item.resting))
                         .foregroundStyle(hrColor).interpolationMethod(.catmullRom)
                         .lineStyle(StrokeStyle(lineWidth: 2))
-                        .symbol { Circle().fill(hrColor).frame(width: 5, height: 5) }
+                        .symbolSize(chartAnimated ? 25 : 0)
+                    .symbol { Circle().fill(hrColor).frame(width: 5, height: 5) }
                     AreaMark(x: .value("Date", item.date), y: .value("RHR", item.resting))
-                        .foregroundStyle(LinearGradient(colors: [hrColor.opacity(0.15), hrColor.opacity(0.02)], startPoint: .top, endPoint: .bottom))
+                        .foregroundStyle(LinearGradient(colors: [hrColor.opacity(chartAnimated ? 0.15 : 0), hrColor.opacity(0.02)], startPoint: .top, endPoint: .bottom))
                         .interpolationMethod(.catmullRom)
+
+                    if let selectedHRDate {
+                        RuleMark(x: .value("Selected", selectedHRDate))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                            .lineStyle(StrokeStyle(lineWidth: 0.5))
+                    }
                 }
                 .chartYAxis { AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { _ in AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4])).foregroundStyle(PulseTheme.border); AxisValueLabel().font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary) } }
-                .chartXAxis { AxisMarks(values: .stride(by: .day, count: 1)) { _ in AxisValueLabel(format: .dateTime.month(.defaultDigits).day()).font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary.opacity(0.7)) } }
-                .frame(height: 180).opacity(chartAnimated ? 1 : 0).animation(.easeOut(duration: 1.0), value: chartAnimated)
+                .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) { _ in AxisValueLabel(format: .dateTime.weekday(.abbreviated)).font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary.opacity(0.7)) } }
+                .chartOverlay { proxy in
+                    GeometryReader { geo in
+                        Rectangle().fill(.clear).contentShape(Rectangle())
+                            .gesture(DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let plotFrame = geo[proxy.plotAreaFrame]
+                                    let x = value.location.x - plotFrame.origin.x
+                                    guard let date: Date = proxy.value(atX: x) else { return }
+                                    if let nearest = data.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+                                        let newDate = Calendar.current.startOfDay(for: nearest.date)
+                                        if selectedHRDate != newDate {
+                                            selectedHRDate = newDate
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) { selectedHRDate = nil }
+                                }
+                            )
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let sel = selectedHRDate,
+                       let point = data.first(where: { Calendar.current.isDate($0.date, inSameDayAs: sel) }) {
+                        let dateFmt: DateFormatter = {
+                            let f = DateFormatter()
+                            f.locale = Locale.current
+                            f.dateFormat = "M/d EEEE"
+                            return f
+                        }()
+                        VStack(spacing: 2) {
+                            Text("\(Int(point.resting)) bpm")
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(dateFmt.string(from: point.date))
+                                .font(.system(size: 11, design: .rounded))
+                                .foregroundStyle(PulseTheme.textSecondary)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .transition(.scale.combined(with: .opacity))
+                        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedHRDate)
+                    }
+                }
+                .frame(height: 180).opacity(chartAnimated ? 1 : 0).animation(.spring(response: 0.8, dampingFraction: 0.7), value: chartAnimated)
             } else {
-                let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
                 let rawData = data.map { (date: $0.date, value: $0.resting) }
-                let candles = aggregateToCandlePoints(from: rawData, groupBy: groupBy)
-                if candles.count >= 3 {
-                    rangeBarChart(candles: candles, color: hrColor, yLabel: "bpm")
-                } else if !rawData.isEmpty {
-                    dailyLineChart(data: rawData, color: hrColor, yLabel: "bpm")
+                let weekly = aggregateWeeklyAverage(from: rawData)
+                if !weekly.isEmpty {
+                    dailyLineChart(data: weekly, color: hrColor, yLabel: "bpm", selectedDate: $selectedHRDate)
                 } else {
                     emptyChartPlaceholder
                 }
@@ -460,7 +930,7 @@ struct HistoryView: View {
         let prevHRVs = previousPeriodSummaries.compactMap(\.averageHRV)
         let prevAvgHRV2 = prevHRVs.isEmpty ? nil : prevHRVs.reduce(0,+) / Double(prevHRVs.count)
         let hrvDelta = deltaPct(cur: curAvgHRV, prev: prevAvgHRV2)
-        let hrvColor = Color(hex: "5C7BC7")  // 蓝色系
+        let hrvColor = PulseTheme.hrvBlue  // 蓝色系
 
         let hrvInsight: String? = {
             guard let cur = curAvgHRV else { return nil }
@@ -490,21 +960,71 @@ struct HistoryView: View {
                     LineMark(x: .value("Date", item.date), y: .value("HRV", item.value))
                         .foregroundStyle(hrvColor).interpolationMethod(.catmullRom)
                         .lineStyle(StrokeStyle(lineWidth: 2))
-                        .symbol { Circle().fill(hrvColor).frame(width: 5, height: 5) }
+                        .symbolSize(chartAnimated ? 25 : 0)
+                    .symbol { Circle().fill(hrvColor).frame(width: 5, height: 5) }
                     AreaMark(x: .value("Date", item.date), y: .value("HRV", item.value))
-                        .foregroundStyle(LinearGradient(colors: [hrvColor.opacity(0.15), hrvColor.opacity(0.02)], startPoint: .top, endPoint: .bottom))
+                        .foregroundStyle(LinearGradient(colors: [hrvColor.opacity(chartAnimated ? 0.15 : 0), hrvColor.opacity(0.02)], startPoint: .top, endPoint: .bottom))
                         .interpolationMethod(.catmullRom)
+
+                    if let selectedHRVDate {
+                        RuleMark(x: .value("Selected", selectedHRVDate))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                            .lineStyle(StrokeStyle(lineWidth: 0.5))
+                    }
                 }
                 .chartYAxis { AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { _ in AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4])).foregroundStyle(PulseTheme.border); AxisValueLabel().font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary) } }
-                .chartXAxis { AxisMarks(values: .stride(by: .day, count: 1)) { _ in AxisValueLabel(format: .dateTime.month(.defaultDigits).day()).font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary.opacity(0.7)) } }
-                .frame(height: 180).opacity(chartAnimated ? 1 : 0).animation(.easeOut(duration: 1.0), value: chartAnimated)
+                .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) { _ in AxisValueLabel(format: .dateTime.weekday(.abbreviated)).font(.system(size: 9)).foregroundStyle(PulseTheme.textTertiary.opacity(0.7)) } }
+                .chartOverlay { proxy in
+                    GeometryReader { geo in
+                        Rectangle().fill(.clear).contentShape(Rectangle())
+                            .gesture(DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let plotFrame = geo[proxy.plotAreaFrame]
+                                    let x = value.location.x - plotFrame.origin.x
+                                    guard let date: Date = proxy.value(atX: x) else { return }
+                                    if let nearest = data.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+                                        let newDate = Calendar.current.startOfDay(for: nearest.date)
+                                        if selectedHRVDate != newDate {
+                                            selectedHRVDate = newDate
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) { selectedHRVDate = nil }
+                                }
+                            )
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let sel = selectedHRVDate,
+                       let point = data.first(where: { Calendar.current.isDate($0.date, inSameDayAs: sel) }) {
+                        let dateFmt: DateFormatter = {
+                            let f = DateFormatter()
+                            f.locale = Locale.current
+                            f.dateFormat = "M/d EEEE"
+                            return f
+                        }()
+                        VStack(spacing: 2) {
+                            Text("\(Int(point.value)) ms")
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(dateFmt.string(from: point.date))
+                                .font(.system(size: 11, design: .rounded))
+                                .foregroundStyle(PulseTheme.textSecondary)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .transition(.scale.combined(with: .opacity))
+                        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedHRVDate)
+                    }
+                }
+                .frame(height: 180).opacity(chartAnimated ? 1 : 0).animation(.spring(response: 0.8, dampingFraction: 0.7), value: chartAnimated)
             } else {
-                let groupBy: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
-                let candles = aggregateToCandlePoints(from: data, groupBy: groupBy)
-                if candles.count >= 3 {
-                    rangeBarChart(candles: candles, color: hrvColor, yLabel: "ms")
-                } else if !data.isEmpty {
-                    dailyLineChart(data: data, color: hrvColor, yLabel: "ms")
+                let weekly = aggregateWeeklyAverage(from: data)
+                if !weekly.isEmpty {
+                    dailyLineChart(data: weekly, color: hrvColor, yLabel: "ms", selectedDate: $selectedHRVDate)
                 } else {
                     emptyChartPlaceholder
                 }
@@ -543,7 +1063,7 @@ struct HistoryView: View {
         return chartCard(
             icon: "moon.fill",
             title: String(localized: "Sleep"),
-            color: Color(hex: "4B3D8F"),
+            color: PulseTheme.sleepViolet,
             currentValue: latestSleep,
             changeText: sleepDelta2?.0,
             changePositive: sleepDelta2?.1 ?? true,
@@ -575,16 +1095,24 @@ struct HistoryView: View {
 
                     // Average baseline
                     RuleMark(y: .value("Avg", avgHours))
-                        .foregroundStyle(PulseTheme.accent.opacity(0.6))
+                        .foregroundStyle(PulseTheme.sleepAccent.opacity(0.6))
                         .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
-                        .annotation(position: .trailing, alignment: .leading) {
+                        .annotation(position: .top, alignment: .trailing) {
                             Text(String(format: "avg %.1fh", avgHours))
                                 .font(.system(size: 9))
-                                .foregroundStyle(PulseTheme.accent.opacity(0.8))
+                                .foregroundStyle(PulseTheme.sleepAccent.opacity(0.8))
+                                .padding(.trailing, 4)
                         }
+
+                    if let selectedSleepDate {
+                        RuleMark(x: .value("Selected", selectedSleepDate, unit: .day))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                            .lineStyle(StrokeStyle(lineWidth: 0.5))
+                    }
                 }
+                .chartYScale(domain: 0...12)
                 .chartYAxis {
-                    AxisMarks(position: .leading) { value in
+                    AxisMarks(position: .leading, values: [0, 3, 6, 9, 12]) { value in
                         AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
                             .foregroundStyle(PulseTheme.border.opacity(0.4))
                         AxisValueLabel {
@@ -596,21 +1124,208 @@ struct HistoryView: View {
                     }
                 }
                 .chartXAxis {
-                    AxisMarks(values: .stride(by: .day, count: selectedRange.xAxisStride)) { _ in
-                        AxisValueLabel(format: .dateTime.month(.defaultDigits).day())
+                    AxisMarks(values: .automatic(desiredCount: 4)) { _ in
+                        AxisValueLabel(format: .dateTime.month(.abbreviated).day())
                             .font(.system(size: 9))
                             .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
                     }
                 }
+                .chartOverlay { proxy in
+                    GeometryReader { geo in
+                        Rectangle().fill(.clear).contentShape(Rectangle())
+                            .gesture(DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let plotFrame = geo[proxy.plotAreaFrame]
+                                    let x = value.location.x - plotFrame.origin.x
+                                    guard let date: Date = proxy.value(atX: x) else { return }
+                                    if let nearest = data.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+                                        let newDate = Calendar.current.startOfDay(for: nearest.date)
+                                        if selectedSleepDate != newDate {
+                                            selectedSleepDate = newDate
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) { selectedSleepDate = nil }
+                                }
+                            )
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let sel = selectedSleepDate,
+                       let point = data.first(where: { Calendar.current.isDate($0.date, inSameDayAs: sel) }) {
+                        let dateFmt: DateFormatter = {
+                            let f = DateFormatter()
+                            f.locale = Locale.current
+                            f.dateFormat = "M/d EEEE"
+                            return f
+                        }()
+                        VStack(spacing: 2) {
+                            Text(String(format: "%.1fh (deep %.1fh)", point.hours, point.deep))
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(dateFmt.string(from: point.date))
+                                .font(.system(size: 11, design: .rounded))
+                                .foregroundStyle(PulseTheme.textSecondary)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .transition(.scale.combined(with: .opacity))
+                        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedSleepDate)
+                    }
+                }
                 .frame(height: 180)
                 .opacity(chartAnimated ? 1 : 0)
-                .animation(.easeOut(duration: 1.0), value: chartAnimated)
+                .animation(.spring(response: 0.8, dampingFraction: 0.7), value: chartAnimated)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(String(localized: "Sleep trend"))
                 .accessibilityValue({
                     let avg = data.map(\.hours).reduce(0, +) / max(Double(data.count), 1)
                     return String(localized: "Average \(String(format: "%.1f", avg)) hours over \(data.count) days")
                 }())
+            }
+        }
+    }
+
+    // MARK: - 压力趋势图
+
+    private var stressTrendChart: some View {
+        let data = filteredSummaries.compactMap { s -> (date: Date, score: Int)? in
+            guard let score = s.stressScore else { return nil }
+            return (s.date, score)
+        }
+
+        let latestStress = data.last?.score
+        let prevStress = previousPeriodSummaries.compactMap(\.stressScore)
+        let prevAvgVal = prevStress.isEmpty ? nil : prevStress.reduce(0,+) / prevStress.count
+        let curAvg = data.isEmpty ? nil : data.map(\.score).reduce(0,+) / data.count
+        // For stress: lower is better, so invert the positive flag
+        let stressDelta = deltaPct(cur: curAvg.map(Double.init), prev: prevAvgVal.map(Double.init))
+        let deltaPositive = stressDelta.map { !$0.1 } // lower stress = positive
+
+        let stressInsight: String? = {
+            guard let cur = curAvg, let prev = prevAvgVal else { return nil }
+            let diff = cur - prev
+            if abs(diff) < 3 { return String(localized: "Your stress level has been steady this period") }
+            return diff > 0
+                ? String(format: String(localized: "Stress is up %d points vs last period"), abs(diff))
+                : String(format: String(localized: "Stress is down %d points vs last period \u{2014} nice"), abs(diff))
+        }()
+
+        let stressColor: Color = {
+            guard let score = latestStress else { return PulseTheme.statusWarning }
+            return StressLevel.from(score: score).color
+        }()
+
+        return chartCard(
+            icon: "brain.head.profile",
+            title: String(localized: "Stress"),
+            color: stressColor,
+            currentValue: latestStress.map { "\($0)" },
+            changeText: stressDelta?.0,
+            changePositive: deltaPositive ?? true,
+            insight: stressInsight
+        ) {
+            if data.isEmpty {
+                emptyChartPlaceholder
+            } else {
+                Chart(data, id: \.date) { item in
+                    LineMark(
+                        x: .value("Date", item.date),
+                        y: .value("Stress", item.score)
+                    )
+                    .foregroundStyle(stressColor)
+                    .interpolationMethod(.catmullRom)
+                    .lineStyle(StrokeStyle(lineWidth: 2))
+                    .symbolSize(chartAnimated ? 25 : 0)
+                    .symbol {
+                        Circle()
+                            .fill(stressColor)
+                            .frame(width: 5, height: 5)
+                    }
+
+                    AreaMark(
+                        x: .value("Date", item.date),
+                        y: .value("Stress", item.score)
+                    )
+                    .foregroundStyle(LinearGradient(
+                        colors: [stressColor.opacity(chartAnimated ? 0.2 : 0), stressColor.opacity(0.02)],
+                        startPoint: .top, endPoint: .bottom
+                    ))
+                    .interpolationMethod(.catmullRom)
+
+                    if let selectedStressDate {
+                        RuleMark(x: .value("Selected", selectedStressDate))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                            .lineStyle(StrokeStyle(lineWidth: 0.5))
+                    }
+                }
+                .chartYScale(domain: 0...100)
+                .chartYAxis {
+                    AxisMarks(position: .leading, values: [0, 25, 50, 75, 100]) { value in
+                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
+                            .foregroundStyle(PulseTheme.border)
+                        AxisValueLabel()
+                            .font(.system(size: 9, design: .rounded))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+                .chartXAxis {
+                    AxisMarks(values: .stride(by: .day, count: 1)) { _ in
+                        AxisValueLabel(format: .dateTime.month(.defaultDigits).day())
+                            .font(.system(size: 9))
+                            .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
+                    }
+                }
+                .chartOverlay { proxy in
+                    GeometryReader { geo in
+                        Rectangle().fill(.clear).contentShape(Rectangle())
+                            .gesture(DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let plotFrame = geo[proxy.plotAreaFrame]
+                                    let x = value.location.x - plotFrame.origin.x
+                                    guard let date: Date = proxy.value(atX: x) else { return }
+                                    if let nearest = data.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+                                        let newDate = Calendar.current.startOfDay(for: nearest.date)
+                                        if selectedStressDate != newDate {
+                                            selectedStressDate = newDate
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                    }
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.easeOut(duration: 0.25)) { selectedStressDate = nil }
+                                }
+                            )
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if let sel = selectedStressDate,
+                       let point = data.first(where: { Calendar.current.isDate($0.date, inSameDayAs: sel) }) {
+                        let dateFmt: DateFormatter = {
+                            let f = DateFormatter()
+                            f.locale = Locale.current
+                            f.dateFormat = "M/d EEEE"
+                            return f
+                        }()
+                        VStack(spacing: 2) {
+                            Text("\(point.score)")
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundStyle(PulseTheme.textPrimary)
+                            Text(dateFmt.string(from: point.date))
+                                .font(.system(size: 11, design: .rounded))
+                                .foregroundStyle(PulseTheme.textSecondary)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .transition(.scale.combined(with: .opacity))
+                        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedStressDate)
+                    }
+                }
+                .frame(height: 180)
             }
         }
     }
@@ -769,7 +1484,7 @@ struct HistoryView: View {
     // MARK: - Daily Line Chart (fallback when not enough data to aggregate)
 
     @ViewBuilder
-    private func dailyLineChart(data: [(date: Date, value: Double)], color: Color, yLabel: String) -> some View {
+    private func dailyLineChart(data: [(date: Date, value: Double)], color: Color, yLabel: String, selectedDate: Binding<Date?>) -> some View {
         let vals = data.map(\.value)
         let lo = (vals.min() ?? 0)
         let hi = (vals.max() ?? 100)
@@ -793,38 +1508,83 @@ struct HistoryView: View {
                     y: .value("Value", item.value)
                 )
                 .foregroundStyle(color)
-                .lineStyle(StrokeStyle(lineWidth: 2.5))
+                .lineStyle(StrokeStyle(lineWidth: 2))
                 .interpolationMethod(.catmullRom)
-                .symbol { Circle().fill(color).frame(width: 6, height: 6) }
+                .symbolSize(data.count <= 14 ? 25 : 0)
+
+                if let selectedVal = selectedDate.wrappedValue {
+                    RuleMark(x: .value("Selected", selectedVal))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                        .lineStyle(StrokeStyle(lineWidth: 0.5))
+                }
             }
             .chartYScale(domain: (lo - pad)...(hi + pad))
             .chartYAxis {
                 AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { _ in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
-                        .foregroundStyle(Color.white.opacity(0.07))
+                        .foregroundStyle(PulseTheme.highlight)
                     AxisValueLabel()
                         .font(.system(size: 9, design: .rounded))
-                        .foregroundStyle(Color.white.opacity(0.4))
+                        .foregroundStyle(PulseTheme.highlight)
                 }
             }
             .chartXAxis {
-                AxisMarks(values: .automatic(desiredCount: min(data.count, 6))) { _ in
-                    AxisValueLabel(format: .dateTime.month(.defaultDigits).day())
+                AxisMarks(values: .automatic(desiredCount: 4)) { _ in
+                    AxisValueLabel(format: .dateTime.month(.abbreviated).day())
                         .font(.system(size: 9))
-                        .foregroundStyle(Color.white.opacity(0.4))
+                        .foregroundStyle(PulseTheme.highlight)
+                }
+            }
+            .chartOverlay { proxy in
+                GeometryReader { geo in
+                    Rectangle().fill(.clear).contentShape(Rectangle())
+                        .gesture(DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                let plotFrame = geo[proxy.plotAreaFrame]
+                                let x = value.location.x - plotFrame.origin.x
+                                guard let date: Date = proxy.value(atX: x) else { return }
+                                if let nearest = data.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+                                    let newDate = Calendar.current.startOfDay(for: nearest.date)
+                                    if selectedDate.wrappedValue != newDate {
+                                        selectedDate.wrappedValue = newDate
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    }
+                                }
+                            }
+                            .onEnded { _ in
+                                withAnimation(.easeOut(duration: 0.25)) { selectedDate.wrappedValue = nil }
+                            }
+                        )
+                }
+            }
+            .overlay(alignment: .top) {
+                if let sel = selectedDate.wrappedValue,
+                   let point = data.first(where: { Calendar.current.isDate($0.date, inSameDayAs: sel) }) {
+                    let dateFmt: DateFormatter = {
+                        let f = DateFormatter()
+                        f.locale = Locale.current
+                        f.dateFormat = "M/d EEEE"
+                        return f
+                    }()
+                    VStack(spacing: 2) {
+                        Text(String(format: "%.1f %@", point.value, yLabel))
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text(dateFmt.string(from: point.date))
+                            .font(.system(size: 11, design: .rounded))
+                            .foregroundStyle(PulseTheme.textSecondary)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .transition(.scale.combined(with: .opacity))
+                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedDate.wrappedValue)
                 }
             }
             .frame(height: 180)
             .opacity(chartAnimated ? 1 : 0)
             .animation(.easeOut(duration: 1.0), value: chartAnimated)
 
-            // Data range note
-            if let first = data.first, let last = data.last {
-                let days = Calendar.current.dateComponents([.day], from: first.date, to: last.date).day ?? 0
-                Text("显示 \(data.count) 天数据（\(days + 1)天跨度），积累更多数据后将显示趋势聚合图")
-                    .font(.system(size: 10))
-                    .foregroundStyle(.white.opacity(0.3))
-            }
         }
     }
 
@@ -837,10 +1597,6 @@ struct HistoryView: View {
         let hi = (avgs.max() ?? 100)
         let spread = max(hi - lo, 5.0)
         let pad = spread * 0.25
-        let unit: Calendar.Component = selectedRange == .month ? .weekOfYear : .month
-        let xFormat: Date.FormatStyle = selectedRange == .month
-            ? .dateTime.month(.defaultDigits).day()
-            : .dateTime.month(.abbreviated)
 
         VStack(alignment: .leading, spacing: 8) {
             Chart(candles) { c in
@@ -866,26 +1622,26 @@ struct HistoryView: View {
                 .interpolationMethod(.catmullRom)
                 .symbol {
                     Circle()
-                        .fill(c.isUp ? color : Color(hex: "FF6B6B"))
-                        .frame(width: 8, height: 8)
-                        .shadow(color: (c.isUp ? color : Color(hex: "FF6B6B")).opacity(0.6), radius: 4)
+                        .fill(color)
+                        .frame(width: 6, height: 6)
                 }
+
             }
             .chartYScale(domain: (lo - pad)...(hi + pad))
             .chartYAxis {
                 AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { _ in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4]))
-                        .foregroundStyle(Color.white.opacity(0.07))
+                        .foregroundStyle(PulseTheme.highlight)
                     AxisValueLabel()
                         .font(.system(size: 9, design: .rounded))
-                        .foregroundStyle(Color.white.opacity(0.4))
+                        .foregroundStyle(PulseTheme.highlight)
                 }
             }
             .chartXAxis {
-                AxisMarks(values: .automatic(desiredCount: candles.count)) { _ in
-                    AxisValueLabel(format: .dateTime.month(.defaultDigits).day())
+                AxisMarks(values: .automatic(desiredCount: 4)) { _ in
+                    AxisValueLabel(format: .dateTime.month(.abbreviated).day())
                         .font(.system(size: 9))
-                        .foregroundStyle(Color.white.opacity(0.4))
+                        .foregroundStyle(PulseTheme.highlight)
                 }
             }
             .frame(height: 180)
@@ -893,9 +1649,9 @@ struct HistoryView: View {
             .animation(.easeOut(duration: 1.0), value: chartAnimated)
 
             // Period summary row
-            if candles.count >= 2 {
-                let first = candles.first!.avg
-                let last = candles.last!.avg
+            if candles.count >= 2, let firstCandle = candles.first, let lastCandle = candles.last {
+                let first = firstCandle.avg
+                let last = lastCandle.avg
                 let delta = last - first
                 let pct = first > 0 ? (delta / first) * 100 : 0
                 let isUp = delta >= 0
@@ -907,11 +1663,11 @@ struct HistoryView: View {
                                 isUp ? "+" : "", delta, yLabel.isEmpty ? "" : " \(yLabel)",
                                 isUp ? "+" : "", pct))
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    Text(selectedRange == .month ? "vs 30天前" : "vs 90天前")
+                    Text(selectedRange == .month ? String(localized: "vs 30 days ago") : String(localized: "vs 90 days ago"))
                         .font(.system(size: 11, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.4))
+                        .foregroundStyle(PulseTheme.textTertiary)
                 }
-                .foregroundStyle(isUp ? color : Color(hex: "FF6B6B"))
+                .foregroundStyle(color)
                 .padding(.leading, 4)
             }
         }
@@ -972,7 +1728,7 @@ struct HistoryView: View {
             if let insight {
                 Text(insight)
                     .font(.system(size: 13, weight: .regular))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(PulseTheme.textSecondary)
                     .lineSpacing(2)
             }
 
@@ -981,10 +1737,10 @@ struct HistoryView: View {
         .padding(PulseTheme.spacingM)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                        .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
     }
@@ -1032,28 +1788,28 @@ struct HistoryView: View {
                 NavigationLink {
                     CorrelationInsightsView().preferredColorScheme(.dark)
                 } label: {
-                    shortcutTile(icon: "link", color: PulseTheme.sleepViolet, title: String(localized: "数据洞察"))
+                    shortcutTile(icon: "link", color: PulseTheme.sleepViolet, title: String(localized: "Insights"))
                 }
                 .buttonStyle(.plain)
 
                 NavigationLink {
                     AnomalyTimelineView().preferredColorScheme(.dark)
                 } label: {
-                    shortcutTile(icon: "exclamationmark.triangle.fill", color: PulseTheme.statusWarning, title: String(localized: "异常记录"))
+                    shortcutTile(icon: "exclamationmark.triangle.fill", color: PulseTheme.statusWarning, title: String(localized: "Anomalies"))
                 }
                 .buttonStyle(.plain)
 
                 NavigationLink {
                     ChallengeView().preferredColorScheme(.dark)
                 } label: {
-                    shortcutTile(icon: "flame.fill", color: PulseTheme.activityCoral, title: String(localized: "训练挑战"))
+                    shortcutTile(icon: "flame.fill", color: PulseTheme.activityCoral, title: String(localized: "Challenges"))
                 }
                 .buttonStyle(.plain)
             }
 
             HStack(spacing: PulseTheme.spacingS) {
                 Button { showMonthlyReport = true } label: {
-                    shortcutTile(icon: "calendar.badge.clock", color: PulseTheme.accentTeal, title: String(localized: "月度报告"))
+                    shortcutTile(icon: "calendar.badge.clock", color: PulseTheme.accentTeal, title: String(localized: "Monthly Report"))
                 }
                 .buttonStyle(.plain)
 
@@ -1081,7 +1837,7 @@ struct HistoryView: View {
             NavigationLink {
                 WorkoutHistoryListView().preferredColorScheme(.dark)
             } label: {
-                shortcutTile(icon: "clock.fill", color: PulseTheme.activityCoral, title: String(localized: "训练记录"))
+                shortcutTile(icon: "clock.fill", color: PulseTheme.activityCoral, title: String(localized: "Workout Log"))
             }
             .buttonStyle(.plain)
         }
@@ -1108,10 +1864,10 @@ struct HistoryView: View {
         .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.05))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
         .accessibilityLabel(title)
@@ -1178,6 +1934,19 @@ struct CandlePoint: Identifiable {
     var isUp: Bool { close >= open }
 }
 
+/// Aggregate daily data to weekly averages — one point per week, smooth line
+func aggregateWeeklyAverage(from data: [(date: Date, value: Double)]) -> [(date: Date, value: Double)] {
+    let cal = Calendar.current
+    var groups: [Date: [Double]] = [:]
+    for item in data {
+        let weekStart = cal.dateInterval(of: .weekOfYear, for: item.date)?.start ?? item.date
+        groups[weekStart, default: []].append(item.value)
+    }
+    return groups.sorted { $0.key < $1.key }.map { (date, values) in
+        (date: date, value: values.reduce(0, +) / Double(values.count))
+    }
+}
+
 func aggregateToCandlePoints(from summaries: [(date: Date, value: Double)], groupBy: Calendar.Component) -> [CandlePoint] {
     let cal = Calendar.current
     var groups: [Date: [Double]] = [:]
@@ -1186,11 +1955,13 @@ func aggregateToCandlePoints(from summaries: [(date: Date, value: Double)], grou
         groups[start, default: []].append(item.value)
     }
     return groups.sorted { $0.key < $1.key }.compactMap { (date, values) in
-        guard !values.isEmpty else { return nil }
+        guard !values.isEmpty,
+              let firstVal = values.first, let lastVal = values.last else { return nil }
         let sorted = values.sorted()
+        guard let sortedFirst = sorted.first, let sortedLast = sorted.last else { return nil }
         return CandlePoint(
-            date: date, open: values.first!, close: values.last!,
-            high: sorted.last!, low: sorted.first!,
+            date: date, open: firstVal, close: lastVal,
+            high: sortedLast, low: sortedFirst,
             avg: values.reduce(0, +) / Double(values.count)
         )
     }
@@ -1211,8 +1982,8 @@ struct CandlestickChartView: View {
     var body: some View {
         if candles.isEmpty {
             VStack(spacing: 8) {
-                Image(systemName: "chart.bar.xaxis").font(.system(size: 24)).foregroundStyle(Color.white.opacity(0.15))
-                Text("Not enough data yet").font(.system(size: 12)).foregroundStyle(Color.white.opacity(0.25))
+                Image(systemName: "chart.bar.xaxis").font(.system(size: 24)).foregroundStyle(PulseTheme.highlight)
+                Text("Not enough data yet").font(.system(size: 12)).foregroundStyle(PulseTheme.highlight)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if useFallback {
@@ -1228,8 +1999,8 @@ struct CandlestickChartView: View {
                         .lineStyle(StrokeStyle(lineWidth: 2))
                 }
             }
-            .chartXAxis { AxisMarks { _ in AxisValueLabel(format: .dateTime.month(.abbreviated)).font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.4)) } }
-            .chartYAxis { AxisMarks(position: .leading) { _ in AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4])).foregroundStyle(Color.white.opacity(0.06)); AxisValueLabel().font(.system(size: 9)).foregroundStyle(Color.white.opacity(0.4)) } }
+            .chartXAxis { AxisMarks { _ in AxisValueLabel(format: .dateTime.month(.abbreviated)).font(.system(size: 9)).foregroundStyle(PulseTheme.highlight) } }
+            .chartYAxis { AxisMarks(position: .leading) { _ in AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3, dash: [4])).foregroundStyle(PulseTheme.highlight); AxisValueLabel().font(.system(size: 9)).foregroundStyle(PulseTheme.highlight) } }
             .frame(maxWidth: .infinity)
             .frame(height: 160)
         } else {
@@ -1259,12 +2030,12 @@ struct CandlestickChartView: View {
                         let val = minVal + (maxVal - minVal) * Double(steps - i) / Double(steps)
                         Group {
                             Rectangle()
-                                .fill(Color.white.opacity(i == 0 || i == steps ? 0.0 : 0.05))
+                                .fill(PulseTheme.highlight)
                                 .frame(width: chartW, height: 0.5)
                                 .offset(x: padding, y: h * pct)
                             Text("\(Int(val))\(yLabel)")
                                 .font(.system(size: 9, design: .rounded))
-                                .foregroundStyle(Color.white.opacity(0.3))
+                                .foregroundStyle(PulseTheme.highlight)
                                 .frame(width: padding - 4, alignment: .trailing)
                                 .offset(x: 0, y: h * pct - 7)
                         }
@@ -1280,7 +2051,7 @@ struct CandlestickChartView: View {
                         let bodyTop = min(openY, closeY)
                         let bodyH   = min(h * 0.8, max(2, abs(closeY - openY)))
                         let bullish = candle.isUp
-                        let c      = bullish ? color : Color(hex: "FF6B6B")
+                        let c      = color
                         let isSelected = selectedIdx == idx
                         let revealX = padding + chartW * revealProgress
                         let show = cx <= revealX
@@ -1349,16 +2120,16 @@ struct CandlestickChartView: View {
                     let sel = candles[i]
                     HStack(spacing: 12) {
                         Text(sel.date, format: .dateTime.month().day())
-                            .foregroundStyle(.white.opacity(0.5))
+                            .foregroundStyle(PulseTheme.textTertiary)
                         Text("↑\(Int(sel.high))\(yLabel)").foregroundStyle(color)
-                        Text("↓\(Int(sel.low))\(yLabel)").foregroundStyle(Color(hex: "FF6B6B"))
-                        Text("~\(Int(sel.avg))\(yLabel)").foregroundStyle(.white.opacity(0.8))
+                        Text("↓\(Int(sel.low))\(yLabel)").foregroundStyle(PulseTheme.textTertiary)
+                        Text("~\(Int(sel.avg))\(yLabel)").foregroundStyle(PulseTheme.textSecondary)
                     }
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .padding(.horizontal, 12).padding(.vertical, 7)
                     .background(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(Color(hex: "1C2A30").opacity(0.97))
+                            .fill(PulseTheme.cardElevated.opacity(0.97))
                             .overlay(RoundedRectangle(cornerRadius: 10).stroke(color.opacity(0.3), lineWidth: 0.5))
                     )
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))

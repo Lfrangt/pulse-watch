@@ -1,13 +1,16 @@
 import SwiftUI
 import SwiftData
+import os
 
 /// Tab 1: 今日状态总览 — 评分大圆环 + 洞察卡片 + 指标网格 + 趋势图 + 训练建议
 struct DashboardView: View {
 
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "DashboardView")
+
     @AppStorage("pulse.demo.enabled") private var demoMode = false
 
-    @State private var healthManager = HealthKitManager.shared
-    @State private var connectivityManager = WatchConnectivityManager.shared
+    private let healthManager = HealthKitManager.shared
+    private let connectivityManager = WatchConnectivityManager.shared
     @State private var isLoading = true
     @State private var brief: ScoreEngine.DailyBrief?
     @State private var insight: HealthInsight?
@@ -15,9 +18,7 @@ struct DashboardView: View {
     @State private var showGymPrompt = false
     @State private var breathe = false
 
-    // 圆环动画状态
     @State private var animatedScore: Int = 0
-    @State private var ringProgress: CGFloat = 0
     @State private var ringAnimated = false
 
     // 演示模式时间线事件
@@ -40,113 +41,191 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 0) {
-                    // HERO — full-bleed atmospheric section
-                    if let brief {
-                        heroSection(score: brief.score, headline: brief.headline)
-                            .staggered(index: 0)
-                    } else if isLoading {
-                        heroLoadingPlaceholder
-                    } else if !healthManager.hasHealthData && !demoMode {
-                        VStack(spacing: PulseTheme.spacingM) {
-                            healthKitPermissionGuide
-                                .staggered(index: 1)
-                            Text(String(localized: "Or wear your Apple Watch to collect data"))
-                                .font(PulseTheme.captionFont)
-                                .foregroundStyle(PulseTheme.textTertiary)
-                                .padding(.horizontal, PulseTheme.spacingM)
-                                .staggered(index: 2)
-                        }
-                        .padding(.horizontal, PulseTheme.spacingM)
-                    } else {
-                        emptyStateCard
-                            .staggered(index: 1)
-                            .padding(.horizontal, PulseTheme.spacingM)
-                    }
+            ZStack(alignment: .top) {
+                // Clinical: flat surface, no gradient, no glow
+                PulseTheme.background
+                    .ignoresSafeArea()
 
-                    // BELOW HERO — cards with padding
-                    VStack(spacing: PulseTheme.spacingS) {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        // HEADER — date eyebrow + Today title (matches Today.jsx)
+                        dashboardHeader
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 12)
+                            .padding(.bottom, 8)
 
-
-                        // Metrics grid
-                        if hasAnyMetric {
-                            metricsGrid
-                                .staggered(index: 3)
-                        }
-
-                        // Weekly trends
-                        WeeklyTrendChartsView(
-                            summaries: allSummaries,
-                            demoMode: demoMode
-                        )
-                        .staggered(index: 4)
-
-                        // Health Age — compact, tap to detail
-                        if let result = healthAgeResult {
-                            NavigationLink(destination: HealthAgeDetailView(result: result)) {
-                                healthAgeCardCompact(result: result)
+                        // HERO — content-driven height, no GeometryReader
+                        if let brief {
+                            heroSection(score: brief.score, headline: brief.headline)
+                                .staggered(index: 0)
+                        } else if isLoading {
+                            heroLoadingPlaceholder
+                        } else if !healthManager.hasHealthData && !demoMode {
+                            VStack(spacing: PulseTheme.spacingM) {
+                                healthKitPermissionGuide
+                                    .staggered(index: 1)
+                                Text(String(localized: "Or wear your Apple Watch to collect data"))
+                                    .font(PulseTheme.captionFont)
+                                    .foregroundStyle(PulseTheme.textTertiary)
+                                    .padding(.horizontal, PulseTheme.spacingM)
+                                    .staggered(index: 2)
                             }
-                            .buttonStyle(.plain)
-                            .staggered(index: 5)
+                            .padding(.horizontal, PulseTheme.spacingM)
+                        } else {
+                            emptyStateCard
+                                .staggered(index: 1)
+                                .padding(.horizontal, PulseTheme.spacingM)
                         }
 
-                        // Recovery timeline
-                        recoveryTimelineSection
+                        // BELOW HERO — cards with padding
+                        VStack(spacing: 24) {
+
+                            // ── JSX Today.jsx layout ──────────────────────
+
+                            // Daily Coach — actionable verb + HealthKit data citations
+                            if let brief {
+                                dailyCoachCard(score: brief.score)
+                                    .staggered(index: 1)
+                            }
+
+                            // Vitals grid — HRV / RHR / SpO2 / Steps
+                            if hasAnyMetric {
+                                VitalsGrid(
+                                    hrv: currentHRV,
+                                    restingHR: healthManager.latestRestingHR,
+                                    spo2: currentBloodOxygen,
+                                    steps: currentSteps > 0 ? currentSteps : nil
+                                )
+                                .staggered(index: 2)
+                            }
+
+                            // Sleep band — Last Night
+                            if healthManager.lastNightSleepMinutes > 0 {
+                                NavigationLink(destination: SleepDetailView()) {
+                                    SleepBandCard(
+                                        totalMinutes: healthManager.lastNightSleepMinutes,
+                                        deepMinutes: healthManager.lastNightDeepSleepMinutes,
+                                        remMinutes: healthManager.lastNightREMSleepMinutes,
+                                        coreMinutes: max(0, healthManager.lastNightSleepMinutes
+                                                              - healthManager.lastNightDeepSleepMinutes
+                                                              - healthManager.lastNightREMSleepMinutes),
+                                        awakeMinutes: 0,
+                                        bedTime: healthManager.lastNightSleepStart,
+                                        wakeTime: healthManager.lastNightSleepEnd
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                                .staggered(index: 3)
+                            }
+
+                            // Training suggestion
+                            if let plan = brief?.trainingPlan, plan.targetMuscleGroup != "rest" {
+                                SuggestionCard(
+                                    intensity: plan.intensity.rawValue,
+                                    intensityColor: intensityColor(for: plan.intensity),
+                                    workoutTitle: workoutTitle(for: plan),
+                                    subtitle: plan.reason,
+                                    exercises: plan.suggestedExercises.map { ex in
+                                        SuggestionCard.Exercise(
+                                            name: ex.name,
+                                            sets: "\(ex.sets) × \(ex.reps)",
+                                            weight: ex.suggestedWeight.map { String(format: "%.0f kg", $0) } ?? ""
+                                        )
+                                    }
+                                )
+                                .staggered(index: 4)
+                            }
+
+                            // 7-day readiness chart
+                            WeeklyReadinessChart(scores: sevenDayAllScores())
+                                .staggered(index: 5)
+
+                            // ── Pulse-specific extras divider ─────────────
+
+                            HStack(spacing: 12) {
+                                Rectangle()
+                                    .fill(PulseTheme.border)
+                                    .frame(height: PulseTheme.hairline)
+                                Text(String(localized: "More from Pulse"))
+                                    .pulseEyebrow()
+                                    .layoutPriority(1)
+                                Rectangle()
+                                    .fill(PulseTheme.border)
+                                    .frame(height: PulseTheme.hairline)
+                            }
+                            .padding(.top, 8)
                             .staggered(index: 6)
 
-                        // Training advice
-                        if let advice = insight?.trainingAdvice {
-                            trainingAdviceCard(advice: advice)
+                            // Energy Bank
+                            energyBankCard
                                 .staggered(index: 6)
-                        } else if let plan = brief?.trainingPlan, plan.targetMuscleGroup != "rest" {
-                            TrainingCard(plan: plan)
-                                .staggered(index: 6)
-                        }
 
-                        // Goal progress
-                        GoalProgressCard()
+                            // Weekly trends (legacy chart — keep for now)
+                            WeeklyTrendChartsView(
+                                summaries: allSummaries,
+                                demoMode: demoMode
+                            )
                             .staggered(index: 7)
 
-                        // Share snapshot button
-                        Button { showShareSnapshot = true } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: "square.and.arrow.up")
-                                    .font(.system(size: 13, weight: .medium))
-                                Text(String(localized: "分享今日快照"))
-                                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                            }
-                            .foregroundStyle(PulseTheme.accentTeal)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(
-                                RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                                    .fill(PulseTheme.accentTeal.opacity(0.08))
-                            )
-                        }
-                        .staggered(index: 7)
-
-                        // Recent workouts
-                        if !recentWorkouts.isEmpty {
-                            recentWorkoutsSection
+                            // Health Age — compact, tap to detail
+                            if let result = healthAgeResult {
+                                NavigationLink(destination: HealthAgeDetailView(result: result)) {
+                                    healthAgeCardCompact(result: result)
+                                }
+                                .buttonStyle(.plain)
                                 .staggered(index: 8)
-                        }
+                            }
 
-                        // Gym setup
-                        if !hasGymLocation {
-                            gymSetupPrompt
+                            // Recovery timeline
+                            recoveryTimelineSection
                                 .staggered(index: 9)
-                        }
 
-                        Spacer(minLength: 16)
+                            // Goal progress
+                            GoalProgressCard()
+                                .staggered(index: 7)
+
+                            // Share snapshot button
+                            Button { showShareSnapshot = true } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.system(size: 13, weight: .medium))
+                                    Text(String(localized: "分享今日快照"))
+                                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                                }
+                                .foregroundStyle(PulseTheme.accentTeal)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(
+                                    RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                                        .fill(PulseTheme.accentTeal.opacity(0.08))
+                                )
+                            }
+                            .staggered(index: 7)
+
+                            // Recent workouts
+                            if !recentWorkouts.isEmpty {
+                                recentWorkoutsSection
+                                    .staggered(index: 8)
+                            }
+
+                            // Gym setup
+                            if !hasGymLocation {
+                                gymSetupPrompt
+                                    .staggered(index: 9)
+                            }
+
+                            Spacer(minLength: 16)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, PulseTheme.spacingM)
+                        .padding(.bottom, 8)
                     }
-                    .padding(.horizontal, PulseTheme.spacingM)
-                    .padding(.top, 4)
-                    .padding(.bottom, 8)
+                    .frame(maxWidth: .infinity)
                 }
-            }
-            .scrollContentBackground(.hidden)
-            .background(PulseTheme.background.ignoresSafeArea())
+                .scrollContentBackground(.hidden)
+                .scrollIndicators(.hidden)
+            } // end ZStack
             .toolbar(.hidden, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
             .sheet(isPresented: $showLocationSetup) {
@@ -179,145 +258,200 @@ struct DashboardView: View {
         .preferredColorScheme(.dark)
     }
 
-    // MARK: - Hero Section (Oura-style full bleed)
+    // MARK: - Dashboard Header — date eyebrow + Today title (Today.jsx pattern)
 
-    private func heroSection(score: Int, headline: String) -> some View {
-        GeometryReader { geo in
-            ZStack(alignment: .top) {
-                // ── Background: deep teal atmospheric gradient (Oura mountain vibe)
-                LinearGradient(
-                    stops: [
-                        .init(color: Color(hex: "0D4A5C"), location: 0),
-                        .init(color: Color(hex: "0A3347"), location: 0.35),
-                        .init(color: Color(hex: "071E2E"), location: 0.65),
-                        .init(color: PulseTheme.background, location: 1.0),
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-
-                // Subtle radial glow behind arc
-                RadialGradient(
-                    colors: [Color(hex: "1ADFFF").opacity(0.12), Color.clear],
-                    center: .init(x: 0.5, y: 0.42),
-                    startRadius: 10,
-                    endRadius: 220
-                )
-                .ignoresSafeArea()
-
-                VStack(spacing: 0) {
-                    // Safe area top padding — 12pt, hero gradient covers the rest
-                    Spacer().frame(height: 12)
-
-                    // ── Score discs row  (Oura's top circle grid)
-                    if let tri = triScore {
-                        ouraScoreDiscRow(
-                            total: score,
-                            sleep: tri.sleep.score,
-                            activity: tri.activity.score,
-                            readiness: tri.readiness.score
-                        )
-                    } else {
-                        ouraScoreDiscRow(total: score, sleep: nil, activity: nil, readiness: nil)
-                    }
-
-                    Spacer().frame(height: 16)
-
-                    // ── Wide arc gauge (Oura's sweeping 180° arc)
-                    ZStack {
-                        // Track
-                        wideArcTrack()
-                            .stroke(Color.white.opacity(0.10),
-                                    style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                            .frame(width: geo.size.width - 60, height: (geo.size.width - 60) / 2 + 10)
-
-                        // Progress
-                        wideArcTrack()
-                            .trim(from: 0, to: ringProgress)
-                            .stroke(Color.white,
-                                    style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                            .frame(width: geo.size.width - 60, height: (geo.size.width - 60) / 2 + 10)
-
-                        // Arc end labels removed — score number is self-explanatory
-
-                        // Crown icon above score (Oura's achievement icon)
-                        VStack(spacing: 4) {
-                            Image(systemName: "crown.fill")
-                                .font(.system(size: 14))
-                                .foregroundStyle(Color(hex: "FFD700").opacity(0.85))
-
-                            // Score number
-                            Text("\(animatedScore)")
-                                .font(.system(size: 64, weight: .bold, design: .default))
-                                .foregroundStyle(.white)
-                                .contentTransition(.numericText())
-
-                            Text("READINESS")
-                                .font(.system(size: 11, weight: .semibold))
-                                .tracking(3.5)
-                                .foregroundStyle(.white.opacity(0.55))
-                        }
-                        .offset(y: 8)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .onAppear {
-                        guard !ringAnimated else { return }
-                        ringAnimated = true
-                        withAnimation(.spring(response: 1.2, dampingFraction: 0.75).delay(0.3)) {
-                            ringProgress = CGFloat(score) / 100.0
-                        }
-                        animateScoreCounter(to: score)
-                    }
-
-                    Spacer().frame(height: 10)
-
-                    // ── Headline
-                    Text(headline)
-                        .font(.system(size: 26, weight: .bold, design: .serif))
-                        .foregroundStyle(.white)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.horizontal, 28)
-
-                    Spacer().frame(height: 6)
-
-                    // ── Sub-headline
-                    if let insight = brief?.insight {
-                        Text(insight)
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.75))
-                            .multilineTextAlignment(.center)
-                            .lineSpacing(2)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.horizontal, 36)
-                    }
-
-                    Spacer().frame(height: 16)
-                }
-                .padding(.top, 0)
+    private var dashboardHeader: some View {
+        HStack(alignment: .bottom) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(headerDateString)
+                    .pulseEyebrow()
+                Text(String(localized: "Today"))
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundStyle(PulseTheme.textPrimary)
+            }
+            Spacer()
+            Button {
+                // Tap = scroll to top / refresh
+            } label: {
+                Image(systemName: "clock")
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundStyle(PulseTheme.textSecondary)
+                    .frame(width: 32, height: 32)
             }
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: heroHeight)
-        .overlay(alignment: .bottom) {
-            LinearGradient(
-                stops: [
-                    .init(color: .clear, location: 0),
-                    .init(color: PulseTheme.background.opacity(0.5), location: 0.5),
-                    .init(color: PulseTheme.background, location: 1.0),
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: 60)
+    }
+
+    private var headerDateString: String {
+        let fmt = DateFormatter()
+        fmt.locale = .current
+        fmt.dateFormat = "EEE · MMM d"
+        return fmt.string(from: .now)
+    }
+
+    // MARK: - Hero Section — Clinical ReadinessCard
+    // 72pt big number, eyebrow label, status chip, 7-day sparkline. No ring.
+
+    private func heroSection(score: Int, headline: String) -> some View {
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            // Top row: eyebrow + status chip
+            HStack {
+                Text(String(localized: "Readiness"))
+                    .pulseEyebrow()
+                Spacer()
+                statusChip(for: score)
+            }
+
+            // Big number + delta
+            HStack(alignment: .firstTextBaseline, spacing: PulseTheme.spacingS) {
+                Text("\(animatedScore)")
+                    .font(PulseTheme.metricXLFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                    .contentTransition(.numericText())
+
+                Text("/ 100")
+                    .font(PulseTheme.calloutFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
+
+                Spacer()
+
+                let baseline = sevenDayBaseline()
+                VStack(alignment: .trailing, spacing: 2) {
+                    if let baseline {
+                        let diff = score - baseline
+                        Text(diff >= 0 ? "+\(diff) vs 7-day avg" : "\(diff) vs 7-day avg")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(diff >= 0 ? PulseTheme.statusGood : PulseTheme.statusPoor)
+                            .monospacedDigit()
+                        Text("baseline \(baseline)")
+                            .font(PulseTheme.monoFont)
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                }
+            }
+
+            // 7-day sparkline
+            ReadinessSparkline(todayScore: score, priorScores: sevenDayPriorScores())
+
+            // Confidence indicator — data source + completeness
+            confidenceFooter
+
+            // Headline + insight
+            if !headline.isEmpty {
+                VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
+                    Text(headline)
+                        .font(PulseTheme.title2Font)
+                        .foregroundStyle(PulseTheme.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let insight = brief?.insight {
+                        Text(insight)
+                            .font(PulseTheme.calloutFont)
+                            .foregroundStyle(PulseTheme.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineSpacing(2)
+                    }
+                }
+                .padding(.top, PulseTheme.spacingXS)
+            }
+        }
+        .pulseCard(padding: PulseTheme.spacingL)
+        .padding(.horizontal, PulseTheme.spacingM)
+        .padding(.top, PulseTheme.spacingS)
+        .onAppear {
+            guard !ringAnimated else { return }
+            ringAnimated = true
+            animateScoreCounter(to: score)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(localized: "Recovery Score \(score), \(headline)"))
     }
 
-    /// Height for the hero section — tall enough to feel immersive
-    private var heroHeight: CGFloat { 410 }
+    // MARK: - Confidence footer — data source + completeness
+
+    private var confidenceFooter: some View {
+        let chips = currentDataChips()
+        let label: String
+        switch chips.count {
+        case 3...:  label = String(localized: "Apple Watch · 数据完整")
+        case 1...2: label = String(localized: "Apple Watch · 数据部分")
+        default:    label = String(localized: "Apple Watch · 等待数据")
+        }
+        return HStack(spacing: 6) {
+            Image(systemName: "applewatch")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(PulseTheme.textTertiary)
+            Text(label)
+                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .foregroundStyle(PulseTheme.textTertiary)
+            Spacer()
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private func statusChip(for score: Int) -> some View {
+        let label: String
+        let color: Color
+        switch score {
+        case 0..<40:  label = String(localized: "Poor");     color = PulseTheme.statusPoor
+        case 40..<70: label = String(localized: "Moderate"); color = PulseTheme.statusModerate
+        case 70..<85: label = String(localized: "Good");     color = PulseTheme.statusGood
+        default:      label = String(localized: "Peak");     color = PulseTheme.statusGood
+        }
+        return Text(label)
+            .font(.system(size: 12, weight: .medium))
+            .foregroundStyle(color)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .overlay(
+                RoundedRectangle(cornerRadius: PulseTheme.radiusXS, style: .continuous)
+                    .stroke(color, lineWidth: PulseTheme.hairline)
+            )
+    }
+
+    /// Six prior days, oldest → most recent. nil for days without data.
+    private func sevenDayPriorScores() -> [Int?] {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: .now)
+        return (1...6).reversed().map { offset -> Int? in
+            guard let d = cal.date(byAdding: .day, value: -offset, to: today) else { return nil }
+            return allSummaries.first { cal.isDate($0.date, inSameDayAs: d) }?.dailyScore
+        }
+    }
+
+    /// All 7 days including today, oldest → most recent.
+    private func sevenDayAllScores() -> [Int?] {
+        sevenDayPriorScores() + [brief?.score]
+    }
+
+    private func intensityColor(for intensity: TrainingPlan.Intensity) -> Color {
+        switch intensity {
+        case .light:    return PulseTheme.statusGood
+        case .moderate: return PulseTheme.accent
+        case .heavy:    return PulseTheme.statusWarning
+        }
+    }
+
+    private func workoutTitle(for plan: TrainingPlan) -> String {
+        switch plan.targetMuscleGroup.lowercased() {
+        case "chest":     return String(localized: "Push — Chest & Triceps")
+        case "back":      return String(localized: "Pull — Back & Biceps")
+        case "legs":      return String(localized: "Legs — Quads, Hams & Glutes")
+        case "shoulders": return String(localized: "Shoulders & Core")
+        case "arms":      return String(localized: "Arms — Biceps & Triceps")
+        case "core":      return String(localized: "Core & Mobility")
+        default:          return plan.targetMuscleGroup.capitalized
+        }
+    }
+
+    private func sevenDayBaseline() -> Int? {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: .now)
+        let prior6 = (1...6).compactMap { offset -> Int? in
+            guard let d = cal.date(byAdding: .day, value: -offset, to: today) else { return nil }
+            return allSummaries.first { cal.isDate($0.date, inSameDayAs: d) }?.dailyScore
+        }
+        guard !prior6.isEmpty else { return nil }
+        return prior6.reduce(0, +) / prior6.count
+    }
 
     // MARK: - Oura Score Disc Row
 
@@ -343,47 +477,49 @@ struct DashboardView: View {
                 .buttonStyle(.plain)
             } else if let hr = currentHeartRate {
                 NavigationLink(destination: HeartRateDetailView()) {
-                    ouraScoreDisc(icon: "heart.fill", iconColor: Color(hex: "FF6B6B"), label: String(localized: "心率"), value: Int(hr), unit: "bpm")
+                    ouraScoreDisc(icon: "heart.fill", iconColor: PulseTheme.activityCoral, label: String(localized: "心率"), value: Int(hr), unit: "bpm")
                 }
                 .buttonStyle(.plain)
             }
+            // Stress disc
+            NavigationLink(destination: StressDetailView()) {
+                ouraScoreDisc(
+                    icon: "brain.head.profile",
+                    iconColor: currentStressColor,
+                    label: String(localized: "压力"),
+                    value: currentStressScore
+                )
+            }
+            .buttonStyle(.plain)
         }
         .padding(.horizontal, 8)
     }
 
-    private func ouraScoreDisc(icon: String, iconColor: Color = .white, label: String, value: Int, unit: String = "") -> some View {
-        VStack(spacing: 5) {
-            Image(systemName: icon)
-                .font(.system(size: 12))
-                .foregroundStyle(iconColor)
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
+    private func ouraScoreDisc(icon: String, iconColor: Color = PulseTheme.textPrimary, label: String, value: Int, unit: String = "") -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .pulseEyebrow()
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
                 Text("\(value)")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .font(PulseTheme.metricSFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
                 if !unit.isEmpty {
                     Text(unit)
-                        .font(.system(size: 10, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.5))
+                        .font(PulseTheme.unitFont)
+                        .foregroundStyle(PulseTheme.textTertiary)
                 }
             }
-            Text(label)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(.white.opacity(0.5))
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 14)
-        .background(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color.white.opacity(0.08))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(PulseTheme.spacingM)
+        .background(PulseTheme.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
         )
         .padding(.horizontal, 4)
         .accessibilityLabel("\(label) \(value) \(unit)")
-    }
-
-    // MARK: - Wide Arc (Oura's sweeping 180° gauge)
-
-    private func wideArcTrack() -> some Shape {
-        Arc(startAngle: .degrees(180), endAngle: .degrees(360), clockwise: false)
     }
 
     // MARK: - Score Pills Row
@@ -398,7 +534,7 @@ struct DashboardView: View {
                 scorePill(icon: "flame.fill", label: "Activity", value: activity, color: PulseTheme.activityAccent)
             }
             if let readiness {
-                scorePill(icon: "heart.fill", label: "Ready", value: readiness, color: .white.opacity(0.7))
+                scorePill(icon: "heart.fill", label: "Ready", value: readiness, color: PulseTheme.textSecondary)
             }
         }
     }
@@ -410,13 +546,13 @@ struct DashboardView: View {
                 .foregroundStyle(color)
             Text("\(value)")
                 .font(.system(size: 12, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(PulseTheme.textPrimary)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
         .background(
             Capsule()
-                .fill(Color.white.opacity(0.06))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     Capsule()
                         .stroke(color.opacity(0.3), lineWidth: 0.5)
@@ -469,9 +605,9 @@ struct DashboardView: View {
         let y = sin(radians) * radius
 
         return Circle()
-            .fill(.white)
+            .fill(PulseTheme.textPrimary)
             .frame(width: 8, height: 8)
-            .shadow(color: .white.opacity(0.6), radius: 4)
+            .shadow(color: PulseTheme.textSecondary, radius: 4)
             .offset(x: x, y: y)
     }
 
@@ -531,11 +667,11 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
                 // Mini bar
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
-                        Capsule().fill(Color.white.opacity(0.08)).frame(height: 3)
+                        Capsule().fill(PulseTheme.highlight).frame(height: 3)
                         Capsule()
                             .fill(LinearGradient(colors: [iconColor.opacity(0.6), iconColor], startPoint: .leading, endPoint: .trailing))
                             .frame(width: geo.size.width * CGFloat(score) / 100, height: 3)
@@ -544,7 +680,7 @@ struct DashboardView: View {
                 .frame(height: 3)
                 Text("\(score) / 100")
                     .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(PulseTheme.textTertiary)
             }
 
             Spacer()
@@ -559,16 +695,16 @@ struct DashboardView: View {
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.2))
+                .foregroundStyle(PulseTheme.textQuaternary)
         }
         .padding(.horizontal, PulseTheme.spacingM)
         .padding(.vertical, 14)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
         .accessibilityElement(children: .ignore)
@@ -577,18 +713,18 @@ struct DashboardView: View {
 
     private func ouraStatusLabel(for score: Int) -> String {
         switch score {
-        case 0..<30: return "较差"
-        case 30..<50: return "一般"
-        case 50..<70: return "良好"
-        case 70..<85: return "优秀"
-        default: return "极佳"
+        case 0..<30: return String(localized: "Poor")
+        case 30..<50: return String(localized: "Average")
+        case 50..<70: return String(localized: "Fair")
+        case 70..<85: return String(localized: "Good")
+        default: return String(localized: "Excellent")
         }
     }
 
     private func ouraStatusColor(for score: Int) -> Color {
         switch score {
-        case 0..<40: return PulseTheme.activityAccent
-        case 40..<70: return Color(hex: "FFD700")
+        case 0..<40: return PulseTheme.statusPoor
+        case 40..<70: return PulseTheme.statusWarning
         default: return PulseTheme.statusGood
         }
     }
@@ -663,11 +799,8 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             // Header
             HStack {
-                Text("Today's Insights")
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .tracking(1.2)
-                    .foregroundStyle(PulseTheme.textTertiary)
-                    .textCase(.uppercase)
+                Text(String(localized: "Today's Insights"))
+                    .pulseEyebrow()
                 Spacer()
             }
 
@@ -687,26 +820,244 @@ struct DashboardView: View {
 
                     Text(text)
                         .font(.system(size: 14, weight: .regular, design: .rounded))
-                        .foregroundStyle(Color.white.opacity(0.75))
+                        .foregroundStyle(PulseTheme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                         .lineSpacing(3)
                 }
                 if idx < min(insights.prefix(3).count, 3) - 1 {
                     Divider()
-                        .background(Color.white.opacity(0.06))
+                        .background(PulseTheme.highlight)
                 }
             }
         }
         .padding(PulseTheme.spacingM)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(
                     RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
                 )
         )
         .accessibilityElement(children: .combine)
+    }
+
+    // MARK: - Energy Bank
+
+    /// Computed energy level (0-100) from available health data
+    private var energyLevel: Int {
+        var total: Double = 0
+        var factors: Double = 0
+
+        // Sleep contribution (40% weight) — use readiness score as proxy
+        if let score = brief?.score {
+            total += Double(score) * 0.4
+            factors += 0.4
+        }
+
+        // HRV contribution (35% weight) — higher HRV = more energy
+        if let hrv = healthManager.latestHRV {
+            let hrvScore = min(max((hrv - 15) / (80 - 15), 0), 1) * 100
+            total += hrvScore * 0.35
+            factors += 0.35
+        }
+
+        // Activity contribution (25% weight) — moderate steps = good, extreme = draining
+        let steps = healthManager.todaySteps
+        if steps > 0 {
+            let stepScore: Double
+            if steps < 3000 {
+                stepScore = Double(steps) / 3000 * 50 // low activity = low-ish
+            } else if steps <= 10000 {
+                stepScore = 50 + (Double(steps - 3000) / 7000) * 50 // sweet spot
+            } else {
+                stepScore = max(50, 100 - Double(steps - 10000) / 200) // diminishing
+            }
+            total += stepScore * 0.25
+            factors += 0.25
+        }
+
+        guard factors > 0 else {
+            // No data — return readiness score or 50
+            return brief?.score ?? 50
+        }
+
+        return Int(total / factors)
+    }
+
+    private var energyRecommendation: (text: String, icon: String) {
+        let level = energyLevel
+        if level > 70 {
+            return (String(localized: "High energy — great day for intensity"), "bolt.fill")
+        } else if level >= 40 {
+            return (String(localized: "Moderate energy — steady effort recommended"), "gauge.with.dots.needle.50percent")
+        } else {
+            return (String(localized: "Low energy — focus on recovery today"), "bed.double.fill")
+        }
+    }
+
+    private var energyBankCard: some View {
+        let level = energyLevel
+        let rec = energyRecommendation
+
+        return VStack(alignment: .leading, spacing: 14) {
+            // Header row
+            HStack(spacing: 10) {
+                Image(systemName: "battery.100.bolt")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(energyColor(for: level).opacity(0.8))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(String(localized: "Energy Bank"))
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundStyle(PulseTheme.textPrimary)
+
+                    Text(String(localized: "Your energy today"))
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                }
+
+                Spacer()
+
+                // Level number
+                Text("\(level)")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundStyle(PulseTheme.textPrimary)
+            }
+
+            // Minimal progress bar — thin, single color
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(PulseTheme.highlight)
+                        .frame(height: 4)
+
+                    Capsule()
+                        .fill(PulseTheme.textTertiary)
+                        .frame(width: geo.size.width * CGFloat(level) / 100, height: 4)
+                        .animation(.easeOut(duration: 0.3), value: level)
+                }
+            }
+            .frame(height: 4)
+
+            // Recommendation — subdued
+            HStack(spacing: 8) {
+                Image(systemName: rec.icon)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(PulseTheme.textTertiary)
+
+                Text(rec.text)
+                    .font(.system(size: 13, weight: .regular, design: .rounded))
+                    .foregroundStyle(PulseTheme.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(18)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                .fill(PulseTheme.highlight)
+                .overlay(
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
+                )
+        )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Energy Bank"))
+        .accessibilityValue("\(level), \(rec.text)")
+    }
+
+    private func energyColor(for level: Int) -> Color {
+        if level > 70 { return PulseTheme.statusGood }
+        if level >= 40 { return PulseTheme.statusWarning }
+        return PulseTheme.statusPoor
+    }
+
+    // MARK: - Daily Coach Card (action + HealthKit citations)
+
+    private func dailyCoachCard(score: Int) -> some View {
+        let action = coachAction(for: score)
+        let chips = currentDataChips()
+
+        return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+            HStack(spacing: 6) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(PulseTheme.accent)
+                Text(String(localized: "Today's Coach"))
+                    .pulseEyebrow()
+                Spacer()
+            }
+
+            Text(action)
+                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                .foregroundStyle(PulseTheme.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+                .lineSpacing(2)
+
+            if !chips.isEmpty {
+                HStack(spacing: 8) {
+                    ForEach(Array(chips.enumerated()), id: \.offset) { idx, chip in
+                        if idx > 0 {
+                            Text("·")
+                                .font(.system(size: 11, weight: .regular, design: .monospaced))
+                                .foregroundStyle(PulseTheme.textQuaternary)
+                        }
+                        Text(chip)
+                            .font(.system(size: 11, weight: .medium, design: .monospaced))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .padding(.top, 2)
+            }
+        }
+        .padding(PulseTheme.spacingM)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                .fill(PulseTheme.accentSoft)
+                .overlay(
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                        .stroke(PulseTheme.accent.opacity(0.18), lineWidth: PulseTheme.hairline)
+                )
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "Today's Coach: \(action)"))
+    }
+
+    private func coachAction(for score: Int) -> String {
+        switch score {
+        case 85...100:
+            return String(localized: "状态在线 — 今天可以做高强度间歇或大重量")
+        case 70..<85:
+            return String(localized: "稳健训练 — 中等强度，避免堆量过深")
+        case 50..<70:
+            return String(localized: "Zone 2 有氧 30 分钟 — 让恢复跟上")
+        case 30..<50:
+            return String(localized: "轻量活动 — 散步或拉伸，控制心率")
+        default:
+            return String(localized: "今天彻底恢复 — 充足睡眠 + 主动补水")
+        }
+    }
+
+    private func currentDataChips() -> [String] {
+        var chips: [String] = []
+
+        let sleepMin = healthManager.lastNightSleepMinutes
+        if sleepMin > 0 {
+            let hours = Double(sleepMin) / 60.0
+            chips.append(String(format: String(localized: "Sleep %.1fh"), hours))
+        }
+
+        if let rhr = healthManager.latestRestingHR, rhr > 0 {
+            chips.append("RHR \(Int(rhr))")
+        }
+
+        if let hrv = currentHRV, hrv > 0 {
+            chips.append("HRV \(Int(hrv))ms")
+        }
+
+        return chips
     }
 
     // MARK: - 关键指标网格（隐藏空值瓷砖）
@@ -742,6 +1093,12 @@ struct DashboardView: View {
     private var currentBloodOxygen: Double? {
         healthManager.latestBloodOxygen
     }
+    private var currentStressScore: Int {
+        healthManager.calculateStressScore()
+    }
+    private var currentStressColor: Color {
+        StressLevel.from(score: currentStressScore).color
+    }
 
     // MARK: - Vitals Strip (HRV + Heart Rate)
 
@@ -767,7 +1124,7 @@ struct DashboardView: View {
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .shadow(color: PulseTheme.cardShadow, radius: 12, y: 4)
         )
         .overlay(
@@ -826,36 +1183,28 @@ struct DashboardView: View {
 
         return LazyVGrid(columns: columns, spacing: PulseTheme.spacingM) {
             // 睡眠
-            if let sleep = currentSleep {
-                NavigationLink(destination: SleepDetailView()) {
-                    metricTile(icon: "moon.fill", label: "睡眠", value: sleep, unit: "", color: PulseTheme.sleepAccent, trend: .good, animated: false)
-                }
-                .buttonStyle(.plain)
+            NavigationLink(destination: SleepDetailView()) {
+                metricTile(icon: "moon.fill", label: String(localized: "Sleep"), value: currentSleep ?? "--", unit: "", color: PulseTheme.sleepAccent, trend: currentSleep != nil ? .good : .ok, animated: false)
             }
+            .buttonStyle(.plain)
 
             // 步数
-            if currentSteps > 0 {
-                NavigationLink(destination: StepsDetailView()) {
-                    metricTile(icon: "figure.run", label: "步数", value: formatSteps(currentSteps), unit: "", color: PulseTheme.accentTeal, trend: currentSteps >= 8000 ? .good : (currentSteps >= 5000 ? .ok : .poor), animated: true)
-                }
-                .buttonStyle(.plain)
+            NavigationLink(destination: StepsDetailView()) {
+                metricTile(icon: "figure.run", label: String(localized: "Steps"), value: currentSteps > 0 ? formatSteps(currentSteps) : "--", unit: "", color: PulseTheme.accentTeal, trend: currentSteps >= 8000 ? .good : (currentSteps >= 5000 ? .ok : .poor), animated: true)
             }
+            .buttonStyle(.plain)
 
             // 卡路里
-            if currentCalories > 0 {
-                NavigationLink(destination: CaloriesDetailView()) {
-                    metricTile(icon: "flame.fill", label: "卡路里", value: "\(Int(currentCalories))", unit: "kcal", color: PulseTheme.activityCoral, trend: currentCalories >= 300 ? .good : .ok, animated: false)
-                }
-                .buttonStyle(.plain)
+            NavigationLink(destination: CaloriesDetailView()) {
+                metricTile(icon: "flame.fill", label: String(localized: "Calories"), value: currentCalories > 0 ? "\(Int(currentCalories))" : "--", unit: currentCalories > 0 ? "kcal" : "", color: PulseTheme.activityCoral, trend: currentCalories >= 300 ? .good : .ok, animated: false)
             }
+            .buttonStyle(.plain)
 
             // 血氧
-            if let spo2 = currentBloodOxygen {
-                NavigationLink(destination: BloodOxygenDetailView()) {
-                    metricTile(icon: "lungs.fill", label: "血氧", value: "\(Int(spo2))%", unit: "", color: PulseTheme.statusGood, trend: spo2 >= 96 ? .good : (spo2 >= 93 ? .ok : .poor), animated: false)
-                }
-                .buttonStyle(.plain)
+            NavigationLink(destination: BloodOxygenDetailView()) {
+                metricTile(icon: "lungs.fill", label: String(localized: "Blood Oxygen"), value: currentBloodOxygen != nil ? "\(Int(currentBloodOxygen!))%" : "--", unit: "", color: PulseTheme.statusGood, trend: (currentBloodOxygen ?? 0) >= 96 ? .good : ((currentBloodOxygen ?? 0) >= 93 ? .ok : .poor), animated: false)
             }
+            .buttonStyle(.plain)
         }
     }
 
@@ -889,62 +1238,44 @@ struct DashboardView: View {
     }
 
     private func metricTile(icon: String, label: String, value: String, unit: String, color: Color, trend: MetricStatus, animated: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Top row: icon circle + label
-            HStack(spacing: 0) {
-                ZStack {
-                    Circle()
-                        .fill(color.opacity(0.12))
-                        .frame(width: 28, height: 28)
-                    Image(systemName: icon)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(color)
-                        .symbolEffect(.pulse, options: .repeating, isActive: animated)
-                }
+        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+            // Eyebrow label
+            Text(label)
+                .pulseEyebrow()
 
-                Spacer()
-
-                // Navigate hint
-                Image(systemName: "arrow.up.right")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.25))
-            }
-
-            // Value
-            HStack(alignment: .firstTextBaseline, spacing: 3) {
+            // Metric value + unit
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(value)
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .font(PulseTheme.metricMFont)
                     .foregroundStyle(PulseTheme.textPrimary)
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
 
                 if !unit.isEmpty {
                     Text(unit)
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .font(PulseTheme.unitFont)
                         .foregroundStyle(PulseTheme.textTertiary)
-                        .offset(y: 1)
                 }
             }
+            .opacity(value == "--" ? 0.4 : 1.0)
 
-            // Label + trend dot
-            HStack(spacing: 5) {
-                Text(label)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
+            // Status dot
+            HStack(spacing: 4) {
                 Circle()
                     .fill(trend.color)
-                    .frame(width: 5, height: 5)
+                    .frame(width: 6, height: 6)
+                Image(systemName: trend.arrow)
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(trend.color)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(PulseTheme.spacingM)
-        .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.04))
-        )
+        .background(PulseTheme.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
@@ -976,9 +1307,8 @@ struct DashboardView: View {
             }
 
             VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
-                Text("Training Advice")
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                Text(String(localized: "Training Advice"))
+                    .pulseEyebrow()
 
                 Text(advice.label)
                     .font(PulseTheme.headlineFont)
@@ -1025,7 +1355,7 @@ struct DashboardView: View {
 
     private func strainRecoveryCard(strain: Int, recovery: Int) -> some View {
         let strainLevel = StrainScoreService.StrainLevel(score: strain)
-        let strainColor = Color(hex: strainLevel.color)
+        let strainColor = strainLevel.pulseColor
         let recoveryColor = PulseTheme.statusColor(for: recovery)
         let warning = StrainScoreService.overtrainWarning(strain: strain, recovery: recovery)
 
@@ -1034,7 +1364,7 @@ struct DashboardView: View {
             HStack(spacing: PulseTheme.spacingL) {
                 // Strain
                 VStack(spacing: 8) {
-                    Text("STRAIN")
+                    Text(String(localized: "STRAIN"))
                         .font(.system(size: 10, weight: .semibold))
                         .tracking(1.5)
                         .foregroundStyle(PulseTheme.textTertiary)
@@ -1064,7 +1394,7 @@ struct DashboardView: View {
 
                 // Recovery
                 VStack(spacing: 8) {
-                    Text("RECOVERY")
+                    Text(String(localized: "RECOVERY"))
                         .font(.system(size: 10, weight: .semibold))
                         .tracking(1.5)
                         .foregroundStyle(PulseTheme.textTertiary)
@@ -1109,7 +1439,7 @@ struct DashboardView: View {
         .padding(PulseTheme.spacingL)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(format: String(localized: "Strain %d, Recovery %d"), strain, recovery))
@@ -1137,12 +1467,12 @@ struct DashboardView: View {
 
             // Label
             VStack(alignment: .leading, spacing: 2) {
-                Text("生理年龄")
+                Text(String(localized: "Health Age"))
                     .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.45))
-                Text("\(ageInt) 岁")
+                    .foregroundStyle(PulseTheme.textTertiary)
+                Text(String(format: String(localized: "%d yrs"), ageInt))
                     .font(.system(size: 17, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(PulseTheme.textPrimary)
             }
 
             Spacer()
@@ -1152,7 +1482,7 @@ struct DashboardView: View {
                 HStack(spacing: 4) {
                     Image(systemName: isYounger ? "arrow.down" : "arrow.up")
                         .font(.system(size: 10, weight: .bold))
-                    Text("\(diffInt) yr \(isYounger ? "更年轻" : "偏老")")
+                    Text(String(format: String(localized: "%d yr %@"), diffInt, isYounger ? String(localized: "younger") : String(localized: "older")))
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                 }
                 .foregroundStyle(accentColor)
@@ -1165,11 +1495,11 @@ struct DashboardView: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(Color.white.opacity(0.04))
+                .fill(PulseTheme.highlight)
                 .overlay(RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .stroke(Color.white.opacity(0.06), lineWidth: 0.5))
+                    .stroke(PulseTheme.highlight, lineWidth: 0.5))
         )
-        .accessibilityLabel("生理年龄 \(ageInt) 岁")
+        .accessibilityLabel(String(format: String(localized: "Health Age %d years"), ageInt))
     }
 
     private func healthAgeCard(result: HealthAgeService.HealthAgeResult) -> some View {
@@ -1180,7 +1510,7 @@ struct DashboardView: View {
         let diffInt = Int(abs(diff).rounded())
 
         return Button {
-            withAnimation(.spring(response: 0.4)) { healthAgeExpanded.toggle() }
+            withAnimation(.easeOut(duration: 0.3)) { healthAgeExpanded.toggle() }
         } label: {
             VStack(spacing: 0) {
                 // Main row
@@ -1220,14 +1550,14 @@ struct DashboardView: View {
 
                     Image(systemName: healthAgeExpanded ? "chevron.up" : "chevron.down")
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(.white.opacity(0.2))
+                        .foregroundStyle(PulseTheme.textQuaternary)
                         .padding(.leading, 8)
                 }
                 .padding(PulseTheme.spacingM)
 
                 // Expanded detail
                 if healthAgeExpanded {
-                    Divider().background(Color.white.opacity(0.06))
+                    Divider().background(PulseTheme.highlight)
                     VStack(spacing: PulseTheme.spacingS) {
                         ForEach(result.metrics, id: \.metric) { metric in
                             healthAgeMetricRow(metric)
@@ -1238,10 +1568,10 @@ struct DashboardView: View {
             }
             .background(
                 RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .fill(Color.white.opacity(0.04))
+                    .fill(PulseTheme.highlight)
                     .overlay(
                         RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                            .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                            .stroke(PulseTheme.highlight, lineWidth: 0.5)
                     )
             )
         }
@@ -1251,8 +1581,8 @@ struct DashboardView: View {
     }
 
     private func healthAgeMetricRow(_ metric: HealthAgeService.MetricScore) -> some View {
-        let isGood = metric.ageImpact < -0.3
-        let isBad = metric.ageImpact > 0.3
+        let isGood = metric.ageImpact < -0.1
+        let isBad = metric.ageImpact > 0.1
         let color: Color = isGood ? PulseTheme.statusGood : (isBad ? PulseTheme.activityAccent : PulseTheme.textSecondary)
 
         return HStack(alignment: .top, spacing: PulseTheme.spacingS) {
@@ -1284,8 +1614,6 @@ struct DashboardView: View {
         case .restingHR:      return String(format: "%.0f bpm", m.value)
         case .hrv:            return String(format: "%.0f ms", m.value)
         case .sleep:          return String(format: "%.1fh", m.value)
-        case .steps:          return String(format: "%.0f", m.value)
-        case .activeMinutes:  return String(format: "%.0f min", m.value)
         }
     }
 
@@ -1332,7 +1660,7 @@ struct DashboardView: View {
             Spacer()
 
             // 时长
-            Text("(workout.durationMinutes) min")
+            Text("\(workout.durationMinutes) min")
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textSecondary)
         }
@@ -1388,7 +1716,7 @@ struct DashboardView: View {
         switch days {
         case 0: return String(localized: "Today")
         case 1: return String(localized: "Yesterday")
-        default: return "(days)d ago"
+        default: return String(localized: "\(days)d ago")
         }
     }
 
@@ -1410,11 +1738,11 @@ struct DashboardView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Set Gym Location")
+                    Text(String(localized: "Set Gym Location"))
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
-                    Text("Auto-remind when arriving")
+                    Text(String(localized: "Auto-remind when arriving"))
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                 }
@@ -1466,36 +1794,19 @@ struct DashboardView: View {
             )
     }
 
-    /// Loading state — same teal hero background so no black flash
     private var heroLoadingPlaceholder: some View {
-        ZStack {
-            LinearGradient(
-                stops: [
-                    .init(color: Color(hex: "0D4A5C"), location: 0),
-                    .init(color: Color(hex: "071E2E"), location: 0.7),
-                    .init(color: PulseTheme.background, location: 1.0),
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea(edges: .top)
-            VStack(spacing: 16) {
-                Spacer()
-                ProgressView()
-                    .tint(PulseTheme.accentTeal)
-                    .scaleEffect(1.3)
-                Text("Analysing your data…")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.4))
-                Spacer()
-            }
+        VStack(spacing: 16) {
+            Spacer()
+            ProgressView()
+                .tint(PulseTheme.accent)
+                .scaleEffect(1.3)
+            Text(String(localized: "Analysing your data…"))
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(PulseTheme.textTertiary)
+            Spacer()
         }
         .frame(maxWidth: .infinity)
-        .frame(height: heroHeight)
-        .overlay(alignment: .bottom) {
-            LinearGradient(colors: [Color.clear, PulseTheme.background], startPoint: .top, endPoint: .bottom)
-                .frame(height: 60)
-        }
+        .frame(height: 280)
     }
 
     private var hasGymLocation: Bool {
@@ -1547,7 +1858,7 @@ struct DashboardView: View {
             )
 
             if let brief {
-                Analytics.trackScoreViewed(score: brief.score)
+                Analytics.trackScoreViewed()
             }
 
             // 同步 workout 总数到 ReviewRequestManager
@@ -1572,9 +1883,7 @@ struct DashboardView: View {
                 ringAnimated = false
             }
         } catch {
-            #if DEBUG
-            print("Dashboard load error: \(error)")
-            #endif
+            logger.error("Dashboard load error: \(error)")
         }
 
         // Strain Score
@@ -1763,12 +2072,12 @@ struct ActivityRingView: View {
         }
         .frame(width: size, height: size)
         .onAppear {
-            withAnimation(.spring(response: 1.0, dampingFraction: 0.75).delay(0.2)) {
+            withAnimation(.spring(response: 0.35, dampingFraction: 1.0).delay(0.2)) {
                 animated = progress
             }
         }
         .onChange(of: progress) { _, newVal in
-            withAnimation(.spring(response: 0.8, dampingFraction: 0.75)) {
+            withAnimation(.easeOut(duration: 0.3)) {
                 animated = newVal
             }
         }

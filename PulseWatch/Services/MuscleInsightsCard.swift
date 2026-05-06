@@ -106,11 +106,11 @@ struct MuscleInsightsCard: View {
             // 方向指示
             ZStack {
                 Circle()
-                    .fill(insight.isPositive ? Color(hex: "7FC75C").opacity(0.15) : Color(hex: "C75C5C").opacity(0.15))
+                    .fill(insight.isPositive ? PulseTheme.statusGood.opacity(0.15) : PulseTheme.statusPoor.opacity(0.15))
                     .frame(width: 32, height: 32)
                 Image(systemName: insight.isPositive ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
                     .font(.system(size: 16))
-                    .foregroundStyle(insight.isPositive ? Color(hex: "7FC75C") : Color(hex: "C75C5C"))
+                    .foregroundStyle(insight.isPositive ? PulseTheme.statusGood : PulseTheme.statusPoor)
             }
             .accessibilityHidden(true)
 

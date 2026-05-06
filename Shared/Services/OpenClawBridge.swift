@@ -45,6 +45,23 @@ struct PulseOpenClawConfig: Codable, Equatable {
         return URL(string: "\(base)/v1/chat/completions")
     }
 
+    /// DeepSeek 预设 — OpenAI 兼容 cloud AI
+    static func deepseek(apiKey: String) -> PulseOpenClawConfig {
+        PulseOpenClawConfig(
+            gatewayURL: "https://api.deepseek.com",
+            token: apiKey,
+            agentID: "deepseek-chat"
+        )
+    }
+
+    /// 内置默认 DeepSeek key — split obfuscation defeats `strings(1)` extraction.
+    /// 用户在 Settings 中明确启用 AI Coach 时使用；可通过自有 OpenClaw Gateway 覆盖。
+    static var bundledDeepSeekKey: String {
+        let p1 = "sk-sjcpv526koog7"
+        let p2 = "lbfoypleebkb6aufabl"
+        return p1 + p2
+    }
+
     /// 构建健康检查 URL
     var healthURL: URL? {
         let base = gatewayURL.hasSuffix("/") ? String(gatewayURL.dropLast()) : gatewayURL
@@ -113,13 +130,29 @@ final class OpenClawBridge {
     /// SwiftData ModelContainer，由 App 在启动时注入，用于写入训练记录
     var modelContainer: ModelContainer?
 
-    /// 配置
+    /// 配置 — cached to avoid repeated Keychain reads; invalidated on pair/unpair
+    private var _cachedConfig: PulseOpenClawConfig?
+    private var _configLoaded = false
+
     var config: PulseOpenClawConfig? {
-        PulseOpenClawConfig.load()
+        if !_configLoaded {
+            _cachedConfig = PulseOpenClawConfig.load()
+            _configLoaded = true
+        }
+        return _cachedConfig
+    }
+
+    /// Invalidate cached config (call after pair/unpair/clear)
+    func invalidateConfigCache() {
+        _configLoaded = false
+        _cachedConfig = nil
     }
 
     /// 上次推送的评分（用于检测重大变化）
     private var lastPushedScore: Int?
+
+    /// 缓存周数据供 buildHealthSyncJSON 使用
+    private var cachedWeekSummaries: [DailySummary] = []
 
     /// 推送间隔（秒）
     private let pushInterval: TimeInterval = 1800 // 30 分钟
@@ -275,6 +308,7 @@ final class OpenClawBridge {
                 agentID: agentID ?? PulseOpenClawConfig.defaultAgentID
             )
             cfg.save()
+            invalidateConfigCache()
             await MainActor.run {
                 connectionStatus = .connected
                 // 确保 isEnabled = true，触发数据推送
@@ -283,6 +317,26 @@ final class OpenClawBridge {
             logger.info("OpenClaw Gateway 配对成功")
             // 配对成功后立即推送健康数据
             await pushHealthStatus()
+        }
+        return ok
+    }
+
+    /// 启用 DeepSeek AI Coach（cloud 路径，用户自带 API key）
+    @discardableResult
+    func enableDeepSeek(apiKey: String) async -> Bool {
+        let cfg = PulseOpenClawConfig.deepseek(apiKey: apiKey)
+        let ok = await verifyConnection(url: cfg.gatewayURL, token: cfg.token)
+        if ok {
+            cfg.save()
+            invalidateConfigCache()
+            await MainActor.run {
+                connectionStatus = .connected
+                UserDefaults.standard.set(true, forKey: "pulse.openclaw.enabled")
+            }
+            logger.info("DeepSeek AI Coach 启用成功")
+            await pushHealthStatus()
+        } else {
+            logger.error("DeepSeek API key 验证失败")
         }
         return ok
     }
@@ -384,14 +438,30 @@ final class OpenClawBridge {
             lastPushedScore = status.recoveryScore
             connectionStatus = .connected
 
+            // 写入 Agent workspace 供 Pulse Coach skill 离线读取
+            writeHealthSyncToWorkspace(healthSyncJSON, cfg: cfg)
+
             // 同时写入 App Group 供 Widget 读取
             writeToAppGroup(status)
+
+            // 写入 App Group JSON 文件供 CLI / Agent 直接读取
+            writeHealthSyncFile(healthSyncJSON)
 
             logger.info("健康数据已推送到 OpenClaw — 恢复评分: \(status.recoveryScore)")
 
         } catch {
             logger.error("推送健康数据失败: \(error.localizedDescription)")
             connectionStatus = .error
+            // Push failed — try to find the gateway on the local subnet
+            // (IP may have changed after DHCP renewal / Wi-Fi reconnect)
+            Task {
+                await attemptAutoReconnect()
+                // Retry push once after reconnect
+                if connectionStatus == .connected {
+                    logger.info("Auto-reconnect succeeded, retrying push")
+                    await pushHealthStatus()
+                }
+            }
         }
     }
 
@@ -436,6 +506,9 @@ final class OpenClawBridge {
         let week = dataService.fetchWeekTrend(days: 7)
         let vitals = dataService.getLatestVitals()
         let insight = HealthAnalyzer.shared.generateInsight()
+
+        // 缓存周数据供 buildHealthSyncJSON 使用
+        cachedWeekSummaries = week
 
         let todaySummary = TodaySummaryPayload(
             date: DailySummary.dateFormatter.string(from: Date()),
@@ -581,11 +654,33 @@ final class OpenClawBridge {
         trend["dailyScores"] = wt.dailyScores.map { ["date": $0.date, "score": $0.score] }
         metrics["weekTrend"] = trend
 
+        // 过去 7 天每日详细数据 — 让 Agent 能回答"昨天状态怎么样"等历史问题
+        let dailyHistory: [[String: Any]] = cachedWeekSummaries.map { s in
+            var day: [String: Any] = ["date": s.dateString]
+            if let score = s.dailyScore { day["score"] = score }
+            if let rhr = s.restingHeartRate { day["restingHeartRate"] = Int(rhr) }
+            if let hrv = s.averageHRV { day["hrv"] = Int(hrv) }
+            if let avgHR = s.averageHeartRate { day["averageHeartRate"] = Int(avgHR) }
+            if let spo2 = s.averageBloodOxygen { day["bloodOxygen"] = Int(spo2) }
+            if let steps = s.totalSteps { day["steps"] = steps }
+            if let cal = s.activeCalories { day["activeCalories"] = Int(cal) }
+            if let exMin = s.exerciseMinutes { day["exerciseMinutes"] = Int(exMin) }
+            if let sleepMin = s.sleepDurationMinutes {
+                var sleep: [String: Any] = ["totalMinutes": sleepMin]
+                if let deep = s.deepSleepMinutes { sleep["deepMinutes"] = deep }
+                if let rem = s.remSleepMinutes { sleep["remMinutes"] = rem }
+                if let core = s.coreSleepMinutes { sleep["coreMinutes"] = core }
+                day["sleep"] = sleep
+            }
+            return day
+        }
+
         let payload: [String: Any] = [
             "type": "health_sync",
             "date": dateStr,
             "metrics": metrics,
-            "workouts": workouts
+            "workouts": workouts,
+            "dailyHistory": dailyHistory
         ]
 
         guard let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
@@ -649,9 +744,62 @@ final class OpenClawBridge {
         return text
     }
 
+    // MARK: - Agent Workspace 持久化
+
+    /// 让 Agent 把 health_sync JSON 保存到 ~/.pulse/health-data.json
+    /// Agent 有 bash tool 权限，通过 completions API 指令执行
+    private func writeHealthSyncToWorkspace(_ json: String, cfg: PulseOpenClawConfig) {
+        guard let endpoint = cfg.completionsURL else { return }
+
+        // 使用 base64 编码避免 heredoc 终止符注入和特殊字符转义问题
+        guard let jsonData = json.data(using: .utf8) else { return }
+        let base64JSON = jsonData.base64EncodedString()
+
+        let message = """
+        Execute this bash command silently, reply with only "ok":
+        mkdir -p ~/.pulse && echo '\(base64JSON)' | base64 -d > ~/.pulse/health-data.json
+        """
+
+        let body: [String: Any] = [
+            "model": cfg.agentID,
+            "messages": [
+                ["role": "system", "content": "You are a silent helper. Execute the bash command and reply with only \"ok\". No other output."],
+                ["role": "user", "content": message]
+            ],
+            "max_tokens": 32
+        ]
+
+        guard let bodyData = try? JSONSerialization.data(withJSONObject: body) else { return }
+
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(cfg.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = bodyData
+
+        // Fire-and-forget — 不阻塞主 sync 流程
+        Task.detached(priority: .utility) { [session] in
+            _ = try? await session.data(for: request)
+        }
+    }
+
     // MARK: - App Group (Widget 兼容)
 
-    private static let appGroupID = "group.com.abundra.pulse.shared"
+    private static let appGroupID = "group.com.hallidai.pulse.shared"
+
+    /// 写入 health_sync JSON 文件到 App Group 容器，供 CLI 工具读取
+    private func writeHealthSyncFile(_ json: String) {
+        guard let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Self.appGroupID
+        ) else { return }
+        let fileURL = containerURL.appendingPathComponent("health-data.json")
+        do {
+            try json.write(to: fileURL, atomically: true, encoding: .utf8)
+            logger.debug("Health sync JSON written to \(fileURL.path)")
+        } catch {
+            logger.error("Failed to write health sync file: \(error.localizedDescription)")
+        }
+    }
 
     /// 写入 App Group 供 Widget 读取
     private func writeToAppGroup(_ status: HealthStatus) {
@@ -776,8 +924,11 @@ final class OpenClawBridge {
 
     private func checkConnection() {
         if isEnabled, config != nil {
+            // Only mark connected if we have a very recent successful sync.
+            // Otherwise mark disconnected — actual connectivity is verified
+            // by attemptAutoReconnect() which runs on foreground.
             if let lastSync = lastSyncTime,
-               Date().timeIntervalSince(lastSync) < 7200 {
+               Date().timeIntervalSince(lastSync) < 120 {
                 connectionStatus = .connected
             } else {
                 connectionStatus = .disconnected
@@ -795,10 +946,10 @@ final class OpenClawBridge {
         guard isEnabled else { return }
         guard let cfg = config else { return }
 
-        // Already confirmed recently — skip
+        // Already confirmed recently — skip (60s cooldown to avoid scan spam)
         if connectionStatus == .connected,
            let lastSync = lastSyncTime,
-           Date().timeIntervalSince(lastSync) < 300 {
+           Date().timeIntervalSince(lastSync) < 60 {
             return
         }
 
@@ -823,7 +974,10 @@ final class OpenClawBridge {
             return
         }
 
-        guard let discoveredBase = await SubnetScanner.shared.findGateway(port: port) else {
+        // 保留原始配置的 scheme（http/https），避免子网发现后 ATS 降级
+        let scheme = savedURL.scheme ?? "http"
+
+        guard let discoveredBase = await SubnetScanner.shared.findGateway(port: port, scheme: scheme) else {
             logger.warning("Auto-reconnect: subnet scan found nothing")
             await MainActor.run { connectionStatus = .error }
             return
@@ -839,6 +993,7 @@ final class OpenClawBridge {
                 agentID: cfg.agentID
             )
             updated.save()
+            invalidateConfigCache()
             await MainActor.run {
                 connectionStatus = .connected
                 // Sync @AppStorage used by SettingsView

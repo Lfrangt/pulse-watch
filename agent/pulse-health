@@ -1,0 +1,162 @@
+#!/bin/bash
+# pulse-health — CLI tool for reading Pulse Watch health data
+# Usage:
+#   pulse-health status    — show latest health summary
+#   pulse-health json      — output raw JSON (for piping to other tools)
+#   pulse-health metrics   — show key metrics only
+#   pulse-health history   — show 7-day daily history
+
+HEALTH_FILE="$HOME/.pulse/health-data.json"
+
+# Colors
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+DIM='\033[0;90m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+check_data() {
+    if [ ! -f "$HEALTH_FILE" ]; then
+        echo -e "${RED}No health data found.${NC}"
+        echo -e "${DIM}Waiting for Pulse Watch to sync data...${NC}"
+        echo -e "${DIM}File expected at: $HEALTH_FILE${NC}"
+        exit 1
+    fi
+}
+
+cmd_status() {
+    check_data
+    python3 -c "
+import json, sys
+from datetime import datetime
+
+with open('$HEALTH_FILE') as f:
+    data = json.load(f)
+
+m = data.get('metrics', {})
+hr = m.get('heartRate', {})
+hrv = m.get('hrv', {})
+sleep = m.get('sleep', {})
+activity = m.get('activity', {})
+score = m.get('recoveryScore', '—')
+date = data.get('date', '—')
+
+print(f'  📅 Date: {date}')
+print(f'  💯 Recovery Score: {score}')
+print()
+print('  Vitals:')
+if hr.get('resting'): print(f'    ❤️  Resting HR:  {hr[\"resting\"]} bpm')
+if hr.get('average'): print(f'    💓 Current HR:   {hr[\"average\"]} bpm')
+if hrv.get('average'): print(f'    📊 HRV (SDNN):   {hrv[\"average\"]} ms')
+print()
+if sleep:
+    total = sleep.get('totalMinutes', 0)
+    hours = total / 60 if total else 0
+    deep = sleep.get('deepMinutes', '—')
+    rem = sleep.get('remMinutes', '—')
+    print(f'  Sleep:')
+    print(f'    🌙 Total:  {hours:.1f}h')
+    print(f'    🔵 Deep:   {deep} min')
+    print(f'    🟣 REM:    {rem} min')
+    print()
+if activity:
+    steps = activity.get('steps', '—')
+    cal = activity.get('activeCalories', '—')
+    print(f'  Activity:')
+    print(f'    🚶 Steps:    {steps}')
+    print(f'    🔥 Calories: {cal} kcal')
+    print()
+
+# Week trend
+wt = m.get('weekTrend', {})
+if wt:
+    print(f'  Week Trend:')
+    if wt.get('averageScore'): print(f'    Avg Score: {wt[\"averageScore\"]}')
+    print(f'    Score: {wt.get(\"scoreTrend\", \"—\")}  HRV: {wt.get(\"hrvTrend\", \"—\")}  Sleep: {wt.get(\"sleepTrend\", \"—\")}')
+
+# Daily history count
+history = data.get('dailyHistory', [])
+if history:
+    print(f'    {len(history)} days of history available (use: pulse-health history)')
+"
+}
+
+cmd_json() {
+    check_data
+    cat "$HEALTH_FILE"
+}
+
+cmd_metrics() {
+    check_data
+    python3 -c "
+import json
+with open('$HEALTH_FILE') as f:
+    data = json.load(f)
+m = data.get('metrics', {})
+hr = m.get('heartRate', {})
+hrv = m.get('hrv', {})
+sleep = m.get('sleep', {})
+activity = m.get('activity', {})
+out = {}
+if hr.get('resting'): out['restingHR'] = hr['resting']
+if hr.get('average'): out['heartRate'] = hr['average']
+if hrv.get('average'): out['hrv'] = hrv['average']
+if sleep.get('totalMinutes'): out['sleepHours'] = round(sleep['totalMinutes']/60, 1)
+if sleep.get('deepMinutes'): out['deepSleep'] = sleep['deepMinutes']
+if sleep.get('remMinutes'): out['remSleep'] = sleep['remMinutes']
+if activity.get('steps'): out['steps'] = activity['steps']
+if activity.get('activeCalories'): out['calories'] = activity['activeCalories']
+out['recoveryScore'] = m.get('recoveryScore', None)
+print(json.dumps(out, indent=2))
+"
+}
+
+cmd_history() {
+    check_data
+    python3 -c "
+import json
+with open('$HEALTH_FILE') as f:
+    data = json.load(f)
+history = data.get('dailyHistory', [])
+if not history:
+    print('No daily history available.')
+else:
+    print(f'  Last {len(history)} days:')
+    print(f'  {\"Date\":<12} {\"Score\":>6} {\"RHR\":>5} {\"HRV\":>5} {\"Sleep\":>6} {\"Steps\":>7}')
+    print(f'  {\"-\"*12} {\"-\"*6} {\"-\"*5} {\"-\"*5} {\"-\"*6} {\"-\"*7}')
+    for day in history:
+        date = day.get('date', '—')
+        score = day.get('score', '—')
+        rhr = day.get('restingHeartRate', '—')
+        hrv = day.get('hrv', '—')
+        sleep_data = day.get('sleep', {})
+        sleep_min = sleep_data.get('totalMinutes', day.get('sleepMinutes', None))
+        sleep_str = f'{sleep_min/60:.1f}h' if sleep_min else '—'
+        steps = day.get('steps', '—')
+        print(f'  {date:<12} {str(score):>6} {str(rhr):>5} {str(hrv):>5} {sleep_str:>6} {str(steps):>7}')
+"
+}
+
+cmd_help() {
+    echo -e "${BOLD}pulse-health${NC} — Read Pulse Watch health data"
+    echo ""
+    echo "Usage:"
+    echo "  pulse-health status    Show latest health summary"
+    echo "  pulse-health json      Output raw JSON"
+    echo "  pulse-health metrics   Key metrics as JSON (for scripting)"
+    echo "  pulse-health history   7-day daily breakdown"
+    echo "  pulse-health help      Show this help"
+    echo ""
+    echo -e "${DIM}Data source: $HEALTH_FILE${NC}"
+}
+
+case "${1:-status}" in
+    status)  cmd_status ;;
+    json)    cmd_json ;;
+    metrics) cmd_metrics ;;
+    history) cmd_history ;;
+    help|-h|--help) cmd_help ;;
+    *) echo "Unknown command: $1"; cmd_help; exit 1 ;;
+esac

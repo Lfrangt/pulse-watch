@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - Shared Data Key
 
 enum PulseSharedData {
-    static let suiteName = "group.com.abundra.pulse"
+    static let suiteName = "group.com.hallidai.pulse.shared"
     static let scoreKey = "pulse.score"
     static let headlineKey = "pulse.headline"
     static let heartRateKey = "pulse.heartRate"
@@ -85,17 +85,17 @@ struct PulseComplicationCircular: View {
 
     private var scoreColor: Color {
         switch entry.score {
-        case 0..<40: return Color(hex: "C75C5C")
-        case 40..<70: return Color(hex: "D4A056")
-        default: return Color(hex: "7FB069")
+        case 0..<40: return PulseTheme.statusPoor
+        case 40..<70: return PulseTheme.statusWarning
+        default: return PulseTheme.statusGood
         }
     }
 
     private var gaugeGradient: Gradient {
         switch entry.score {
-        case 0..<40: return Gradient(colors: [Color(hex: "C75C5C"), Color(hex: "A04040")])
-        case 40..<70: return Gradient(colors: [Color(hex: "D4A056"), Color(hex: "B88A40")])
-        default: return Gradient(colors: [Color(hex: "7FB069"), Color(hex: "5A9044")])
+        case 0..<40: return Gradient(colors: [PulseTheme.statusPoor, PulseTheme.statusPoor.opacity(0.7)])
+        case 40..<70: return Gradient(colors: [PulseTheme.statusWarning, PulseTheme.statusWarning.opacity(0.7)])
+        default: return Gradient(colors: [PulseTheme.statusGood, PulseTheme.statusGood.opacity(0.7)])
         }
     }
 }
@@ -130,7 +130,7 @@ struct PulseComplicationRectangular: View {
                     HStack(spacing: 2) {
                         Image(systemName: "heart.fill")
                             .font(.system(size: 8))
-                            .foregroundStyle(Color(hex: "C75C5C"))
+                            .foregroundStyle(PulseTheme.activityCoral)
                         Text(entry.heartRate > 0 ? "\(entry.heartRate)" : "--")
                             .font(.system(size: 10, design: .rounded))
                     }
@@ -139,7 +139,7 @@ struct PulseComplicationRectangular: View {
                     HStack(spacing: 2) {
                         Image(systemName: "figure.walk")
                             .font(.system(size: 8))
-                            .foregroundStyle(Color(hex: "7FB069"))
+                            .foregroundStyle(PulseTheme.statusGood)
                         Text(formatSteps(entry.steps))
                             .font(.system(size: 10, design: .rounded))
                     }
@@ -152,9 +152,9 @@ struct PulseComplicationRectangular: View {
 
     private var gaugeColor: Color {
         switch entry.score {
-        case 0..<40: return Color(hex: "C75C5C")
-        case 40..<70: return Color(hex: "D4A056")
-        default: return Color(hex: "7FB069")
+        case 0..<40: return PulseTheme.statusPoor
+        case 40..<70: return PulseTheme.statusWarning
+        default: return PulseTheme.statusGood
         }
     }
 
@@ -199,9 +199,9 @@ struct PulseComplicationCorner: View {
 
     private var scoreColor: Color {
         switch entry.score {
-        case 0..<40: return Color(hex: "C75C5C")
-        case 40..<70: return Color(hex: "D4A056")
-        default: return Color(hex: "7FB069")
+        case 0..<40: return PulseTheme.statusPoor
+        case 40..<70: return PulseTheme.statusWarning
+        default: return PulseTheme.statusGood
         }
     }
 }

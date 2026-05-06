@@ -25,7 +25,27 @@ struct PulseWatchApp: App {
         do {
             return try ModelContainer(for: schema, configurations: [config])
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            // If migration fails, delete the store and recreate — losing data is better than crashing
+            // This can happen after a schema change in an app update
+            let storeURL = config.url
+            try? FileManager.default.removeItem(at: storeURL)
+            // Also remove the .sqlite-shm and .sqlite-wal files
+            let shmURL = storeURL.deletingPathExtension().appendingPathExtension("sqlite-shm")
+            let walURL = storeURL.deletingPathExtension().appendingPathExtension("sqlite-wal")
+            try? FileManager.default.removeItem(at: shmURL)
+            try? FileManager.default.removeItem(at: walURL)
+
+            do {
+                return try ModelContainer(for: schema, configurations: [config])
+            } catch {
+                // Last resort: in-memory store to avoid crash
+                let memConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+                do {
+                    return try ModelContainer(for: schema, configurations: [memConfig])
+                } catch {
+                    fatalError("Pulse Watch: Failed to create even in-memory ModelContainer: \(error)")
+                }
+            }
         }
     }()
 
@@ -84,6 +104,10 @@ struct PulseWatchApp: App {
             await HealthKitService.shared.performInitialFetch()
             // 训练历史同步 — 每次启动时增量同步
             await WorkoutHistoryService.shared.syncWorkouts()
+            // 数据采集完成后立即推送到 OpenClaw（确保 Agent 有最新数据）
+            await MainActor.run {
+                OpenClawBridge.shared.checkAndPushIfNeeded()
+            }
         }
     }
 
@@ -131,6 +155,11 @@ struct PulseWatchApp: App {
                 // 检查并处理 OpenClaw pending workouts（每次前台都检查）
                 Task {
                     await OpenClawBridge.shared.checkAndProcessPendingIfNeeded()
+                }
+
+                // 回到前台时推送最新健康数据到 OpenClaw
+                Task { @MainActor in
+                    OpenClawBridge.shared.checkAndPushIfNeeded()
                 }
             }
         }

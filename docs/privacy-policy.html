@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy — Pulse Watch</title>
+    <title>Privacy Policy — Pulse</title>
     <style>
         :root {
             --bg: #0A0A0F;
@@ -54,6 +54,11 @@
             letter-spacing: -0.5px;
             margin-bottom: 8px;
         }
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
         .updated {
             color: var(--text-secondary);
             font-size: 14px;
@@ -68,7 +73,6 @@
             font-size: 16px;
             font-weight: 500;
         }
-        .summary-box .icon { font-size: 20px; margin-right: 8px; }
         h2 {
             font-size: 20px;
             font-weight: 600;
@@ -109,186 +113,290 @@
         .back-link:hover { color: var(--accent); }
         .lang-content { display: none; }
         .lang-content.active { display: block; }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 24px;
+        }
+        .data-table th, .data-table td {
+            text-align: left;
+            padding: 10px 14px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table th {
+            color: var(--text);
+            font-weight: 600;
+            background: var(--surface);
+        }
+        .data-table td {
+            color: var(--text-secondary);
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-read {
+            background: rgba(91,141,239,0.15);
+            color: var(--accent);
+        }
+        .badge-write {
+            background: rgba(239,170,91,0.15);
+            color: #EFAA5B;
+        }
+        .badge-rw {
+            background: rgba(141,239,91,0.15);
+            color: #8DEF5B;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="index.html" class="back-link">← Back to Pulse Watch</a>
+        <a href="index.html" class="back-link">&larr; Back to Pulse</a>
 
         <div class="lang-switch">
             <button class="active" onclick="switchLang('en')">English</button>
             <button onclick="switchLang('zh')">中文</button>
         </div>
 
-        <!-- English -->
+        <!-- ==================== ENGLISH ==================== -->
         <div id="lang-en" class="lang-content active">
             <h1>Privacy Policy</h1>
-            <p class="updated">Last Updated: March 16, 2026</p>
+            <p class="subtitle">Pulse by Abundra / Hallidai Inc.</p>
+            <p class="updated">Effective Date: April 2, 2026</p>
 
             <div class="summary-box">
-                <span class="icon">🔒</span> Pulse Watch is privacy-first. <strong>All your health data stays on your device.</strong> We never collect, store, or transmit your personal health information to any server.
+                Pulse is privacy-first. <strong>All your health data stays on your device.</strong> We never collect, store, or transmit your personal health information to any external server.
             </div>
 
-            <h2>Data We Access</h2>
+            <!-- 1. What Data We Access -->
+            <h2>1. What Data We Access</h2>
 
-            <h3>Health Data (HealthKit)</h3>
-            <p>Pulse Watch reads the following from Apple HealthKit:</p>
-            <ul>
-                <li>Heart rate, resting heart rate, heart rate variability (HRV)</li>
-                <li>Blood oxygen saturation (SpO2)</li>
-                <li>Sleep analysis (duration, stages)</li>
-                <li>Step count</li>
-                <li>Active and resting energy burned</li>
-            </ul>
-            <p>The App writes workout data to HealthKit when you complete a workout on Apple Watch.</p>
+            <h3>Health Data (Apple HealthKit)</h3>
+            <p>Pulse reads and writes the following data types through Apple HealthKit with your explicit permission:</p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Data Type</th>
+                        <th>Access</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Heart Rate</td><td><span class="badge badge-read">Read</span></td><td>Readiness scoring, trend analysis</td></tr>
+                    <tr><td>Resting Heart Rate</td><td><span class="badge badge-read">Read</span></td><td>Recovery and baseline tracking</td></tr>
+                    <tr><td>Heart Rate Variability (HRV)</td><td><span class="badge badge-read">Read</span></td><td>Readiness scoring, stress analysis</td></tr>
+                    <tr><td>Sleep Analysis</td><td><span class="badge badge-read">Read</span></td><td>Sleep quality scoring, readiness input</td></tr>
+                    <tr><td>Step Count</td><td><span class="badge badge-read">Read</span></td><td>Daily activity tracking</td></tr>
+                    <tr><td>Active Energy Burned</td><td><span class="badge badge-read">Read</span></td><td>Calorie and energy tracking</td></tr>
+                    <tr><td>Exercise Minutes</td><td><span class="badge badge-read">Read</span></td><td>Activity and training load</td></tr>
+                    <tr><td>Workout Data</td><td><span class="badge badge-rw">Read + Write</span></td><td>Training history and workout logging</td></tr>
+                    <tr><td>Blood Oxygen (SpO2)</td><td><span class="badge badge-read">Read</span></td><td>Health overview, readiness input</td></tr>
+                </tbody>
+            </table>
+
             <p><strong>All HealthKit data is processed and stored locally on your device using Apple's SwiftData framework. It is never transmitted to external servers.</strong></p>
 
             <h3>Location Data</h3>
-            <p>The App uses location services to detect when you arrive at a saved gym location for automatic training suggestions. Location data is processed entirely on-device, never uploaded to any server, and never shared with third parties.</p>
+            <p>Pulse uses location services solely to detect when you arrive at a saved gym location for automatic training suggestions. Location data is processed entirely on-device. It is <strong>never uploaded to any server</strong> and never shared with third parties.</p>
 
             <h3>Camera</h3>
-            <p>The App uses the camera solely to scan QR codes for optional OpenClaw pairing. No images or video are stored or transmitted.</p>
+            <p>The camera is used only to scan QR codes for optional OpenClaw AI coach pairing. No images or video are stored or transmitted.</p>
 
-            <h3>Analytics</h3>
-            <p>The App uses <a href="https://telemetrydeck.com/privacy" target="_blank">TelemetryDeck</a> for anonymous, privacy-preserving usage analytics. TelemetryDeck does not collect personal information and complies with GDPR. No health data is included in analytics.</p>
+            <h3>Local Network</h3>
+            <p>Pulse uses Bonjour/mDNS to discover OpenClaw AI coach instances on your local Wi-Fi network. This network traffic never leaves your local network.</p>
 
+            <!-- 2. How Data Is Stored -->
             <div class="section">
-                <h2>Optional: OpenClaw Integration</h2>
-                <p>If you choose to connect to your own OpenClaw instance (an optional AI coaching feature), the App transmits aggregated health summaries to your specified server. This connection is:</p>
-                <ul>
-                    <li>Entirely opt-in</li>
-                    <li>Configured by you with your own server URL and credentials</li>
-                    <li>Secured with bearer token authentication over HTTPS</li>
-                    <li>Disconnectable at any time</li>
-                </ul>
-                <p>We do not operate or have access to your OpenClaw server.</p>
-            </div>
-
-            <div class="section">
-                <h2>Data Storage</h2>
+                <h2>2. How Data Is Stored</h2>
                 <p>All data is stored locally on your device:</p>
                 <ul>
                     <li><strong>Health records:</strong> SwiftData (on-device database)</li>
                     <li><strong>Preferences:</strong> UserDefaults (on-device)</li>
                     <li><strong>OpenClaw token:</strong> iOS Keychain (encrypted, on-device)</li>
-                    <li><strong>Widget data:</strong> App Group container (on-device)</li>
+                    <li><strong>Widget data:</strong> App Group container (on-device, shared between app and widgets)</li>
                 </ul>
+                <p>There is no cloud sync. There are no remote servers storing your health data. If you delete the app, all locally stored data is permanently removed.</p>
             </div>
 
+            <!-- 3. Third-Party Services -->
             <div class="section">
-                <h2>Data Sharing</h2>
-                <p>We do not sell, share, or transmit your personal data to any third party.</p>
-            </div>
+                <h2>3. Third-Party Services</h2>
 
-            <div class="section">
-                <h2>Children's Privacy</h2>
-                <p>Pulse Watch is not directed at children under 13. We do not knowingly collect data from children.</p>
-            </div>
+                <h3>TelemetryDeck (Anonymous Analytics)</h3>
+                <p>Pulse uses <a href="https://telemetrydeck.com/privacy" target="_blank">TelemetryDeck</a> for anonymous, privacy-preserving app usage analytics (e.g., which screens are visited, app version). TelemetryDeck does not collect personal information, does not use device identifiers, and complies with GDPR. <strong>No health data is ever included in analytics.</strong></p>
 
-            <div class="section">
-                <h2>Your Rights</h2>
-                <p>Since all data is stored locally, you have full control:</p>
+                <h3>OpenClaw AI Coach (Optional, Local Network Only)</h3>
+                <p>If you choose to connect to your own OpenClaw instance, the app transmits aggregated health summaries to a gateway running on your local network (discovered via mDNS/Bonjour). This connection is:</p>
                 <ul>
-                    <li><strong>Access:</strong> View all your data in the App at any time</li>
-                    <li><strong>Deletion:</strong> Delete the App to remove all data, or clear data from Settings</li>
-                    <li><strong>Portability:</strong> Your health data remains in Apple HealthKit</li>
+                    <li>Entirely opt-in &mdash; disabled by default</li>
+                    <li>Local network only &mdash; data does not traverse the internet</li>
+                    <li>Configured and controlled entirely by you</li>
+                    <li>Disconnectable at any time from the app's settings</li>
+                </ul>
+                <p>We do not operate, host, or have access to your OpenClaw gateway.</p>
+
+                <h3>No Advertising or Tracking SDKs</h3>
+                <p>Pulse contains no advertising SDKs, no tracking pixels, no social media SDKs, and no third-party analytics that receive health data.</p>
+            </div>
+
+            <!-- 4. Your Rights -->
+            <div class="section">
+                <h2>4. Your Rights</h2>
+                <p>Since all data is stored locally on your device, you have full control:</p>
+                <ul>
+                    <li><strong>Access:</strong> View all your data in the app at any time.</li>
+                    <li><strong>Revoke HealthKit Access:</strong> Go to iOS Settings &gt; Health &gt; Data Access &amp; Devices &gt; Pulse to revoke any or all health data permissions at any time.</li>
+                    <li><strong>Deletion:</strong> Delete the app to permanently remove all locally stored data, or use the in-app settings to clear specific data.</li>
+                    <li><strong>Portability:</strong> Your health data remains in Apple HealthKit and is not locked into Pulse.</li>
+                    <li><strong>Revoke Location Access:</strong> Go to iOS Settings &gt; Privacy &amp; Security &gt; Location Services &gt; Pulse to change or revoke location permissions.</li>
                 </ul>
             </div>
 
+            <!-- 5. Children's Privacy -->
             <div class="section">
-                <h2>Changes</h2>
-                <p>We may update this policy from time to time. Changes will be reflected in the "Last Updated" date above.</p>
+                <h2>5. Children's Privacy</h2>
+                <p>Pulse is not directed at children under 13. We do not knowingly collect data from children. If you believe a child has provided data to us, please contact us and we will promptly delete it.</p>
             </div>
 
+            <!-- 6. Changes to This Policy -->
             <div class="section">
-                <h2>Contact</h2>
-                <p>Questions? Reach us at <a href="mailto:abundra.dev@gmail.com">abundra.dev@gmail.com</a> or via <a href="https://github.com/Lfrangt/pulse-watch/issues" target="_blank">GitHub Issues</a>.</p>
+                <h2>6. Changes to This Policy</h2>
+                <p>We may update this Privacy Policy from time to time to reflect changes in the app or applicable laws. When we make changes, we will update the "Effective Date" at the top of this page. We encourage you to review this page periodically. Continued use of Pulse after changes constitutes acceptance of the updated policy.</p>
+            </div>
+
+            <!-- 7. Contact -->
+            <div class="section">
+                <h2>7. Contact</h2>
+                <p>If you have questions or concerns about this Privacy Policy or your data, please contact us:</p>
+                <ul>
+                    <li>Email: <a href="mailto:support@abundra.com">support@abundra.com</a></li>
+                    <li>GitHub: <a href="https://github.com/Lfrangt/pulse-watch/issues" target="_blank">github.com/Lfrangt/pulse-watch/issues</a></li>
+                </ul>
+                <p style="margin-top: 24px; font-size: 13px; color: var(--text-secondary);">Pulse is developed by Abundra / Hallidai Inc.</p>
             </div>
         </div>
 
-        <!-- Chinese -->
+        <!-- ==================== CHINESE ==================== -->
         <div id="lang-zh" class="lang-content">
             <h1>隐私政策</h1>
-            <p class="updated">最后更新：2026年3月16日</p>
+            <p class="subtitle">Pulse — Abundra / Hallidai Inc.</p>
+            <p class="updated">生效日期：2026 年 4 月 2 日</p>
 
             <div class="summary-box">
-                <span class="icon">🔒</span> Pulse Watch 隐私优先。<strong>您的所有健康数据均存储在您的设备上。</strong>我们绝不收集、存储或传输您的个人健康信息到任何服务器。
+                Pulse 以隐私为先。<strong>您的所有健康数据均存储在您的设备上。</strong>我们绝不收集、存储或传输您的个人健康信息到任何外部服务器。
             </div>
 
-            <h2>我们访问的数据</h2>
+            <!-- 1. 我们访问的数据 -->
+            <h2>1. 我们访问的数据</h2>
 
-            <h3>健康数据 (HealthKit)</h3>
-            <p>Pulse Watch 从 Apple HealthKit 读取以下数据：</p>
-            <ul>
-                <li>心率、静息心率、心率变异性 (HRV)</li>
-                <li>血氧饱和度 (SpO2)</li>
-                <li>睡眠分析（时长、阶段）</li>
-                <li>步数</li>
-                <li>活动与静息能量消耗</li>
-            </ul>
-            <p>当您在 Apple Watch 上完成训练时，本应用会将运动数据写入 HealthKit。</p>
+            <h3>健康数据（Apple HealthKit）</h3>
+            <p>Pulse 在获得您的明确授权后，通过 Apple HealthKit 读写以下数据类型：</p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>数据类型</th>
+                        <th>权限</th>
+                        <th>用途</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>心率</td><td><span class="badge badge-read">读取</span></td><td>准备度评分、趋势分析</td></tr>
+                    <tr><td>静息心率</td><td><span class="badge badge-read">读取</span></td><td>恢复与基线追踪</td></tr>
+                    <tr><td>心率变异性（HRV）</td><td><span class="badge badge-read">读取</span></td><td>准备度评分、压力分析</td></tr>
+                    <tr><td>睡眠分析</td><td><span class="badge badge-read">读取</span></td><td>睡眠质量评分、准备度输入</td></tr>
+                    <tr><td>步数</td><td><span class="badge badge-read">读取</span></td><td>日常活动追踪</td></tr>
+                    <tr><td>活动消耗能量</td><td><span class="badge badge-read">读取</span></td><td>卡路里与能量追踪</td></tr>
+                    <tr><td>锻炼分钟数</td><td><span class="badge badge-read">读取</span></td><td>活动量与训练负荷</td></tr>
+                    <tr><td>运动数据</td><td><span class="badge badge-rw">读写</span></td><td>训练记录与运动日志</td></tr>
+                    <tr><td>血氧饱和度（SpO2）</td><td><span class="badge badge-read">读取</span></td><td>健康概览、准备度输入</td></tr>
+                </tbody>
+            </table>
+
             <p><strong>所有 HealthKit 数据均使用 Apple 的 SwiftData 框架在设备本地处理和存储，绝不会传输到外部服务器。</strong></p>
 
             <h3>位置数据</h3>
-            <p>本应用使用位置服务检测您是否到达已保存的健身房位置，以提供自动训练建议。位置数据完全在设备上处理，绝不上传到任何服务器，也绝不与第三方共享。</p>
+            <p>Pulse 仅使用位置服务检测您是否到达已保存的健身房位置，以提供自动训练建议。位置数据完全在设备上处理，<strong>绝不上传到任何服务器</strong>，也绝不与第三方共享。</p>
 
             <h3>相机</h3>
-            <p>本应用仅使用相机扫描 OpenClaw 配对二维码。不存储或传输任何图像或视频。</p>
+            <p>相机仅用于扫描 OpenClaw AI 教练配对二维码。不存储或传输任何图像或视频。</p>
 
-            <h3>分析</h3>
-            <p>本应用使用 <a href="https://telemetrydeck.com/privacy" target="_blank">TelemetryDeck</a> 进行匿名、隐私保护的使用分析。TelemetryDeck 不收集个人信息，符合 GDPR 规定。分析数据中不包含任何健康数据。</p>
+            <h3>本地网络</h3>
+            <p>Pulse 使用 Bonjour/mDNS 在您的本地 Wi-Fi 网络上发现 OpenClaw AI 教练实例。此网络流量绝不会离开您的本地网络。</p>
 
+            <!-- 2. 数据如何存储 -->
             <div class="section">
-                <h2>可选：OpenClaw 集成</h2>
-                <p>如果您选择将本应用连接到您自己的 OpenClaw 实例（可选的 AI 教练功能），本应用会将聚合的健康摘要传输到您指定的服务器。此连接：</p>
-                <ul>
-                    <li>完全由用户选择启用</li>
-                    <li>由您使用自己的服务器 URL 和凭据配置</li>
-                    <li>通过 HTTPS 的 Bearer Token 认证保护</li>
-                    <li>您可以随时断开连接</li>
-                </ul>
-                <p>我们不运营也无法访问您的 OpenClaw 服务器。</p>
-            </div>
-
-            <div class="section">
-                <h2>数据存储</h2>
+                <h2>2. 数据如何存储</h2>
                 <p>所有数据存储在设备本地：</p>
                 <ul>
-                    <li><strong>健康记录：</strong>SwiftData（设备数据库）</li>
+                    <li><strong>健康记录：</strong>SwiftData（设备本地数据库）</li>
                     <li><strong>偏好设置：</strong>UserDefaults（设备本地）</li>
                     <li><strong>OpenClaw 令牌：</strong>iOS 钥匙串（加密存储）</li>
-                    <li><strong>小组件数据：</strong>App Group 容器（设备本地）</li>
+                    <li><strong>小组件数据：</strong>App Group 容器（设备本地，应用与小组件共享）</li>
                 </ul>
+                <p>没有云同步，没有远程服务器存储您的健康数据。删除应用将永久移除所有本地存储的数据。</p>
             </div>
 
+            <!-- 3. 第三方服务 -->
             <div class="section">
-                <h2>数据共享</h2>
-                <p>我们不会向任何第三方出售、共享或传输您的个人数据。</p>
+                <h2>3. 第三方服务</h2>
+
+                <h3>TelemetryDeck（匿名分析）</h3>
+                <p>Pulse 使用 <a href="https://telemetrydeck.com/privacy" target="_blank">TelemetryDeck</a> 进行匿名、隐私保护的应用使用分析（例如访问了哪些页面、应用版本等）。TelemetryDeck 不收集个人信息，不使用设备标识符，并符合 GDPR 规定。<strong>分析数据中绝不包含任何健康数据。</strong></p>
+
+                <h3>OpenClaw AI 教练（可选，仅限本地网络）</h3>
+                <p>如果您选择连接到自己的 OpenClaw 实例，应用会将聚合的健康摘要传输到在您本地网络上运行的网关（通过 mDNS/Bonjour 发现）。此连接：</p>
+                <ul>
+                    <li>完全由用户选择启用 &mdash; 默认关闭</li>
+                    <li>仅限本地网络 &mdash; 数据不经过互联网传输</li>
+                    <li>完全由您配置和控制</li>
+                    <li>可随时在应用设置中断开连接</li>
+                </ul>
+                <p>我们不运营、不托管、也无法访问您的 OpenClaw 网关。</p>
+
+                <h3>无广告或追踪 SDK</h3>
+                <p>Pulse 不包含任何广告 SDK、追踪像素、社交媒体 SDK，也没有接收健康数据的第三方分析工具。</p>
             </div>
 
+            <!-- 4. 您的权利 -->
             <div class="section">
-                <h2>儿童隐私</h2>
-                <p>Pulse Watch 不面向 13 岁以下儿童。我们不会故意收集儿童数据。</p>
-            </div>
-
-            <div class="section">
-                <h2>您的权利</h2>
+                <h2>4. 您的权利</h2>
                 <p>由于所有数据存储在本地，您拥有完全控制权：</p>
                 <ul>
-                    <li><strong>访问：</strong>随时在应用中查看所有数据</li>
-                    <li><strong>删除：</strong>删除应用即可移除所有数据，或在设置中清除</li>
-                    <li><strong>可携带：</strong>您的健康数据保留在 Apple HealthKit 中</li>
+                    <li><strong>访问：</strong>随时在应用中查看所有数据。</li>
+                    <li><strong>撤销 HealthKit 访问权限：</strong>前往 iOS 设置 &gt; 健康 &gt; 数据访问与设备 &gt; Pulse，随时撤销任何或所有健康数据权限。</li>
+                    <li><strong>删除：</strong>删除应用即可永久移除所有本地存储的数据，或使用应用内设置清除特定数据。</li>
+                    <li><strong>可携带：</strong>您的健康数据保留在 Apple HealthKit 中，不会被锁定在 Pulse 内。</li>
+                    <li><strong>撤销位置权限：</strong>前往 iOS 设置 &gt; 隐私与安全性 &gt; 位置服务 &gt; Pulse，更改或撤销位置权限。</li>
                 </ul>
             </div>
 
+            <!-- 5. 儿童隐私 -->
             <div class="section">
-                <h2>政策变更</h2>
-                <p>我们可能会不时更新本隐私政策。变更将在上方"最后更新"日期中体现。</p>
+                <h2>5. 儿童隐私</h2>
+                <p>Pulse 不面向 13 岁以下儿童。我们不会故意收集儿童数据。如果您认为儿童向我们提供了数据，请联系我们，我们将及时删除。</p>
             </div>
 
+            <!-- 6. 政策变更 -->
             <div class="section">
-                <h2>联系方式</h2>
-                <p>如有问题，请通过 <a href="mailto:abundra.dev@gmail.com">abundra.dev@gmail.com</a> 或 <a href="https://github.com/Lfrangt/pulse-watch/issues" target="_blank">GitHub Issues</a> 联系我们。</p>
+                <h2>6. 政策变更</h2>
+                <p>我们可能会不时更新本隐私政策，以反映应用变更或适用法律的变化。变更时，我们将更新本页顶部的"生效日期"。建议您定期查看本页面。在变更后继续使用 Pulse 即表示接受更新后的政策。</p>
+            </div>
+
+            <!-- 7. 联系方式 -->
+            <div class="section">
+                <h2>7. 联系方式</h2>
+                <p>如果您对本隐私政策或您的数据有任何疑问或顾虑，请联系我们：</p>
+                <ul>
+                    <li>邮箱：<a href="mailto:support@abundra.com">support@abundra.com</a></li>
+                    <li>GitHub：<a href="https://github.com/Lfrangt/pulse-watch/issues" target="_blank">github.com/Lfrangt/pulse-watch/issues</a></li>
+                </ul>
+                <p style="margin-top: 24px; font-size: 13px; color: var(--text-secondary);">Pulse 由 Abundra / Hallidai Inc. 开发。</p>
             </div>
         </div>
     </div>

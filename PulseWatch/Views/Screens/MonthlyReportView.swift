@@ -14,12 +14,21 @@ struct MonthlyReportView: View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 0) {
-                    reportCard
+                    if lastMonthSummaries.isEmpty {
+                        EmptyStateView(
+                            icon: "doc.text",
+                            title: String(localized: "No Monthly Report"),
+                            message: String(localized: "Reports generate after one month of data.")
+                        )
                         .staggered(index: 0)
+                    } else {
+                        reportCard
+                            .staggered(index: 0)
 
-                    shareButton
-                        .staggered(index: 1)
-                        .padding(.top, PulseTheme.spacingM)
+                        shareButton
+                            .staggered(index: 1)
+                            .padding(.top, PulseTheme.spacingM)
+                    }
 
                     Spacer(minLength: 60)
                 }
@@ -43,23 +52,23 @@ struct MonthlyReportView: View {
 
     private var lastMonthSummaries: [DailySummary] {
         let cal = Calendar.current
-        let thisMonthStart = cal.date(from: cal.dateComponents([.year, .month], from: .now))!
-        let lastMonthStart = cal.date(byAdding: .month, value: -1, to: thisMonthStart)!
+        let thisMonthStart = cal.safeDate(from: cal.dateComponents([.year, .month], from: .now))
+        let lastMonthStart = cal.safeDate(byAdding: .month, value: -1, to: thisMonthStart)
         return allSummaries.filter { $0.date >= lastMonthStart && $0.date < thisMonthStart }
     }
 
     private var prevMonthSummaries: [DailySummary] {
         let cal = Calendar.current
-        let thisMonthStart = cal.date(from: cal.dateComponents([.year, .month], from: .now))!
-        let lastMonthStart = cal.date(byAdding: .month, value: -1, to: thisMonthStart)!
-        let prevMonthStart = cal.date(byAdding: .month, value: -1, to: lastMonthStart)!
+        let thisMonthStart = cal.safeDate(from: cal.dateComponents([.year, .month], from: .now))
+        let lastMonthStart = cal.safeDate(byAdding: .month, value: -1, to: thisMonthStart)
+        let prevMonthStart = cal.safeDate(byAdding: .month, value: -1, to: lastMonthStart)
         return allSummaries.filter { $0.date >= prevMonthStart && $0.date < lastMonthStart }
     }
 
     private var monthLabel: String {
         let cal = Calendar.current
-        let thisMonthStart = cal.date(from: cal.dateComponents([.year, .month], from: .now))!
-        let lastMonthStart = cal.date(byAdding: .month, value: -1, to: thisMonthStart)!
+        let thisMonthStart = cal.safeDate(from: cal.dateComponents([.year, .month], from: .now))
+        let lastMonthStart = cal.safeDate(byAdding: .month, value: -1, to: thisMonthStart)
         let fmt = DateFormatter()
         fmt.dateFormat = "yyyy年M月"
         return fmt.string(from: lastMonthStart)
@@ -189,7 +198,7 @@ struct MonthlyReportView: View {
                             if score > 0 {
                                 Text("\(score)")
                                     .font(.system(size: 7, weight: .bold, design: .rounded))
-                                    .foregroundStyle(.white.opacity(0.8))
+                                    .foregroundStyle(PulseTheme.textSecondary)
                             }
                         }
                 }
@@ -231,8 +240,8 @@ struct MonthlyReportView: View {
         let prevScore = avgScore(prev)
         let workouts = allWorkouts.filter { w in
             let cal = Calendar.current
-            let thisMonthStart = cal.date(from: cal.dateComponents([.year, .month], from: .now))!
-            let lastMonthStart = cal.date(byAdding: .month, value: -1, to: thisMonthStart)!
+            let thisMonthStart = cal.safeDate(from: cal.dateComponents([.year, .month], from: .now))
+            let lastMonthStart = cal.safeDate(byAdding: .month, value: -1, to: thisMonthStart)
             return w.startDate >= lastMonthStart && w.startDate < thisMonthStart
         }.count
 

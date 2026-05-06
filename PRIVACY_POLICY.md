@@ -1,6 +1,7 @@
 # Privacy Policy — Pulse
 
-**Last Updated: March 15, 2026**
+**Last Updated: May 5, 2026**
+**Effective Date: March 15, 2026**
 
 Pulse ("the App") is developed by Abundra. This privacy policy explains how we handle your data.
 
@@ -34,15 +35,35 @@ The App uses location services to detect when you arrive at a saved gym location
 
 The App uses the camera solely to scan QR codes for OpenClaw pairing. No images or video are stored or transmitted.
 
+### Local Network
+
+The App may use local network discovery (Bonjour) to find OpenClaw gateway instances on your local network. This is an optional feature for AI coaching integration. No network scan data is transmitted externally.
+
 ### Analytics
 
 The App uses TelemetryDeck for anonymous, privacy-preserving usage analytics (e.g., feature adoption, crash-free rates). TelemetryDeck does not collect personal information and complies with GDPR without requiring user consent. No health data is included in analytics.
 
 Learn more: https://telemetrydeck.com/privacy
 
+## Optional: AI Coach (DeepSeek)
+
+If you explicitly enable the **AI Coach** feature in Settings, the App transmits the following aggregated health summary to **DeepSeek** (api.deepseek.com) over HTTPS to generate personalized training advice:
+- Daily recovery score (0–100)
+- Last night sleep duration and stage breakdown
+- Resting heart rate, average heart rate, heart rate variability (HRV)
+- Recent workout summaries (type, duration, calories) — past 7 days
+- Step count and active calories — current day
+
+This connection is:
+- **Off by default.** You must tap "Enable AI Coach" in Settings to activate it. The activation prompt discloses the data flow before any transmission.
+- Sent to **DeepSeek**, an OpenAI-compatible LLM provider. Refer to DeepSeek's privacy policy at https://www.deepseek.com/privacy for their data handling practices.
+- Disable at any time by turning off "Auto-push health data" or unpairing the gateway in Settings.
+
+We do not transmit, store, or share any DeepSeek-specific identifiers; the AI Coach uses an API key bundled with the App.
+
 ## Optional: OpenClaw Integration
 
-If you choose to connect the App to your own OpenClaw instance (an optional AI coaching feature), the App will transmit aggregated health summaries to your specified server. This connection is:
+If you choose to connect the App to your own OpenClaw instance (an optional self-hosted AI coaching feature), the App will transmit aggregated health summaries to your specified server. This connection is:
 - Entirely opt-in
 - Configured by you with your own server URL and credentials
 - Secured with bearer token authentication over HTTPS
@@ -79,13 +100,14 @@ We may update this privacy policy from time to time. Changes will be reflected i
 ## Contact
 
 If you have questions about this privacy policy, please contact us at:
-- GitHub: https://github.com/nicexe/pulse-watch/issues
+- Email: abundra.dev@gmail.com
+- GitHub: https://github.com/Lfrangt/pulse-watch/issues
 
 ---
 
 # 隐私政策 — Pulse
 
-**最后更新：2026年3月15日**
+**最后更新：2026年3月27日**
 
 Pulse（以下简称"本应用"）由 Abundra 开发。本隐私政策说明我们如何处理您的数据。
 
@@ -143,4 +165,4 @@ Pulse 是一款隐私优先的应用。**您的所有健康数据均存储在您
 
 ## 联系方式
 
-如有隐私相关问题，请通过 GitHub Issues 联系我们。
+如有隐私相关问题，请通过邮件 abundra.dev@gmail.com 或 [GitHub Issues](https://github.com/Lfrangt/pulse-watch/issues) 联系我们。

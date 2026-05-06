@@ -24,7 +24,11 @@ struct TrainingCalendarView: View {
     // MARK: - 常量
 
     private let calendar = Calendar.current
-    private let weekdayHeaders = ["一", "二", "三", "四", "五", "六", "日"]
+    private let weekdayHeaders: [String] = {
+        let symbols = Calendar.current.veryShortStandaloneWeekdaySymbols
+        // Rotate from Sunday-first to Monday-first
+        return Array(symbols[1...]) + [symbols[0]]
+    }()
 
     // MARK: - 训练分类颜色
 
@@ -32,13 +36,13 @@ struct TrainingCalendarView: View {
     private func categoryColor(for category: String) -> Color {
         switch category.lowercased() {
         case "chest", "shoulders":
-            return Color(hex: "5B8DEF")   // Push — 蓝色
+            return PulseTheme.trendBlue   // Push — 蓝色
         case "back":
             return PulseTheme.statusGood   // Pull — 绿色
         case "legs":
             return PulseTheme.statusModerate   // 腿 — 琥珀色
         case "arms":
-            return Color(hex: "C9A96E")   // 手臂 — 金色
+            return PulseTheme.statusWarning   // 手臂 — 金色
         case "cardio":
             return PulseTheme.activityAccent   // 有氧 — 红色
         default:
@@ -51,10 +55,10 @@ struct TrainingCalendarView: View {
         switch category.lowercased() {
         case "chest":      return String(localized: "Chest")
         case "back":       return String(localized: "Back")
-        case "legs":       return "腿部"
+        case "legs":       return String(localized: "Legs")
         case "shoulders":  return String(localized: "Shoulders")
-        case "arms":       return "手臂"
-        case "cardio":     return "有氧"
+        case "arms":       return String(localized: "Arms")
+        case "cardio":     return String(localized: "Cardio")
         default:           return category
         }
     }
@@ -83,13 +87,22 @@ struct TrainingCalendarView: View {
                             .staggered(index: 2)
                     }
 
-                    // 月度统计
-                    monthlyStatsCard
+                    if allWorkouts.isEmpty && allHKWorkouts.isEmpty {
+                        EmptyStateView(
+                            icon: "calendar",
+                            title: String(localized: "No Training Events"),
+                            message: String(localized: "Start a workout to see your training calendar.")
+                        )
                         .staggered(index: 3)
+                    } else {
+                        // 月度统计
+                        monthlyStatsCard
+                            .staggered(index: 3)
 
-                    // 分类图例
-                    categoryLegend
-                        .staggered(index: 4)
+                        // 分类图例
+                        categoryLegend
+                            .staggered(index: 4)
+                    }
 
                     Spacer(minLength: 60)
                 }
@@ -97,7 +110,7 @@ struct TrainingCalendarView: View {
                 .padding(.top, PulseTheme.spacingS)
             }
             .background(PulseTheme.background)
-            .navigationTitle("训练日历")
+            .navigationTitle(String(localized: "Training Calendar"))
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
         }
@@ -149,7 +162,7 @@ struct TrainingCalendarView: View {
     /// 当前月份的标题字符串，例如 "2026年3月"
     private var monthYearString: String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.locale = Locale.current
         formatter.dateFormat = "yyyy MMM"
         return formatter.string(from: currentMonth)
     }
@@ -213,7 +226,7 @@ struct TrainingCalendarView: View {
             let dayDate = dateForDay(item.day)
             let workouts = workoutsForDate(dayDate)
             let hasWorkout = hasAnyWorkout(dayDate)
-            let isSelected = selectedDate != nil && calendar.isDate(dayDate, inSameDayAs: selectedDate!)
+            let isSelected = selectedDate.map { calendar.isDate(dayDate, inSameDayAs: $0) } ?? false
             let isToday = calendar.isDateInToday(dayDate)
             let workoutColor = hasWorkout ? primaryCategoryColor(dayDate) : Color.clear
 
@@ -282,7 +295,7 @@ struct TrainingCalendarView: View {
                 if let summary = summaryForDate(date), let score = summary.dailyScore {
                     HStack(spacing: 4) {
                         Image(systemName: "heart.fill").font(.system(size: 11)).foregroundStyle(PulseTheme.statusColor(for: score))
-                        Text("恢复 \(score)").font(PulseTheme.captionFont).foregroundStyle(PulseTheme.statusColor(for: score))
+                        Text(String(localized: "Recovery \(score)")).font(PulseTheme.captionFont).foregroundStyle(PulseTheme.statusColor(for: score))
                     }
                     .padding(.horizontal, 10).padding(.vertical, 5)
                     .background(Capsule().fill(PulseTheme.statusColor(for: score).opacity(0.15)))
@@ -292,7 +305,7 @@ struct TrainingCalendarView: View {
             // HK 训练（Apple Watch 同步）
             ForEach(Array(hkWorkouts.enumerated()), id: \.offset) { _, hk in
                 HStack(spacing: PulseTheme.spacingS) {
-                    Circle().fill(Color(hex: WorkoutActivityHelper.colorHex(for: hk.activityType))).frame(width: 8, height: 8)
+                    Circle().fill(WorkoutActivityHelper.pulseColor(for: hk.activityType)).frame(width: 8, height: 8)
                     VStack(alignment: .leading, spacing: 2) {
                         HStack {
                             Text(hk.activityName)
@@ -302,7 +315,7 @@ struct TrainingCalendarView: View {
                                 .font(.system(size: 11)).foregroundStyle(PulseTheme.textTertiary)
                         }
                         HStack(spacing: 8) {
-                            Label("\(hk.durationMinutes) 分钟", systemImage: "clock")
+                            Label("\(hk.durationMinutes) \(String(localized: "min"))", systemImage: "clock")
                             if let cal = hk.totalCalories, cal > 0 {
                                 Label("\(Int(cal)) kcal", systemImage: "flame.fill")
                             }
@@ -447,7 +460,7 @@ struct TrainingCalendarView: View {
     /// 日期详情标题，例如 "3月14日 周六"
     private func dayDetailTitle(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.locale = Locale.current
         formatter.dateFormat = "MMM d, EEEE"
         return formatter.string(from: date)
     }
@@ -472,7 +485,7 @@ struct TrainingCalendarView: View {
         return VStack(spacing: PulseTheme.spacingM) {
             // 标题
             HStack {
-                Text("本月概览")
+                Text(String(localized: "Monthly Overview"))
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
                 Spacer()
@@ -482,7 +495,7 @@ struct TrainingCalendarView: View {
                 // 训练天数
                 statItem(
                     value: "\(trainingDays)",
-                    label: "训练天数",
+                    label: String(localized: "Training Days"),
                     icon: "calendar",
                     color: PulseTheme.accent
                 )
@@ -494,10 +507,10 @@ struct TrainingCalendarView: View {
 
                 // 最常练部位
                 statItem(
-                    value: topCategory != nil ? categoryLabel(for: topCategory!.key) : "—",
-                    label: "最常练部位",
+                    value: topCategory.map { categoryLabel(for: $0.key) } ?? "—",
+                    label: String(localized: "Top Muscle"),
                     icon: "figure.strengthtraining.traditional",
-                    color: topCategory != nil ? categoryColor(for: topCategory!.key) : PulseTheme.textTertiary
+                    color: topCategory.map { categoryColor(for: $0.key) } ?? PulseTheme.textTertiary
                 )
 
                 // 分隔线
@@ -508,7 +521,7 @@ struct TrainingCalendarView: View {
                 // 总训练时长
                 statItem(
                     value: totalMinutes >= 60 ? "\(totalMinutes / 60)h\(totalMinutes % 60)m" : "\(totalMinutes)m",
-                    label: "总训练时长",
+                    label: String(localized: "Total Duration"),
                     icon: "clock.fill",
                     color: PulseTheme.statusModerate
                 )
@@ -541,16 +554,16 @@ struct TrainingCalendarView: View {
 
     private var categoryLegend: some View {
         let legends: [(String, String, Color)] = [
-            ("推（胸/肩）", "chest",   Color(hex: "5B8DEF")),
-            ("拉（背部）",   "back",    PulseTheme.statusGood),
-            ("腿部",        "legs",    PulseTheme.statusModerate),
-            ("手臂",      "arms",    Color(hex: "C9A96E")),
-            ("有氧",      "cardio",  PulseTheme.activityAccent),
+            (String(localized: "Push (Chest/Shoulders)"), "chest",   PulseTheme.trendBlue),
+            (String(localized: "Pull (Back)"),   "back",    PulseTheme.statusGood),
+            (String(localized: "Legs"),        "legs",    PulseTheme.statusModerate),
+            (String(localized: "Arms"),      "arms",    PulseTheme.statusWarning),
+            (String(localized: "Cardio"),      "cardio",  PulseTheme.activityAccent),
         ]
 
         return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
             HStack {
-                Text("图例")
+                Text(String(localized: "Legend"))
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
                 Spacer()
@@ -636,7 +649,7 @@ struct TrainingCalendarView: View {
     /// 主要训练颜色（优先手动记录，其次 HK）
     private func primaryCategoryColor(_ date: Date) -> Color {
         if let w = workoutsForDate(date)?.first { return categoryColor(for: w.category) }
-        if let hk = hkWorkoutsForDate(date).first { return Color(hex: WorkoutActivityHelper.colorHex(for: hk.activityType)) }
+        if let hk = hkWorkoutsForDate(date).first { return WorkoutActivityHelper.pulseColor(for: hk.activityType) }
         return .clear
     }
 

@@ -1,11 +1,14 @@
 import SwiftUI
 import SwiftData
+import os
 
 /// Main iPhone screen — the daily command center
 struct HomeView: View {
 
-    @State private var healthManager = HealthKitManager.shared
-    @State private var connectivityManager = WatchConnectivityManager.shared
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "HomeView")
+
+    private let healthManager = HealthKitManager.shared
+    private let connectivityManager = WatchConnectivityManager.shared
     @State private var isLoading = true
     @State private var brief: ScoreEngine.DailyBrief?
     @State private var showLocationSetup = false
@@ -96,7 +99,7 @@ struct HomeView: View {
                 LocationSetupView()
             }
             .alert(String(localized: "Arrived at Gym"), isPresented: $showGymPrompt) {
-                Button("OK") {}
+                Button(String(localized: "OK")) {}
             } message: {
                 if let plan = brief?.trainingPlan {
                     Text("Suggested: \(localizedGroup(plan.targetMuscleGroup)) — Watch notified")
@@ -164,11 +167,11 @@ struct HomeView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Set Gym Location")
+                    Text(String(localized: "Set Gym Location"))
                         .font(PulseTheme.bodyFont)
                         .foregroundStyle(PulseTheme.textPrimary)
 
-                    Text("Auto-remind when arriving")
+                    Text(String(localized: "Auto-remind when arriving"))
                         .font(PulseTheme.captionFont)
                         .foregroundStyle(PulseTheme.textTertiary)
                 }
@@ -214,9 +217,8 @@ struct HomeView: View {
 
     private var dateString: String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateStyle = .medium
         formatter.locale = Locale.current
+        formatter.dateStyle = .medium
         return formatter.string(from: .now)
     }
 
@@ -253,9 +255,7 @@ struct HomeView: View {
                 )
             }
         } catch {
-            #if DEBUG
-            print("Load error: \(error)")
-            #endif
+            logger.error("Load error: \(error)")
         }
 
         isLoading = false
@@ -350,7 +350,7 @@ struct LocationSetupView: View {
                     .disabled(isSaving)
                 }
 
-                Button("Set Up Later") {
+                Button(String(localized: "Set Up Later")) {
                     dismiss()
                 }
                 .foregroundStyle(PulseTheme.textTertiary)
@@ -361,7 +361,7 @@ struct LocationSetupView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Close") { dismiss() }
+                    Button(String(localized: "Close")) { dismiss() }
                         .foregroundStyle(PulseTheme.textSecondary)
                 }
             }

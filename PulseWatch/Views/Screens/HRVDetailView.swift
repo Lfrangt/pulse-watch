@@ -1,12 +1,16 @@
 import SwiftUI
 import Charts
+import os
 
 /// HRV deep-dive — 7-day trend, score context, what HRV means
 struct HRVDetailView: View {
 
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "HRVDetailView")
+
     @State private var healthManager = HealthKitManager.shared
     @State private var weekSamples: [(date: Date, value: Double)] = []
     @State private var chartAppeared = false
+    @State private var selectedTrendDate: Date?
 
     private var currentHRV: Double { healthManager.latestHRV ?? 0 }
 
@@ -57,7 +61,7 @@ struct HRVDetailView: View {
             .padding(.top, PulseTheme.spacingM)
         }
         .background(PulseTheme.background)
-        .navigationTitle("HRV")
+        .navigationTitle(String(localized: "HRV"))
         .navigationBarTitleDisplayMode(.inline)
         .task { await loadData() }
     }
@@ -65,43 +69,43 @@ struct HRVDetailView: View {
     // MARK: - Hero
 
     private var heroCard: some View {
-        HStack(alignment: .center, spacing: 0) {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text("\(Int(currentHRV))")
-                        .font(.system(size: 56, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                    Text("ms")
-                        .font(.system(size: 18, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
-                        .offset(y: 4)
-                }
+        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            HStack {
                 Text("HRV · " + String(localized: "Last reading"))
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .pulseEyebrow()
+                Spacer()
+                Text(status)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(statusColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: PulseTheme.radiusXS, style: .continuous)
+                            .stroke(statusColor, lineWidth: PulseTheme.hairline)
+                    )
             }
 
-            Spacer()
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text("\(Int(currentHRV))")
+                    .font(PulseTheme.metricLFont)
+                    .foregroundStyle(PulseTheme.textPrimary)
+                Text("ms")
+                    .font(PulseTheme.unitFont)
+                    .foregroundStyle(PulseTheme.textTertiary)
 
-            VStack(alignment: .trailing, spacing: 8) {
-                Text(status)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(statusColor)
-                    .multilineTextAlignment(.trailing)
-                    .fixedSize(horizontal: false, vertical: true)
+                Spacer()
 
                 if !weekSamples.isEmpty {
                     VStack(alignment: .trailing, spacing: 2) {
                         Text(String(format: "%.0f ms", avg7day))
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .font(PulseTheme.metricSFont)
                             .foregroundStyle(PulseTheme.textPrimary)
                         Text(String(localized: "7-day avg"))
-                            .font(.system(size: 11, design: .rounded))
+                            .font(PulseTheme.monoFont)
                             .foregroundStyle(PulseTheme.textTertiary)
                     }
                 }
             }
-            .frame(maxWidth: 140)
         }
         .padding(PulseTheme.spacingL)
         .background(cardBg)
@@ -112,39 +116,46 @@ struct HRVDetailView: View {
     private var trendCard: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             Text(String(localized: "7-Day Trend"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
 
-            Chart(weekSamples, id: \.date) { s in
-                // Area fill
-                AreaMark(
-                    x: .value("Date", s.date),
-                    y: .value("HRV", chartAppeared ? s.value : 0)
-                )
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [PulseTheme.accentTeal.opacity(0.25), PulseTheme.accentTeal.opacity(0.02)],
-                        startPoint: .top, endPoint: .bottom
+            Chart {
+                ForEach(weekSamples, id: \.date) { s in
+                    // Area fill
+                    AreaMark(
+                        x: .value("Date", s.date),
+                        y: .value("HRV", chartAppeared ? s.value : 0)
                     )
-                )
-                .interpolationMethod(.catmullRom)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [PulseTheme.accentTeal.opacity(0.25), PulseTheme.accentTeal.opacity(0.02)],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    )
+                    .interpolationMethod(.catmullRom)
 
-                // Line
-                LineMark(
-                    x: .value("Date", s.date),
-                    y: .value("HRV", chartAppeared ? s.value : 0)
-                )
-                .foregroundStyle(PulseTheme.accentTeal)
-                .lineStyle(StrokeStyle(lineWidth: 2))
-                .interpolationMethod(.catmullRom)
+                    // Line
+                    LineMark(
+                        x: .value("Date", s.date),
+                        y: .value("HRV", chartAppeared ? s.value : 0)
+                    )
+                    .foregroundStyle(PulseTheme.accentTeal)
+                    .lineStyle(StrokeStyle(lineWidth: 2))
+                    .interpolationMethod(.catmullRom)
 
-                // Point
-                PointMark(
-                    x: .value("Date", s.date),
-                    y: .value("HRV", chartAppeared ? s.value : 0)
-                )
-                .foregroundStyle(PulseTheme.accentTeal)
-                .symbolSize(30)
+                    // Point
+                    PointMark(
+                        x: .value("Date", s.date),
+                        y: .value("HRV", chartAppeared ? s.value : 0)
+                    )
+                    .foregroundStyle(PulseTheme.accentTeal)
+                    .symbolSize(30)
+                }
+
+                if let selectedTrendDate {
+                    RuleMark(x: .value("Selected", selectedTrendDate))
+                        .foregroundStyle(PulseTheme.textTertiary)
+                        .lineStyle(StrokeStyle(lineWidth: 0.5))
+                }
             }
             .chartXAxis {
                 AxisMarks(values: .stride(by: .day)) { val in
@@ -160,7 +171,7 @@ struct HRVDetailView: View {
             .chartYAxis {
                 AxisMarks { val in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
-                        .foregroundStyle(Color.white.opacity(0.06))
+                        .foregroundStyle(PulseTheme.highlight)
                     AxisValueLabel {
                         if let v = val.as(Double.self) {
                             Text("\(Int(v))")
@@ -170,13 +181,60 @@ struct HRVDetailView: View {
                     }
                 }
             }
+            .chartOverlay { proxy in
+                GeometryReader { geo in
+                    Rectangle().fill(.clear).contentShape(Rectangle())
+                        .gesture(DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                let plotFrame = geo[proxy.plotAreaFrame]
+                                let x = value.location.x - plotFrame.origin.x
+                                guard let date: Date = proxy.value(atX: x) else { return }
+                                let cal = Calendar.current
+                                if let nearest = weekSamples.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+                                    let newDate = cal.startOfDay(for: nearest.date)
+                                    if selectedTrendDate != newDate {
+                                        selectedTrendDate = newDate
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    }
+                                }
+                            }
+                            .onEnded { _ in
+                                withAnimation(.easeOut(duration: 0.25)) { selectedTrendDate = nil }
+                            }
+                        )
+                }
+            }
+            .overlay(alignment: .top) {
+                if let sel = selectedTrendDate,
+                   let point = weekSamples.first(where: { Calendar.current.isDate($0.date, inSameDayAs: sel) }) {
+                    let dateFmt: DateFormatter = {
+                        let f = DateFormatter()
+                        f.locale = Locale.current
+                        f.dateFormat = "EEEE, M/d"
+                        return f
+                    }()
+                    VStack(spacing: 2) {
+                        Text("\(Int(point.value)) ms")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(PulseTheme.textPrimary)
+                        Text(dateFmt.string(from: point.date))
+                            .font(.system(size: 11, design: .rounded))
+                            .foregroundStyle(PulseTheme.textSecondary)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .transition(.scale.combined(with: .opacity))
+                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedTrendDate)
+                }
+            }
             .frame(height: 160)
             .animation(.easeInOut(duration: 0.8), value: chartAppeared)
 
             // Avg baseline
             HStack {
                 Rectangle()
-                    .fill(Color.white.opacity(0.25))
+                    .fill(PulseTheme.highlight)
                     .frame(width: 16, height: 1)
                 Text(String(format: String(localized: "Avg %.0f ms"), avg7day))
                     .font(.system(size: 11, design: .rounded))
@@ -192,8 +250,7 @@ struct HRVDetailView: View {
     private var explainerCard: some View {
         VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
             Text(String(localized: "What is HRV?"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .pulseEyebrow()
 
             ForEach(explainerPoints, id: \.title) { point in
                 HStack(alignment: .top, spacing: 12) {
@@ -236,30 +293,23 @@ struct HRVDetailView: View {
 
     private var cardBg: some View {
         RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-            .fill(Color.white.opacity(0.04))
+            .fill(PulseTheme.cardBackground)
             .overlay(
                 RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                    .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
             )
     }
 
     private func loadData() async {
-        // Fetch 7-day HRV samples from HealthKit (simplified — daily latest)
-        let calendar = Calendar.current
-        var results: [(date: Date, value: Double)] = []
-        for daysAgo in (0..<7).reversed() {
-            if let date = calendar.date(byAdding: .day, value: -daysAgo, to: .now) {
-                // Use current value for today, demo values for past days
-                if daysAgo == 0, let v = healthManager.latestHRV {
-                    results.append((date: date, value: v))
-                } else {
-                    // Randomised demo — replace with real HK query if needed
-                    let demo = Double.random(in: 45...95)
-                    results.append((date: date, value: demo))
-                }
+        // Fetch 7-day HRV daily averages from HealthKit
+        do {
+            let hkData = try await healthManager.fetchWeeklyHRV()
+            if !hkData.isEmpty {
+                weekSamples = hkData
             }
+        } catch {
+            logger.error("HRV weekly fetch error: \(error)")
         }
-        weekSamples = results
         withAnimation(.easeInOut(duration: 0.6).delay(0.2)) {
             chartAppeared = true
         }

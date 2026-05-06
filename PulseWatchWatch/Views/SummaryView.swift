@@ -1,8 +1,12 @@
 import SwiftUI
+import os
 
-/// Watch 端摘要视图
-/// 显示完整的每日健康数据：评分仪表盘 + 四项指标卡片 + 操作按钮
+/// Watch summary view — Clinical Result-style breakdown of today's data.
+/// Layout per WatchApp.jsx WatchResult: eyebrow + title, hairline-bordered
+/// 2x2 metric grid, full-width primary CTA at the bottom.
 struct SummaryView: View {
+
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "SummaryView")
 
     @State private var healthManager = HealthKitManager.shared
     @State private var connectivity = WatchConnectivityManager.shared
@@ -17,144 +21,126 @@ struct SummaryView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 12) {
-                // MARK: - 状态评分 Gauge
-                scoreGauge
-                    .padding(.top, 4)
+            VStack(alignment: .leading, spacing: 0) {
 
-                // MARK: - 指标卡片
+                // Eyebrow + hero score
+                eyebrowHeader
+                    .padding(.top, 2)
+
+                hero
+                    .padding(.top, 8)
+
+                // 2x2 metric grid in hairline rule
                 metricsGrid
+                    .padding(.top, 14)
+                    .overlay(alignment: .top) {
+                        Rectangle().fill(PulseTheme.border).frame(height: PulseTheme.hairline)
+                    }
+                    .overlay(alignment: .bottom) {
+                        Rectangle().fill(PulseTheme.border).frame(height: PulseTheme.hairline)
+                    }
+                    .padding(.bottom, 12)
 
-                // MARK: - Action 按钮
+                Spacer(minLength: 12)
+
+                // Trends CTA (inverted full-width)
                 NavigationLink {
                     WatchHomeView()
                 } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "chart.bar.fill")
-                            .font(.system(size: 12))
-                        Text("View Trends")
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
-                    }
-                    .foregroundStyle(PulseTheme.accent)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(PulseTheme.accent.opacity(0.15))
-                    )
+                    Text("View Trends")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(PulseTheme.background)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 11)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .fill(PulseTheme.textPrimary)
+                        )
                 }
                 .buttonStyle(.plain)
+                .padding(.top, 6)
                 .opacity(appeared ? 1 : 0)
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 4)
         }
-        .containerBackground(
-            LinearGradient(
-                colors: [Color(hex: "0D0C0B"), Color(hex: "111010")],
-                startPoint: .top,
-                endPoint: .bottom
-            ),
-            for: .navigation
-        )
+        .containerBackground(PulseTheme.background, for: .navigation)
         .navigationTitle("Summary")
         .onAppear {
             loadData()
-            withAnimation(.spring(response: 0.8, dampingFraction: 0.75)) {
+            withAnimation(.easeOut(duration: 0.35)) {
                 appeared = true
             }
         }
     }
 
-    // MARK: - 评分仪表盘
+    // MARK: - Eyebrow + hero
 
-    private var scoreGauge: some View {
-        ZStack {
-            // 背景光晕
-            Circle()
-                .fill(statusColor.opacity(0.08))
-                .frame(width: 100, height: 100)
-                .blur(radius: 12)
+    private var eyebrowHeader: some View {
+        Text("Today")
+            .font(.system(size: 9, weight: .semibold))
+            .tracking(2.0)
+            .textCase(.uppercase)
+            .foregroundStyle(PulseTheme.textTertiary)
+    }
 
-            // 仪表盘
-            Gauge(value: Double(score), in: 0...100) {
-                EmptyView()
-            } currentValueLabel: {
-                VStack(spacing: 1) {
-                    Text("\(score)")
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
-                        .contentTransition(.numericText())
+    private var hero: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Text("\(score)")
+                .font(.system(size: 38, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .kerning(-1.2)
+                .foregroundStyle(PulseTheme.textPrimary)
+                .contentTransition(.numericText())
 
-                    Text(headline)
-                        .font(.system(size: 10, weight: .medium, design: .rounded))
-                        .foregroundStyle(statusColor)
-                }
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Readiness")
+                    .font(.system(size: 9, weight: .semibold))
+                    .tracking(1.4)
+                    .textCase(.uppercase)
+                    .foregroundStyle(PulseTheme.textTertiary)
+                Text(headline)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(statusColor)
             }
-            .gaugeStyle(.accessoryCircular)
-            .scaleEffect(2.2)
-            .tint(gaugeGradient)
-        }
-        .frame(height: 110)
-        .opacity(appeared ? 1 : 0)
-    }
-
-    private var gaugeGradient: Gradient {
-        switch score {
-        case 0..<40:
-            return Gradient(colors: [PulseTheme.activityAccent, PulseTheme.activityAccent.opacity(0.6)])
-        case 40..<70:
-            return Gradient(colors: [PulseTheme.statusModerate, PulseTheme.statusModerate.opacity(0.6)])
-        default:
-            return Gradient(colors: [PulseTheme.statusGood, PulseTheme.statusGood.opacity(0.6)])
+            Spacer()
         }
     }
 
-    // MARK: - 指标网格
+    // MARK: - Metrics grid (2x2)
 
     private var metricsGrid: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 8) {
-                MetricCard(
-                    icon: "heart.fill",
-                    label: String(localized: "Heart Rate"),
-                    value: heartRate > 0 ? "\(heartRate)" : "--",
-                    unit: "bpm",
-                    color: PulseTheme.statusPoor
-                )
-                MetricCard(
-                    icon: "waveform.path.ecg",
-                    label: "HRV",
-                    value: hrv > 0 ? "\(Int(hrv))" : "--",
-                    unit: "ms",
-                    color: PulseTheme.accent
-                )
-            }
-            .staggered(index: 1)
+        let items: [(String, String)] = [
+            ("HR",    heartRate > 0 ? "\(heartRate)" : "--"),
+            ("HRV",   hrv > 0 ? "\(Int(hrv))" : "--"),
+            ("SLEEP", sleepMinutes > 0 ? formatSleep(sleepMinutes) : "--"),
+            ("STEPS", formatSteps(steps)),
+        ]
 
-            HStack(spacing: 8) {
-                MetricCard(
-                    icon: "moon.fill",
-                    label: String(localized: "Sleep"),
-                    value: sleepMinutes > 0 ? formatSleep(sleepMinutes) : "--",
-                    unit: "",
-                    color: PulseTheme.sleepAccent
-                )
-                MetricCard(
-                    icon: "figure.walk",
-                    label: String(localized: "Steps"),
-                    value: formatSteps(steps),
-                    unit: "",
-                    color: PulseTheme.statusGood
-                )
+        return LazyVGrid(
+            columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)],
+            spacing: 10
+        ) {
+            ForEach(items, id: \.0) { label, value in
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(label)
+                        .font(.system(size: 8, weight: .semibold))
+                        .tracking(1.0)
+                        .foregroundStyle(PulseTheme.textTertiary)
+                    Text(value)
+                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(PulseTheme.textPrimary)
+                        .contentTransition(.numericText())
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .staggered(index: 2)
         }
+        .padding(.vertical, 10)
     }
 
-    // MARK: - 数据加载
+    // MARK: - Data load
 
     private func loadData() {
-        // 优先使用 WatchConnectivity 同步数据
         if let wcScore = connectivity.receivedScore {
             score = wcScore
             headline = connectivity.receivedHeadline ?? PulseTheme.statusLabel(for: wcScore)
@@ -162,7 +148,6 @@ struct SummaryView: View {
             steps = connectivity.receivedSteps ?? 0
         }
 
-        // 本地 HealthKit 补充
         Task {
             do {
                 try await healthManager.requestAuthorization()
@@ -179,15 +164,13 @@ struct SummaryView: View {
                 sleepMinutes = healthManager.lastNightSleepMinutes
                 steps = healthManager.todaySteps
 
-                // 触觉反馈：评分刷新完成
                 HapticManager.scoreRefreshed()
 
-                // 异常告警：评分过低
                 if (connectivity.receivedScore ?? localScore) < 30 {
                     HapticManager.alertTriggered()
                 }
             } catch {
-                print("SummaryView HealthKit error: \(error)")
+                logger.error("SummaryView HealthKit error: \(error)")
             }
         }
     }
@@ -205,59 +188,11 @@ struct SummaryView: View {
     }
 
     private func formatSteps(_ steps: Int) -> String {
-        if steps >= 10000 {
-            return String(format: "%.1fk", Double(steps) / 1000)
-        } else if steps >= 1000 {
+        guard steps > 0 else { return "--" }
+        if steps >= 1000 {
             return String(format: "%.1fk", Double(steps) / 1000)
         }
         return "\(steps)"
-    }
-}
-
-// MARK: - 指标卡片组件
-
-struct MetricCard: View {
-    let icon: String
-    let label: String
-    let value: String
-    let unit: String
-    let color: Color
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.system(size: 10))
-                    .foregroundStyle(color)
-                Text(label)
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.textSecondary)
-            }
-
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(value)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
-                    .contentTransition(.numericText())
-
-                if !unit.isEmpty {
-                    Text(unit)
-                        .font(.system(size: 9, weight: .regular, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(PulseTheme.cardBackground)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .stroke(PulseTheme.border.opacity(0.4), lineWidth: 0.5)
-        )
     }
 }
 

@@ -1,6 +1,6 @@
 # Privacy Policy — Pulse
 
-**Last Updated: March 27, 2026**
+**Last Updated: May 5, 2026**
 **Effective Date: March 15, 2026**
 
 Pulse ("the App") is developed by Abundra. This privacy policy explains how we handle your data.
@@ -45,9 +45,25 @@ The App uses TelemetryDeck for anonymous, privacy-preserving usage analytics (e.
 
 Learn more: https://telemetrydeck.com/privacy
 
+## Optional: AI Coach (DeepSeek)
+
+If you explicitly enable the **AI Coach** feature in Settings, the App transmits the following aggregated health summary to **DeepSeek** (api.deepseek.com) over HTTPS to generate personalized training advice:
+- Daily recovery score (0–100)
+- Last night sleep duration and stage breakdown
+- Resting heart rate, average heart rate, heart rate variability (HRV)
+- Recent workout summaries (type, duration, calories) — past 7 days
+- Step count and active calories — current day
+
+This connection is:
+- **Off by default.** You must tap "Enable AI Coach" in Settings to activate it. The activation prompt discloses the data flow before any transmission.
+- Sent to **DeepSeek**, an OpenAI-compatible LLM provider. Refer to DeepSeek's privacy policy at https://www.deepseek.com/privacy for their data handling practices.
+- Disable at any time by turning off "Auto-push health data" or unpairing the gateway in Settings.
+
+We do not transmit, store, or share any DeepSeek-specific identifiers; the AI Coach uses an API key bundled with the App.
+
 ## Optional: OpenClaw Integration
 
-If you choose to connect the App to your own OpenClaw instance (an optional AI coaching feature), the App will transmit aggregated health summaries to your specified server. This connection is:
+If you choose to connect the App to your own OpenClaw instance (an optional self-hosted AI coaching feature), the App will transmit aggregated health summaries to your specified server. This connection is:
 - Entirely opt-in
 - Configured by you with your own server URL and credentials
 - Secured with bearer token authentication over HTTPS

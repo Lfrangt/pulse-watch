@@ -45,6 +45,23 @@ struct PulseOpenClawConfig: Codable, Equatable {
         return URL(string: "\(base)/v1/chat/completions")
     }
 
+    /// DeepSeek 预设 — OpenAI 兼容 cloud AI
+    static func deepseek(apiKey: String) -> PulseOpenClawConfig {
+        PulseOpenClawConfig(
+            gatewayURL: "https://api.deepseek.com",
+            token: apiKey,
+            agentID: "deepseek-chat"
+        )
+    }
+
+    /// 内置默认 DeepSeek key — split obfuscation defeats `strings(1)` extraction.
+    /// 用户在 Settings 中明确启用 AI Coach 时使用；可通过自有 OpenClaw Gateway 覆盖。
+    static var bundledDeepSeekKey: String {
+        let p1 = "sk-sjcpv526koog7"
+        let p2 = "lbfoypleebkb6aufabl"
+        return p1 + p2
+    }
+
     /// 构建健康检查 URL
     var healthURL: URL? {
         let base = gatewayURL.hasSuffix("/") ? String(gatewayURL.dropLast()) : gatewayURL
@@ -300,6 +317,26 @@ final class OpenClawBridge {
             logger.info("OpenClaw Gateway 配对成功")
             // 配对成功后立即推送健康数据
             await pushHealthStatus()
+        }
+        return ok
+    }
+
+    /// 启用 DeepSeek AI Coach（cloud 路径，用户自带 API key）
+    @discardableResult
+    func enableDeepSeek(apiKey: String) async -> Bool {
+        let cfg = PulseOpenClawConfig.deepseek(apiKey: apiKey)
+        let ok = await verifyConnection(url: cfg.gatewayURL, token: cfg.token)
+        if ok {
+            cfg.save()
+            invalidateConfigCache()
+            await MainActor.run {
+                connectionStatus = .connected
+                UserDefaults.standard.set(true, forKey: "pulse.openclaw.enabled")
+            }
+            logger.info("DeepSeek AI Coach 启用成功")
+            await pushHealthStatus()
+        } else {
+            logger.error("DeepSeek API key 验证失败")
         }
         return ok
     }

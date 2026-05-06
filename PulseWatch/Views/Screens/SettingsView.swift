@@ -52,6 +52,9 @@ struct SettingsView: View {
     @State private var showProfileDetail = false
     @State private var showOpenClawDetail = false
     @State private var showQRScanner = false
+    @State private var showEnableAICoachAlert = false
+    @State private var aiCoachActivating = false
+    @State private var aiCoachActivationFailed = false
 
     @AppStorage("pulse.openclaw.gatewayURL") private var savedGatewayURL = ""
     @AppStorage("pulse.openclaw.agentID") private var savedAgentID = "openclaw:main"
@@ -139,13 +142,18 @@ struct SettingsView: View {
                         }
                         .staggered(index: 6)
 
+                        SettingsGroup(label: String(localized: "AI Coach")) {
+                            aiCoachRow
+                        }
+                        .staggered(index: 7)
+
                         SettingsGroup(label: String(localized: "OpenClaw Integration")) {
                             openClawConnectionRow
                             if OpenClawBridge.shared.config != nil {
                                 openClawAutoPushRow
                             }
                         }
-                        .staggered(index: 7)
+                        .staggered(index: 8)
 
                         SettingsGroup(label: String(localized: "Diagnostics")) {
                             #if DEBUG
@@ -153,7 +161,7 @@ struct SettingsView: View {
                             #endif
                             resetOnboardingRow
                         }
-                        .staggered(index: 8)
+                        .staggered(index: 9)
                     }
                     .padding(.horizontal, 16)
 
@@ -194,6 +202,30 @@ struct SettingsView: View {
             .sheet(isPresented: $showOpenClawDetail) {
                 openClawDetailSheet
                     .preferredColorScheme(.dark)
+            }
+            .alert(String(localized: "Enable AI Coach"), isPresented: $showEnableAICoachAlert) {
+                Button(String(localized: "Cancel"), role: .cancel) {}
+                Button(String(localized: "Enable")) {
+                    aiCoachActivating = true
+                    Task {
+                        let ok = await OpenClawBridge.shared.enableDeepSeek(
+                            apiKey: PulseOpenClawConfig.bundledDeepSeekKey
+                        )
+                        await MainActor.run {
+                            aiCoachActivating = false
+                            if !ok {
+                                aiCoachActivationFailed = true
+                            }
+                        }
+                    }
+                }
+            } message: {
+                Text(String(localized: "Pulse will send your daily recovery score, sleep, resting heart rate, and HRV to api.deepseek.com over HTTPS to generate personalized training advice. You can disable this anytime from Settings."))
+            }
+            .alert(String(localized: "Connection Failed"), isPresented: $aiCoachActivationFailed) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text(String(localized: "Could not reach DeepSeek. Check your internet connection and try again."))
             }
             .sheet(isPresented: $showQRScanner) {
                 QRScannerView { url, token, agent in
@@ -587,6 +619,26 @@ struct SettingsView: View {
             valueText: "\(hrAlertLow) bpm",
             chevron: true,
             action: { showHRAlertDetail = true }
+        )
+    }
+
+    private var aiCoachIsActive: Bool {
+        guard let cfg = OpenClawBridge.shared.config else { return false }
+        return cfg.gatewayURL.contains("api.deepseek.com") && OpenClawBridge.shared.isEnabled
+    }
+
+    private var aiCoachRow: some View {
+        SettingsRow(
+            label: aiCoachActivating
+                ? String(localized: "Connecting…")
+                : (aiCoachIsActive ? String(localized: "AI Coach Active") : String(localized: "Enable AI Coach")),
+            valueText: aiCoachIsActive ? "DeepSeek" : "",
+            chevron: !aiCoachIsActive && !aiCoachActivating,
+            action: {
+                if !aiCoachIsActive && !aiCoachActivating {
+                    showEnableAICoachAlert = true
+                }
+            }
         )
     }
 

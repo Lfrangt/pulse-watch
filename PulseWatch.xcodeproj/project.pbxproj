@@ -1127,7 +1127,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CURRENT_PROJECT_VERSION = 202605051843;
+				CURRENT_PROJECT_VERSION = 202605051851;
 				INFOPLIST_FILE = PulseWatchUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1146,7 +1146,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CURRENT_PROJECT_VERSION = 202605051843;
+				CURRENT_PROJECT_VERSION = 202605051851;
 				INFOPLIST_FILE = PulseWatchUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1179,7 +1179,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PulseWatchWatch/Complications/PulseWatchWatchWidgetExtension.entitlements;
-				CURRENT_PROJECT_VERSION = 202605051843;
+				CURRENT_PROJECT_VERSION = 202605051851;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\".\"",
@@ -1221,7 +1221,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PulseWatchWidget/PulseWatchWidget.entitlements;
-				CURRENT_PROJECT_VERSION = 202605051843;
+				CURRENT_PROJECT_VERSION = 202605051851;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PulseWatchWidget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1240,7 +1240,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CURRENT_PROJECT_VERSION = 202605051843;
+				CURRENT_PROJECT_VERSION = 202605051851;
 				INFOPLIST_FILE = PulseWatchTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1259,7 +1259,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CURRENT_PROJECT_VERSION = 202605051843;
+				CURRENT_PROJECT_VERSION = 202605051851;
 				INFOPLIST_FILE = PulseWatchTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1309,7 +1309,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 202605051843;
+				CURRENT_PROJECT_VERSION = 202605051851;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = AV25N53237;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -1369,7 +1369,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 202605051843;
+				CURRENT_PROJECT_VERSION = 202605051851;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = AV25N53237;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1419,7 +1419,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PulseWatchWidget/PulseWatchWidget.entitlements;
-				CURRENT_PROJECT_VERSION = 202605051843;
+				CURRENT_PROJECT_VERSION = 202605051851;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PulseWatchWidget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1438,7 +1438,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PulseWatchWatch/Complications/PulseWatchWatchWidgetExtension.entitlements;
-				CURRENT_PROJECT_VERSION = 202605051843;
+				CURRENT_PROJECT_VERSION = 202605051851;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\".\"",

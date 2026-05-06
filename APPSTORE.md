@@ -89,7 +89,11 @@ Initial release of Pulse — your AI fitness coach for Apple Watch.
 
 ## App Review Notes
 
-This app uses HealthKit to read health data (heart rate, HRV, sleep analysis, steps, blood oxygen, calories) and write workout data. All data is stored locally on the device using SwiftData. No data is transmitted to external servers unless the user explicitly configures an OpenClaw connection (optional AI coaching feature).
+This app uses HealthKit to read health data (heart rate, HRV, sleep analysis, steps, blood oxygen, calories) and write workout data. All data is stored locally on the device using SwiftData. By default, no data is transmitted to external servers.
+
+**Optional AI Coach (DeepSeek):** Settings → AI Coach → "Enable AI Coach". This feature is OFF by default. When the user taps Enable, a consent alert is shown disclosing that the following data will be sent to api.deepseek.com over HTTPS for personalized training advice: daily recovery score, last-night sleep summary, resting heart rate, HRV, recent workouts, step count. The user must tap "Enable" on the alert before any data is sent. Disclosure is also in the Privacy Policy under "Optional: AI Coach (DeepSeek)".
+
+**Optional OpenClaw Integration:** Self-hosted alternative to DeepSeek for power users. Configured via QR scan in Settings. User-supplied gateway URL + bearer token. Disabled by default.
 
 The app uses location services for gym detection (geofencing) to suggest training plans. Location data is processed on-device and never uploaded.
 
@@ -107,7 +111,7 @@ Demo/test account is not required — the app works with real HealthKit data fro
 
 | Data Type | Collected | Linked to User | Tracking | Purpose |
 |-----------|-----------|----------------|----------|---------|
-| Health & Fitness (Heart Rate, HRV, Sleep, Steps, SpO2, Calories) | Yes | No | No | App Functionality |
+| Health & Fitness (Heart Rate, HRV, Sleep, Steps, SpO2, Calories) | Yes | No | No | App Functionality (transmitted to api.deepseek.com only when user enables AI Coach in Settings) |
 | Precise Location | Yes | No | No | App Functionality (gym detection) |
 | Diagnostics (Crash Data, Performance) | Yes | No | No | Analytics (via TelemetryDeck, anonymous) |
 | Usage Data (Feature Interaction) | Yes | No | No | Analytics (via TelemetryDeck, anonymous) |

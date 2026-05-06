@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Pulse pre-commit hook — runs design rule checks against staged files.
+#
+# Bypass (only for genuine emergencies, e.g. fixing the hook itself):
+#   git commit --no-verify
+#
+# Bypassing for "I'll fix the violations later" is rule-laundering.
+# Don't.
+
+set -u
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root" || exit 2
+
+# Only run if any staged file is in the watched paths.
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+if [[ -z "$staged" ]]; then
+  exit 0
+fi
+
+staged_swift=()
+while IFS= read -r f; do
+  case "$f" in
+    PulseWatch/*|PulseWatchWatch/*|PulseWatchWidget/*|Shared/*)
+      [[ "$f" == *.swift ]] && staged_swift+=( "$f" )
+      ;;
+  esac
+done <<< "$staged"
+
+if [[ ${#staged_swift[@]} -eq 0 ]]; then
+  exit 0
+fi
+
+if [[ ! -x Scripts/check-design-rules.sh ]]; then
+  echo "⚠️  Scripts/check-design-rules.sh missing or not executable — skipping design check." >&2
+  exit 0
+fi
+
+echo "→ pre-commit: checking ${#staged_swift[@]} staged Swift file(s) for design rule violations…"
+if ! ./Scripts/check-design-rules.sh "${staged_swift[@]}"; then
+  echo "" >&2
+  echo "✋ Commit blocked by design/RULES.md violations. Fix the issues above, or escalate per RULES §When a rule must be broken." >&2
+  echo "   Bypass (emergencies only): git commit --no-verify" >&2
+  exit 1
+fi
+
+exit 0

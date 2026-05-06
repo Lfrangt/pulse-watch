@@ -83,6 +83,12 @@ struct DashboardView: View {
 
                             // ── JSX Today.jsx layout ──────────────────────
 
+                            // Daily Coach — actionable verb + HealthKit data citations
+                            if let brief {
+                                dailyCoachCard(score: brief.score)
+                                    .staggered(index: 1)
+                            }
+
                             // Vitals grid — HRV / RHR / SpO2 / Steps
                             if hasAnyMetric {
                                 VitalsGrid(
@@ -154,10 +160,6 @@ struct DashboardView: View {
                             // Energy Bank
                             energyBankCard
                                 .staggered(index: 6)
-
-                            // Nutrition — coming soon teaser
-                            nutritionCard
-                                .staggered(index: 7)
 
                             // Weekly trends (legacy chart — keep for now)
                             WeeklyTrendChartsView(
@@ -330,6 +332,9 @@ struct DashboardView: View {
             // 7-day sparkline
             ReadinessSparkline(todayScore: score, priorScores: sevenDayPriorScores())
 
+            // Confidence indicator — data source + completeness
+            confidenceFooter
+
             // Headline + insight
             if !headline.isEmpty {
                 VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
@@ -358,6 +363,28 @@ struct DashboardView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(localized: "Recovery Score \(score), \(headline)"))
+    }
+
+    // MARK: - Confidence footer — data source + completeness
+
+    private var confidenceFooter: some View {
+        let chips = currentDataChips()
+        let label: String
+        switch chips.count {
+        case 3...:  label = String(localized: "Apple Watch · 数据完整")
+        case 1...2: label = String(localized: "Apple Watch · 数据部分")
+        default:    label = String(localized: "Apple Watch · 等待数据")
+        }
+        return HStack(spacing: 6) {
+            Image(systemName: "applewatch")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(PulseTheme.textTertiary)
+            Text(label)
+                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .foregroundStyle(PulseTheme.textTertiary)
+            Spacer()
+        }
+        .accessibilityElement(children: .combine)
     }
 
     private func statusChip(for score: Int) -> some View {
@@ -945,64 +972,92 @@ struct DashboardView: View {
         return PulseTheme.statusPoor
     }
 
-    // MARK: - Nutrition Card (Coming Soon teaser)
+    // MARK: - Daily Coach Card (action + HealthKit citations)
 
-    private var nutritionCard: some View {
-        NavigationLink(destination: NutritionView()) {
-            HStack(spacing: 14) {
-                // Icon
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(PulseTheme.accentSoft)
-                        .frame(width: 44, height: 44)
+    private func dailyCoachCard(score: Int) -> some View {
+        let action = coachAction(for: score)
+        let chips = currentDataChips()
 
-                    Image(systemName: "fork.knife")
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(PulseTheme.accent)
-                }
-
-                // Text
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 6) {
-                        Text(String(localized: "Nutrition Tracking"))
-                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .foregroundStyle(PulseTheme.textPrimary)
-
-                        Text(String(localized: "Soon"))
-                            .font(.system(size: 9, weight: .bold, design: .rounded))
-                            .textCase(.uppercase)
-                            .foregroundStyle(PulseTheme.accent)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(
-                                Capsule().fill(PulseTheme.accentSoft)
-                            )
-                    }
-
-                    Text(String(localized: "Meals, macros & recovery impact"))
-                        .font(.system(size: 12, weight: .regular))
-                        .foregroundStyle(PulseTheme.textTertiary)
-                }
-
+        return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+            HStack(spacing: 6) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(PulseTheme.accent)
+                Text(String(localized: "Today's Coach"))
+                    .pulseEyebrow()
                 Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(PulseTheme.textTertiary)
             }
-            .padding(PulseTheme.spacingM)
-            .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .fill(PulseTheme.highlight)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                            .stroke(PulseTheme.highlight, lineWidth: 0.5)
-                    )
-            )
+
+            Text(action)
+                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                .foregroundStyle(PulseTheme.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+                .lineSpacing(2)
+
+            if !chips.isEmpty {
+                HStack(spacing: 8) {
+                    ForEach(Array(chips.enumerated()), id: \.offset) { idx, chip in
+                        if idx > 0 {
+                            Text("·")
+                                .font(.system(size: 11, weight: .regular, design: .monospaced))
+                                .foregroundStyle(PulseTheme.textQuaternary)
+                        }
+                        Text(chip)
+                            .font(.system(size: 11, weight: .medium, design: .monospaced))
+                            .foregroundStyle(PulseTheme.textTertiary)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .padding(.top, 2)
+            }
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(String(localized: "Nutrition Tracking"))
-        .accessibilityHint(String(localized: "Coming soon — tap to preview"))
+        .padding(PulseTheme.spacingM)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                .fill(PulseTheme.accentSoft)
+                .overlay(
+                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                        .stroke(PulseTheme.accent.opacity(0.18), lineWidth: PulseTheme.hairline)
+                )
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "Today's Coach: \(action)"))
+    }
+
+    private func coachAction(for score: Int) -> String {
+        switch score {
+        case 85...100:
+            return String(localized: "状态在线 — 今天可以做高强度间歇或大重量")
+        case 70..<85:
+            return String(localized: "稳健训练 — 中等强度，避免堆量过深")
+        case 50..<70:
+            return String(localized: "Zone 2 有氧 30 分钟 — 让恢复跟上")
+        case 30..<50:
+            return String(localized: "轻量活动 — 散步或拉伸，控制心率")
+        default:
+            return String(localized: "今天彻底恢复 — 充足睡眠 + 主动补水")
+        }
+    }
+
+    private func currentDataChips() -> [String] {
+        var chips: [String] = []
+
+        let sleepMin = healthManager.lastNightSleepMinutes
+        if sleepMin > 0 {
+            let hours = Double(sleepMin) / 60.0
+            chips.append(String(format: String(localized: "Sleep %.1fh"), hours))
+        }
+
+        if let rhr = healthManager.latestRestingHR, rhr > 0 {
+            chips.append("RHR \(Int(rhr))")
+        }
+
+        if let hrv = currentHRV, hrv > 0 {
+            chips.append("HRV \(Int(hrv))ms")
+        }
+
+        return chips
     }
 
     // MARK: - 关键指标网格（隐藏空值瓷砖）
@@ -1300,7 +1355,7 @@ struct DashboardView: View {
 
     private func strainRecoveryCard(strain: Int, recovery: Int) -> some View {
         let strainLevel = StrainScoreService.StrainLevel(score: strain)
-        let strainColor = Color(hex: strainLevel.color)
+        let strainColor = strainLevel.pulseColor
         let recoveryColor = PulseTheme.statusColor(for: recovery)
         let warning = StrainScoreService.overtrainWarning(strain: strain, recovery: recovery)
 

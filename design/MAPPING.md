@@ -11,7 +11,7 @@
 
 | Old file                        | Action                | New                                  | Status   |
 |---------------------------------|-----------------------|--------------------------------------|----------|
-| `Shared/Theme/PulseTheme.swift` | DELETE after Phase 1  | `Shared/Theme/DS.swift` (from `design/TOKENS.swift`) | pending  |
+| `Shared/Theme/PulseTheme.swift` | DELETE in Phase 5 cleanup (after all v2 screens shipped) | `Shared/Theme/DS.swift` (from `design/TOKENS.swift`) | pending  |
 
 ---
 
@@ -46,8 +46,8 @@
 
 | Old (Views/Screens/)              | Action  | New screen        | Status |
 |-----------------------------------|---------|-------------------|--------|
-| `HomeView.swift`                  | REPLACE | S01 Today         | pending |
-| `DashboardView.swift`             | DELETE  | folded into S01   | pending |
+| `HomeView.swift`                  | REPLACE | S01 Today         | done    |
+| `DashboardView.swift`             | DELETE  | folded into S01   | done    |
 | `HistoryView.swift`               | REPLACE | S05 History       | pending |
 | `WorkoutHistoryListView.swift`    | DELETE  | folded into S05   | pending |
 | `WorkoutHistoryDetailView.swift`  | REPLACE | S05 detail variant| pending |

@@ -209,7 +209,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            DashboardView()
+            TodayView()
                 .tabItem {
                     Label(String(localized: "Today"), systemImage: "heart.text.clipboard")
                         .accessibilityLabel(String(localized: "Today"))

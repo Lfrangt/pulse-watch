@@ -225,7 +225,7 @@ struct MainTabView: View {
                 }
                 .tag(1)
 
-            HistoryView()
+            TrendsView()
                 .tabItem {
                     Label(String(localized: "Trends"), systemImage: "chart.xyaxis.line")
                         .accessibilityLabel(String(localized: "Trends"))

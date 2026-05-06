@@ -48,7 +48,7 @@
 |-----------------------------------|---------|-------------------|--------|
 | `HomeView.swift`                  | REPLACE | S01 Today         | done    |
 | `DashboardView.swift`             | DELETE  | folded into S01   | done    |
-| `HistoryView.swift`               | REPLACE | S05 History       | pending |
+| `HistoryView.swift`               | REPLACE | S05 History       | done    |
 | `WorkoutHistoryListView.swift`    | DELETE  | folded into S05   | pending |
 | `WorkoutHistoryDetailView.swift`  | REPLACE | S05 detail variant| pending |
 | `WorkoutView.swift`               | REPLACE | S03 Workout Live  | pending |

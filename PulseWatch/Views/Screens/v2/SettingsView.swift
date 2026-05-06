@@ -174,7 +174,7 @@ struct SettingsView: View {
                 .padding(.bottom, 16)
             }
             .scrollDismissesKeyboard(.interactively)
-            .background(PulseTheme.background.ignoresSafeArea())
+            .background(DS.Color.bg.ignoresSafeArea())
             .navigationBarHidden(true)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
@@ -283,7 +283,7 @@ struct SettingsView: View {
                 Text(String(localized: "The welcome guide will appear next time you open the app."))
             }
         }
-        .background(PulseTheme.background.ignoresSafeArea())
+        .background(DS.Color.bg.ignoresSafeArea())
     }
 
     // MARK: - Header
@@ -291,8 +291,8 @@ struct SettingsView: View {
     private var clinicalHeader: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(String(localized: "Settings"))
-                .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.title1)
+                .foregroundStyle(DS.Color.ink)
                 .tracking(-0.5)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -301,22 +301,22 @@ struct SettingsView: View {
     private var moreFromPulseDivider: some View {
         HStack(spacing: 12) {
             Rectangle()
-                .fill(PulseTheme.divider)
-                .frame(height: PulseTheme.hairline)
+                .fill(DS.Color.lineSoft)
+                .frame(height: DS.Stroke.hairline)
                 .frame(maxWidth: .infinity)
             Text(String(localized: "More from Pulse"))
-                .pulseEyebrow()
+                .font(DS.Typography.mono).tracking(DS.Tracking.mono).textCase(.uppercase).foregroundStyle(DS.Color.inkMid)
             Rectangle()
-                .fill(PulseTheme.divider)
-                .frame(height: PulseTheme.hairline)
+                .fill(DS.Color.lineSoft)
+                .frame(height: DS.Stroke.hairline)
                 .frame(maxWidth: .infinity)
         }
     }
 
     private var versionFooter: some View {
         Text(String(format: String(localized: "Pulse %@ · build %@ · on-device"), appVersion, buildNumber))
-            .font(.system(size: 11))
-            .foregroundStyle(PulseTheme.textQuaternary)
+            .font(DS.Typography.caption)
+            .foregroundStyle(DS.Color.inkDim)
             .frame(maxWidth: .infinity)
     }
 
@@ -329,27 +329,27 @@ struct SettingsView: View {
             HStack(spacing: 14) {
                 ZStack {
                     Circle()
-                        .fill(PulseTheme.textPrimary)
-                        .frame(width: 48, height: 48)
+                        .fill(DS.Color.ink)
+                        .frame(width: DS.Spacing.xxl + DS.Spacing.s, height: DS.Spacing.xxl + DS.Spacing.s)
                     Text(userInitial)
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(PulseTheme.background)
+                        .font(DS.Typography.bodyL.weight(.medium))
+                        .foregroundStyle(DS.Color.bg)
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text(displayName)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .font(DS.Typography.body.weight(.medium))
+                        .foregroundStyle(DS.Color.ink)
                     Text(profileSubtitle)
-                        .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.caption)
+                        .foregroundStyle(DS.Color.inkDim)
                         .lineLimit(1)
                 }
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(PulseTheme.textQuaternary)
+                    .font(DS.Typography.bodyS.weight(.semibold))
+                    .foregroundStyle(DS.Color.inkDim)
             }
-            .pulseCard(padding: 20)
+            .dsCard(padding: DS.Spacing.l)
         }
         .buttonStyle(.plain)
     }
@@ -385,7 +385,7 @@ struct SettingsView: View {
                 Text(String(localized: "Imperial")).tag("imperial")
             }
             .pickerStyle(.menu)
-            .tint(PulseTheme.accent)
+            .tint(DS.Color.accent)
             .labelsHidden()
         }
     }
@@ -491,7 +491,7 @@ struct SettingsView: View {
             label: String(localized: "Export health data"),
             valueText: "CSV",
             chevron: !isExporting,
-            trailing: isExporting ? AnyView(ProgressView().tint(PulseTheme.accent)) : nil,
+            trailing: isExporting ? AnyView(ProgressView().tint(DS.Color.accent)) : nil,
             action: { exportCSV() }
         )
     }
@@ -689,8 +689,8 @@ struct SettingsView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     Text(String(localized: "Profile"))
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .font(DS.Typography.title1)
+                        .foregroundStyle(DS.Color.ink)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 20)
                         .padding(.top, 12)
@@ -704,8 +704,8 @@ struct SettingsView: View {
                         ) {
                             TextField(String(localized: "Your name"), text: $userName)
                                 .multilineTextAlignment(.trailing)
-                                .font(PulseTheme.bodyFont)
-                                .foregroundStyle(PulseTheme.textPrimary)
+                                .font(DS.Typography.body)
+                                .foregroundStyle(DS.Color.ink)
                                 .frame(maxWidth: 160)
                                 .focused($isNumberFieldFocused)
                         }
@@ -721,7 +721,7 @@ struct SettingsView: View {
                                 }
                             }
                             .pickerStyle(.menu)
-                            .tint(PulseTheme.accent)
+                            .tint(DS.Color.accent)
                             .labelsHidden()
                             .onChange(of: birthYear) {
                                 HealthAgeService.shared.birthYear = birthYear
@@ -739,7 +739,7 @@ struct SettingsView: View {
                                 }
                             }
                             .pickerStyle(.menu)
-                            .tint(PulseTheme.accent)
+                            .tint(DS.Color.accent)
                             .labelsHidden()
                             .onChange(of: birthMonth) {
                                 HealthAgeService.shared.birthMonth = birthMonth
@@ -756,7 +756,7 @@ struct SettingsView: View {
                                 Text(String(localized: "Female")).tag("female")
                             }
                             .pickerStyle(.menu)
-                            .tint(PulseTheme.accent)
+                            .tint(DS.Color.accent)
                             .labelsHidden()
                         }
                     }
@@ -774,12 +774,12 @@ struct SettingsView: View {
                                     .keyboardType(.decimalPad)
                                     .focused($isNumberFieldFocused)
                                     .multilineTextAlignment(.trailing)
-                                    .font(PulseTheme.bodyFont.monospacedDigit())
-                                    .foregroundStyle(PulseTheme.textPrimary)
+                                    .font(DS.Typography.body.monospacedDigit())
+                                    .foregroundStyle(DS.Color.ink)
                                     .frame(width: 60)
                                 Text("cm")
-                                    .font(PulseTheme.unitFont)
-                                    .foregroundStyle(PulseTheme.textTertiary)
+                                    .font(DS.Typography.monoL)
+                                    .foregroundStyle(DS.Color.inkDim)
                             }
                         }
                         SettingsRow(
@@ -792,12 +792,12 @@ struct SettingsView: View {
                                     .keyboardType(.decimalPad)
                                     .focused($isNumberFieldFocused)
                                     .multilineTextAlignment(.trailing)
-                                    .font(PulseTheme.bodyFont.monospacedDigit())
-                                    .foregroundStyle(PulseTheme.textPrimary)
+                                    .font(DS.Typography.body.monospacedDigit())
+                                    .foregroundStyle(DS.Color.ink)
                                     .frame(width: 60)
                                 Text("kg")
-                                    .font(PulseTheme.unitFont)
-                                    .foregroundStyle(PulseTheme.textTertiary)
+                                    .font(DS.Typography.monoL)
+                                    .foregroundStyle(DS.Color.inkDim)
                             }
                         }
                     }
@@ -806,13 +806,13 @@ struct SettingsView: View {
                     Spacer(minLength: 60)
                 }
             }
-            .background(PulseTheme.background)
+            .background(DS.Color.bg)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(String(localized: "Done")) {
                         showProfileDetail = false
                     }
-                    .foregroundStyle(PulseTheme.accent)
+                    .foregroundStyle(DS.Color.accent)
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
@@ -827,69 +827,69 @@ struct SettingsView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     Text(String(localized: "Heart Rate Alerts"))
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .font(DS.Typography.title1)
+                        .foregroundStyle(DS.Color.ink)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 20)
                         .padding(.top, 12)
 
-                    VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                    VStack(alignment: .leading, spacing: DS.Spacing.s) {
                         HStack {
                             Text(String(localized: "High threshold"))
-                                .font(PulseTheme.bodyFont)
-                                .foregroundStyle(PulseTheme.textPrimary)
+                                .font(DS.Typography.body)
+                                .foregroundStyle(DS.Color.ink)
                             Spacer()
                             Text("\(hrAlertHigh) bpm")
-                                .font(PulseTheme.bodyFont.monospacedDigit())
-                                .foregroundStyle(PulseTheme.statusPoor)
+                                .font(DS.Typography.body.monospacedDigit())
+                                .foregroundStyle(DS.Color.bad)
                         }
                         Slider(value: Binding(
                             get: { Double(hrAlertHigh) },
                             set: { hrAlertHigh = Int($0) }
                         ), in: 90...180, step: 5)
-                        .tint(PulseTheme.statusPoor)
+                        .tint(DS.Color.bad)
                         .onChange(of: hrAlertHigh) {
                             HeartRateAlertService.shared.highThreshold = hrAlertHigh
                         }
                     }
-                    .pulseCard(padding: 20)
+                    .dsCard(padding: DS.Spacing.l)
                     .padding(.horizontal, 16)
 
-                    VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                    VStack(alignment: .leading, spacing: DS.Spacing.s) {
                         HStack {
                             Text(String(localized: "Low threshold"))
-                                .font(PulseTheme.bodyFont)
-                                .foregroundStyle(PulseTheme.textPrimary)
+                                .font(DS.Typography.body)
+                                .foregroundStyle(DS.Color.ink)
                             Spacer()
                             Text("\(hrAlertLow) bpm")
-                                .font(PulseTheme.bodyFont.monospacedDigit())
-                                .foregroundStyle(PulseTheme.accent)
+                                .font(DS.Typography.body.monospacedDigit())
+                                .foregroundStyle(DS.Color.accent)
                         }
                         Slider(value: Binding(
                             get: { Double(hrAlertLow) },
                             set: { hrAlertLow = Int($0) }
                         ), in: 30...60, step: 5)
-                        .tint(PulseTheme.accent)
+                        .tint(DS.Color.accent)
                         .onChange(of: hrAlertLow) {
                             HeartRateAlertService.shared.lowThreshold = hrAlertLow
                         }
                     }
-                    .pulseCard(padding: 20)
+                    .dsCard(padding: DS.Spacing.l)
                     .padding(.horizontal, 16)
 
                     Text(String(localized: "Same alert won't repeat within 1 hour"))
-                        .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.caption)
+                        .foregroundStyle(DS.Color.inkDim)
                         .padding(.horizontal, 24)
                 }
             }
-            .background(PulseTheme.background)
+            .background(DS.Color.bg)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(String(localized: "Done")) {
                         showHRAlertDetail = false
                     }
-                    .foregroundStyle(PulseTheme.accent)
+                    .foregroundStyle(DS.Color.accent)
                 }
             }
         }
@@ -900,28 +900,28 @@ struct SettingsView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     Text(String(localized: "Morning Brief"))
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .font(DS.Typography.title1)
+                        .foregroundStyle(DS.Color.ink)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 20)
                         .padding(.top, 12)
 
-                    VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                    VStack(alignment: .leading, spacing: DS.Spacing.s) {
                         Text(String(localized: "Delivery time"))
-                            .pulseEyebrow()
-                        HStack(spacing: PulseTheme.spacingM) {
+                            .font(DS.Typography.mono).tracking(DS.Tracking.mono).textCase(.uppercase).foregroundStyle(DS.Color.inkMid)
+                        HStack(spacing: DS.Spacing.m) {
                             Picker(String(localized: "hour"), selection: $briefHour) {
                                 ForEach(5..<12, id: \.self) { h in
                                     Text("\(h)").tag(h)
                                 }
                             }
                             .pickerStyle(.wheel)
-                            .frame(width: 80, height: 100)
+                            .frame(width: DS.Spacing.xxl * 2, height: DS.Spacing.xxl * 2 + DS.Spacing.l)
                             .clipped()
 
                             Text(":")
-                                .font(.system(size: 24, weight: .light, design: .monospaced))
-                                .foregroundStyle(PulseTheme.textTertiary)
+                                .font(DS.Typography.title1)
+                                .foregroundStyle(DS.Color.inkDim)
 
                             Picker(String(localized: "min"), selection: $briefMinute) {
                                 ForEach([0, 15, 30, 45], id: \.self) { m in
@@ -929,7 +929,7 @@ struct SettingsView: View {
                                 }
                             }
                             .pickerStyle(.wheel)
-                            .frame(width: 80, height: 100)
+                            .frame(width: DS.Spacing.xxl * 2, height: DS.Spacing.xxl * 2 + DS.Spacing.l)
                             .clipped()
                         }
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -940,35 +940,35 @@ struct SettingsView: View {
                             MorningBriefService.shared.scheduledMinute = briefMinute
                         }
                     }
-                    .pulseCard(padding: 20)
+                    .dsCard(padding: DS.Spacing.l)
                     .padding(.horizontal, 16)
 
                     if !MorningBriefService.shared.isAuthorized {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(String(localized: "Notifications disabled"))
-                                .font(PulseTheme.bodyFont.weight(.medium))
-                                .foregroundStyle(PulseTheme.statusPoor)
+                                .font(DS.Typography.body.weight(.medium))
+                                .foregroundStyle(DS.Color.bad)
                             Text(String(localized: "Enable in Settings → Notifications → Pulse"))
-                                .font(PulseTheme.captionFont)
-                                .foregroundStyle(PulseTheme.textTertiary)
+                                .font(DS.Typography.caption)
+                                .foregroundStyle(DS.Color.inkDim)
                             Button(String(localized: "Open Settings")) {
                                 openAppSettings()
                             }
                             .buttonStyle(PulseSecondaryButtonStyle())
                             .padding(.top, 8)
                         }
-                        .pulseCard(padding: 20)
+                        .dsCard(padding: DS.Spacing.l)
                         .padding(.horizontal, 16)
                     }
                 }
             }
-            .background(PulseTheme.background)
+            .background(DS.Color.bg)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(String(localized: "Done")) {
                         showMorningBriefDetail = false
                     }
-                    .foregroundStyle(PulseTheme.accent)
+                    .foregroundStyle(DS.Color.accent)
                 }
             }
         }
@@ -979,8 +979,8 @@ struct SettingsView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     Text(String(localized: "OpenClaw Gateway"))
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .font(DS.Typography.title1)
+                        .foregroundStyle(DS.Color.ink)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 20)
                         .padding(.top, 12)
@@ -992,23 +992,23 @@ struct SettingsView: View {
                         if isPaired, let cfg = bridge.config {
                             HStack(spacing: 8) {
                                 Image(systemName: "checkmark.seal.fill")
-                                    .foregroundStyle(PulseTheme.statusGood)
+                                    .foregroundStyle(DS.Color.good)
                                 Text(String(localized: "Connected"))
-                                    .font(PulseTheme.bodyFont.weight(.medium))
-                                    .foregroundStyle(PulseTheme.textPrimary)
+                                    .font(DS.Typography.body.weight(.medium))
+                                    .foregroundStyle(DS.Color.ink)
                             }
                             Text(cfg.gatewayURL)
-                                .font(PulseTheme.monoFont)
-                                .foregroundStyle(PulseTheme.textTertiary)
+                                .font(DS.Typography.mono)
+                                .foregroundStyle(DS.Color.inkDim)
                                 .lineLimit(1)
                         } else {
                             Text(String(localized: "Connect your gateway to push health data to your AI agent"))
-                                .font(PulseTheme.bodyFont)
-                                .foregroundStyle(PulseTheme.textSecondary)
+                                .font(DS.Typography.body)
+                                .foregroundStyle(DS.Color.inkMid)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .pulseCard(padding: 20)
+                    .dsCard(padding: DS.Spacing.l)
                     .padding(.horizontal, 16)
 
                     Button {
@@ -1027,20 +1027,20 @@ struct SettingsView: View {
 
                     HStack(spacing: 6) {
                         Image(systemName: "terminal")
-                            .font(.system(size: 11))
+                            .font(DS.Typography.caption)
                         Text("openclaw pair --qr")
-                            .font(.system(size: 12, design: .monospaced))
+                            .font(DS.Typography.monoL)
                     }
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
                 }
             }
-            .background(PulseTheme.background)
+            .background(DS.Color.bg)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(String(localized: "Done")) {
                         showOpenClawDetail = false
                     }
-                    .foregroundStyle(PulseTheme.accent)
+                    .foregroundStyle(DS.Color.accent)
                 }
             }
         }
@@ -1163,17 +1163,17 @@ private struct SettingsGroup<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(label)
-                .pulseEyebrow()
+                .font(DS.Typography.mono).tracking(DS.Tracking.mono).textCase(.uppercase).foregroundStyle(DS.Color.inkMid)
                 .padding(.leading, 4)
 
             VStack(spacing: 0) {
                 content()
             }
-            .background(PulseTheme.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous))
+            .background(DS.Color.bgElev)
+            .clipShape(RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                    .stroke(DS.Color.line, lineWidth: DS.Stroke.hairline)
             )
         }
     }
@@ -1222,24 +1222,24 @@ private struct SettingsRow<Trailing: View>: View {
     private var rowContent: some View {
         HStack(spacing: 10) {
             Text(label)
-                .font(.system(size: 15, weight: .medium))
-                .foregroundStyle(destructive ? PulseTheme.statusPoor : PulseTheme.textPrimary)
+                .font(DS.Typography.body.weight(.medium))
+                .foregroundStyle(destructive ? DS.Color.bad : DS.Color.ink)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             if let trailing {
                 trailing
             } else if !valueText.isEmpty {
                 Text(valueText)
-                    .font(.system(size: 13, design: .monospaced))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.monoL)
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
             builder()
 
             if chevron {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(PulseTheme.textQuaternary)
+                    .font(DS.Typography.caption.weight(.semibold))
+                    .foregroundStyle(DS.Color.inkDim)
             }
         }
         .padding(.horizontal, 18)
@@ -1247,8 +1247,8 @@ private struct SettingsRow<Trailing: View>: View {
         .contentShape(Rectangle())
         .overlay(alignment: .top) {
             Rectangle()
-                .fill(PulseTheme.divider)
-                .frame(height: PulseTheme.hairline)
+                .fill(DS.Color.lineSoft)
+                .frame(height: DS.Stroke.hairline)
         }
     }
 }
@@ -1287,12 +1287,12 @@ private struct SettingsToggleRow: View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.body.weight(.medium))
+                    .foregroundStyle(DS.Color.ink)
                 if let sub, !sub.isEmpty {
                     Text(sub)
-                        .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.caption)
+                        .foregroundStyle(DS.Color.inkDim)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -1303,7 +1303,7 @@ private struct SettingsToggleRow: View {
 
             Toggle("", isOn: $isOn)
                 .labelsHidden()
-                .tint(PulseTheme.accent)
+                .tint(DS.Color.accent)
                 .onChange(of: isOn) {
                     onChange?(isOn)
                 }
@@ -1312,8 +1312,8 @@ private struct SettingsToggleRow: View {
         .padding(.vertical, 14)
         .overlay(alignment: .top) {
             Rectangle()
-                .fill(PulseTheme.divider)
-                .frame(height: PulseTheme.hairline)
+                .fill(DS.Color.lineSoft)
+                .frame(height: DS.Stroke.hairline)
         }
     }
 }
@@ -1340,27 +1340,27 @@ private struct SettingsNavRow<Destination: View>: View {
             HStack(spacing: 10) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(label)
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .font(DS.Typography.body.weight(.medium))
+                        .foregroundStyle(DS.Color.ink)
                     if let sub, !sub.isEmpty {
                         Text(sub)
-                            .font(PulseTheme.captionFont)
-                            .foregroundStyle(PulseTheme.textTertiary)
+                            .font(DS.Typography.caption)
+                            .foregroundStyle(DS.Color.inkDim)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(PulseTheme.textQuaternary)
+                    .font(DS.Typography.caption.weight(.semibold))
+                    .foregroundStyle(DS.Color.inkDim)
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 14)
             .contentShape(Rectangle())
             .overlay(alignment: .top) {
                 Rectangle()
-                    .fill(PulseTheme.divider)
-                    .frame(height: PulseTheme.hairline)
+                    .fill(DS.Color.lineSoft)
+                    .frame(height: DS.Stroke.hairline)
             }
         }
         .buttonStyle(.plain)

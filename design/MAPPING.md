@@ -68,7 +68,7 @@
 | `WeeklyReportView.swift`          | REPLACE | S07 Reports week  | pending |
 | `MonthlyReportView.swift`         | REPLACE | S07 Reports month | pending |
 | `CoachModeView.swift`             | REPLACE | S06 Coach         | pending |
-| `SettingsView.swift`              | REPLACE | S08 Settings      | pending |
+| `SettingsView.swift`              | REPLACE | S08 Settings      | done    |
 | `OnboardingView.swift`            | REPLACE | S09 Onboarding    | pending |
 | `GoalSettingView.swift`           | KEEP-MIGRATE | re-tokenize within S08 | pending |
 | `NutritionView.swift`             | KEEP-MIGRATE | re-tokenize  | pending |

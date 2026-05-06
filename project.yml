@@ -83,6 +83,7 @@ targets:
     platform: iOS
     sources:
       - path: PulseWatchWidget
+      - path: Shared/Theme/DS.swift
     info:
       path: PulseWatchWidget/Info.plist
       properties:

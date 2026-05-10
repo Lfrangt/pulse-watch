@@ -1,5 +1,7 @@
 Welcome to Pulse 1.0 — your AI fitness coach for Apple Watch.
 
+NEW: v2 Clinical UI redesign across the entire app — editorial layout, single lime accent, mono labels, hairline borders. Today / Trends / Training / Settings tabs all rebuilt with the design system. Watch + widgets + complications updated to match.
+
 What's in this release:
 
 • Daily Coach — Score-banded actionable advice on the dashboard, citing your sleep, RHR, and HRV. Tap "Today's Coach" to see what your body needs.

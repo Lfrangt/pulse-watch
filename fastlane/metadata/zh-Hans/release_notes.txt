@@ -1,5 +1,7 @@
 欢迎使用 Pulse 1.0 — Apple Watch 的 AI 健身教练。
 
+全新 v2 Clinical 界面 — 编辑型排版、单一柠檬绿强调色、mono 标签、hairline 描边。今日 / 趋势 / 运动 / 设置四个 tab 全部用 design system 重写。Watch + 小组件 + 复杂功能同步更新。
+
 本次更新内容：
 
 • 今日教练卡片 — Dashboard 顶部一句话训练建议，引用你的睡眠 / RHR / HRV 数据。

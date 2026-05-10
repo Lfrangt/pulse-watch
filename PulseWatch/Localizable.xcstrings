@@ -8246,6 +8246,204 @@
           }
         }
       }
+    },
+    "Connect": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接"
+          }
+        }
+      }
+    },
+    "Connect Google Health": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接 Google Health"
+          }
+        }
+      }
+    },
+    "Disconnect": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "断开连接"
+          }
+        }
+      }
+    },
+    "Disconnect Google Health?": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "断开 Google Health？"
+          }
+        }
+      }
+    },
+    "Fitbit · Pixel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitbit · Pixel"
+          }
+        }
+      }
+    },
+    "Google Health": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google Health"
+          }
+        }
+      }
+    },
+    "Google Health Active": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google Health 已连接"
+          }
+        }
+      }
+    },
+    "Google Health not connected": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未连接 Google Health"
+          }
+        }
+      }
+    },
+    "Google Health OAuth client not configured": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google Health OAuth 客户端未配置"
+          }
+        }
+      }
+    },
+    "Malformed OAuth callback": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OAuth 回调格式错误"
+          }
+        }
+      }
+    },
+    "OAuth error: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OAuth 错误：%@"
+          }
+        }
+      }
+    },
+    "OAuth state mismatch — possible CSRF": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OAuth state 不匹配 — 可能 CSRF 攻击"
+          }
+        }
+      }
+    },
+    "Pulse will request read-only access to your Google Health data — heart rate, sleep, blood oxygen, and activity from your Fitbit, Pixel Watch, or other connected devices. Data stays on this device and is never uploaded to Pulse's servers.": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pulse 将请求只读访问你的 Google Health 数据 — 来自 Fitbit、Pixel Watch 或其他已连接设备的心率、睡眠、血氧和活动量。数据仅保存在本机，不会上传到 Pulse 的服务器。"
+          }
+        }
+      }
+    },
+    "Pulse will stop reading from Google Health. You can reconnect anytime.": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pulse 将停止读取 Google Health 的数据。你可以随时重新连接。"
+          }
+        }
+      }
+    },
+    "Retry": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重试"
+          }
+        }
+      }
+    },
+    "Sign-in cancelled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已取消登录"
+          }
+        }
+      }
+    },
+    "Token exchange failed: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Token 兑换失败：%@"
+          }
+        }
+      }
+    },
+    "Unknown sign-in error": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未知登录错误"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

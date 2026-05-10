@@ -55,6 +55,10 @@ struct SettingsView: View {
     @State private var showEnableAICoachAlert = false
     @State private var aiCoachActivating = false
     @State private var aiCoachActivationFailed = false
+    @State private var showConnectGoogleHealthAlert = false
+    @State private var showDisconnectGoogleHealthAlert = false
+
+    @ObservedObject private var googleHealth = GoogleHealthAuth.shared
 
     @AppStorage("pulse.openclaw.gatewayURL") private var savedGatewayURL = ""
     @AppStorage("pulse.openclaw.agentID") private var savedAgentID = "openclaw:main"
@@ -147,13 +151,18 @@ struct SettingsView: View {
                         }
                         .staggered(index: 7)
 
+                        SettingsGroup(label: String(localized: "Google Health")) {
+                            googleHealthRow
+                        }
+                        .staggered(index: 8)
+
                         SettingsGroup(label: String(localized: "OpenClaw Integration")) {
                             openClawConnectionRow
                             if OpenClawBridge.shared.config != nil {
                                 openClawAutoPushRow
                             }
                         }
-                        .staggered(index: 8)
+                        .staggered(index: 9)
 
                         SettingsGroup(label: String(localized: "Diagnostics")) {
                             #if DEBUG
@@ -161,7 +170,7 @@ struct SettingsView: View {
                             #endif
                             resetOnboardingRow
                         }
-                        .staggered(index: 9)
+                        .staggered(index: 10)
                     }
                     .padding(.horizontal, 16)
 
@@ -226,6 +235,22 @@ struct SettingsView: View {
                 Button(String(localized: "OK"), role: .cancel) {}
             } message: {
                 Text(String(localized: "Could not reach DeepSeek. Check your internet connection and try again."))
+            }
+            .alert(String(localized: "Connect Google Health"), isPresented: $showConnectGoogleHealthAlert) {
+                Button(String(localized: "Cancel"), role: .cancel) {}
+                Button(String(localized: "Connect")) {
+                    Task { await googleHealth.connect() }
+                }
+            } message: {
+                Text(String(localized: "Pulse will request read-only access to your Google Health data — heart rate, sleep, blood oxygen, and activity from your Fitbit, Pixel Watch, or other connected devices. Data stays on this device and is never uploaded to Pulse's servers."))
+            }
+            .alert(String(localized: "Disconnect Google Health?"), isPresented: $showDisconnectGoogleHealthAlert) {
+                Button(String(localized: "Cancel"), role: .cancel) {}
+                Button(String(localized: "Disconnect"), role: .destructive) {
+                    googleHealth.disconnect()
+                }
+            } message: {
+                Text(String(localized: "Pulse will stop reading from Google Health. You can reconnect anytime."))
             }
             .sheet(isPresented: $showQRScanner) {
                 QRScannerView { url, token, agent in
@@ -638,6 +663,35 @@ struct SettingsView: View {
             action: {
                 if !aiCoachIsActive && !aiCoachActivating {
                     showEnableAICoachAlert = true
+                }
+            }
+        )
+    }
+
+    private var googleHealthRow: some View {
+        let state = googleHealth.connectionState
+        let isConnected = state == .connected
+        let isConnecting = state == .connecting
+        let isError: Bool = {
+            if case .error = state { return true }
+            return false
+        }()
+        return SettingsRow(
+            label: isConnecting
+                ? String(localized: "Connecting…")
+                : (isConnected
+                    ? String(localized: "Google Health Active")
+                    : String(localized: "Connect Google Health")),
+            valueText: isConnected
+                ? String(localized: "Fitbit · Pixel")
+                : (isError ? String(localized: "Retry") : ""),
+            chevron: !isConnecting,
+            action: {
+                if isConnecting { return }
+                if isConnected {
+                    showDisconnectGoogleHealthAlert = true
+                } else {
+                    showConnectGoogleHealthAlert = true
                 }
             }
         )

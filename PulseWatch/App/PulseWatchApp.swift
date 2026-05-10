@@ -240,7 +240,7 @@ struct MainTabView: View {
                 }
                 .tag(3)
         }
-        .tint(PulseTheme.accent)
+        .tint(DS.Color.accent)
         .onChange(of: selectedTab) { _, newTab in
             let tabNames = ["Today", "Exercise", "Trends", "Settings"]
             let name = newTab < tabNames.count ? tabNames[newTab] : "unknown"

@@ -52,11 +52,11 @@ struct CorrelationInsightsView: View {
         HStack(spacing: DS.Spacing.m) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(PulseTheme.sleepViolet.opacity(0.12))
+                    .fill(DS.Color.accent.opacity(0.12))
                     .frame(width: DS.Spacing.xl + DS.Spacing.xs, height: DS.Spacing.xl + DS.Spacing.xs)
                 Image(systemName: "link")
                     .font(DS.Typography.body.weight(.medium))
-                    .foregroundStyle(PulseTheme.sleepViolet)
+                    .foregroundStyle(DS.Color.accent)
             }
 
             VStack(alignment: .leading, spacing: 2) {
@@ -163,7 +163,7 @@ struct CorrelationInsightsView: View {
 
     private func correlationBar(_ result: CorrelationResult) -> some View {
         let r = result.coefficient
-        let barColor: Color = r > 0 ? DS.Color.accent : PulseTheme.activityCoral
+        let barColor: Color = r > 0 ? DS.Color.accent : DS.Color.accent
 
         return VStack(spacing: 4) {
             GeometryReader { geo in

@@ -142,17 +142,17 @@ struct MonthlyReportView: View {
             metricCard(
                 icon: "waveform.path.ecg", label: "HRV",
                 value: avgHRV.map { String(format: "%.0f ms", $0) } ?? "—",
-                color: PulseTheme.hrvBlue
+                color: DS.Color.accent
             )
             metricCard(
                 icon: "moon.fill", label: String(localized: "睡眠"),
                 value: avgSleep.map { String(format: "%.1fh", $0) } ?? "—",
-                color: PulseTheme.sleepViolet
+                color: DS.Color.accent
             )
             metricCard(
                 icon: "heart.fill", label: String(localized: "静息心率"),
                 value: avgRHR.map { String(format: "%.0f bpm", $0) } ?? "—",
-                color: PulseTheme.activityCoral
+                color: DS.Color.accent
             )
         }
     }
@@ -281,10 +281,10 @@ struct MonthlyReportView: View {
             if let (text, positive) = delta {
                 Text(text)
                     .font(DS.Typography.mono.weight(.semibold))
-                    .foregroundStyle(positive ? DS.Color.accent : PulseTheme.activityCoral)
+                    .foregroundStyle(positive ? DS.Color.accent : DS.Color.accent)
                     .padding(.horizontal, DS.Spacing.xs)
                     .padding(.vertical, DS.Spacing.m)
-                    .background(Capsule().fill((positive ? DS.Color.accent : PulseTheme.activityCoral).opacity(0.12)))
+                    .background(Capsule().fill((positive ? DS.Color.accent : DS.Color.accent).opacity(0.12)))
             }
         }
         .frame(maxWidth: .infinity)

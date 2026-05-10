@@ -41,9 +41,9 @@ struct OnboardingView: View {
     private func backgroundGradient(for page: Int) -> some View {
         let colors: [(top: Color, bottom: Color)] = [
             (DS.Color.accent, DS.Color.good),       // Score: gold → green
-            (PulseTheme.trendBlue, DS.Color.accent),         // Trends: blue → gold
+            (DS.Color.accent, DS.Color.accent),         // Trends: blue → gold
             (DS.Color.warn, DS.Color.bad),// Workout: amber → terracotta
-            (DS.Color.good, PulseTheme.trendBlue),     // Coach: green → blue
+            (DS.Color.good, DS.Color.accent),     // Coach: green → blue
         ]
         let pair = colors[min(page, colors.count - 1)]
 
@@ -120,7 +120,7 @@ struct OnboardingView: View {
     private var trendsPage: some View {
         OnboardingPageView(
             icon: "chart.xyaxis.line",
-            iconColors: [PulseTheme.trendBlue, DS.Color.accent],
+            iconColors: [DS.Color.accent, DS.Color.accent],
             title: String(localized: "Weekly Trends"),
             subtitle: String(localized: "See your progress over time"),
             description: String(localized: "7-day charts for heart rate, HRV, and sleep. Spot patterns, track improvement, and share your gains."),
@@ -153,7 +153,7 @@ struct OnboardingView: View {
                 }
                 .fill(
                     LinearGradient(
-                        colors: [PulseTheme.trendBlue.opacity(0.3), Color.clear],
+                        colors: [DS.Color.accent.opacity(0.3), Color.clear],
                         startPoint: .top,
                         endPoint: .bottom
                     )
@@ -170,7 +170,7 @@ struct OnboardingView: View {
                 }
                 .stroke(
                     LinearGradient(
-                        colors: [PulseTheme.trendBlue, DS.Color.accent],
+                        colors: [DS.Color.accent, DS.Color.accent],
                         startPoint: .leading,
                         endPoint: .trailing
                     ),
@@ -180,7 +180,7 @@ struct OnboardingView: View {
                 // Dots
                 ForEach(0..<points.count, id: \.self) { i in
                     Circle()
-                        .fill(i == points.count - 1 ? DS.Color.accent : PulseTheme.trendBlue)
+                        .fill(i == points.count - 1 ? DS.Color.accent : DS.Color.accent)
                         .frame(width: DS.Spacing.s, height: DS.Spacing.s)
                         .position(x: step * CGFloat(i), y: h * (1 - points[i]))
                 }
@@ -284,7 +284,7 @@ struct OnboardingView: View {
                     .font(DS.Typography.display3)
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [DS.Color.good, PulseTheme.trendBlue],
+                            colors: [DS.Color.good, DS.Color.accent],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )

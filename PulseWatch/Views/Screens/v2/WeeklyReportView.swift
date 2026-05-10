@@ -325,7 +325,7 @@ struct WeeklyReportView: View {
                     value: thisSleep.map { String(format: "%.1f", $0) } ?? "--",
                     unit: String(localized: "hour"),
                     delta: percentDelta(thisSleep, lastSleep),
-                    color: PulseTheme.sleepAccent
+                    color: DS.Color.accent
                 )
 
                 metricTile(

@@ -879,11 +879,11 @@ struct TrainingView: View {
             }
 
             let zones: [HeartRateZone] = [
-                HeartRateZone(name: String(localized: "Warm-up"), percentage: Double(zoneCounts[0]) / total, color: PulseTheme.zoneRest),
-                HeartRateZone(name: String(localized: "Fat Burn"), percentage: Double(zoneCounts[1]) / total, color: PulseTheme.zoneFatBurn),
-                HeartRateZone(name: String(localized: "Cardio"), percentage: Double(zoneCounts[2]) / total, color: PulseTheme.zoneCardio),
-                HeartRateZone(name: String(localized: "Anaerobic"), percentage: Double(zoneCounts[3]) / total, color: PulseTheme.zonePeak),
-                HeartRateZone(name: String(localized: "Peak"), percentage: Double(zoneCounts[4]) / total, color: PulseTheme.zoneMax),
+                HeartRateZone(name: String(localized: "Warm-up"), percentage: Double(zoneCounts[0]) / total, color: DS.Color.lineSoft),
+                HeartRateZone(name: String(localized: "Fat Burn"), percentage: Double(zoneCounts[1]) / total, color: DS.Color.inkDim),
+                HeartRateZone(name: String(localized: "Cardio"), percentage: Double(zoneCounts[2]) / total, color: DS.Color.accent),
+                HeartRateZone(name: String(localized: "Anaerobic"), percentage: Double(zoneCounts[3]) / total, color: DS.Color.warn),
+                HeartRateZone(name: String(localized: "Peak"), percentage: Double(zoneCounts[4]) / total, color: DS.Color.bad),
             ]
 
             heartRateZones[workout.uuid] = zones

@@ -51,8 +51,8 @@
 | `HistoryView.swift`               | REPLACE | S05 History       | done    |
 | `WorkoutHistoryListView.swift`    | DELETE  | folded into S05   | pending |
 | `WorkoutHistoryDetailView.swift`  | REPLACE | S05 detail variant| pending |
-| `WorkoutView.swift`               | REPLACE | S03 Workout Live  | pending |
-| `ManualWorkoutView.swift`         | REPLACE | S03 manual variant| pending |
+| `WorkoutView.swift`               | REPLACE | S03 Workout Live  | done    |
+| `ManualWorkoutView.swift`         | REPLACE | S03 manual variant| done    |
 | `WorkoutShareScreen.swift`        | KEEP-MIGRATE | re-tokenize  | pending |
 | `HRVDetailView.swift`             | REPLACE | S02 metric=hrv    | done    |
 | `HeartRateDetailView.swift`       | REPLACE | S02 metric=hr     | done    |

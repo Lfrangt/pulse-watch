@@ -10,9 +10,9 @@ import os
 /// → History card (hairline-separated rows)
 /// → "MORE FROM PULSE" divider
 /// → Strength + AI/OpenClaw sections
-struct WorkoutView: View {
+struct TrainingView: View {
 
-    private let logger = Logger(subsystem: "com.abundra.pulse", category: "WorkoutView")
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "TrainingView")
 
     @State private var workouts: [HKWorkout] = []
     @State private var heartRateZones: [UUID: [HeartRateZone]] = [:]
@@ -40,9 +40,9 @@ struct WorkoutView: View {
                 VStack(spacing: 0) {
                     // ── Clinical header (eyebrow + 32pt title + History action)
                     clinicalHeader
-                        .padding(.horizontal, 20)
-                        .padding(.top, 12)
-                        .padding(.bottom, 8)
+                        .padding(.horizontal, DS.Spacing.l)
+                        .padding(.top, DS.Spacing.m)
+                        .padding(.bottom, DS.Spacing.s)
 
                     // ── JSX-aligned cards
                     VStack(spacing: 12) {
@@ -60,16 +60,16 @@ struct WorkoutView: View {
                         historyCard
                             .staggered(index: 2)
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, DS.Spacing.m)
 
                     // ── "MORE FROM PULSE" divider
                     moreFromPulseDivider
-                        .padding(.horizontal, 16)
-                        .padding(.top, 16)
-                        .padding(.bottom, 16)
+                        .padding(.horizontal, DS.Spacing.m)
+                        .padding(.top, DS.Spacing.m)
+                        .padding(.bottom, DS.Spacing.m)
 
                     // ── Pulse-only extras
-                    VStack(spacing: PulseTheme.spacingM) {
+                    VStack(spacing: DS.Spacing.m) {
                         strengthSection
                             .staggered(index: 3)
 
@@ -85,10 +85,10 @@ struct WorkoutView: View {
 
                         Spacer(minLength: 60)
                     }
-                    .padding(.horizontal, PulseTheme.spacingM)
+                    .padding(.horizontal, DS.Spacing.m)
                 }
             }
-            .background(PulseTheme.background)
+            .background(DS.Color.bg)
             .navigationBarHidden(true)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .task {
@@ -110,10 +110,10 @@ struct WorkoutView: View {
         HStack(alignment: .firstTextBaseline) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(headerEyebrowText)
-                    .pulseEyebrow()
+                    .font(DS.Typography.mono).tracking(DS.Tracking.mono).textCase(.uppercase).foregroundStyle(DS.Color.inkMid)
                 Text(String(localized: "Workout"))
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.title1.weight(.bold))
+                    .foregroundStyle(DS.Color.ink)
                     .tracking(-0.5)
             }
             Spacer()
@@ -122,9 +122,9 @@ struct WorkoutView: View {
                     .preferredColorScheme(.dark)
             } label: {
                 Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(PulseTheme.textSecondary)
-                    .padding(8)
+                    .font(DS.Typography.body.weight(.medium))
+                    .foregroundStyle(DS.Color.inkMid)
+                    .padding(DS.Spacing.s)
                     .accessibilityLabel(String(localized: "History"))
             }
         }
@@ -144,14 +144,14 @@ struct WorkoutView: View {
     private var moreFromPulseDivider: some View {
         HStack(spacing: 12) {
             Rectangle()
-                .fill(PulseTheme.divider)
-                .frame(height: PulseTheme.hairline)
+                .fill(DS.Color.lineSoft)
+                .frame(height: DS.Stroke.hairline)
                 .frame(maxWidth: .infinity)
             Text(String(localized: "More from Pulse"))
-                .pulseEyebrow()
+                .font(DS.Typography.mono).tracking(DS.Tracking.mono).textCase(.uppercase).foregroundStyle(DS.Color.inkMid)
             Rectangle()
-                .fill(PulseTheme.divider)
-                .frame(height: PulseTheme.hairline)
+                .fill(DS.Color.lineSoft)
+                .frame(height: DS.Stroke.hairline)
                 .frame(maxWidth: .infinity)
         }
     }
@@ -163,11 +163,11 @@ struct WorkoutView: View {
             // Top row: eyebrow + week range mono
             HStack(alignment: .firstTextBaseline) {
                 Text(String(localized: "This Week"))
-                    .pulseEyebrow()
+                    .font(DS.Typography.mono).tracking(DS.Tracking.mono).textCase(.uppercase).foregroundStyle(DS.Color.inkMid)
                 Spacer()
                 Text(weekRangeText)
-                    .font(PulseTheme.monoFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.mono)
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
             // 3-up metric grid
@@ -188,29 +188,29 @@ struct WorkoutView: View {
                     label: String(localized: "kcal")
                 )
             }
-            .padding(.top, 14)
+            .padding(.top, DS.Spacing.card)
 
             // Week dot matrix — M T W T F S S
             weekDayStrip
-                .padding(.top, 20)
+                .padding(.top, DS.Spacing.l)
         }
-        .pulseCard(padding: 20)
+        .dsCard(padding: DS.Spacing.l)
     }
 
     private func summaryMetric(primary: String, primarySuffix: String, label: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .lastTextBaseline, spacing: 0) {
                 Text(primary)
-                    .font(.system(size: 28, weight: .semibold, design: .rounded).monospacedDigit())
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.title1.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(DS.Color.ink)
                 if !primarySuffix.isEmpty {
                     Text(primarySuffix)
-                        .font(.system(size: 14, weight: .regular).monospacedDigit())
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.bodyS.monospacedDigit())
+                        .foregroundStyle(DS.Color.inkDim)
                 }
             }
             Text(label)
-                .pulseEyebrow()
+                .font(DS.Typography.mono).tracking(DS.Tracking.mono).textCase(.uppercase).foregroundStyle(DS.Color.inkMid)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -221,15 +221,15 @@ struct WorkoutView: View {
                 let trained = weekDayActivity.indices.contains(i) ? weekDayActivity[i] : false
                 VStack(spacing: 6) {
                     Text(weekdayLabel(i))
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.mono.weight(.semibold))
+                        .foregroundStyle(DS.Color.inkDim)
 
                     RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .fill(trained ? PulseTheme.textPrimary : Color.clear)
-                        .frame(width: 28, height: 28)
+                        .fill(trained ? DS.Color.ink : Color.clear)
+                        .frame(width: DS.Spacing.xl - DS.Spacing.xs, height: DS.Spacing.xl - DS.Spacing.xs)
                         .overlay(
                             RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                .stroke(trained ? Color.clear : PulseTheme.border, lineWidth: PulseTheme.hairline)
+                                .stroke(trained ? Color.clear : DS.Color.line, lineWidth: DS.Stroke.hairline)
                         )
                 }
                 .frame(maxWidth: .infinity)
@@ -296,47 +296,47 @@ struct WorkoutView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(String(localized: "Last Session"))
-                        .pulseEyebrow()
+                        .font(DS.Typography.mono).tracking(DS.Tracking.mono).textCase(.uppercase).foregroundStyle(DS.Color.inkMid)
                     Text(workoutName(workout))
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
-                        .padding(.top, 6)
+                        .font(DS.Typography.bodyL.weight(.semibold))
+                        .foregroundStyle(DS.Color.ink)
+                        .padding(.top, DS.Spacing.xs)
                     Text(lastSessionMetaText(workout))
-                        .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
-                        .padding(.top, 2)
+                        .font(DS.Typography.caption)
+                        .foregroundStyle(DS.Color.inkDim)
+                        .padding(.top, DS.Spacing.m)
                 }
                 Spacer()
                 Text(String(localized: "Logged"))
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(PulseTheme.textSecondary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
+                    .font(DS.Typography.caption.weight(.medium))
+                    .foregroundStyle(DS.Color.inkMid)
+                    .padding(.horizontal, DS.Spacing.s)
+                    .padding(.vertical, DS.Spacing.xs)
                     .overlay(
-                        RoundedRectangle(cornerRadius: PulseTheme.radiusXS, style: .continuous)
-                            .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
+                        RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                            .stroke(DS.Color.line, lineWidth: DS.Stroke.hairline)
                     )
             }
 
             // HR zones bar
             heartRateZonesView
-                .padding(.top, 16)
+                .padding(.top, DS.Spacing.m)
         }
-        .pulseCard(padding: 20)
+        .dsCard(padding: DS.Spacing.l)
     }
 
     private var heartRateZonesView: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(String(localized: "Heart Rate Zones"))
-                .pulseEyebrow()
+                .font(DS.Typography.mono).tracking(DS.Tracking.mono).textCase(.uppercase).foregroundStyle(DS.Color.inkMid)
 
             // Stacked horizontal bar
             zoneBar
-                .padding(.top, 0)
+                .padding(.top, DS.Spacing.m)
 
             // Z1 2m  Z2 6m  Z3 26m...
             zoneLegend
-                .padding(.top, 4)
+                .padding(.top, DS.Spacing.xs)
         }
     }
 
@@ -353,7 +353,7 @@ struct WorkoutView: View {
                     }
                 } else {
                     // Empty / skeleton bar
-                    Rectangle().fill(PulseTheme.divider)
+                    Rectangle().fill(DS.Color.lineSoft)
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
@@ -366,19 +366,19 @@ struct WorkoutView: View {
     }
 
     private func zoneColor(forIndex idx: Int, mins: Int) -> Color {
-        if mins == 0 { return PulseTheme.divider }
+        if mins == 0 { return DS.Color.lineSoft }
         // Highlight the dominant zone with textPrimary; others are tonal greys.
         let maxIdx = lastSessionZoneMinutes.firstIndex(of: lastSessionZoneMinutes.max() ?? 0) ?? -1
         if idx == maxIdx {
-            return PulseTheme.textPrimary
+            return DS.Color.ink
         }
         // Secondary tones
         switch idx {
-        case 0: return PulseTheme.textQuaternary
-        case 1: return PulseTheme.textTertiary
-        case 3: return PulseTheme.textSecondary
-        case 4: return PulseTheme.textQuaternary
-        default: return PulseTheme.textTertiary
+        case 0: return DS.Color.inkDim
+        case 1: return DS.Color.inkDim
+        case 3: return DS.Color.inkMid
+        case 4: return DS.Color.inkDim
+        default: return DS.Color.inkDim
         }
     }
 
@@ -389,11 +389,11 @@ struct WorkoutView: View {
                 let isDominant = mins > 0 && mins == lastSessionZoneMinutes.max()
                 HStack(spacing: 3) {
                     Text("Z\(i + 1)")
-                        .font(.system(size: 10, weight: isDominant ? .semibold : .regular, design: .monospaced))
+                        .font(DS.Typography.mono)
                     Text(mins > 0 ? "\(mins)m" : "—")
-                        .font(.system(size: 10, weight: isDominant ? .semibold : .regular, design: .monospaced))
+                        .font(DS.Typography.mono)
                 }
-                .foregroundStyle(isDominant ? PulseTheme.textPrimary : PulseTheme.textTertiary)
+                .foregroundStyle(isDominant ? DS.Color.ink : DS.Color.inkDim)
                 .frame(maxWidth: .infinity)
             }
         }
@@ -416,43 +416,43 @@ struct WorkoutView: View {
         VStack(spacing: 0) {
             HStack(alignment: .firstTextBaseline) {
                 Text(String(localized: "History"))
-                    .pulseEyebrow()
+                    .font(DS.Typography.mono).tracking(DS.Tracking.mono).textCase(.uppercase).foregroundStyle(DS.Color.inkMid)
                 Spacer()
                 NavigationLink {
                     WorkoutHistoryListView()
                         .preferredColorScheme(.dark)
                 } label: {
                     Text(String(localized: "See all"))
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(PulseTheme.accent)
+                        .font(DS.Typography.caption.weight(.medium))
+                        .foregroundStyle(DS.Color.accent)
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 14)
-            .padding(.bottom, 8)
+            .padding(.horizontal, DS.Spacing.l)
+            .padding(.top, DS.Spacing.card)
+            .padding(.bottom, DS.Spacing.s)
 
             if isLoading && workouts.isEmpty {
                 ProgressView()
-                    .tint(PulseTheme.accent)
+                    .tint(DS.Color.accent)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 24)
+                    .padding(.vertical, DS.Spacing.l)
             } else if workouts.isEmpty {
                 Text(String(localized: "No workouts in the last 30 days"))
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkDim)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 20)
+                    .padding(.vertical, DS.Spacing.l)
             } else {
                 ForEach(Array(workouts.prefix(6).enumerated()), id: \.element.uuid) { idx, workout in
                     historyRow(workout, isFirst: idx == 0)
                 }
             }
         }
-        .background(PulseTheme.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous))
+        .background(DS.Color.bgElev)
+        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                .stroke(DS.Color.line, lineWidth: DS.Stroke.hairline)
         )
     }
 
@@ -461,39 +461,39 @@ struct WorkoutView: View {
             // Day label column (3-letter weekday + day number)
             VStack(spacing: 2) {
                 Text(workout.startDate.formatted(.dateTime.weekday(.abbreviated)).uppercased())
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(DS.Typography.mono.weight(.semibold))
                     .tracking(0.6)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
                 Text("\(Calendar.current.component(.day, from: workout.startDate))")
-                    .font(.system(size: 13, weight: .medium).monospacedDigit())
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.bodyS.weight(.medium).monospacedDigit())
+                    .foregroundStyle(DS.Color.ink)
             }
             .frame(width: 44)
 
             // Title + meta
             VStack(alignment: .leading, spacing: 2) {
                 Text(workoutName(workout))
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.bodyS.weight(.medium))
+                    .foregroundStyle(DS.Color.ink)
                     .lineLimit(1)
                 Text(historyMetaText(workout))
-                    .font(.system(size: 12).monospacedDigit())
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption.monospacedDigit())
+                    .foregroundStyle(DS.Color.inkDim)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
             // Zone chip
             Text(estimatedZone(workout))
-                .font(.system(size: 11, design: .monospaced))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.mono)
+                .foregroundStyle(DS.Color.inkDim)
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 14)
+        .padding(.horizontal, DS.Spacing.l)
+        .padding(.vertical, DS.Spacing.card)
         .overlay(alignment: .top) {
             if !isFirst {
                 Rectangle()
-                    .fill(PulseTheme.divider)
-                    .frame(height: PulseTheme.hairline)
+                    .fill(DS.Color.lineSoft)
+                    .frame(height: DS.Stroke.hairline)
             }
         }
     }
@@ -537,32 +537,32 @@ struct WorkoutView: View {
     }
 
     private var strengthSection: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            HStack(spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.m) {
+            HStack(spacing: DS.Spacing.s) {
                 Text(String(localized: "Strength"))
-                    .pulseEyebrow()
+                    .font(DS.Typography.mono).tracking(DS.Tracking.mono).textCase(.uppercase).foregroundStyle(DS.Color.inkMid)
                 Spacer()
                 if let a = strengthAssessment, a.totalScore > 0 {
                     Text("\(a.totalScore)")
-                        .font(.system(size: 13, weight: .semibold, design: .rounded).monospacedDigit())
-                        .foregroundStyle(PulseTheme.textPrimary)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 3)
+                        .font(DS.Typography.bodyS.weight(.semibold).monospacedDigit())
+                        .foregroundStyle(DS.Color.ink)
+                        .padding(.horizontal, DS.Spacing.s)
+                        .padding(.vertical, DS.Spacing.m)
                         .overlay(
-                            RoundedRectangle(cornerRadius: PulseTheme.radiusXS, style: .continuous)
-                                .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
+                            RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                                .stroke(DS.Color.line, lineWidth: DS.Stroke.hairline)
                         )
                 }
                 Button {
                     showAddStrength = true
                 } label: {
                     Image(systemName: "plus")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(PulseTheme.accent)
-                        .frame(width: 28, height: 28)
+                        .font(DS.Typography.bodyS.weight(.medium))
+                        .foregroundStyle(DS.Color.accent)
+                        .frame(width: DS.Spacing.xl - DS.Spacing.xs, height: DS.Spacing.xl - DS.Spacing.xs)
                         .overlay(
-                            RoundedRectangle(cornerRadius: PulseTheme.radiusXS, style: .continuous)
-                                .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
+                            RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                                .stroke(DS.Color.line, lineWidth: DS.Stroke.hairline)
                         )
                 }
                 .buttonStyle(.plain)
@@ -574,58 +574,58 @@ struct WorkoutView: View {
                     ForEach(a.lifts, id: \.liftType) { lift in
                         VStack(spacing: 4) {
                             Text(String(format: "%.0f", lift.best1RM))
-                                .font(.system(size: 22, weight: .semibold, design: .rounded).monospacedDigit())
-                                .foregroundStyle(PulseTheme.textPrimary)
+                                .font(DS.Typography.title2.weight(.semibold).monospacedDigit())
+                                .foregroundStyle(DS.Color.ink)
                             Text(lift.liftType.label)
-                                .font(.system(size: 11))
-                                .foregroundStyle(PulseTheme.textSecondary)
+                                .font(DS.Typography.caption)
+                                .foregroundStyle(DS.Color.inkMid)
                             Text(lift.level.label)
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundStyle(PulseTheme.textTertiary)
+                                .font(DS.Typography.mono.weight(.medium))
+                                .foregroundStyle(DS.Color.inkDim)
                         }
                         .frame(maxWidth: .infinity)
                     }
                 }
             } else if bodyweight <= 0 {
                 Text(String(localized: "Set body weight in Settings → Profile"))
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkDim)
             } else if strengthRecords.isEmpty {
                 Text(String(localized: "No lifts recorded yet — tap + to add"))
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
             // Recent records (compact)
             if !strengthRecords.isEmpty {
                 Rectangle()
-                    .fill(PulseTheme.divider)
-                    .frame(height: PulseTheme.hairline)
+                    .fill(DS.Color.lineSoft)
+                    .frame(height: DS.Stroke.hairline)
 
                 VStack(spacing: 8) {
                     ForEach(strengthRecords.prefix(3)) { record in
                         let type = StrengthService.LiftType(rawValue: record.liftType) ?? .squat
-                        HStack(spacing: PulseTheme.spacingS) {
+                        HStack(spacing: DS.Spacing.s) {
                             Text(type.label)
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(PulseTheme.textPrimary)
+                                .font(DS.Typography.caption.weight(.medium))
+                                .foregroundStyle(DS.Color.ink)
                                 .frame(width: 70, alignment: .leading)
                             Text(String(format: "%.0f kg × %d × %d", record.weightKg, record.sets, record.reps))
-                                .font(.system(size: 12, design: .monospaced))
-                                .foregroundStyle(PulseTheme.textSecondary)
+                                .font(DS.Typography.monoL)
+                                .foregroundStyle(DS.Color.inkMid)
                             Spacer()
                             Text(record.date, format: .dateTime.month(.abbreviated).day())
-                                .font(.system(size: 10, design: .monospaced))
-                                .foregroundStyle(PulseTheme.textTertiary)
+                                .font(DS.Typography.mono)
+                                .foregroundStyle(DS.Color.inkDim)
                             if record.isPersonalRecord {
                                 Text("PR")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundStyle(PulseTheme.statusModerate)
-                                    .padding(.horizontal, 4)
-                                    .padding(.vertical, 1)
+                                    .font(DS.Typography.monoS.weight(.bold))
+                                    .foregroundStyle(DS.Color.warn)
+                                    .padding(.horizontal, DS.Spacing.xs)
+                                    .padding(.vertical, DS.Spacing.m)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 3, style: .continuous)
-                                            .stroke(PulseTheme.statusModerate.opacity(0.5), lineWidth: PulseTheme.hairline)
+                                            .stroke(DS.Color.warn.opacity(0.5), lineWidth: DS.Stroke.hairline)
                                     )
                             }
                         }
@@ -638,19 +638,19 @@ struct WorkoutView: View {
                 } label: {
                     HStack {
                         Text(String(localized: "View Full Strength Details"))
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(PulseTheme.accent)
+                            .font(DS.Typography.caption.weight(.medium))
+                            .foregroundStyle(DS.Color.accent)
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(PulseTheme.accent)
+                            .font(DS.Typography.mono.weight(.semibold))
+                            .foregroundStyle(DS.Color.accent)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 4)
+                    .padding(.top, DS.Spacing.xs)
                 }
                 .buttonStyle(.plain)
             }
         }
-        .pulseCard(padding: 20)
+        .dsCard(padding: DS.Spacing.l)
     }
 
     // MARK: - AI workouts (Pulse-only)
@@ -659,10 +659,10 @@ struct WorkoutView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 6) {
                 Image(systemName: "cpu")
-                    .font(.system(size: 11))
-                    .foregroundStyle(PulseTheme.accent)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.accent)
                 Text(String(localized: "OpenClaw AI Records"))
-                    .pulseEyebrow()
+                    .font(DS.Typography.mono).tracking(DS.Tracking.mono).textCase(.uppercase).foregroundStyle(DS.Color.inkMid)
             }
 
             VStack(spacing: 0) {
@@ -670,11 +670,11 @@ struct WorkoutView: View {
                     aiWorkoutRow(entry, isFirst: idx == 0)
                 }
             }
-            .background(PulseTheme.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous))
+            .background(DS.Color.bgElev)
+            .clipShape(RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                    .stroke(DS.Color.line, lineWidth: DS.Stroke.hairline)
             )
         }
     }
@@ -684,45 +684,45 @@ struct WorkoutView: View {
         return NavigationLink(destination: WorkoutHistoryDetailView(entry: entry)) {
             HStack(spacing: 12) {
                 Image(systemName: entry.activityIcon)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .font(DS.Typography.bodyS.weight(.medium))
+                    .foregroundStyle(DS.Color.inkMid)
                     .frame(width: 24)
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
                         Text(title)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(PulseTheme.textPrimary)
+                            .font(DS.Typography.bodyS.weight(.medium))
+                            .foregroundStyle(DS.Color.ink)
                             .lineLimit(1)
                         Text("AI")
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(PulseTheme.accent)
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 1)
+                            .font(DS.Typography.monoS.weight(.bold))
+                            .foregroundStyle(DS.Color.accent)
+                            .padding(.horizontal, DS.Spacing.xs)
+                            .padding(.vertical, DS.Spacing.m)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 3, style: .continuous)
-                                    .stroke(PulseTheme.accent.opacity(0.5), lineWidth: PulseTheme.hairline)
+                                    .stroke(DS.Color.accent.opacity(0.5), lineWidth: DS.Stroke.hairline)
                             )
                     }
                     Text(timeString(entry.startDate))
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.mono)
+                        .foregroundStyle(DS.Color.inkDim)
                 }
                 Spacer()
                 Text("\(entry.durationMinutes)m")
-                    .font(.system(size: 12, design: .monospaced))
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .font(DS.Typography.monoL)
+                    .foregroundStyle(DS.Color.inkMid)
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption.weight(.semibold))
+                    .foregroundStyle(DS.Color.inkDim)
             }
-            .padding(.horizontal, 18)
-            .padding(.vertical, 14)
+            .padding(.horizontal, DS.Spacing.l)
+            .padding(.vertical, DS.Spacing.card)
             .overlay(alignment: .top) {
                 if !isFirst {
                     Rectangle()
-                        .fill(PulseTheme.divider)
-                        .frame(height: PulseTheme.hairline)
+                        .fill(DS.Color.lineSoft)
+                        .frame(height: DS.Stroke.hairline)
                 }
             }
         }
@@ -732,32 +732,32 @@ struct WorkoutView: View {
     // MARK: - Empty state / loading
 
     private var emptyState: some View {
-        VStack(spacing: PulseTheme.spacingM) {
+        VStack(spacing: DS.Spacing.m) {
             Image(systemName: "figure.run")
-                .font(.system(size: 28, weight: .light))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.title1.weight(.light))
+                .foregroundStyle(DS.Color.inkDim)
             Text(String(localized: "No workout records yet"))
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.body.weight(.semibold))
+                .foregroundStyle(DS.Color.ink)
             Text(String(localized: "Your workout records will appear here.\nSupports running, cycling, swimming, strength training, and more."))
-                .font(PulseTheme.bodyFont)
-                .foregroundStyle(PulseTheme.textSecondary)
+                .font(DS.Typography.body)
+                .foregroundStyle(DS.Color.inkMid)
                 .multilineTextAlignment(.center)
                 .lineSpacing(3)
         }
-        .padding(.vertical, PulseTheme.spacingXL)
+        .padding(.vertical, DS.Spacing.xl)
         .frame(maxWidth: .infinity)
-        .pulseCard(padding: 20)
+        .dsCard(padding: DS.Spacing.l)
     }
 
     private var loadingPlaceholder: some View {
         VStack {
             ProgressView()
-                .tint(PulseTheme.accent)
+                .tint(DS.Color.accent)
         }
         .frame(maxWidth: .infinity)
         .frame(height: 100)
-        .pulseCard(padding: 20)
+        .dsCard(padding: DS.Spacing.l)
     }
 
     // MARK: - Data loading
@@ -957,6 +957,6 @@ private struct HeartRateZone: Identifiable {
 }
 
 #Preview {
-    WorkoutView()
+    TrainingView()
         .preferredColorScheme(.dark)
 }

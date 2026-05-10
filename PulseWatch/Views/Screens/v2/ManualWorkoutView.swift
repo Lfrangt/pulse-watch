@@ -21,7 +21,7 @@ struct ManualWorkoutView: View {
     var body: some View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: PulseTheme.spacingL) {
+                VStack(spacing: DS.Spacing.l) {
                     // 运动类型
                     typeSection
                     // 日期时间
@@ -39,17 +39,17 @@ struct ManualWorkoutView: View {
 
                     Spacer(minLength: 40)
                 }
-                .padding(.horizontal, PulseTheme.spacingM)
-                .padding(.top, PulseTheme.spacingM)
+                .padding(.horizontal, DS.Spacing.m)
+                .padding(.top, DS.Spacing.m)
             }
-            .background(PulseTheme.background)
+            .background(DS.Color.bg)
             .navigationTitle(String(localized: "Add Workout"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button(String(localized: "Cancel")) { dismiss() }
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .foregroundStyle(DS.Color.inkMid)
                 }
             }
         }
@@ -58,10 +58,10 @@ struct ManualWorkoutView: View {
     // MARK: - 运动类型
 
     private var typeSection: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.s) {
             Text("Workout Type")
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyL)
+                .foregroundStyle(DS.Color.ink)
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 4), spacing: 8) {
                 ForEach(WorkoutType.allCases) { type in
@@ -71,100 +71,100 @@ struct ManualWorkoutView: View {
                     } label: {
                         VStack(spacing: 4) {
                             Image(systemName: type.icon)
-                                .font(.system(size: 20))
-                                .foregroundStyle(selected ? PulseTheme.accent : PulseTheme.textTertiary)
+                                .font(DS.Typography.bodyL)
+                                .foregroundStyle(selected ? DS.Color.accent : DS.Color.inkDim)
                             Text(type.label)
-                                .font(.system(size: 10, weight: selected ? .semibold : .regular))
-                                .foregroundStyle(selected ? PulseTheme.textPrimary : PulseTheme.textTertiary)
+                                .font(DS.Typography.mono)
+                                .foregroundStyle(selected ? DS.Color.ink : DS.Color.inkDim)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.7)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
+                        .padding(.vertical, DS.Spacing.m)
                         .background(
                             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(selected ? PulseTheme.accent.opacity(0.12) : PulseTheme.surface)
+                                .fill(selected ? DS.Color.accent.opacity(0.12) : DS.Color.bgElev)
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .stroke(selected ? PulseTheme.accent.opacity(0.5) : Color.clear, lineWidth: 1)
+                                .stroke(selected ? DS.Color.accent.opacity(0.5) : Color.clear, lineWidth: 1)
                         )
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
-        .pulseCard()
+        .dsCard()
     }
 
     // MARK: - 日期
 
     private var dateSection: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.s) {
             Text("Date & Time")
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyL)
+                .foregroundStyle(DS.Color.ink)
 
             DatePicker("", selection: $date, in: ...Date(), displayedComponents: [.date, .hourAndMinute])
                 .datePickerStyle(.compact)
-                .tint(PulseTheme.accent)
+                .tint(DS.Color.accent)
                 .labelsHidden()
                 .colorScheme(.dark)
         }
-        .pulseCard()
+        .dsCard()
     }
 
     // MARK: - 时长
 
     private var durationSection: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.s) {
             HStack {
                 Text("Duration")
-                    .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.bodyL)
+                    .foregroundStyle(DS.Color.ink)
                 Spacer()
                 Text(String(format: String(localized: "%d min"), durationMinutes))
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                    .foregroundStyle(PulseTheme.accent)
+                    .font(DS.Typography.title2.weight(.bold))
+                    .foregroundStyle(DS.Color.accent)
             }
 
             Slider(value: Binding(
                 get: { Double(durationMinutes) },
                 set: { durationMinutes = Int($0) }
             ), in: 5...180, step: 5)
-            .tint(PulseTheme.accent)
+            .tint(DS.Color.accent)
         }
-        .pulseCard()
+        .dsCard()
     }
 
     // MARK: - 卡路里
 
     private var caloriesSection: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.s) {
             Text("Calories (optional)")
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyL)
+                .foregroundStyle(DS.Color.ink)
 
             TextField("e.g. 350", text: $calories)
                 .keyboardType(.numberPad)
-                .font(PulseTheme.bodyFont)
-                .foregroundStyle(PulseTheme.textPrimary)
-                .padding(PulseTheme.spacingM)
+                .font(DS.Typography.body)
+                .foregroundStyle(DS.Color.ink)
+                .padding(DS.Spacing.m)
                 .background(
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                        .fill(PulseTheme.surface)
+                    RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                        .fill(DS.Color.bgElev)
                 )
         }
-        .pulseCard()
+        .dsCard()
     }
 
     // MARK: - 肌群
 
     private var muscleGroupSection: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.s) {
             Text("Muscle Groups")
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyL)
+                .foregroundStyle(DS.Color.ink)
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 4), spacing: 8) {
                 ForEach(MuscleGroup.allCases) { group in
@@ -175,18 +175,18 @@ struct ManualWorkoutView: View {
                     } label: {
                         VStack(spacing: 4) {
                             Text(group.emoji)
-                                .font(.system(size: 16))
+                                .font(DS.Typography.body)
                             Text(group.label)
-                                .font(.system(size: 10, weight: selected ? .semibold : .regular))
-                                .foregroundStyle(selected ? group.color : PulseTheme.textTertiary)
+                                .font(DS.Typography.mono)
+                                .foregroundStyle(selected ? group.color : DS.Color.inkDim)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.7)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
+                        .padding(.vertical, DS.Spacing.s)
                         .background(
                             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(selected ? group.color.opacity(0.15) : PulseTheme.surface)
+                                .fill(selected ? group.color.opacity(0.15) : DS.Color.bgElev)
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -197,28 +197,28 @@ struct ManualWorkoutView: View {
                 }
             }
         }
-        .pulseCard()
+        .dsCard()
     }
 
     // MARK: - 备注
 
     private var notesSection: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.s) {
             Text("Notes (optional)")
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyL)
+                .foregroundStyle(DS.Color.ink)
 
             TextField(String(localized: "How did it feel?"), text: $notes, axis: .vertical)
-                .font(PulseTheme.bodyFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.body)
+                .foregroundStyle(DS.Color.ink)
                 .lineLimit(3...6)
-                .padding(PulseTheme.spacingM)
+                .padding(DS.Spacing.m)
                 .background(
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                        .fill(PulseTheme.surface)
+                    RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                        .fill(DS.Color.bgElev)
                 )
         }
-        .pulseCard()
+        .dsCard()
     }
 
     // MARK: - 保存
@@ -229,13 +229,13 @@ struct ManualWorkoutView: View {
             dismiss()
         } label: {
             Text("Save Workout")
-                .font(PulseTheme.bodyFont.weight(.semibold))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.body.weight(.semibold))
+                .foregroundStyle(DS.Color.ink)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                .padding(.vertical, DS.Spacing.m)
                 .background(
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .fill(PulseTheme.accent)
+                    RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                        .fill(DS.Color.accent)
                 )
         }
         .buttonStyle(.plain)

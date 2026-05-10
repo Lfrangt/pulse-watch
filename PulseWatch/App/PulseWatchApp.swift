@@ -216,7 +216,7 @@ struct MainTabView: View {
                 }
                 .tag(0)
 
-            WorkoutView()
+            TrainingView()
                 .tabItem {
                     Label(String(localized: "Exercise"), systemImage: "figure.run")
                         .accessibilityLabel(String(localized: "Exercise"))

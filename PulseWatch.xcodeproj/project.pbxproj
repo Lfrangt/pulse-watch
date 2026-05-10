@@ -184,6 +184,7 @@
 		F1F518A15DA7B73F41229690 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FFFEBEA80AE5F444B45E97E /* Card.swift */; };
 		F4B3BFD8FCB29275EBFC3C6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 691CF6519E17F0083CE8A11B /* Assets.xcassets */; };
 		F7CE1B220148D4D2F89B11E0 /* GoogleHealthAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4439447C7945993E01B2DF /* GoogleHealthAuth.swift */; };
+		4E246430674AD9A65B41F0EB /* GoogleHealthFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4C0D058DF4E258CFD0087B /* GoogleHealthFetcher.swift */; };
 		F8177CBBA3F13228F6789DC2 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24D4B80B8A0AE76ECAF39C6 /* HealthKitManager.swift */; };
 		FA5FEC930F0EF865D6BF4BE7 /* HealthRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423E402954856FBC1F53AFD4 /* HealthRecord.swift */; };
 		FBF9978DF44F2F341324D64A /* WorkoutHistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8C1678E009592879DFAACC /* WorkoutHistoryEntry.swift */; };
@@ -360,6 +361,7 @@
 		C97109479A7A9833D9887F50 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		CA37A9F3F85218835E55B1C2 /* VitalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VitalDetailView.swift; sourceTree = "<group>"; };
 		CC4439447C7945993E01B2DF /* GoogleHealthAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleHealthAuth.swift; sourceTree = "<group>"; };
+		AF4C0D058DF4E258CFD0087B /* GoogleHealthFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleHealthFetcher.swift; sourceTree = "<group>"; };
 		CD95A9E97EC1B3355056FD4B /* PulseWatchWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PulseWatchWidget.entitlements; sourceTree = "<group>"; };
 		CF3E17F0CFFCA3AE1F152110 /* Timeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timeline.swift; sourceTree = "<group>"; };
 		CF79FB4DE1FF6C33541719F6 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
@@ -476,6 +478,7 @@
 				63297E7E4D464EC073735FB3 /* CorrelationService.swift */,
 				E5FB0885FD11CEE3AFFABF82 /* DataExportService.swift */,
 				CC4439447C7945993E01B2DF /* GoogleHealthAuth.swift */,
+				AF4C0D058DF4E258CFD0087B /* GoogleHealthFetcher.swift */,
 				624D05567DAEB29F5F5F6D38 /* GymCoordinator.swift */,
 				749A187F075B3040BC72947E /* HealthAnalyzer.swift */,
 				62B314F45ABCFD3CDEFC751D /* HealthDataService.swift */,
@@ -1073,6 +1076,7 @@
 				58DC0E4B5DB4AEFAC8A50CAB /* GoalProgressCard.swift in Sources */,
 				7A86D904A3C0EA6697564ADF /* GoalSettingView.swift in Sources */,
 				F7CE1B220148D4D2F89B11E0 /* GoogleHealthAuth.swift in Sources */,
+				4E246430674AD9A65B41F0EB /* GoogleHealthFetcher.swift in Sources */,
 				C8990A8AFC1244F626875120 /* GymArrivalFlowView.swift in Sources */,
 				6D78E19149EBA723FFBE2C66 /* GymCoordinator.swift in Sources */,
 				DDD48BA6186F2B46986943F5 /* HealthAgeService.swift in Sources */,

@@ -59,6 +59,7 @@ struct SettingsView: View {
     @State private var showDisconnectGoogleHealthAlert = false
 
     @ObservedObject private var googleHealth = GoogleHealthAuth.shared
+    private var googleHealthService = GoogleHealthService.shared
 
     @AppStorage("pulse.openclaw.gatewayURL") private var savedGatewayURL = ""
     @AppStorage("pulse.openclaw.agentID") private var savedAgentID = "openclaw:main"
@@ -676,25 +677,89 @@ struct SettingsView: View {
             if case .error = state { return true }
             return false
         }()
-        return SettingsRow(
-            label: isConnecting
-                ? String(localized: "Connecting…")
-                : (isConnected
-                    ? String(localized: "Google Health Active")
-                    : String(localized: "Connect Google Health")),
-            valueText: isConnected
-                ? String(localized: "Fitbit · Pixel")
-                : (isError ? String(localized: "Retry") : ""),
-            chevron: !isConnecting,
-            action: {
-                if isConnecting { return }
+        let subtitle = googleHealthSubtitle(
+            isConnected: isConnected,
+            snapshot: googleHealthService.snapshot
+        )
+        return Button {
+            if isConnecting { return }
+            if isConnected {
+                showDisconnectGoogleHealthAlert = true
+            } else {
+                showConnectGoogleHealthAlert = true
+            }
+        } label: {
+            HStack(spacing: 10) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(isConnecting
+                         ? String(localized: "Connecting…")
+                         : (isConnected
+                            ? String(localized: "Google Health Active")
+                            : String(localized: "Connect Google Health")))
+                        .font(DS.Typography.body.weight(.medium))
+                        .foregroundStyle(DS.Color.ink)
+                    if let subtitle {
+                        Text(subtitle)
+                            .font(DS.Typography.caption)
+                            .foregroundStyle(DS.Color.inkDim)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
                 if isConnected {
-                    showDisconnectGoogleHealthAlert = true
-                } else {
-                    showConnectGoogleHealthAlert = true
+                    Text(String(localized: "Fitbit · Pixel"))
+                        .font(DS.Typography.monoL)
+                        .foregroundStyle(DS.Color.inkDim)
+                } else if isError {
+                    Text(String(localized: "Retry"))
+                        .font(DS.Typography.monoL)
+                        .foregroundStyle(DS.Color.inkDim)
+                }
+
+                if !isConnecting {
+                    Text("→")
+                        .font(DS.Typography.mono)
+                        .tracking(DS.Tracking.mono)
+                        .foregroundStyle(DS.Color.inkDim)
                 }
             }
-        )
+            .padding(.horizontal, 18)
+            .padding(.vertical, 14)
+            .contentShape(Rectangle())
+            .overlay(alignment: .top) {
+                Rectangle()
+                    .fill(DS.Color.lineSoft)
+                    .frame(height: DS.Stroke.hairline)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func googleHealthSubtitle(isConnected: Bool, snapshot: GoogleHealthSnapshot?) -> String? {
+        if isConnected {
+            guard let snapshot else {
+                return String(localized: "Syncing…")
+            }
+            var parts: [String] = []
+            if let hr = snapshot.heartRate {
+                parts.append(String(format: "HR: %d bpm", Int(hr)))
+            }
+            if let steps = snapshot.steps {
+                let formatter = NumberFormatter()
+                formatter.numberStyle = .decimal
+                let formatted = formatter.string(from: NSNumber(value: steps)) ?? "\(steps)"
+                parts.append(String(format: "Steps: %@", formatted))
+            }
+            if parts.isEmpty {
+                let formatter = DateFormatter()
+                formatter.timeStyle = .short
+                formatter.dateStyle = .none
+                return String(format: String(localized: "Last sync %@"), formatter.string(from: snapshot.fetchedAt))
+            }
+            return parts.joined(separator: " · ")
+        } else {
+            return String(localized: "Connects Pixel Watch / Fitbit Air data")
+        }
     }
 
     private var openClawConnectionRow: some View {

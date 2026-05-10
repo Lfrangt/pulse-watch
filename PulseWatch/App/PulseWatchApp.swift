@@ -109,6 +109,13 @@ struct PulseWatchApp: App {
                 OpenClawBridge.shared.checkAndPushIfNeeded()
             }
         }
+
+        #if os(iOS)
+        // Google Health — refresh on launch if already connected
+        Task { @MainActor in
+            await GoogleHealthService.shared.refresh()
+        }
+        #endif
     }
 
     var body: some Scene {

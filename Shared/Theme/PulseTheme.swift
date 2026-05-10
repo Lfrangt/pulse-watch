@@ -3,181 +3,131 @@ import SwiftUI
 import UIKit
 #endif
 
-// MARK: - Pulse Design System v2 — Clinical
-// Direction: Medical/dashboard minimalism (Apple Health + Luma references)
-// Two themes: Light (warm paper #F7F6F2) + Dark (true black #000)
-// Type: SF Pro Rounded for metrics (tabular), SF Pro Text for body, SF Mono for units
-// Rules: data is decoration, no gradients/glass/shadows except overlays,
-//        single functional accent (desaturated teal), hairline borders replace shadows.
+// MARK: - Pulse Design System v2 — DS shim
+//
+// Phase 5 collapses the v1 PulseTheme namespace into a thin forwarding layer
+// over DS.Color / DS.Spacing / DS.Radius / DS.Typography / DS.Motion. Every
+// `PulseTheme.X` reference in legacy services / models / KEEP-MIGRATE
+// components (which R11 forbids touching) now resolves to the v2 Clinical
+// design tokens.
+//
+// New code MUST use DS.* directly. PulseTheme.X is preserved only so the
+// untouched service / model layer compiles.
 
 enum PulseTheme {
 
-    // MARK: - Dynamic color helpers
-
-    private static func dyn(light: UInt32, dark: UInt32) -> Color {
-        #if os(watchOS)
-        return Color(rgb: dark)
-        #elseif canImport(UIKit)
-        return Color(UIColor { trait in
-            UIColor(rgb: trait.userInterfaceStyle == .dark ? dark : light)
-        })
-        #else
-        return Color(rgb: dark)
-        #endif
-    }
-
-    private static func dynA(light: (UInt32, Double), dark: (UInt32, Double)) -> Color {
-        #if os(watchOS)
-        return Color(rgb: dark.0).opacity(dark.1)
-        #elseif canImport(UIKit)
-        return Color(UIColor { trait in
-            let (hex, alpha) = trait.userInterfaceStyle == .dark ? dark : light
-            return UIColor(rgb: hex, alpha: alpha)
-        })
-        #else
-        return Color(rgb: dark.0).opacity(dark.1)
-        #endif
-    }
-
     // MARK: - Surfaces
-
-    static let background       = dyn(light: 0xF7F6F2, dark: 0x000000)
-    static let surface          = dyn(light: 0xFFFFFF, dark: 0x141414)
-    static let surface2         = dyn(light: 0xFFFFFF, dark: 0x1A1A1A)
-    static let cardBackground   = dyn(light: 0xFFFFFF, dark: 0x141414)
-    static let cardElevated     = dyn(light: 0xFBFAF7, dark: 0x1F1F1F)
-    static let border           = dyn(light: 0xE8E5DC, dark: 0x2A2A2A)
-    static let borderStrong     = dyn(light: 0xD4CFC0, dark: 0x363636)
-    static let divider          = dyn(light: 0xEFECE4, dark: 0x171717)
-    static let highlight        = dynA(light: (0x000000, 0.03), dark: (0xFFFFFF, 0.04))
-    static let warmHighlight    = highlight
-    static let scrim            = dynA(light: (0x000000, 0.06), dark: (0x000000, 0.60))
+    static let background       = DS.Color.bg
+    static let surface          = DS.Color.bgElev
+    static let surface2         = DS.Color.bgElev
+    static let cardBackground   = DS.Color.bgElev
+    static let cardElevated     = DS.Color.bgElev
+    static let border           = DS.Color.line
+    static let borderStrong     = DS.Color.line
+    static let divider          = DS.Color.lineSoft
+    static let highlight        = DS.Color.chipBg
+    static let warmHighlight    = DS.Color.chipBg
+    static let scrim            = Color.black.opacity(0.6)
 
     // MARK: - Foreground
+    static let textPrimary      = DS.Color.ink
+    static let textSecondary    = DS.Color.inkMid
+    static let textTertiary     = DS.Color.inkDim
+    static let textQuaternary   = DS.Color.inkDim
 
-    static let textPrimary      = dynA(light: (0x17161A, 1.00), dark: (0xF5F5F0, 1.00))
-    static let textSecondary    = dynA(light: (0x52504C, 1.00), dark: (0xF5F5F0, 0.60))
-    static let textTertiary     = dynA(light: (0x8A867E, 1.00), dark: (0xF5F5F0, 0.40))
-    static let textQuaternary   = dynA(light: (0xB7B2A6, 1.00), dark: (0xF5F5F0, 0.20))
+    // MARK: - Accent (single mono accent per v2 Clinical)
+    static let accent           = DS.Color.accent
+    static let accentTeal       = DS.Color.accent
+    static let accentSoft       = DS.Color.accent.opacity(0.12)
+    static let accentStrong     = DS.Color.accent
 
-    // MARK: - Accent — desaturated medical teal (single functional accent)
+    // MARK: - Status
+    static let statusGood       = DS.Color.good
+    static let statusWarning    = DS.Color.warn
+    static let statusPoor       = DS.Color.bad
+    static let statusModerate   = DS.Color.warn
 
-    static let accent           = dyn(light: 0x0A7E8C, dark: 0x4FD9E6)
-    static let accentTeal       = accent
-    static let accentSoft       = dynA(light: (0x0A7E8C, 0.10), dark: (0x4FD9E6, 0.14))
-    static let accentStrong     = dyn(light: 0x086570, dark: 0x7FE6F0)
+    // MARK: - Legacy multi-color aliases — all retired to single accent.
+    static let sleepViolet      = DS.Color.accent
+    static let activityCoral    = DS.Color.accent
+    static let positiveGreen    = DS.Color.good
+    static let sleepAccent      = DS.Color.accent
+    static let activityAccent   = DS.Color.accent
+    static let trendBlue        = DS.Color.accent
+    static let hrvBlue          = DS.Color.accent
+    static let chartPurple      = DS.Color.accent
 
-    // MARK: - Status (medical-appropriate desaturated)
-
-    static let statusGood       = dyn(light: 0x2F9E5C, dark: 0x6BD393)
-    static let statusWarning    = dyn(light: 0xC28A2C, dark: 0xE8B24F)
-    static let statusPoor       = dyn(light: 0xC43E28, dark: 0xF07A5F)
-    static let statusModerate   = dyn(light: 0x6B5FC2, dark: 0xA898F5)
-
-    // MARK: - Legacy multi-color aliases — all retired to single accent
-    // v2 Clinical: data is decoration; semantic distinction lives in icon + label,
-    // not color. These tokens stay name-compatible so views compile, but every
-    // chart / metric / decorative usage now resolves to the single teal accent.
-    // Real status semantics (statusGood / Warning / Poor / Moderate) stay below.
-
-    static let sleepViolet      = accent
-    static let activityCoral    = accent
-    static let positiveGreen    = statusGood
-    static let sleepAccent      = accent
-    static let activityAccent   = accent
-    static let trendBlue        = accent
-    static let hrvBlue          = accent
-    static let chartPurple      = accent
-
-    // MARK: - Heart Rate Zones (Z1 → Z5)
-
-    static let zoneRest         = dyn(light: 0x6FA8DC, dark: 0x6FA8DC)
-    static let zoneFatBurn      = dyn(light: 0x2F9E5C, dark: 0x6BD393)
-    static let zoneCardio       = dyn(light: 0xC28A2C, dark: 0xE8B24F)
-    static let zonePeak         = dyn(light: 0xD97A2B, dark: 0xF09A4F)
-    static let zoneMax          = dyn(light: 0xC43E28, dark: 0xF07A5F)
+    // MARK: - HR Zones (Z1 → Z5) — clinical neutral progression.
+    static let zoneRest         = DS.Color.lineSoft
+    static let zoneFatBurn      = DS.Color.inkDim
+    static let zoneCardio       = DS.Color.accent
+    static let zonePeak         = DS.Color.warn
+    static let zoneMax          = DS.Color.bad
     static let zoneColors: [Color] = [zoneRest, zoneFatBurn, zoneCardio, zonePeak, zoneMax]
 
     // MARK: - Muscle status
+    static let muscleHealthy    = DS.Color.good
+    static let muscleFatigued   = DS.Color.bad
 
-    static let muscleHealthy    = statusGood
-    static let muscleFatigued   = statusPoor
+    // MARK: - Typography (forward to DS.Typography)
+    static let displayFont: Font     = DS.Typography.display3
+    static let titleFont: Font       = DS.Typography.title1
+    static let title2Font: Font      = DS.Typography.title2
+    static let headlineFont: Font    = DS.Typography.bodyL
+    static let bodyFont: Font        = DS.Typography.body
+    static let bodyStrongFont: Font  = DS.Typography.body.weight(.medium)
+    static let calloutFont: Font     = DS.Typography.bodyS
+    static let footnoteFont: Font    = DS.Typography.caption
+    static let captionFont: Font     = DS.Typography.caption
+    static let eyebrowFont: Font     = DS.Typography.mono
 
-    // MARK: - Typography
-    // SF Pro Rounded for metrics, SF Pro Text for body, SF Mono for units
-    // Hierarchy by size, not weight. Tabular numerics on all data.
+    static let metricXLFont: Font    = DS.Typography.display2
+    static let metricLFont: Font     = DS.Typography.display3
+    static let metricMFont: Font     = DS.Typography.title1
+    static let metricSFont: Font     = DS.Typography.title2
 
-    static let displayFont: Font     = .system(size: 56, weight: .bold,     design: .rounded)
-    static let titleFont: Font       = .system(size: 34, weight: .bold,     design: .rounded)
-    static let title2Font: Font      = .system(size: 22, weight: .semibold, design: .rounded)
-    static let headlineFont: Font    = .system(size: 17, weight: .semibold, design: .rounded)
-    static let bodyFont: Font        = .system(size: 15, weight: .regular)
-    static let bodyStrongFont: Font  = .system(size: 15, weight: .medium)
-    static let calloutFont: Font     = .system(size: 13, weight: .medium)
-    static let footnoteFont: Font    = .system(size: 12, weight: .regular)
-    static let captionFont: Font     = .system(size: 11, weight: .semibold)
-    static let eyebrowFont: Font     = .system(size: 10, weight: .semibold)
+    static let unitFont: Font        = DS.Typography.monoL
+    static let monoFont: Font        = DS.Typography.mono
 
-    // Metric scale — tabular numerics
-    static let metricXLFont: Font    = .system(size: 72, weight: .bold,     design: .rounded).monospacedDigit()
-    static let metricLFont: Font     = .system(size: 44, weight: .semibold, design: .rounded).monospacedDigit()
-    static let metricMFont: Font     = .system(size: 28, weight: .semibold, design: .rounded).monospacedDigit()
-    static let metricSFont: Font     = .system(size: 20, weight: .semibold, design: .rounded).monospacedDigit()
+    static let scoreFont: Font       = DS.Typography.display3
+    static let metricFont: Font      = DS.Typography.title1
+    static let metricLabelFont: Font = DS.Typography.mono
 
-    // Mono unit/timestamp
-    static let unitFont: Font        = .system(size: 13, weight: .medium, design: .monospaced)
-    static let monoFont: Font        = .system(size: 13, weight: .regular, design: .monospaced)
+    static let captionTracking: CGFloat = DS.Tracking.mono
+    static let eyebrowTracking: CGFloat = DS.Tracking.mono
 
-    // Legacy aliases
-    static let scoreFont: Font       = metricLFont
-    static let metricFont: Font      = metricMFont
-    static let metricLabelFont: Font = eyebrowFont
+    // MARK: - Spacing (mapped onto DS.Spacing)
+    static let spacingXS: CGFloat  = DS.Spacing.xs
+    static let spacingS:  CGFloat  = DS.Spacing.s
+    static let spacingM:  CGFloat  = DS.Spacing.m
+    static let spacingL:  CGFloat  = DS.Spacing.l
+    static let spacingXL: CGFloat  = DS.Spacing.xl
+    static let spacing2XL: CGFloat = DS.Spacing.xxl
 
-    // Tracking (points, not em)
-    static let captionTracking: CGFloat = 0.66   // ~0.06em at 11pt
-    static let eyebrowTracking: CGFloat = 2.2    // ~0.22em at 10pt
+    // MARK: - Radius
+    static let radiusXS: CGFloat = DS.Radius.chip
+    static let radiusS:  CGFloat = DS.Radius.chip
+    static let radiusM:  CGFloat = DS.Radius.inner
+    static let radiusL:  CGFloat = DS.Radius.card
+    static let radiusXL: CGFloat = DS.Radius.card
 
-    // MARK: - Spacing (4-based)
+    // MARK: - Stroke
+    static let hairline: CGFloat = DS.Stroke.hairline
 
-    static let spacingXS: CGFloat  = 4
-    static let spacingS:  CGFloat  = 8
-    static let spacingM:  CGFloat  = 16
-    static let spacingL:  CGFloat  = 24
-    static let spacingXL: CGFloat  = 32
-    static let spacing2XL: CGFloat = 48
-
-    // MARK: - Corner Radius
-
-    static let radiusXS: CGFloat = 6    // pills
-    static let radiusS:  CGFloat = 10   // small buttons, inputs
-    static let radiusM:  CGFloat = 14   // metric tiles, buttons
-    static let radiusL:  CGFloat = 19   // cards, sheets
-    static let radiusXL: CGFloat = 28   // bottom sheets
-
-    // MARK: - Borders
-
-    static let hairline: CGFloat = 1
-
-    // MARK: - Shadows
-    // Clinical: shadows reserved for popovers/sheets only — cards rely on hairline borders.
-    // Legacy properties kept near-invisible for backward compat.
-
-    static let cardShadow: Color = .black.opacity(0.04)
-    static let popShadow:  Color = .black.opacity(0.10)
+    // MARK: - Shadows — R7 forbids shadows. Tokens kept clear for backward compat.
+    static let cardShadow: Color = .clear
+    static let popShadow:  Color = .clear
     static let glowShadow: Color = .clear
 
-    // MARK: - Animation
-    // easeOut only, no bounce. Fast/normal/slow durations.
-
-    static let animationFast:      Animation = .easeOut(duration: 0.15)
-    static let animationNormal:    Animation = .easeOut(duration: 0.22)
-    static let animationSlow:      Animation = .easeOut(duration: 0.35)
+    // MARK: - Animation (forward to DS.Motion)
+    static let animationFast:      Animation = DS.Motion.tabSwitch
+    static let animationNormal:    Animation = DS.Motion.scoreChange
+    static let animationSlow:      Animation = DS.Motion.scoreChange
     static let animationBreathing: Animation = .easeInOut(duration: 4).repeatForever(autoreverses: true)
 
-    // MARK: - Gradients (legacy compat — flattened to clinical)
-
+    // MARK: - Gradients (legacy compat — flattened to flat surfaces per v2 Clinical)
     static let heroGradient = LinearGradient(
-        colors: [background, background],
+        colors: [DS.Color.bg, DS.Color.bg],
         startPoint: .top, endPoint: .bottom
     )
 
@@ -194,12 +144,11 @@ enum PulseTheme {
     }
 
     // MARK: - Helpers
-
     static func statusColor(for score: Int) -> Color {
         switch score {
-        case 0..<40:  return statusPoor
-        case 40..<70: return statusModerate
-        default:      return statusGood
+        case 0..<40:  return DS.Color.bad
+        case 40..<70: return DS.Color.warn
+        default:      return DS.Color.good
         }
     }
 
@@ -214,57 +163,66 @@ enum PulseTheme {
     }
 }
 
-// MARK: - Card Modifier — Clinical (opaque + hairline + 19pt)
+// MARK: - Card modifier (mirror of DS.Card primitive — forwarded for legacy callers)
 
 struct PulseCardStyle: ViewModifier {
-    var padding: CGFloat = PulseTheme.spacingL
+    var padding: CGFloat = DS.Spacing.l
 
     func body(content: Content) -> some View {
         content
             .padding(padding)
-            .background(PulseTheme.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous))
+            .background(DS.Color.bgElev)
+            .clipShape(RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                    .stroke(DS.Color.line, lineWidth: DS.Stroke.hairline)
             )
     }
 }
 
 extension View {
-    func pulseCard(padding: CGFloat = PulseTheme.spacingL) -> some View {
+    /// Legacy `.pulseCard()` — forwards to DS-tokenised PulseCardStyle.
+    func pulseCard(padding: CGFloat = DS.Spacing.l) -> some View {
         modifier(PulseCardStyle(padding: padding))
     }
 
-    /// Eyebrow label: 10pt semibold, ALL CAPS, +0.22em tracking, fg-3.
+    /// Legacy `.pulseEyebrow()` — small mono uppercase + tracking + inkMid.
     func pulseEyebrow() -> some View {
-        self.font(PulseTheme.eyebrowFont)
-            .tracking(PulseTheme.eyebrowTracking)
+        self.font(DS.Typography.mono)
+            .tracking(DS.Tracking.mono)
             .textCase(.uppercase)
-            .foregroundStyle(PulseTheme.textTertiary)
+            .foregroundStyle(DS.Color.inkDim)
     }
 
-    /// Hairline border at given radius.
-    func pulseHairline(radius: CGFloat = PulseTheme.radiusL) -> some View {
+    /// Legacy `.pulseHairline()` — overlay rounded rect with line stroke.
+    func pulseHairline(radius: CGFloat = DS.Radius.card) -> some View {
         self.overlay(
             RoundedRectangle(cornerRadius: radius, style: .continuous)
-                .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
+                .stroke(DS.Color.line, lineWidth: DS.Stroke.hairline)
         )
     }
 }
 
-// MARK: - Staggered appearance
+// MARK: - Staggered entrance (legacy decoration — opacity + offset, no harm under
+// reduce motion since the move is small).
 
 struct StaggeredAppear: ViewModifier {
     let index: Int
     @State private var appeared = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
         content
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 20)
             .onAppear {
-                withAnimation(.easeOut(duration: 0.35).delay(Double(index) * 0.08)) {
+                let anim = DS.Motion.respecting(
+                    .easeOut(duration: 0.35).delay(Double(index) * 0.08),
+                    reduce: reduceMotion
+                )
+                if let anim {
+                    withAnimation(anim) { appeared = true }
+                } else {
                     appeared = true
                 }
             }
@@ -290,42 +248,40 @@ extension View {
     }
 }
 
-// MARK: - Buttons — Clinical
+// MARK: - Button styles (legacy — both forward to clinical DS surfaces)
 
-/// Primary: inverted fg/bg pattern (data-as-decoration aesthetic).
 struct PulseButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(PulseTheme.bodyStrongFont)
-            .foregroundStyle(PulseTheme.background)
+            .font(DS.Typography.body.weight(.medium))
+            .foregroundStyle(DS.Color.bg)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
+            .padding(.vertical, DS.Spacing.card)
             .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                    .fill(PulseTheme.textPrimary)
+                RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                    .fill(DS.Color.ink)
             )
             .opacity(configuration.isPressed ? 0.88 : 1)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
-            .animation(PulseTheme.animationFast, value: configuration.isPressed)
     }
 }
 
-/// Secondary: tinted accent, used sparingly.
 struct PulseSecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(PulseTheme.bodyStrongFont)
-            .foregroundStyle(PulseTheme.accent)
-            .padding(.horizontal, PulseTheme.spacingL)
-            .padding(.vertical, PulseTheme.spacingS)
-            .background(PulseTheme.accentSoft)
-            .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous))
+            .font(DS.Typography.body.weight(.medium))
+            .foregroundStyle(DS.Color.accent)
+            .padding(.horizontal, DS.Spacing.l)
+            .padding(.vertical, DS.Spacing.s)
+            .background(DS.Color.accent.opacity(0.12))
+            .clipShape(RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous))
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
-            .animation(PulseTheme.animationFast, value: configuration.isPressed)
     }
 }
 
-// MARK: - Color helpers
+// MARK: - Color hex helpers (preserved — used by legacy services / models that
+// build colors from hex strings or UInt32 RGB. Kept distinct from DS.swift's
+// single-arg rgb initialiser by the alpha parameter.)
 
 extension Color {
     init(hex: String) {

@@ -10,12 +10,19 @@ struct HeroScore: View {
     var trendData: [Double] = []
     var trendLabel: String = "30d Trend"
     var dateLabel: String
+    /// Optional baseline delta — e.g. "+6 vs 7d" — rendered as a small mono
+    /// label opposite the dateLabel. Preserves the v1 hero's "vs 7-day avg"
+    /// affordance under R11.
+    var baselineDelta: (text: String, tone: MonoTone)? = nil
 
     var body: some View {
         VStack(alignment: .center, spacing: DS.Spacing.l) {
-            HStack {
+            HStack(alignment: .firstTextBaseline) {
                 MonoLabel(text: dateLabel, size: .m)
                 Spacer()
+                if let baselineDelta {
+                    MonoLabel(text: baselineDelta.text, size: .s, tone: baselineDelta.tone)
+                }
             }
             ScoreDial(score: score, status: status)
             if let insightText {

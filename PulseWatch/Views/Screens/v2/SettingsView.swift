@@ -345,8 +345,9 @@ struct SettingsView: View {
                         .lineLimit(1)
                 }
                 Spacer()
-                Image(systemName: "chevron.right")
-                    .font(DS.Typography.bodyS.weight(.semibold))
+                Text("→")
+                    .font(DS.Typography.mono)
+                    .tracking(DS.Tracking.mono)
                     .foregroundStyle(DS.Color.inkDim)
             }
             .dsCard(padding: DS.Spacing.l)
@@ -990,9 +991,10 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 12) {
                         if isPaired, let cfg = bridge.config {
-                            HStack(spacing: 8) {
-                                Image(systemName: "checkmark.seal.fill")
-                                    .foregroundStyle(DS.Color.good)
+                            HStack(spacing: DS.Spacing.s) {
+                                Circle()
+                                    .fill(DS.Color.good)
+                                    .frame(width: DS.Spacing.s, height: DS.Spacing.s)
                                 Text(String(localized: "Connected"))
                                     .font(DS.Typography.body.weight(.medium))
                                     .foregroundStyle(DS.Color.ink)
@@ -1017,17 +1019,28 @@ struct SettingsView: View {
                             showQRScanner = true
                         }
                     } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "qrcode.viewfinder")
+                        HStack(spacing: DS.Spacing.s) {
+                            Text("[QR]")
+                                .font(DS.Typography.mono)
+                                .tracking(DS.Tracking.mono)
                             Text(isPaired ? String(localized: "Scan to reconnect") : String(localized: "Scan to connect"))
+                                .font(DS.Typography.body)
                         }
+                        .foregroundStyle(DS.Color.accent)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, DS.Spacing.m)
+                        .background(
+                            RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                                .fill(DS.Color.accent.opacity(0.12))
+                        )
                     }
-                    .buttonStyle(PulseSecondaryButtonStyle())
-                    .padding(.horizontal, 16)
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, DS.Spacing.l)
 
-                    HStack(spacing: 6) {
-                        Image(systemName: "terminal")
-                            .font(DS.Typography.caption)
+                    HStack(spacing: DS.Spacing.xs) {
+                        Text(">_")
+                            .font(DS.Typography.mono)
+                            .tracking(DS.Tracking.mono)
                         Text("openclaw pair --qr")
                             .font(DS.Typography.monoL)
                     }
@@ -1237,8 +1250,9 @@ private struct SettingsRow<Trailing: View>: View {
             builder()
 
             if chevron {
-                Image(systemName: "chevron.right")
-                    .font(DS.Typography.caption.weight(.semibold))
+                Text("→")
+                    .font(DS.Typography.mono)
+                    .tracking(DS.Tracking.mono)
                     .foregroundStyle(DS.Color.inkDim)
             }
         }
@@ -1350,8 +1364,9 @@ private struct SettingsNavRow<Destination: View>: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                Image(systemName: "chevron.right")
-                    .font(DS.Typography.caption.weight(.semibold))
+                Text("→")
+                    .font(DS.Typography.mono)
+                    .tracking(DS.Tracking.mono)
                     .foregroundStyle(DS.Color.inkDim)
             }
             .padding(.horizontal, 18)

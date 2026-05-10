@@ -142,7 +142,7 @@ struct TodayView: View {
     private var navDateLabel: String {
         let f = DateFormatter()
         f.locale = .current
-        f.dateFormat = isChinese ? "M月d日 EEEE" : "EEE · MMM d"
+        f.dateFormat = isChinese ? "M月d日" : "MMM d"
         return String(localized: "Today") + " · " + f.string(from: .now)
     }
 
@@ -158,7 +158,8 @@ struct TodayView: View {
                 insightLabel: String(localized: "Today's coach"),
                 trendData: trendDataForHero(),
                 trendLabel: String(localized: "30d Trend"),
-                dateLabel: String(localized: "Readiness")
+                dateLabel: String(localized: "Readiness"),
+                baselineDelta: heroBaselineDelta(score: brief.score)
             )
             confidenceFooter
         } else if isLoading {
@@ -168,6 +169,20 @@ struct TodayView: View {
         } else {
             emptyHero
         }
+    }
+
+    private func heroBaselineDelta(score: Int) -> (text: String, tone: MonoTone)? {
+        let prior = sevenDayPriorScores().compactMap { $0 }
+        guard !prior.isEmpty else { return nil }
+        let baseline = prior.reduce(0, +) / prior.count
+        let diff = score - baseline
+        if diff == 0 {
+            return (String(format: String(localized: "= 7d avg %d"), baseline), .dim)
+        }
+        let sign = diff > 0 ? "+" : ""
+        let label = String(format: String(localized: "%@%d vs 7d avg"), sign, diff)
+        let tone: MonoTone = diff > 0 ? .good : .warn
+        return (label, tone)
     }
 
     private func trendDataForHero() -> [Double] {

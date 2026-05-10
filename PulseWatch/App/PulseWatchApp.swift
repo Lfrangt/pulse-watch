@@ -188,18 +188,17 @@ struct MainTabView: View {
 
     @State private var selectedTab = 0
     init() {
-        // 自定义 TabBar 外观
+        // v2 Clinical TabBar — DS-tokenised: bg surface + line hairline + accent selection.
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(PulseTheme.background)
-        appearance.shadowColor = .clear
-        // Remove iOS 18 tab selection background pill
+        appearance.backgroundColor = UIColor(DS.Color.bg)
+        appearance.shadowColor = UIColor(DS.Color.line)
         let itemAppearance = UITabBarItemAppearance()
-        itemAppearance.normal.iconColor = UIColor(PulseTheme.textTertiary)
-        itemAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(PulseTheme.textTertiary)]
-        itemAppearance.selected.iconColor = UIColor(PulseTheme.accent)
-        itemAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(PulseTheme.accent)]
-        appearance.selectionIndicatorTintColor = UIColor.white.withAlphaComponent(0.1)
+        itemAppearance.normal.iconColor = UIColor(DS.Color.inkDim)
+        itemAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(DS.Color.inkDim)]
+        itemAppearance.selected.iconColor = UIColor(DS.Color.accent)
+        itemAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(DS.Color.accent)]
+        appearance.selectionIndicatorTintColor = .clear
         appearance.stackedLayoutAppearance = itemAppearance
         appearance.inlineLayoutAppearance = itemAppearance
         appearance.compactInlineLayoutAppearance = itemAppearance

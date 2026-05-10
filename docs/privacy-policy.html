@@ -169,7 +169,7 @@
             <p class="updated">Effective Date: April 2, 2026</p>
 
             <div class="summary-box">
-                Pulse is privacy-first. <strong>All your health data stays on your device.</strong> We never collect, store, or transmit your personal health information to any external server.
+                Pulse is privacy-first. <strong>All your health data stays on your device by default.</strong> If you optionally enable the DeepSeek AI Coach feature, aggregated health summaries are sent to DeepSeek's API. This is strictly opt-in — core features never transmit any health data externally.
             </div>
 
             <!-- 1. What Data We Access -->
@@ -199,7 +199,7 @@
                 </tbody>
             </table>
 
-            <p><strong>All HealthKit data is processed and stored locally on your device using Apple's SwiftData framework. It is never transmitted to external servers.</strong></p>
+            <p><strong>All HealthKit data is processed and stored locally on your device using Apple's SwiftData framework. It is never transmitted to external servers, except when you explicitly opt into the DeepSeek AI Coach feature (see Section 3).</strong></p>
 
             <h3>Location Data</h3>
             <p>Pulse uses location services solely to detect when you arrive at a saved gym location for automatic training suggestions. Location data is processed entirely on-device. It is <strong>never uploaded to any server</strong> and never shared with third parties.</p>
@@ -240,8 +240,18 @@
                 </ul>
                 <p>We do not operate, host, or have access to your OpenClaw gateway.</p>
 
+                <h3>DeepSeek AI Coach (Optional, Internet)</h3>
+                <p>If you choose to enable the DeepSeek AI Coach in Settings, the app sends aggregated health summaries (e.g., daily recovery score, recent HRV trend) to <a href="https://www.deepseek.com/privacy" target="_blank">DeepSeek's API</a> (api.deepseek.com) to generate personalized coaching advice. This feature is:</p>
+                <ul>
+                    <li>Entirely opt-in &mdash; disabled by default</li>
+                    <li>Clearly disclosed in Settings before you enable it</li>
+                    <li>Governed by <a href="https://www.deepseek.com/privacy" target="_blank">DeepSeek's Privacy Policy</a></li>
+                    <li>Disconnectable at any time from Settings &rarr; AI Coach</li>
+                </ul>
+                <p>No raw HealthKit records are sent — only aggregated summaries computed on-device. Disabling AI Coach stops all data transmission immediately.</p>
+
                 <h3>No Advertising or Tracking SDKs</h3>
-                <p>Pulse contains no advertising SDKs, no tracking pixels, no social media SDKs, and no third-party analytics that receive health data.</p>
+                <p>Pulse contains no advertising SDKs, no tracking pixels, no social media SDKs, and no third-party services that receive health data except as described above.</p>
             </div>
 
             <!-- 4. Your Rights -->
@@ -288,7 +298,7 @@
             <p class="updated">生效日期：2026 年 4 月 2 日</p>
 
             <div class="summary-box">
-                Pulse 以隐私为先。<strong>您的所有健康数据均存储在您的设备上。</strong>我们绝不收集、存储或传输您的个人健康信息到任何外部服务器。
+                Pulse 以隐私为先。<strong>默认情况下，您的所有健康数据均存储在您的设备上。</strong>如果您选择启用 DeepSeek AI 教练功能，聚合的健康摘要将发送至 DeepSeek API。此功能严格为可选 &mdash; 核心功能绝不向外部传输任何健康数据。
             </div>
 
             <!-- 1. 我们访问的数据 -->
@@ -318,7 +328,7 @@
                 </tbody>
             </table>
 
-            <p><strong>所有 HealthKit 数据均使用 Apple 的 SwiftData 框架在设备本地处理和存储，绝不会传输到外部服务器。</strong></p>
+            <p><strong>所有 HealthKit 数据均使用 Apple 的 SwiftData 框架在设备本地处理和存储，绝不会传输到外部服务器（您明确启用 DeepSeek AI 教练功能时除外，详见第 3 节）。</strong></p>
 
             <h3>位置数据</h3>
             <p>Pulse 仅使用位置服务检测您是否到达已保存的健身房位置，以提供自动训练建议。位置数据完全在设备上处理，<strong>绝不上传到任何服务器</strong>，也绝不与第三方共享。</p>
@@ -359,8 +369,18 @@
                 </ul>
                 <p>我们不运营、不托管、也无法访问您的 OpenClaw 网关。</p>
 
+                <h3>DeepSeek AI 教练（可选，互联网）</h3>
+                <p>如果您在设置中选择启用 DeepSeek AI 教练，应用会将聚合的健康摘要（例如每日恢复评分、近期 HRV 趋势）发送至 <a href="https://www.deepseek.com/privacy" target="_blank">DeepSeek API</a>（api.deepseek.com），以生成个性化训练建议。此功能：</p>
+                <ul>
+                    <li>完全由用户选择启用 &mdash; 默认关闭</li>
+                    <li>在您启用前会在设置中明确告知</li>
+                    <li>受 <a href="https://www.deepseek.com/privacy" target="_blank">DeepSeek 隐私政策</a>约束</li>
+                    <li>可随时在设置 &rarr; AI 教练中关闭</li>
+                </ul>
+                <p>发送的是设备端计算的聚合摘要，不包含原始 HealthKit 记录。关闭 AI 教练后，所有数据传输立即停止。</p>
+
                 <h3>无广告或追踪 SDK</h3>
-                <p>Pulse 不包含任何广告 SDK、追踪像素、社交媒体 SDK，也没有接收健康数据的第三方分析工具。</p>
+                <p>Pulse 不包含任何广告 SDK、追踪像素、社交媒体 SDK，也没有接收健康数据的第三方服务（上述说明的情况除外）。</p>
             </div>
 
             <!-- 4. 您的权利 -->

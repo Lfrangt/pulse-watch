@@ -11,16 +11,16 @@ struct AnomalyTimelineView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: PulseTheme.spacingM) {
+            VStack(spacing: DS.Spacing.m) {
                 // 说明
                 headerCard
                     .staggered(index: 0)
 
                 if isLoading {
                     ProgressView()
-                        .tint(PulseTheme.accent)
+                        .tint(DS.Color.accent)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, PulseTheme.spacingXL)
+                        .padding(.vertical, DS.Spacing.xl)
                 } else if anomalyDays.isEmpty {
                     allClearCard
                         .staggered(index: 1)
@@ -34,10 +34,10 @@ struct AnomalyTimelineView: View {
 
                 Spacer(minLength: 40)
             }
-            .padding(.horizontal, PulseTheme.spacingM)
-            .padding(.top, PulseTheme.spacingS)
+            .padding(.horizontal, DS.Spacing.m)
+            .padding(.top, DS.Spacing.s)
         }
-        .background(PulseTheme.background)
+        .background(DS.Color.bg)
         .navigationTitle(String(localized: "异常记录"))
         .navigationBarTitleDisplayMode(.large)
         .toolbarColorScheme(.dark, for: .navigationBar)
@@ -54,74 +54,74 @@ struct AnomalyTimelineView: View {
     // MARK: - Header
 
     private var headerCard: some View {
-        HStack(spacing: PulseTheme.spacingM) {
+        HStack(spacing: DS.Spacing.m) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(PulseTheme.statusWarning.opacity(0.12))
-                    .frame(width: 36, height: 36)
+                    .fill(DS.Color.warn.opacity(0.12))
+                    .frame(width: DS.Spacing.xl + DS.Spacing.xs, height: DS.Spacing.xl + DS.Spacing.xs)
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(PulseTheme.statusWarning)
+                    .font(DS.Typography.body.weight(.medium))
+                    .foregroundStyle(DS.Color.warn)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(String(localized: "健康异常时间线"))
-                    .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.bodyL)
+                    .foregroundStyle(DS.Color.ink)
                     .accessibilityAddTraits(.isHeader)
                 Text(String(localized: "基于个人基线的标准差检测，非医学诊断"))
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
             Spacer()
         }
-        .pulseCard()
+        .dsCard()
     }
 
     // MARK: - All Clear
 
     private var allClearCard: some View {
-        VStack(spacing: PulseTheme.spacingM) {
+        VStack(spacing: DS.Spacing.m) {
             Image(systemName: "checkmark.shield.fill")
-                .font(.system(size: 36))
-                .foregroundStyle(PulseTheme.accentTeal)
+                .font(DS.Typography.title1)
+                .foregroundStyle(DS.Color.accent)
 
             Text(String(localized: "一切正常"))
-                .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyL)
+                .foregroundStyle(DS.Color.ink)
 
             Text(String(localized: "过去 90 天内未检测到显著异常"))
-                .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.caption)
+                .foregroundStyle(DS.Color.inkDim)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, PulseTheme.spacingXL)
-        .pulseCard()
+        .padding(.vertical, DS.Spacing.xl)
+        .dsCard()
     }
 
     // MARK: - 每日异常段
 
     private func daySection(_ date: Date, anomalies: [Anomaly]) -> some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.s) {
             // 日期头
-            HStack(spacing: PulseTheme.spacingS) {
+            HStack(spacing: DS.Spacing.s) {
                 Circle()
                     .fill(severityColor(anomalies.first?.severity ?? .low))
-                    .frame(width: 8, height: 8)
+                    .frame(width: DS.Spacing.s, height: DS.Spacing.s)
 
                 Text(date, format: .dateTime.month(.wide).day().weekday(.wide))
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .font(DS.Typography.bodyS.weight(.semibold))
+                    .foregroundStyle(DS.Color.inkMid)
 
                 Spacer()
 
                 Text("\(anomalies.count)")
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(Capsule().fill(PulseTheme.surface2))
+                    .font(DS.Typography.caption.weight(.bold))
+                    .foregroundStyle(DS.Color.inkDim)
+                    .padding(.horizontal, DS.Spacing.s)
+                    .padding(.vertical, DS.Spacing.m)
+                    .background(Capsule().fill(DS.Color.bgElev))
             }
 
             // 异常卡片列表
@@ -129,38 +129,38 @@ struct AnomalyTimelineView: View {
                 anomalyRow(anomaly)
             }
         }
-        .pulseCard()
+        .dsCard()
     }
 
     private func anomalyRow(_ anomaly: Anomaly) -> some View {
-        HStack(alignment: .top, spacing: PulseTheme.spacingM) {
+        HStack(alignment: .top, spacing: DS.Spacing.m) {
             // 指标图标
             ZStack {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .fill(severityColor(anomaly.severity).opacity(0.12))
-                    .frame(width: 32, height: 32)
+                    .frame(width: DS.Spacing.xl, height: DS.Spacing.xl)
                 Image(systemName: metricIcon(anomaly.metric))
-                    .font(.system(size: 14, weight: .medium))
+                    .font(DS.Typography.bodyS.weight(.medium))
                     .foregroundStyle(severityColor(anomaly.severity))
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
                     Text(anomaly.message)
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .font(DS.Typography.bodyS.weight(.semibold))
+                        .foregroundStyle(DS.Color.ink)
 
                     severityBadge(anomaly.severity)
                 }
 
                 Text(anomaly.detail)
-                    .font(.system(size: 12, design: .rounded))
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkMid)
 
                 // z-score 指示
                 Text(String(format: "z = %.1f", anomaly.zScore))
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.mono.weight(.medium))
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
             Spacer()
@@ -171,26 +171,26 @@ struct AnomalyTimelineView: View {
 
     private func severityColor(_ severity: AnomalySeverityLevel) -> Color {
         switch severity {
-        case .high: return PulseTheme.statusPoor
-        case .medium: return PulseTheme.statusWarning
-        case .low: return PulseTheme.textTertiary
+        case .high: return DS.Color.bad
+        case .medium: return DS.Color.warn
+        case .low: return DS.Color.inkDim
         }
     }
 
     private func severityBadge(_ severity: AnomalySeverityLevel) -> some View {
         let (label, color): (String, Color) = {
             switch severity {
-            case .high: return (String(localized: "严重"), PulseTheme.statusPoor)
-            case .medium: return (String(localized: "注意"), PulseTheme.statusWarning)
-            case .low: return (String(localized: "轻微"), PulseTheme.textTertiary)
+            case .high: return (String(localized: "严重"), DS.Color.bad)
+            case .medium: return (String(localized: "注意"), DS.Color.warn)
+            case .low: return (String(localized: "轻微"), DS.Color.inkDim)
             }
         }()
 
         return Text(label)
-            .font(.system(size: 9, weight: .bold, design: .rounded))
+            .font(DS.Typography.monoS.weight(.bold))
             .foregroundStyle(color)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
+            .padding(.horizontal, DS.Spacing.xs)
+            .padding(.vertical, DS.Spacing.m)
             .background(Capsule().fill(color.opacity(0.12)))
     }
 

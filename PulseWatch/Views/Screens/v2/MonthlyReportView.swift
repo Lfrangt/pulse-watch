@@ -27,22 +27,22 @@ struct MonthlyReportView: View {
 
                         shareButton
                             .staggered(index: 1)
-                            .padding(.top, PulseTheme.spacingM)
+                            .padding(.top, DS.Spacing.m)
                     }
 
                     Spacer(minLength: 60)
                 }
-                .padding(.horizontal, PulseTheme.spacingM)
-                .padding(.top, PulseTheme.spacingS)
+                .padding(.horizontal, DS.Spacing.m)
+                .padding(.top, DS.Spacing.s)
             }
-            .background(PulseTheme.background)
+            .background(DS.Color.bg)
             .navigationTitle(String(localized: "月度报告"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(String(localized: "完成")) { dismiss() }
-                        .foregroundStyle(PulseTheme.accent)
+                        .foregroundStyle(DS.Color.accent)
                 }
             }
         }
@@ -77,21 +77,21 @@ struct MonthlyReportView: View {
     // MARK: - Report Card
 
     private var reportCard: some View {
-        VStack(spacing: PulseTheme.spacingL) {
+        VStack(spacing: DS.Spacing.l) {
             // 标题
             VStack(spacing: 4) {
                 Text("Pulse")
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.accentTeal)
+                    .font(DS.Typography.caption.weight(.semibold))
+                    .foregroundStyle(DS.Color.accent)
                     .tracking(2)
 
                 Text(monthLabel)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.bodyL.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
 
                 Text(String(localized: "月度健康报告"))
-                    .font(.system(size: 13, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.bodyS)
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
             // 核心指标
@@ -106,15 +106,15 @@ struct MonthlyReportView: View {
             // 洞察
             monthlyInsight
         }
-        .padding(PulseTheme.spacingL)
+        .padding(DS.Spacing.l)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .fill(PulseTheme.cardBackground)
-                .shadow(color: PulseTheme.cardShadow, radius: 20, y: 8)
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                .fill(DS.Color.bgElev)
+                
         )
         .overlay(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                .stroke(DS.Color.line.opacity(0.5), lineWidth: 0.5)
         )
     }
 
@@ -133,11 +133,11 @@ struct MonthlyReportView: View {
         let avgRHR = data.compactMap(\.restingHeartRate).isEmpty ? nil :
             data.compactMap(\.restingHeartRate).reduce(0, +) / Double(data.compactMap(\.restingHeartRate).count)
 
-        return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: PulseTheme.spacingM) {
+        return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: DS.Spacing.m) {
             metricCard(
                 icon: "chart.line.uptrend.xyaxis", label: String(localized: "平均评分"),
                 value: avgScore.map { "\($0)" } ?? "—",
-                color: PulseTheme.accentTeal
+                color: DS.Color.accent
             )
             metricCard(
                 icon: "waveform.path.ecg", label: "HRV",
@@ -160,20 +160,20 @@ struct MonthlyReportView: View {
     private func metricCard(icon: String, label: String, value: String, color: Color) -> some View {
         VStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.system(size: 14, weight: .medium))
+                .font(DS.Typography.bodyS.weight(.medium))
                 .foregroundStyle(color)
             Text(value)
-                .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.title2.weight(.bold))
+                .foregroundStyle(DS.Color.ink)
             Text(label)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.caption.weight(.medium))
+                .foregroundStyle(DS.Color.inkDim)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, PulseTheme.spacingM)
+        .padding(.vertical, DS.Spacing.m)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                .fill(PulseTheme.surface2)
+            RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                .fill(DS.Color.bgElev)
         )
     }
 
@@ -183,10 +183,10 @@ struct MonthlyReportView: View {
         let data = lastMonthSummaries.sorted { $0.date < $1.date }
         let columns = Array(repeating: GridItem(.flexible(), spacing: 3), count: 7)
 
-        return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        return VStack(alignment: .leading, spacing: DS.Spacing.s) {
             Text(String(localized: "每日评分"))
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(PulseTheme.textSecondary)
+                .font(DS.Typography.bodyS.weight(.semibold))
+                .foregroundStyle(DS.Color.inkMid)
 
             LazyVGrid(columns: columns, spacing: 3) {
                 ForEach(data, id: \.id) { summary in
@@ -197,18 +197,18 @@ struct MonthlyReportView: View {
                         .overlay {
                             if score > 0 {
                                 Text("\(score)")
-                                    .font(.system(size: 7, weight: .bold, design: .rounded))
-                                    .foregroundStyle(PulseTheme.textSecondary)
+                                    .font(DS.Typography.monoS.weight(.bold))
+                                    .foregroundStyle(DS.Color.inkMid)
                             }
                         }
                 }
             }
 
             // 图例
-            HStack(spacing: PulseTheme.spacingM) {
-                legendItem(color: PulseTheme.statusPoor, label: "<40")
-                legendItem(color: PulseTheme.statusModerate, label: "40-70")
-                legendItem(color: PulseTheme.statusGood, label: "70+")
+            HStack(spacing: DS.Spacing.m) {
+                legendItem(color: DS.Color.bad, label: "<40")
+                legendItem(color: DS.Color.warn, label: "40-70")
+                legendItem(color: DS.Color.good, label: "70+")
                 Spacer()
             }
         }
@@ -218,10 +218,10 @@ struct MonthlyReportView: View {
         HStack(spacing: 4) {
             RoundedRectangle(cornerRadius: 2, style: .continuous)
                 .fill(color.opacity(0.7))
-                .frame(width: 10, height: 10)
+                .frame(width: DS.Spacing.s + DS.Spacing.xs, height: DS.Spacing.s + DS.Spacing.xs)
             Text(label)
-                .font(.system(size: 9, design: .rounded))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.monoS)
+                .foregroundStyle(DS.Color.inkDim)
         }
     }
 
@@ -245,10 +245,10 @@ struct MonthlyReportView: View {
             return w.startDate >= lastMonthStart && w.startDate < thisMonthStart
         }.count
 
-        return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        return VStack(alignment: .leading, spacing: DS.Spacing.s) {
             Text(String(localized: "与上月对比"))
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(PulseTheme.textSecondary)
+                .font(DS.Typography.bodyS.weight(.semibold))
+                .foregroundStyle(DS.Color.inkMid)
 
             HStack(spacing: 0) {
                 comparisonItem(
@@ -273,18 +273,18 @@ struct MonthlyReportView: View {
     private func comparisonItem(label: String, current: String, delta: (String, Bool)?) -> some View {
         VStack(spacing: 4) {
             Text(current)
-                .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyL.weight(.bold))
+                .foregroundStyle(DS.Color.ink)
             Text(label)
-                .font(.system(size: 10, weight: .medium, design: .rounded))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.mono.weight(.medium))
+                .foregroundStyle(DS.Color.inkDim)
             if let (text, positive) = delta {
                 Text(text)
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(positive ? PulseTheme.accentTeal : PulseTheme.activityCoral)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(Capsule().fill((positive ? PulseTheme.accentTeal : PulseTheme.activityCoral).opacity(0.12)))
+                    .font(DS.Typography.mono.weight(.semibold))
+                    .foregroundStyle(positive ? DS.Color.accent : PulseTheme.activityCoral)
+                    .padding(.horizontal, DS.Spacing.xs)
+                    .padding(.vertical, DS.Spacing.m)
+                    .background(Capsule().fill((positive ? DS.Color.accent : PulseTheme.activityCoral).opacity(0.12)))
             }
         }
         .frame(maxWidth: .infinity)
@@ -329,22 +329,22 @@ struct MonthlyReportView: View {
         return VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
                 Image(systemName: "lightbulb.fill")
-                    .font(.system(size: 12))
-                    .foregroundStyle(PulseTheme.statusWarning)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.warn)
                 Text(String(localized: "月度洞察"))
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .font(DS.Typography.bodyS.weight(.semibold))
+                    .foregroundStyle(DS.Color.inkMid)
             }
 
             Text(insight)
-                .font(.system(size: 13, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyS)
+                .foregroundStyle(DS.Color.ink)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(PulseTheme.spacingM)
+        .padding(DS.Spacing.m)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                .fill(PulseTheme.statusWarning.opacity(0.06))
+            RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                .fill(DS.Color.warn.opacity(0.06))
         )
     }
 
@@ -355,17 +355,17 @@ struct MonthlyReportView: View {
             item: Image(uiImage: renderShareImage()),
             preview: SharePreview(String(localized: "Pulse 月度报告"), image: Image(uiImage: renderShareImage()))
         ) {
-            HStack(spacing: PulseTheme.spacingS) {
+            HStack(spacing: DS.Spacing.s) {
                 Image(systemName: "square.and.arrow.up")
                 Text(String(localized: "分享月报"))
             }
-            .font(.system(size: 15, weight: .medium, design: .rounded))
-            .foregroundStyle(PulseTheme.textPrimary)
+            .font(DS.Typography.body.weight(.medium))
+            .foregroundStyle(DS.Color.ink)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
+            .padding(.vertical, DS.Spacing.card)
             .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .fill(PulseTheme.surface2)
+                RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                    .fill(DS.Color.bgElev)
             )
         }
     }
@@ -377,8 +377,8 @@ struct MonthlyReportView: View {
         let renderer = ImageRenderer(content:
             reportCard
                 .frame(width: 390)
-                .padding(PulseTheme.spacingM)
-                .background(PulseTheme.background)
+                .padding(DS.Spacing.m)
+                .background(DS.Color.bg)
         )
         renderer.scale = 3
         let image = renderer.uiImage ?? UIImage()

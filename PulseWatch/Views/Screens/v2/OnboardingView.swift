@@ -9,13 +9,14 @@ struct OnboardingView: View {
 
     @AppStorage("pulse.onboarding.completed") private var onboardingCompleted = false
     @State private var currentPage = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let totalPages = 4
 
     var body: some View {
         ZStack {
             backgroundGradient(for: currentPage)
-                .animation(.easeInOut(duration: 0.5), value: currentPage)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.5), value: currentPage)
 
             VStack(spacing: 0) {
                 TabView(selection: $currentPage) {
@@ -25,11 +26,11 @@ struct OnboardingView: View {
                     coachPage.tag(3)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
-                .animation(.spring(response: 0.5, dampingFraction: 0.85), value: currentPage)
+                .animation(reduceMotion ? nil : .spring(response: 0.5, dampingFraction: 0.85), value: currentPage)
 
                 bottomControls
-                    .padding(.horizontal, PulseTheme.spacingL)
-                    .padding(.bottom, 50)
+                    .padding(.horizontal, DS.Spacing.l)
+                    .padding(.bottom, DS.Spacing.m)
             }
         }
         .preferredColorScheme(.dark)
@@ -39,15 +40,15 @@ struct OnboardingView: View {
 
     private func backgroundGradient(for page: Int) -> some View {
         let colors: [(top: Color, bottom: Color)] = [
-            (PulseTheme.accent, PulseTheme.statusGood),       // Score: gold → green
-            (PulseTheme.trendBlue, PulseTheme.accent),         // Trends: blue → gold
-            (PulseTheme.statusModerate, PulseTheme.statusPoor),// Workout: amber → terracotta
-            (PulseTheme.statusGood, PulseTheme.trendBlue),     // Coach: green → blue
+            (DS.Color.accent, DS.Color.good),       // Score: gold → green
+            (PulseTheme.trendBlue, DS.Color.accent),         // Trends: blue → gold
+            (DS.Color.warn, DS.Color.bad),// Workout: amber → terracotta
+            (DS.Color.good, PulseTheme.trendBlue),     // Coach: green → blue
         ]
         let pair = colors[min(page, colors.count - 1)]
 
         return ZStack {
-            PulseTheme.background.ignoresSafeArea()
+            DS.Color.bg.ignoresSafeArea()
 
             RadialGradient(
                 colors: [pair.top.opacity(0.12), pair.top.opacity(0.03), Color.clear],
@@ -72,7 +73,7 @@ struct OnboardingView: View {
     private var scorePage: some View {
         OnboardingPageView(
             icon: "gauge.open.with.lines.needle.33percent.and.arrowtriangle",
-            iconColors: [PulseTheme.accent, PulseTheme.statusGood],
+            iconColors: [DS.Color.accent, DS.Color.good],
             title: String(localized: "Daily Recovery Score"),
             subtitle: String(localized: "Know your body's readiness"),
             description: String(localized: "Combines heart rate, HRV, and sleep quality into a single 0-100 score every morning. Green means go hard, red means rest."),
@@ -84,30 +85,30 @@ struct OnboardingView: View {
         ZStack {
             // Score ring
             Circle()
-                .stroke(PulseTheme.border.opacity(0.3), lineWidth: 8)
-                .frame(width: 140, height: 140)
+                .stroke(DS.Color.line.opacity(0.3), lineWidth: 8)
+                .frame(width: DS.Spacing.xxl * 3 + DS.Spacing.l, height: DS.Spacing.xxl * 3 + DS.Spacing.l)
 
             Circle()
                 .trim(from: 0, to: 0.82)
                 .stroke(
                     LinearGradient(
-                        colors: [PulseTheme.statusGood, PulseTheme.accent],
+                        colors: [DS.Color.good, DS.Color.accent],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
                     style: StrokeStyle(lineWidth: 8, lineCap: .round)
                 )
-                .frame(width: 140, height: 140)
+                .frame(width: DS.Spacing.xxl * 3 + DS.Spacing.l, height: DS.Spacing.xxl * 3 + DS.Spacing.l)
                 .rotationEffect(.degrees(-90))
 
             VStack(spacing: 2) {
                 Text("82")
-                    .font(.system(size: 44, weight: .bold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.display3)
+                    .foregroundStyle(DS.Color.ink)
 
                 Text("Good")
-                    .font(.system(size: 14, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.statusGood)
+                    .font(DS.Typography.bodyS.weight(.medium))
+                    .foregroundStyle(DS.Color.good)
             }
         }
         .accessibilityElement(children: .ignore)
@@ -119,7 +120,7 @@ struct OnboardingView: View {
     private var trendsPage: some View {
         OnboardingPageView(
             icon: "chart.xyaxis.line",
-            iconColors: [PulseTheme.trendBlue, PulseTheme.accent],
+            iconColors: [PulseTheme.trendBlue, DS.Color.accent],
             title: String(localized: "Weekly Trends"),
             subtitle: String(localized: "See your progress over time"),
             description: String(localized: "7-day charts for heart rate, HRV, and sleep. Spot patterns, track improvement, and share your gains."),
@@ -132,7 +133,7 @@ struct OnboardingView: View {
         let points: [CGFloat] = [0.4, 0.5, 0.35, 0.6, 0.55, 0.75, 0.82]
         let days = ["M", "T", "W", "T", "F", "S", "S"]
 
-        return VStack(spacing: PulseTheme.spacingS) {
+        return VStack(spacing: DS.Spacing.s) {
             GeometryReader { geo in
                 let w = geo.size.width
                 let h = geo.size.height
@@ -169,7 +170,7 @@ struct OnboardingView: View {
                 }
                 .stroke(
                     LinearGradient(
-                        colors: [PulseTheme.trendBlue, PulseTheme.accent],
+                        colors: [PulseTheme.trendBlue, DS.Color.accent],
                         startPoint: .leading,
                         endPoint: .trailing
                     ),
@@ -179,24 +180,24 @@ struct OnboardingView: View {
                 // Dots
                 ForEach(0..<points.count, id: \.self) { i in
                     Circle()
-                        .fill(i == points.count - 1 ? PulseTheme.accent : PulseTheme.trendBlue)
-                        .frame(width: 8, height: 8)
+                        .fill(i == points.count - 1 ? DS.Color.accent : PulseTheme.trendBlue)
+                        .frame(width: DS.Spacing.s, height: DS.Spacing.s)
                         .position(x: step * CGFloat(i), y: h * (1 - points[i]))
                 }
             }
             .frame(height: 100)
-            .padding(.horizontal, PulseTheme.spacingM)
+            .padding(.horizontal, DS.Spacing.m)
 
             // Day labels
             HStack {
                 ForEach(days, id: \.self) { day in
                     Text(day)
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.caption.weight(.medium))
+                        .foregroundStyle(DS.Color.inkDim)
                         .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.horizontal, PulseTheme.spacingM)
+            .padding(.horizontal, DS.Spacing.m)
         }
         .frame(width: 260)
         .accessibilityElement(children: .ignore)
@@ -208,7 +209,7 @@ struct OnboardingView: View {
     private var workoutPage: some View {
         OnboardingPageView(
             icon: "dumbbell.fill",
-            iconColors: [PulseTheme.statusModerate, PulseTheme.statusPoor],
+            iconColors: [DS.Color.warn, DS.Color.bad],
             title: String(localized: "Training Records"),
             subtitle: String(localized: "Every rep counts"),
             description: String(localized: "Auto-syncs workouts from Apple Watch. Heart rate zones, calories, duration — all saved and shareable."),
@@ -217,10 +218,10 @@ struct OnboardingView: View {
     }
 
     private var workoutIllustration: some View {
-        VStack(spacing: PulseTheme.spacingS) {
-            workoutRow(icon: "figure.run", name: String(localized: "Running"), duration: "32 min", cal: "320 kcal", color: PulseTheme.statusPoor)
-            workoutRow(icon: "figure.strengthtraining.traditional", name: String(localized: "Strength"), duration: "48 min", cal: "280 kcal", color: PulseTheme.statusModerate)
-            workoutRow(icon: "figure.outdoor.cycle", name: String(localized: "Cycling"), duration: "25 min", cal: "210 kcal", color: PulseTheme.statusGood)
+        VStack(spacing: DS.Spacing.s) {
+            workoutRow(icon: "figure.run", name: String(localized: "Running"), duration: "32 min", cal: "320 kcal", color: DS.Color.bad)
+            workoutRow(icon: "figure.strengthtraining.traditional", name: String(localized: "Strength"), duration: "48 min", cal: "280 kcal", color: DS.Color.warn)
+            workoutRow(icon: "figure.outdoor.cycle", name: String(localized: "Cycling"), duration: "25 min", cal: "210 kcal", color: DS.Color.good)
         }
         .frame(width: 260)
         .accessibilityElement(children: .ignore)
@@ -228,62 +229,62 @@ struct OnboardingView: View {
     }
 
     private func workoutRow(icon: String, name: String, duration: String, cal: String, color: Color) -> some View {
-        HStack(spacing: PulseTheme.spacingM) {
+        HStack(spacing: DS.Spacing.m) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(color.opacity(0.12))
-                    .frame(width: 40, height: 40)
+                    .frame(width: DS.Spacing.xxl, height: DS.Spacing.xxl)
 
                 Image(systemName: icon)
-                    .font(.system(size: 18, weight: .medium))
+                    .font(DS.Typography.bodyL.weight(.medium))
                     .foregroundStyle(color)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(name)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.body.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
 
                 Text(duration)
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkMid)
             }
 
             Spacer()
 
             Text(cal)
-                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .font(DS.Typography.bodyS.weight(.medium))
                 .foregroundStyle(color)
         }
-        .padding(PulseTheme.spacingM)
+        .padding(DS.Spacing.m)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(PulseTheme.cardBackground)
+            RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                .fill(DS.Color.bgElev)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                .stroke(DS.Color.line.opacity(0.5), lineWidth: 0.5)
         )
     }
 
     // MARK: - Page 4: AI 教练 + 开始按钮
 
     private var coachPage: some View {
-        VStack(spacing: PulseTheme.spacingL) {
+        VStack(spacing: DS.Spacing.l) {
             Spacer()
 
             // Icon
             ZStack {
                 Circle()
-                    .fill(PulseTheme.statusGood.opacity(0.08))
-                    .frame(width: 100, height: 100)
+                    .fill(DS.Color.good.opacity(0.08))
+                    .frame(width: DS.Spacing.xxl * 2 + DS.Spacing.l, height: DS.Spacing.xxl * 2 + DS.Spacing.l)
                     .blur(radius: 20)
 
                 Image(systemName: "brain.head.profile.fill")
-                    .font(.system(size: 48))
+                    .font(DS.Typography.display3)
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [PulseTheme.statusGood, PulseTheme.trendBlue],
+                            colors: [DS.Color.good, PulseTheme.trendBlue],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -291,22 +292,22 @@ struct OnboardingView: View {
             }
 
             // Title area
-            VStack(spacing: PulseTheme.spacingS) {
+            VStack(spacing: DS.Spacing.s) {
                 Text("AI Coach")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.title1.weight(.bold))
+                    .foregroundStyle(DS.Color.ink)
 
                 Text("Your personal fitness advisor")
-                    .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.statusGood)
+                    .font(DS.Typography.body.weight(.medium))
+                    .foregroundStyle(DS.Color.good)
             }
 
             Text("Personalized training advice based on your recovery. Push day or rest day? AI analyzes your data and tells you exactly what to do.")
-                .font(PulseTheme.bodyFont)
-                .foregroundStyle(PulseTheme.textSecondary)
+                .font(DS.Typography.body)
+                .foregroundStyle(DS.Color.inkMid)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
-                .padding(.horizontal, PulseTheme.spacingXL)
+                .padding(.horizontal, DS.Spacing.xl)
 
             // Coach bubble illustration
             coachIllustration
@@ -319,8 +320,8 @@ struct OnboardingView: View {
             } label: {
                 Text("Get Started")
             }
-            .buttonStyle(PulseButtonStyle())
-            .padding(.horizontal, PulseTheme.spacingL)
+            .buttonStyle(.plain)
+            .padding(.horizontal, DS.Spacing.l)
             .accessibilityLabel(String(localized: "Get Started"))
             .accessibilityHint(String(localized: "Requests health permissions and starts the app"))
 
@@ -329,7 +330,7 @@ struct OnboardingView: View {
     }
 
     private var coachIllustration: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.s) {
             chatBubble(
                 text: String(localized: "Recovery 82 — great day for strength training! 💪"),
                 isAI: true
@@ -339,31 +340,31 @@ struct OnboardingView: View {
                 isAI: true
             )
         }
-        .padding(.horizontal, PulseTheme.spacingXL)
+        .padding(.horizontal, DS.Spacing.xl)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(localized: "Example AI Coach messages: personalized training advice based on your recovery data"))
     }
 
     private func chatBubble(text: String, isAI: Bool) -> some View {
-        HStack(spacing: PulseTheme.spacingS) {
+        HStack(spacing: DS.Spacing.s) {
             if isAI {
                 Image(systemName: "brain.head.profile.fill")
-                    .font(.system(size: 14))
-                    .foregroundStyle(PulseTheme.statusGood)
+                    .font(DS.Typography.bodyS)
+                    .foregroundStyle(DS.Color.good)
             }
 
             Text(text)
-                .font(.system(size: 13, weight: .regular, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyS)
+                .foregroundStyle(DS.Color.ink)
         }
-        .padding(PulseTheme.spacingM)
+        .padding(DS.Spacing.m)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(PulseTheme.cardBackground)
+                .fill(DS.Color.bgElev)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(PulseTheme.statusGood.opacity(0.15), lineWidth: 0.5)
+                .stroke(DS.Color.good.opacity(0.15), lineWidth: 0.5)
         )
     }
 
@@ -377,8 +378,8 @@ struct OnboardingView: View {
                     completeOnboarding()
                 } label: {
                     Text("Skip")
-                        .font(PulseTheme.bodyFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.body)
+                        .foregroundStyle(DS.Color.inkDim)
                 }
                 .accessibilityLabel(String(localized: "Skip onboarding"))
                 .accessibilityHint(String(localized: "Skips the introduction and goes to the main app"))
@@ -392,9 +393,9 @@ struct OnboardingView: View {
             HStack(spacing: 8) {
                 ForEach(0..<totalPages, id: \.self) { index in
                     Capsule()
-                        .fill(index == currentPage ? PulseTheme.accent : PulseTheme.border)
+                        .fill(index == currentPage ? DS.Color.accent : DS.Color.line)
                         .frame(width: index == currentPage ? 20 : 8, height: 8)
-                        .animation(.spring(response: 0.3), value: currentPage)
+                        .animation(reduceMotion ? nil : .spring(response: 0.3), value: currentPage)
                 }
             }
             .accessibilityElement(children: .ignore)
@@ -410,8 +411,8 @@ struct OnboardingView: View {
                     }
                 } label: {
                     Image(systemName: "arrow.right.circle.fill")
-                        .font(.system(size: 36))
-                        .foregroundStyle(PulseTheme.accent)
+                        .font(DS.Typography.title1)
+                        .foregroundStyle(DS.Color.accent)
                 }
                 .accessibilityLabel(String(localized: "Next page"))
                 .accessibilityHint(String(localized: "Goes to the next introduction page"))
@@ -460,18 +461,18 @@ private struct OnboardingPageView<Illustration: View>: View {
     @ViewBuilder let illustration: () -> Illustration
 
     var body: some View {
-        VStack(spacing: PulseTheme.spacingL) {
+        VStack(spacing: DS.Spacing.l) {
             Spacer()
 
             // Icon
             ZStack {
                 Circle()
                     .fill(iconColors.first?.opacity(0.08) ?? Color.clear)
-                    .frame(width: 100, height: 100)
+                    .frame(width: DS.Spacing.xxl * 2 + DS.Spacing.l, height: DS.Spacing.xxl * 2 + DS.Spacing.l)
                     .blur(radius: 20)
 
                 Image(systemName: icon)
-                    .font(.system(size: 48))
+                    .font(DS.Typography.display3)
                     .foregroundStyle(
                         LinearGradient(
                             colors: iconColors,
@@ -482,26 +483,26 @@ private struct OnboardingPageView<Illustration: View>: View {
             }
 
             // Title area
-            VStack(spacing: PulseTheme.spacingS) {
+            VStack(spacing: DS.Spacing.s) {
                 Text(title)
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.title1.weight(.bold))
+                    .foregroundStyle(DS.Color.ink)
 
                 Text(subtitle)
-                    .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .foregroundStyle(iconColors.first ?? PulseTheme.accent)
+                    .font(DS.Typography.body.weight(.medium))
+                    .foregroundStyle(iconColors.first ?? DS.Color.accent)
             }
 
             Text(description)
-                .font(PulseTheme.bodyFont)
-                .foregroundStyle(PulseTheme.textSecondary)
+                .font(DS.Typography.body)
+                .foregroundStyle(DS.Color.inkMid)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
-                .padding(.horizontal, PulseTheme.spacingXL)
+                .padding(.horizontal, DS.Spacing.xl)
 
             // Illustration
             illustration()
-                .padding(.top, PulseTheme.spacingM)
+                .padding(.top, DS.Spacing.m)
 
             Spacer()
             Spacer()

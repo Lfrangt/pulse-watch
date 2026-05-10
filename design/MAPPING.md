@@ -63,13 +63,13 @@
 | `CaloriesDetailView.swift`        | REPLACE | S02 metric=cal    | done    |
 | `HealthAgeDetailView.swift`       | REPLACE | S02 metric=age    | done    |
 | `ActivityDetailView.swift`        | REPLACE | S02 metric=activity | done    |
-| `AnomalyTimelineView.swift`       | REPLACE | folded into S07   | pending |
-| `CorrelationInsightsView.swift`   | REPLACE | folded into S07   | pending |
-| `WeeklyReportView.swift`          | REPLACE | S07 Reports week  | pending |
-| `MonthlyReportView.swift`         | REPLACE | S07 Reports month | pending |
-| `CoachModeView.swift`             | REPLACE | S06 Coach         | pending |
+| `AnomalyTimelineView.swift`       | REPLACE | folded into S07   | done    |
+| `CorrelationInsightsView.swift`   | REPLACE | folded into S07   | done    |
+| `WeeklyReportView.swift`          | REPLACE | S07 Reports week  | done    |
+| `MonthlyReportView.swift`         | REPLACE | S07 Reports month | done    |
+| `CoachModeView.swift`             | REPLACE | S06 Coach         | done    |
 | `SettingsView.swift`              | REPLACE | S08 Settings      | done    |
-| `OnboardingView.swift`            | REPLACE | S09 Onboarding    | pending |
+| `OnboardingView.swift`            | REPLACE | S09 Onboarding    | done    |
 | `GoalSettingView.swift`           | KEEP-MIGRATE | re-tokenize within S08 | pending |
 | `NutritionView.swift`             | KEEP-MIGRATE | re-tokenize  | pending |
 | `ChallengeView.swift`             | KEEP-MIGRATE | re-tokenize  | pending |

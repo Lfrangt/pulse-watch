@@ -21,21 +21,21 @@ struct WeeklyReportView: View {
                     // 分享按钮
                     shareButton
                         .staggered(index: 1)
-                        .padding(.top, PulseTheme.spacingM)
+                        .padding(.top, DS.Spacing.m)
 
                     Spacer(minLength: 60)
                 }
-                .padding(.horizontal, PulseTheme.spacingM)
-                .padding(.top, PulseTheme.spacingS)
+                .padding(.horizontal, DS.Spacing.m)
+                .padding(.top, DS.Spacing.s)
             }
-            .background(PulseTheme.background)
+            .background(DS.Color.bg)
             .navigationTitle(String(localized: "Weekly Report"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(String(localized: "Done")) { dismiss() }
-                        .foregroundStyle(PulseTheme.accent)
+                        .foregroundStyle(DS.Color.accent)
                 }
             }
             .task {
@@ -93,7 +93,7 @@ struct WeeklyReportView: View {
 
     @ViewBuilder
     private var reportCard: some View {
-        VStack(spacing: PulseTheme.spacingL) {
+        VStack(spacing: DS.Spacing.l) {
             // 头部：日期范围 + 品牌
             reportHeader
 
@@ -115,27 +115,27 @@ struct WeeklyReportView: View {
             // 底部品牌
             reportFooter
         }
-        .padding(PulseTheme.spacingL)
+        .padding(DS.Spacing.l)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: [
-                            PulseTheme.cardBackground,
-                            PulseTheme.cardElevated,
-                            PulseTheme.cardBackground
+                            DS.Color.bgElev,
+                            DS.Color.bgElev,
+                            DS.Color.bgElev
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
-                .shadow(color: PulseTheme.cardShadow, radius: 20, y: 8)
+                
         )
         .overlay(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
                 .stroke(
                     LinearGradient(
-                        colors: [PulseTheme.accent.opacity(0.3), PulseTheme.border.opacity(0.3)],
+                        colors: [DS.Color.accent.opacity(0.3), DS.Color.line.opacity(0.3)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -147,21 +147,21 @@ struct WeeklyReportView: View {
     // MARK: - 头部
 
     private var reportHeader: some View {
-        VStack(spacing: PulseTheme.spacingS) {
+        VStack(spacing: DS.Spacing.s) {
             HStack {
                 Image(systemName: "doc.richtext")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(PulseTheme.accent)
+                    .font(DS.Typography.body.weight(.medium))
+                    .foregroundStyle(DS.Color.accent)
                 Text("Pulse Weekly")
-                    .font(.system(size: 20, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.bodyL.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
                 Spacer()
             }
 
             HStack {
                 Text(dateRangeTitle)
-                    .font(.system(size: 14, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .font(DS.Typography.bodyS.weight(.medium))
+                    .foregroundStyle(DS.Color.inkMid)
                 Spacer()
             }
         }
@@ -177,32 +177,32 @@ struct WeeklyReportView: View {
             return t - l
         }()
 
-        return HStack(alignment: .bottom, spacing: PulseTheme.spacingM) {
+        return HStack(alignment: .bottom, spacing: DS.Spacing.m) {
             // 左侧：大评分
             VStack(alignment: .leading, spacing: 2) {
                 Text("Avg Score")
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkDim)
 
-                HStack(alignment: .firstTextBaseline, spacing: PulseTheme.spacingS) {
+                HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.s) {
                     Text("\(thisAvg ?? 0)")
-                        .font(.system(size: 52, weight: .bold, design: .rounded))
+                        .font(DS.Typography.display3)
                         .foregroundStyle(PulseTheme.statusColor(for: thisAvg ?? 50))
 
                     // 对比箭头
                     if let delta {
                         HStack(spacing: 2) {
                             Image(systemName: delta >= 0 ? "arrow.up.right" : "arrow.down.right")
-                                .font(.system(size: 14, weight: .bold))
+                                .font(DS.Typography.bodyS.weight(.bold))
                             Text("\(abs(delta))")
-                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .font(DS.Typography.body.weight(.semibold))
                         }
-                        .foregroundStyle(delta >= 0 ? PulseTheme.statusGood : PulseTheme.statusPoor)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .foregroundStyle(delta >= 0 ? DS.Color.good : DS.Color.bad)
+                        .padding(.horizontal, DS.Spacing.s)
+                        .padding(.vertical, DS.Spacing.xs)
                         .background(
                             Capsule()
-                                .fill((delta >= 0 ? PulseTheme.statusGood : PulseTheme.statusPoor).opacity(0.12))
+                                .fill((delta >= 0 ? DS.Color.good : DS.Color.bad).opacity(0.12))
                         )
                     }
                 }
@@ -213,10 +213,10 @@ struct WeeklyReportView: View {
             // 右侧：状态标签
             if let avg = thisAvg {
                 Text(PulseTheme.statusLabel(for: avg))
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .font(DS.Typography.bodyS.weight(.medium))
                     .foregroundStyle(PulseTheme.statusColor(for: avg))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
+                    .padding(.horizontal, DS.Spacing.s)
+                    .padding(.vertical, DS.Spacing.xs)
                     .background(
                         Capsule()
                             .fill(PulseTheme.statusColor(for: avg).opacity(0.12))
@@ -230,10 +230,10 @@ struct WeeklyReportView: View {
     private var dailyScoreChart: some View {
         let data = buildDailyChartData()
 
-        return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        return VStack(alignment: .leading, spacing: DS.Spacing.s) {
             Text("Daily Score")
-                .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.caption)
+                .foregroundStyle(DS.Color.inkDim)
 
             if data.isEmpty {
                 emptyPlaceholder(String(localized: "No data this week"))
@@ -243,7 +243,7 @@ struct WeeklyReportView: View {
                         VStack(spacing: 4) {
                             // 分数标签
                             Text("\(item.score)")
-                                .font(.system(size: 10, weight: .medium, design: .rounded))
+                                .font(DS.Typography.mono.weight(.medium))
                                 .foregroundStyle(PulseTheme.statusColor(for: item.score))
 
                             // 柱子
@@ -262,20 +262,20 @@ struct WeeklyReportView: View {
 
                             // 星期标签
                             Text(item.dayLabel)
-                                .font(.system(size: 10, weight: .regular, design: .rounded))
-                                .foregroundStyle(item.isToday ? PulseTheme.accent : PulseTheme.textTertiary)
+                                .font(DS.Typography.mono)
+                                .foregroundStyle(item.isToday ? DS.Color.accent : DS.Color.inkDim)
                         }
                         .frame(maxWidth: .infinity)
                     }
                 }
                 .frame(height: 140)
-                .padding(.vertical, PulseTheme.spacingS)
+                .padding(.vertical, DS.Spacing.s)
             }
         }
-        .padding(PulseTheme.spacingM)
+        .padding(DS.Spacing.m)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(PulseTheme.surface)
+            RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                .fill(DS.Color.bgElev)
         )
     }
 
@@ -291,15 +291,15 @@ struct WeeklyReportView: View {
         let thisSteps = averageSteps(thisWeekSummaries)
         let lastSteps = averageSteps(lastWeekSummaries)
 
-        return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        return VStack(alignment: .leading, spacing: DS.Spacing.s) {
             Text("Key Metrics vs Last Week")
-                .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.caption)
+                .foregroundStyle(DS.Color.inkDim)
 
             LazyVGrid(columns: [
-                GridItem(.flexible(), spacing: PulseTheme.spacingS),
-                GridItem(.flexible(), spacing: PulseTheme.spacingS)
-            ], spacing: PulseTheme.spacingS) {
+                GridItem(.flexible(), spacing: DS.Spacing.s),
+                GridItem(.flexible(), spacing: DS.Spacing.s)
+            ], spacing: DS.Spacing.s) {
                 metricTile(
                     icon: "heart.fill",
                     label: String(localized: "Resting HR"),
@@ -307,7 +307,7 @@ struct WeeklyReportView: View {
                     unit: "bpm",
                     delta: percentDelta(thisHR, lastHR),
                     invertDelta: true, // 心率降低是好事
-                    color: PulseTheme.statusPoor
+                    color: DS.Color.bad
                 )
 
                 metricTile(
@@ -316,7 +316,7 @@ struct WeeklyReportView: View {
                     value: thisHRV.map { "\(Int($0))" } ?? "--",
                     unit: "ms",
                     delta: percentDelta(thisHRV, lastHRV),
-                    color: PulseTheme.accent
+                    color: DS.Color.accent
                 )
 
                 metricTile(
@@ -334,7 +334,7 @@ struct WeeklyReportView: View {
                     value: thisSteps.map { formatSteps(Int($0)) } ?? "--",
                     unit: "",
                     delta: percentDelta(thisSteps, lastSteps),
-                    color: PulseTheme.statusGood
+                    color: DS.Color.good
                 )
             }
         }
@@ -349,24 +349,24 @@ struct WeeklyReportView: View {
         invertDelta: Bool = false,
         color: Color
     ) -> some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.s) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 11))
+                    .font(DS.Typography.caption)
                     .foregroundStyle(color)
                 Text(label)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption.weight(.medium))
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
             HStack(alignment: .firstTextBaseline, spacing: 3) {
                 Text(value)
-                    .font(.system(size: 22, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.title2.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
                 if !unit.isEmpty {
                     Text(unit)
-                        .font(.system(size: 11, weight: .regular, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.caption)
+                        .foregroundStyle(DS.Color.inkDim)
                 }
             }
 
@@ -375,22 +375,22 @@ struct WeeklyReportView: View {
                 let isGood = invertDelta ? delta <= 0 : delta >= 0
                 HStack(spacing: 2) {
                     Image(systemName: delta >= 0 ? "arrow.up.right" : "arrow.down.right")
-                        .font(.system(size: 9, weight: .bold))
+                        .font(DS.Typography.monoS.weight(.bold))
                     Text(String(format: "%.0f%%", abs(delta)))
-                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .font(DS.Typography.mono.weight(.medium))
                 }
-                .foregroundStyle(isGood ? PulseTheme.statusGood : PulseTheme.statusPoor)
+                .foregroundStyle(isGood ? DS.Color.good : DS.Color.bad)
             } else {
                 Text("--")
-                    .font(.system(size: 10))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.mono)
+                    .foregroundStyle(DS.Color.inkDim)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(PulseTheme.spacingM)
+        .padding(DS.Spacing.m)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                .fill(PulseTheme.surface)
+            RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                .fill(DS.Color.bgElev)
         )
     }
 
@@ -399,34 +399,34 @@ struct WeeklyReportView: View {
     private var aiInsightsSection: some View {
         let insights = generateWeeklyInsights()
 
-        return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-            HStack(spacing: PulseTheme.spacingXS) {
+        return VStack(alignment: .leading, spacing: DS.Spacing.s) {
+            HStack(spacing: DS.Spacing.xs) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(PulseTheme.accent)
+                    .font(DS.Typography.caption.weight(.medium))
+                    .foregroundStyle(DS.Color.accent)
                 Text("AI Insights")
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
-            VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+            VStack(alignment: .leading, spacing: DS.Spacing.s) {
                 ForEach(insights, id: \.self) { insight in
-                    HStack(alignment: .top, spacing: PulseTheme.spacingS) {
+                    HStack(alignment: .top, spacing: DS.Spacing.s) {
                         Circle()
-                            .fill(PulseTheme.accent)
-                            .frame(width: 4, height: 4)
-                            .padding(.top, 6)
+                            .fill(DS.Color.accent)
+                            .frame(width: DS.Spacing.xs, height: DS.Spacing.xs)
+                            .padding(.top, DS.Spacing.xs)
                         Text(insight)
-                            .font(.system(size: 13, weight: .regular, design: .rounded))
-                            .foregroundStyle(PulseTheme.textSecondary)
+                            .font(DS.Typography.bodyS)
+                            .foregroundStyle(DS.Color.inkMid)
                             .lineSpacing(2)
                     }
                 }
             }
-            .padding(PulseTheme.spacingM)
+            .padding(DS.Spacing.m)
             .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                    .fill(PulseTheme.accent.opacity(0.05))
+                RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                    .fill(DS.Color.accent.opacity(0.05))
             )
         }
     }
@@ -436,34 +436,34 @@ struct WeeklyReportView: View {
     private var nextWeekAdvice: some View {
         let advice = generateNextWeekAdvice()
 
-        return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-            HStack(spacing: PulseTheme.spacingXS) {
+        return VStack(alignment: .leading, spacing: DS.Spacing.s) {
+            HStack(spacing: DS.Spacing.xs) {
                 Image(systemName: "lightbulb.fill")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(PulseTheme.statusModerate)
+                    .font(DS.Typography.caption.weight(.medium))
+                    .foregroundStyle(DS.Color.warn)
                 Text("Next Week's Advice")
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
-            VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
+            VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                 ForEach(advice, id: \.self) { tip in
-                    HStack(alignment: .top, spacing: PulseTheme.spacingS) {
+                    HStack(alignment: .top, spacing: DS.Spacing.s) {
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 8, weight: .bold))
-                            .foregroundStyle(PulseTheme.statusModerate)
-                            .padding(.top, 5)
+                            .font(DS.Typography.monoS.weight(.bold))
+                            .foregroundStyle(DS.Color.warn)
+                            .padding(.top, DS.Spacing.m)
                         Text(tip)
-                            .font(.system(size: 13, weight: .regular, design: .rounded))
-                            .foregroundStyle(PulseTheme.textSecondary)
+                            .font(DS.Typography.bodyS)
+                            .foregroundStyle(DS.Color.inkMid)
                             .lineSpacing(2)
                     }
                 }
             }
-            .padding(PulseTheme.spacingM)
+            .padding(DS.Spacing.m)
             .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                    .fill(PulseTheme.statusModerate.opacity(0.05))
+                RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                    .fill(DS.Color.warn.opacity(0.05))
             )
         }
     }
@@ -474,14 +474,14 @@ struct WeeklyReportView: View {
         HStack {
             Spacer()
             Text("Pulse Watch")
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(PulseTheme.textTertiary.opacity(0.5))
+                .font(DS.Typography.caption.weight(.medium))
+                .foregroundStyle(DS.Color.inkDim.opacity(0.5))
             Image(systemName: "heart.text.clipboard")
-                .font(.system(size: 10))
-                .foregroundStyle(PulseTheme.accent.opacity(0.5))
+                .font(DS.Typography.mono)
+                .foregroundStyle(DS.Color.accent.opacity(0.5))
             Spacer()
         }
-        .padding(.top, PulseTheme.spacingS)
+        .padding(.top, DS.Spacing.s)
     }
 
     // MARK: - 分享按钮
@@ -494,33 +494,33 @@ struct WeeklyReportView: View {
                 item: image,
                 preview: SharePreview(String(localized: "Pulse Weekly"), image: image)
             ) {
-                HStack(spacing: PulseTheme.spacingS) {
+                HStack(spacing: DS.Spacing.s) {
                     Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 15, weight: .medium))
+                        .font(DS.Typography.body.weight(.medium))
                     Text("Share Report")
-                        .font(PulseTheme.bodyFont.weight(.medium))
+                        .font(DS.Typography.body.weight(.medium))
                 }
-                .foregroundStyle(PulseTheme.background)
+                .foregroundStyle(DS.Color.bg)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                .padding(.vertical, DS.Spacing.m)
                 .background(
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .fill(PulseTheme.accent)
-                        .shadow(color: PulseTheme.accent.opacity(0.3), radius: 8, y: 4)
+                    RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                        .fill(DS.Color.accent)
+                        
                 )
             }
             .buttonStyle(.plain)
         } else {
-            HStack(spacing: PulseTheme.spacingS) {
+            HStack(spacing: DS.Spacing.s) {
                 ProgressView()
-                    .tint(PulseTheme.textTertiary)
+                    .tint(DS.Color.inkDim)
                     .scaleEffect(0.8)
                 Text("Generating share image...")
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkDim)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
+            .padding(.vertical, DS.Spacing.m)
         }
     }
 
@@ -532,7 +532,7 @@ struct WeeklyReportView: View {
         let renderer = ImageRenderer(content:
             reportCardForShare
                 .frame(width: 390)
-                .background(PulseTheme.background)
+                .background(DS.Color.bg)
         )
         renderer.scale = 3.0
         if let uiImage = renderer.uiImage {
@@ -543,7 +543,7 @@ struct WeeklyReportView: View {
 
     /// 分享用的报告卡片（不含交互元素）
     private var reportCardForShare: some View {
-        VStack(spacing: PulseTheme.spacingL) {
+        VStack(spacing: DS.Spacing.l) {
             reportHeader
             scoreOverview
             dailyScoreChart
@@ -552,12 +552,12 @@ struct WeeklyReportView: View {
             nextWeekAdvice
             reportFooter
         }
-        .padding(PulseTheme.spacingL)
+        .padding(DS.Spacing.l)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .fill(PulseTheme.cardBackground)
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                .fill(DS.Color.bgElev)
         )
-        .padding(PulseTheme.spacingM)
+        .padding(DS.Spacing.m)
     }
 
     // MARK: - 数据计算
@@ -751,8 +751,8 @@ struct WeeklyReportView: View {
 
     private func emptyPlaceholder(_ message: String) -> some View {
         Text(message)
-            .font(PulseTheme.captionFont)
-            .foregroundStyle(PulseTheme.textTertiary)
+            .font(DS.Typography.caption)
+            .foregroundStyle(DS.Color.inkDim)
             .frame(maxWidth: .infinity)
             .frame(height: 80)
     }

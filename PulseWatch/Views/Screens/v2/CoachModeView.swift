@@ -12,7 +12,7 @@ struct CoachModeView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: PulseTheme.spacingL) {
+            VStack(spacing: DS.Spacing.l) {
 
                 headerCard
                     .staggered(index: 0)
@@ -31,10 +31,10 @@ struct CoachModeView: View {
 
                 Spacer(minLength: 40)
             }
-            .padding(.horizontal, PulseTheme.spacingM)
-            .padding(.top, PulseTheme.spacingS)
+            .padding(.horizontal, DS.Spacing.m)
+            .padding(.top, DS.Spacing.s)
         }
-        .background(PulseTheme.background)
+        .background(DS.Color.bg)
         .navigationTitle(String(localized: "教练模式"))
         .navigationBarTitleDisplayMode(.large)
         .toolbarColorScheme(.dark, for: .navigationBar)
@@ -46,27 +46,27 @@ struct CoachModeView: View {
     // MARK: - Header
 
     private var headerCard: some View {
-        HStack(spacing: PulseTheme.spacingM) {
+        HStack(spacing: DS.Spacing.m) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(PulseTheme.accentTeal.opacity(0.12))
-                    .frame(width: 36, height: 36)
+                    .fill(DS.Color.accent.opacity(0.12))
+                    .frame(width: DS.Spacing.xl + DS.Spacing.xs, height: DS.Spacing.xl + DS.Spacing.xs)
                 Image(systemName: "person.2.fill")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(PulseTheme.accentTeal)
+                    .font(DS.Typography.body.weight(.medium))
+                    .foregroundStyle(DS.Color.accent)
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(String(localized: "教练模式"))
-                    .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.bodyL)
+                    .foregroundStyle(DS.Color.ink)
                     .accessibilityAddTraits(.isHeader)
                 Text(String(localized: "生成健康快照分享给教练或朋友"))
-                    .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkDim)
             }
             Spacer()
         }
-        .pulseCard()
+        .dsCard()
     }
 
     // MARK: - Status Card
@@ -79,30 +79,30 @@ struct CoachModeView: View {
         let today = summaries.first { Calendar.current.isDateInToday($0.date) }
         let insight = currentInsight
 
-        return VStack(spacing: PulseTheme.spacingM) {
+        return VStack(spacing: DS.Spacing.m) {
             // 评分
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(String(localized: "今日评分"))
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.caption.weight(.medium))
+                        .foregroundStyle(DS.Color.inkDim)
                     Text("\(insight.dailyScore)")
-                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                        .font(DS.Typography.display3)
                         .foregroundStyle(PulseTheme.statusColor(for: insight.dailyScore))
                 }
                 Spacer()
                 // 训练建议
                 VStack(alignment: .trailing, spacing: 4) {
                     Image(systemName: insight.trainingAdvice.icon)
-                        .font(.system(size: 20))
-                        .foregroundStyle(PulseTheme.accent)
+                        .font(DS.Typography.bodyL)
+                        .foregroundStyle(DS.Color.accent)
                     Text(insight.trainingAdvice.label)
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .font(DS.Typography.caption.weight(.medium))
+                        .foregroundStyle(DS.Color.inkMid)
                 }
             }
 
-            Divider().background(PulseTheme.border)
+            Divider().background(DS.Color.line)
 
             // 关键指标
             HStack(spacing: 0) {
@@ -112,22 +112,22 @@ struct CoachModeView: View {
                 coachMetric(label: String(localized: "步数"), value: today?.totalSteps.map { "\($0)" } ?? "—", unit: "")
             }
         }
-        .pulseCard()
+        .dsCard()
     }
 
     private func coachMetric(label: String, value: String, unit: String) -> some View {
         VStack(spacing: 2) {
             Text(value)
-                .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyL.weight(.bold))
+                .foregroundStyle(DS.Color.ink)
             HStack(spacing: 2) {
                 Text(label)
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.mono.weight(.medium))
+                    .foregroundStyle(DS.Color.inkDim)
                 if !unit.isEmpty {
                     Text(unit)
-                        .font(.system(size: 9, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary.opacity(0.7))
+                        .font(DS.Typography.monoS)
+                        .foregroundStyle(DS.Color.inkDim.opacity(0.7))
                 }
             }
         }
@@ -137,41 +137,41 @@ struct CoachModeView: View {
     // MARK: - QR Code
 
     private var qrCard: some View {
-        VStack(spacing: PulseTheme.spacingM) {
+        VStack(spacing: DS.Spacing.m) {
             Text(String(localized: "健康快照 QR 码"))
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(PulseTheme.textSecondary)
+                .font(DS.Typography.bodyS.weight(.semibold))
+                .foregroundStyle(DS.Color.inkMid)
 
             if let qrImage {
                 Image(uiImage: qrImage)
                     .interpolation(.none)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 200, height: 200)
+                    .frame(width: DS.Spacing.xxl * 5, height: DS.Spacing.xxl * 5)
                     .accessibilityLabel(String(localized: "健康快照 QR 码"))
                     .background(
-                        RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                        RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
                             .fill(.white)
                             .padding(-12)
                     )
             } else {
                 ProgressView()
-                    .tint(PulseTheme.accent)
-                    .frame(width: 200, height: 200)
+                    .tint(DS.Color.accent)
+                    .frame(width: DS.Spacing.xxl * 5, height: DS.Spacing.xxl * 5)
             }
 
             Text(String(localized: "扫码查看今日健康数据快照"))
-                .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.caption)
+                .foregroundStyle(DS.Color.inkDim)
         }
         .frame(maxWidth: .infinity)
-        .pulseCard()
+        .dsCard()
     }
 
     // MARK: - Share Buttons
 
     private var shareButtons: some View {
-        VStack(spacing: PulseTheme.spacingS) {
+        VStack(spacing: DS.Spacing.s) {
             // 分享快照图片
             Button {
                 shareSnapshot()
@@ -180,13 +180,13 @@ struct CoachModeView: View {
                     Image(systemName: "photo")
                     Text(String(localized: "分享健康快照图片"))
                 }
-                .font(.system(size: 15, weight: .medium, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.body.weight(.medium))
+                .foregroundStyle(DS.Color.ink)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
+                .padding(.vertical, DS.Spacing.card)
                 .background(
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .fill(PulseTheme.surface2)
+                    RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                        .fill(DS.Color.bgElev)
                 )
             }
 
@@ -198,13 +198,13 @@ struct CoachModeView: View {
                     Image(systemName: "qrcode")
                     Text(String(localized: "分享 QR 码"))
                 }
-                .font(.system(size: 15, weight: .medium, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.body.weight(.medium))
+                .foregroundStyle(DS.Color.ink)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
+                .padding(.vertical, DS.Spacing.card)
                 .background(
-                    RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                        .fill(PulseTheme.surface2)
+                    RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                        .fill(DS.Color.bgElev)
                 )
             }
         }

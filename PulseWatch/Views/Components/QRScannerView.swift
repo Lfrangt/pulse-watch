@@ -3,6 +3,7 @@ import AVFoundation
 
 /// QR Code 扫码配对视图
 struct QRScannerView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dismiss) private var dismiss
     let onScanned: (String, String, String) -> Void  // (url, token, agent)
 
@@ -20,11 +21,11 @@ struct QRScannerView: View {
             } else if permissionDenied {
                 VStack(spacing: 16) {
                     Image(systemName: "camera.fill")
-                        .font(.system(size: 40))
+                        .font(DS.Typography.title1)
                         .foregroundStyle(.gray)
                     Text("Camera access needed to scan QR code")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .font(DS.Typography.body.weight(.medium))
+                        .foregroundStyle(DS.Color.ink)
                     Button("Open Settings") {
                         if let url = URL(string: UIApplication.openSettingsURLString) {
                             UIApplication.shared.open(url)
@@ -47,8 +48,8 @@ struct QRScannerView: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 30))
-                            .foregroundStyle(PulseTheme.textSecondary)
+                            .font(DS.Typography.title1)
+                            .foregroundStyle(DS.Color.inkMid)
                     }
                     .padding()
                 }
@@ -57,12 +58,12 @@ struct QRScannerView: View {
 
                 // 扫描框
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .strokeBorder(PulseTheme.textSecondary, lineWidth: 2)
-                    .frame(width: 250, height: 250)
+                    .strokeBorder(DS.Color.inkMid, lineWidth: 2)
+                    .frame(width: DS.Spacing.xxl * 6 + DS.Spacing.s, height: DS.Spacing.xxl * 6 + DS.Spacing.s)
                     .overlay {
                         if scanned {
                             Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 60))
+                                .font(DS.Typography.display3)
                                 .foregroundStyle(.green)
                                 .transition(.scale.combined(with: .opacity))
                         }
@@ -74,27 +75,27 @@ struct QRScannerView: View {
                 VStack(spacing: 8) {
                     if let error {
                         Text(error)
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .font(DS.Typography.bodyS.weight(.medium))
                             .foregroundStyle(.red)
                             .multilineTextAlignment(.center)
                     } else {
                         Text(scanned ? "Connected! ✓" : "Scan QR code to connect")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .font(DS.Typography.body.weight(.medium))
                             .foregroundStyle(scanned ? .green : .white)
-                            .animation(.easeInOut, value: scanned)
+                            
                         if !scanned {
                             Text("Open PulseWatch Settings on your Mac to get the QR code")
-                                .font(.system(size: 13))
-                                .foregroundStyle(PulseTheme.textTertiary)
+                                .font(DS.Typography.bodyS)
+                                .foregroundStyle(DS.Color.inkDim)
                                 .multilineTextAlignment(.center)
                         }
                     }
                 }
-                .padding(.bottom, 60)
+                .padding(.bottom, DS.Spacing.m)
             }
         }
-        .animation(.spring(response: 0.3), value: scanned)
-        .animation(.spring(response: 0.3), value: error)
+        .animation(reduceMotion ? nil : .spring(response: 0.3), value: scanned)
+        .animation(reduceMotion ? nil : .spring(response: 0.3), value: error)
         .task {
             switch AVCaptureDevice.authorizationStatus(for: .video) {
             case .authorized:

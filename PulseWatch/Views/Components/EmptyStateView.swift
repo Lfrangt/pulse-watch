@@ -9,7 +9,7 @@ struct EmptyStateView: View {
     var body: some View {
         VStack(spacing: PulseTheme.spacingM) {
             Image(systemName: icon)
-                .font(.system(size: 36, weight: .light))
+                .font(DS.Typography.title1.weight(.light))
                 .foregroundStyle(PulseTheme.textTertiary)
                 .accessibilityHidden(true)
 

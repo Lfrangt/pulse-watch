@@ -10,7 +10,7 @@ struct GoalSettingView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: PulseTheme.spacingM) {
+            VStack(spacing: DS.Spacing.m) {
 
                 headerCard
                     .staggered(index: 0)
@@ -31,10 +31,10 @@ struct GoalSettingView: View {
 
                 Spacer(minLength: 40)
             }
-            .padding(.horizontal, PulseTheme.spacingM)
-            .padding(.top, PulseTheme.spacingS)
+            .padding(.horizontal, DS.Spacing.m)
+            .padding(.top, DS.Spacing.s)
         }
-        .background(PulseTheme.background)
+        .background(DS.Color.bg)
         .navigationTitle(String(localized: "目标设置"))
         .navigationBarTitleDisplayMode(.large)
         .toolbarColorScheme(.dark, for: .navigationBar)
@@ -54,24 +54,24 @@ struct GoalSettingView: View {
     // MARK: - Header
 
     private var headerCard: some View {
-        HStack(spacing: PulseTheme.spacingM) {
+        HStack(spacing: DS.Spacing.m) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(PulseTheme.accentTeal.opacity(0.12))
-                    .frame(width: 36, height: 36)
+                    .fill(DS.Color.accent.opacity(0.12))
+                    .frame(width: DS.Spacing.xl + DS.Spacing.xs, height: DS.Spacing.xl + DS.Spacing.xs)
                 Image(systemName: "target")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(PulseTheme.accentTeal)
+                    .font(DS.Typography.body.weight(.medium))
+                    .foregroundStyle(DS.Color.accent)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(String(localized: "健康目标"))
                     .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .foregroundStyle(DS.Color.ink)
                     .accessibilityAddTraits(.isHeader)
                 Text(String(localized: "设定目标，追踪每日进度"))
                     .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
             Spacer()
@@ -82,20 +82,20 @@ struct GoalSettingView: View {
     // MARK: - Empty
 
     private var emptyCard: some View {
-        VStack(spacing: PulseTheme.spacingM) {
+        VStack(spacing: DS.Spacing.m) {
             Image(systemName: "flag.checkered")
-                .font(.system(size: 36))
-                .foregroundStyle(PulseTheme.textTertiary.opacity(0.5))
+                .font(DS.Typography.title1)
+                .foregroundStyle(DS.Color.inkDim.opacity(0.5))
             Text(String(localized: "还没有设定目标"))
                 .font(PulseTheme.bodyFont)
-                .foregroundStyle(PulseTheme.textSecondary)
+                .foregroundStyle(DS.Color.inkMid)
             Text(String(localized: "设定步数、睡眠、训练等目标，让 Pulse 帮你追踪"))
                 .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .foregroundStyle(DS.Color.inkDim)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, PulseTheme.spacingXL)
+        .padding(.vertical, DS.Spacing.xl)
         .pulseCard()
     }
 
@@ -104,25 +104,25 @@ struct GoalSettingView: View {
     private func goalRow(_ goal: HealthGoal) -> some View {
         let metric = GoalMetricType(rawValue: goal.metricType)
 
-        return HStack(spacing: PulseTheme.spacingM) {
+        return HStack(spacing: DS.Spacing.m) {
             // 图标
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(PulseTheme.accent.opacity(0.12))
-                    .frame(width: 40, height: 40)
+                    .fill(DS.Color.accent.opacity(0.12))
+                    .frame(width: DS.Spacing.xxl, height: DS.Spacing.xxl)
                 Image(systemName: metric?.icon ?? "questionmark")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(PulseTheme.accent)
+                    .font(DS.Typography.body.weight(.medium))
+                    .foregroundStyle(DS.Color.accent)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(metric?.label ?? goal.metricType)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.body.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
 
                 Text(String(localized: "目标: \(formatTarget(goal.targetValue, metric: metric)) \(metric?.unit ?? "")"))
-                    .font(.system(size: 12, design: .rounded))
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkMid)
             }
 
             Spacer()
@@ -133,15 +133,15 @@ struct GoalSettingView: View {
                 set: { goal.isActive = $0 }
             ))
             .labelsHidden()
-            .tint(PulseTheme.accentTeal)
+            .tint(DS.Color.accent)
 
             // 删除
             Button {
                 modelContext.delete(goal)
             } label: {
                 Image(systemName: "trash")
-                    .font(.system(size: 13))
-                    .foregroundStyle(PulseTheme.statusPoor.opacity(0.7))
+                    .font(DS.Typography.bodyS)
+                    .foregroundStyle(DS.Color.bad.opacity(0.7))
             }
         }
         .pulseCard()
@@ -163,19 +163,19 @@ struct GoalSettingView: View {
         Button {
             showAddGoal = true
         } label: {
-            HStack(spacing: PulseTheme.spacingS) {
+            HStack(spacing: DS.Spacing.s) {
                 Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 16))
+                    .font(DS.Typography.body)
                 Text(String(localized: "添加目标"))
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .font(DS.Typography.body.weight(.medium))
             }
-            .foregroundStyle(PulseTheme.accentTeal)
+            .foregroundStyle(DS.Color.accent)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
+            .padding(.vertical, DS.Spacing.card)
             .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .stroke(PulseTheme.accentTeal.opacity(0.3), lineWidth: 1)
-                    .fill(PulseTheme.accentTeal.opacity(0.05))
+                RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                    .stroke(DS.Color.accent.opacity(0.3), lineWidth: 1)
+                    .fill(DS.Color.accent.opacity(0.05))
             )
         }
     }
@@ -193,57 +193,57 @@ struct AddGoalSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: PulseTheme.spacingL) {
+            VStack(spacing: DS.Spacing.l) {
                 // 指标选择
-                VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                VStack(alignment: .leading, spacing: DS.Spacing.s) {
                     Text(String(localized: "选择指标"))
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.bodyS.weight(.medium))
+                        .foregroundStyle(DS.Color.inkDim)
 
                     ForEach(GoalMetricType.allCases, id: \.rawValue) { metric in
                         Button {
                             selectedMetric = metric
                             targetValue = metric.defaultTarget
                         } label: {
-                            HStack(spacing: PulseTheme.spacingM) {
+                            HStack(spacing: DS.Spacing.m) {
                                 Image(systemName: metric.icon)
-                                    .font(.system(size: 14))
-                                    .foregroundStyle(selectedMetric == metric ? PulseTheme.accentTeal : PulseTheme.textTertiary)
+                                    .font(DS.Typography.bodyS)
+                                    .foregroundStyle(selectedMetric == metric ? DS.Color.accent : DS.Color.inkDim)
                                     .frame(width: 24)
 
                                 Text(metric.label)
                                     .font(PulseTheme.bodyFont)
-                                    .foregroundStyle(selectedMetric == metric ? PulseTheme.textPrimary : PulseTheme.textSecondary)
+                                    .foregroundStyle(selectedMetric == metric ? DS.Color.ink : DS.Color.inkMid)
 
                                 Spacer()
 
                                 if selectedMetric == metric {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .foregroundStyle(PulseTheme.accentTeal)
+                                        .foregroundStyle(DS.Color.accent)
                                 }
                             }
-                            .padding(.vertical, 10)
+                            .padding(.vertical, DS.Spacing.s)
                         }
                     }
                 }
                 .pulseCard()
 
                 // 目标值
-                VStack(spacing: PulseTheme.spacingM) {
+                VStack(spacing: DS.Spacing.m) {
                     Text(String(localized: "目标值"))
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.bodyS.weight(.medium))
+                        .foregroundStyle(DS.Color.inkDim)
 
                     Text("\(formatValue(targetValue)) \(selectedMetric.unit)")
-                        .font(.system(size: 36, weight: .bold, design: .rounded))
-                        .foregroundStyle(PulseTheme.accentTeal)
+                        .font(DS.Typography.title1)
+                        .foregroundStyle(DS.Color.accent)
 
                     Slider(
                         value: $targetValue,
                         in: selectedMetric.range,
                         step: selectedMetric.step
                     )
-                    .tint(PulseTheme.accentTeal)
+                    .tint(DS.Color.accent)
                 }
                 .pulseCard()
 
@@ -258,15 +258,15 @@ struct AddGoalSheet: View {
                 }
                 .buttonStyle(PulseButtonStyle())
             }
-            .padding(PulseTheme.spacingM)
-            .background(PulseTheme.background)
+            .padding(DS.Spacing.m)
+            .background(DS.Color.bg)
             .navigationTitle(String(localized: "新目标"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "取消")) { dismiss() }
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .foregroundStyle(DS.Color.inkMid)
                 }
             }
         }

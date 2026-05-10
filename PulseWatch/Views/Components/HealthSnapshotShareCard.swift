@@ -45,13 +45,13 @@ struct HealthSnapshotShareCard: View {
                 // 品牌
                 HStack {
                     Text("PULSE")
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .foregroundStyle(PulseTheme.accentTeal.opacity(0.7))
+                        .font(DS.Typography.caption.weight(.bold))
+                        .foregroundStyle(DS.Color.accent.opacity(0.7))
                         .tracking(3)
                     Spacer()
                     Text(Date.now, format: .dateTime.month(.abbreviated).day())
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.caption.weight(.medium))
+                        .foregroundStyle(DS.Color.inkDim)
                 }
 
                 Spacer()
@@ -60,13 +60,13 @@ struct HealthSnapshotShareCard: View {
                 VStack(spacing: 8) {
                     Text("\(score)")
                         .font(.system(size: ratio == .story ? 72 : 56, weight: .bold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .foregroundStyle(DS.Color.ink)
 
                     Text(PulseTheme.statusLabel(for: score))
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .font(DS.Typography.body.weight(.semibold))
                         .foregroundStyle(PulseTheme.statusColor(for: score))
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, DS.Spacing.m)
+                        .padding(.vertical, DS.Spacing.xs)
                         .background(
                             Capsule().fill(PulseTheme.statusColor(for: score).opacity(0.15))
                         )
@@ -80,22 +80,22 @@ struct HealthSnapshotShareCard: View {
                         miniMetric(icon: "heart.fill", value: "\(Int(rhr))", unit: "bpm", color: PulseTheme.activityCoral)
                     }
                     if let hrv = hrv {
-                        miniMetric(icon: "waveform.path.ecg", value: "\(Int(hrv))", unit: "ms", color: PulseTheme.accentTeal)
+                        miniMetric(icon: "waveform.path.ecg", value: "\(Int(hrv))", unit: "ms", color: DS.Color.accent)
                     }
                     if let sleep = sleepHours {
                         miniMetric(icon: "moon.fill", value: String(format: "%.1f", sleep), unit: "h", color: PulseTheme.sleepViolet)
                     }
                     if let steps = steps {
-                        miniMetric(icon: "figure.walk", value: formatSteps(steps), unit: "", color: PulseTheme.statusWarning)
+                        miniMetric(icon: "figure.walk", value: formatSteps(steps), unit: "", color: DS.Color.warn)
                     }
                 }
 
                 // 水印
                 Text("pulse-watch.app")
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.textQuaternary)
+                    .font(DS.Typography.monoS.weight(.medium))
+                    .foregroundStyle(DS.Color.inkDim)
             }
-            .padding(24)
+            .padding(DS.Spacing.l)
         }
         .aspectRatio(ratio.aspectRatio, contentMode: .fit)
     }
@@ -103,15 +103,15 @@ struct HealthSnapshotShareCard: View {
     private func miniMetric(icon: String, value: String, unit: String, color: Color) -> some View {
         VStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 12, weight: .medium))
+                .font(DS.Typography.caption.weight(.medium))
                 .foregroundStyle(color)
             Text(value)
-                .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyL.weight(.bold))
+                .foregroundStyle(DS.Color.ink)
             if !unit.isEmpty {
                 Text(unit)
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.monoS.weight(.medium))
+                    .foregroundStyle(DS.Color.inkDim)
             }
         }
         .frame(maxWidth: .infinity)
@@ -141,7 +141,7 @@ struct HealthSnapshotShareScreen: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: PulseTheme.spacingM) {
+            VStack(spacing: DS.Spacing.m) {
                 // 比例选择
                 Picker("", selection: $selectedRatio) {
                     ForEach(HealthSnapshotShareCard.CardRatio.allCases, id: \.rawValue) { ratio in
@@ -149,13 +149,13 @@ struct HealthSnapshotShareScreen: View {
                     }
                 }
                 .pickerStyle(.segmented)
-                .padding(.horizontal, PulseTheme.spacingM)
+                .padding(.horizontal, DS.Spacing.m)
                 .onChange(of: selectedRatio) { _, _ in renderedImage = nil }
 
                 // 预览
                 ScrollView {
                     cardView
-                        .padding(.horizontal, PulseTheme.spacingL)
+                        .padding(.horizontal, DS.Spacing.l)
                 }
 
                 // 分享按钮
@@ -168,17 +168,17 @@ struct HealthSnapshotShareScreen: View {
                     }
                 }
                 .buttonStyle(PulseButtonStyle())
-                .padding(.horizontal, PulseTheme.spacingM)
-                .padding(.bottom, PulseTheme.spacingM)
+                .padding(.horizontal, DS.Spacing.m)
+                .padding(.bottom, DS.Spacing.m)
             }
-            .background(PulseTheme.background)
+            .background(DS.Color.bg)
             .navigationTitle(String(localized: "分享健康快照"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "取消")) { dismiss() }
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .foregroundStyle(DS.Color.inkMid)
                 }
             }
         }

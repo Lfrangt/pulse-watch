@@ -20,25 +20,25 @@ struct MuscleInsightsCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+        VStack(alignment: .leading, spacing: DS.Spacing.m) {
             // Header
-            HStack(spacing: PulseTheme.spacingS) {
+            HStack(spacing: DS.Spacing.s) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .fill(PulseTheme.accent.opacity(0.12))
-                        .frame(width: 24, height: 24)
+                        .fill(DS.Color.accent.opacity(0.12))
+                        .frame(width: DS.Spacing.l + DS.Spacing.xs, height: DS.Spacing.l + DS.Spacing.xs)
                     Image(systemName: "chart.bar.xaxis.ascending")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(PulseTheme.accent)
+                        .font(DS.Typography.caption.weight(.medium))
+                        .foregroundStyle(DS.Color.accent)
                 }
                 Text("Recovery Insights")
                     .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .foregroundStyle(DS.Color.ink)
                     .accessibilityAddTraits(.isHeader)
                 Spacer()
                 Text("by muscle group")
                     .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
             if taggedWorkoutsCount == 0 {
@@ -48,12 +48,12 @@ struct MuscleInsightsCard: View {
                 // 有 tag 但都不足 5 次
                 Text(String(localized: "Building your personal insights…\nTag your workouts with muscle groups to unlock."))
                     .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .foregroundStyle(DS.Color.inkMid)
                     .multilineTextAlignment(.leading)
             } else {
                 // 真实洞察
                 if !insights.isEmpty {
-                    VStack(spacing: PulseTheme.spacingS) {
+                    VStack(spacing: DS.Spacing.s) {
                         ForEach(insights) { insight in
                             insightRow(insight)
                         }
@@ -62,10 +62,10 @@ struct MuscleInsightsCard: View {
 
                 // 积累中的提示
                 if !pending.isEmpty {
-                    Divider().background(PulseTheme.border)
+                    Divider().background(DS.Color.line)
                     Text(String(localized: "Accumulating data:"))
                         .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .foregroundStyle(DS.Color.inkDim)
                     ForEach(pending, id: \.0) { group, count in
                         HStack {
                             Text(group.emoji + " " + group.label)
@@ -74,7 +74,7 @@ struct MuscleInsightsCard: View {
                             Spacer()
                             Text(String(format: String(localized: "%d / 5 sessions"), count))
                                 .font(PulseTheme.captionFont)
-                                .foregroundStyle(PulseTheme.textTertiary)
+                                .foregroundStyle(DS.Color.inkDim)
                         }
                     }
                 }
@@ -86,43 +86,43 @@ struct MuscleInsightsCard: View {
     // MARK: - Subviews
 
     private var emptyState: some View {
-        HStack(spacing: PulseTheme.spacingM) {
+        HStack(spacing: DS.Spacing.m) {
             Image(systemName: "tag.slash")
-                .font(.system(size: 20))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.bodyL)
+                .foregroundStyle(DS.Color.inkDim)
             VStack(alignment: .leading, spacing: 4) {
                 Text("No muscle groups tagged yet")
                     .font(PulseTheme.bodyFont)
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .foregroundStyle(DS.Color.inkMid)
                 Text("Open a workout and tag which muscles you trained")
                     .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
             }
         }
     }
 
     private func insightRow(_ insight: MuscleInsightEngine.Insight) -> some View {
-        HStack(alignment: .top, spacing: PulseTheme.spacingM) {
+        HStack(alignment: .top, spacing: DS.Spacing.m) {
             // 方向指示
             ZStack {
                 Circle()
-                    .fill(insight.isPositive ? PulseTheme.statusGood.opacity(0.15) : PulseTheme.statusPoor.opacity(0.15))
-                    .frame(width: 32, height: 32)
+                    .fill(insight.isPositive ? DS.Color.good.opacity(0.15) : DS.Color.bad.opacity(0.15))
+                    .frame(width: DS.Spacing.xl, height: DS.Spacing.xl)
                 Image(systemName: insight.isPositive ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
-                    .font(.system(size: 16))
-                    .foregroundStyle(insight.isPositive ? PulseTheme.statusGood : PulseTheme.statusPoor)
+                    .font(DS.Typography.body)
+                    .foregroundStyle(insight.isPositive ? DS.Color.good : DS.Color.bad)
             }
             .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(insight.description)
                     .font(PulseTheme.bodyFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .foregroundStyle(DS.Color.ink)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(String(format: String(localized: "Based on %d sessions"), insight.sampleCount))
                     .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
             }
         }
     }

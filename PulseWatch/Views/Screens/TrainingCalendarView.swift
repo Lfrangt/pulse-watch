@@ -38,15 +38,15 @@ struct TrainingCalendarView: View {
         case "chest", "shoulders":
             return PulseTheme.trendBlue   // Push — 蓝色
         case "back":
-            return PulseTheme.statusGood   // Pull — 绿色
+            return DS.Color.good   // Pull — 绿色
         case "legs":
-            return PulseTheme.statusModerate   // 腿 — 琥珀色
+            return DS.Color.warn   // 腿 — 琥珀色
         case "arms":
-            return PulseTheme.statusWarning   // 手臂 — 金色
+            return DS.Color.warn   // 手臂 — 金色
         case "cardio":
             return PulseTheme.activityAccent   // 有氧 — 红色
         default:
-            return PulseTheme.textTertiary
+            return DS.Color.inkDim
         }
     }
 
@@ -68,7 +68,7 @@ struct TrainingCalendarView: View {
     var body: some View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: PulseTheme.spacingM) {
+                VStack(spacing: DS.Spacing.m) {
                     // 月份导航
                     monthNavigationBar
                         .staggered(index: 0)
@@ -106,10 +106,10 @@ struct TrainingCalendarView: View {
 
                     Spacer(minLength: 60)
                 }
-                .padding(.horizontal, PulseTheme.spacingM)
-                .padding(.top, PulseTheme.spacingS)
+                .padding(.horizontal, DS.Spacing.m)
+                .padding(.top, DS.Spacing.s)
             }
-            .background(PulseTheme.background)
+            .background(DS.Color.bg)
             .navigationTitle(String(localized: "Training Calendar"))
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -127,18 +127,18 @@ struct TrainingCalendarView: View {
                 }
             } label: {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.accent)
-                    .frame(width: 40, height: 40)
-                    .background(PulseTheme.accent.opacity(0.1))
+                    .font(DS.Typography.body.weight(.semibold))
+                    .foregroundStyle(DS.Color.accent)
+                    .frame(width: DS.Spacing.xxl, height: DS.Spacing.xxl)
+                    .background(DS.Color.accent.opacity(0.1))
                     .clipShape(Circle())
             }
 
             Spacer()
 
             Text(monthYearString)
-                .font(.system(size: 20, weight: .semibold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyL.weight(.semibold))
+                .foregroundStyle(DS.Color.ink)
 
             Spacer()
 
@@ -149,14 +149,14 @@ struct TrainingCalendarView: View {
                 }
             } label: {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.accent)
-                    .frame(width: 40, height: 40)
-                    .background(PulseTheme.accent.opacity(0.1))
+                    .font(DS.Typography.body.weight(.semibold))
+                    .foregroundStyle(DS.Color.accent)
+                    .frame(width: DS.Spacing.xxl, height: DS.Spacing.xxl)
+                    .background(DS.Color.accent.opacity(0.1))
                     .clipShape(Circle())
             }
         }
-        .padding(.horizontal, PulseTheme.spacingS)
+        .padding(.horizontal, DS.Spacing.s)
     }
 
     /// 当前月份的标题字符串，例如 "2026年3月"
@@ -170,17 +170,17 @@ struct TrainingCalendarView: View {
     // MARK: - 日历网格
 
     private var calendarGrid: some View {
-        VStack(spacing: PulseTheme.spacingS) {
+        VStack(spacing: DS.Spacing.s) {
             // 星期头部
             HStack(spacing: 0) {
                 ForEach(weekdayHeaders, id: \.self) { day in
                     Text(day)
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.bodyS.weight(.medium))
+                        .foregroundStyle(DS.Color.inkDim)
                         .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.bottom, PulseTheme.spacingXS)
+            .padding(.bottom, DS.Spacing.xs)
 
             // 日期网格
             let gridData = calendarGridData
@@ -202,15 +202,15 @@ struct TrainingCalendarView: View {
                 }
             }
         }
-        .padding(PulseTheme.spacingM)
+        .padding(DS.Spacing.m)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .fill(PulseTheme.cardBackground)
-                .shadow(color: PulseTheme.cardShadow, radius: 16, y: 6)
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                .fill(DS.Color.bgElev)
+                
         )
         .overlay(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                .stroke(DS.Color.line.opacity(0.5), lineWidth: 0.5)
         )
     }
 
@@ -243,35 +243,35 @@ struct TrainingCalendarView: View {
                     ZStack {
                         // 背景色
                         if hasWorkout {
-                            RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                            RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
                                 .fill(workoutColor.opacity(0.2))
                         }
 
                         // 选中高亮
                         if isSelected {
-                            RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                                .stroke(PulseTheme.accent, lineWidth: 1.5)
+                            RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                                .stroke(DS.Color.accent, lineWidth: 1.5)
                         }
 
                         // 今天标记
                         if isToday && !isSelected {
-                            RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                                .stroke(PulseTheme.textTertiary.opacity(0.5), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                                .stroke(DS.Color.inkDim.opacity(0.5), lineWidth: 1)
                         }
 
                         Text("\(item.day)")
-                            .font(.system(size: 14, weight: isToday ? .bold : .regular, design: .rounded))
-                            .foregroundStyle(isSelected ? PulseTheme.accent :
-                                                isToday ? PulseTheme.textPrimary :
-                                                hasWorkout ? PulseTheme.textPrimary :
-                                                PulseTheme.textSecondary)
+                            .font(DS.Typography.bodyS)
+                            .foregroundStyle(isSelected ? DS.Color.accent :
+                                                isToday ? DS.Color.ink :
+                                                hasWorkout ? DS.Color.ink :
+                                                DS.Color.inkMid)
                     }
-                    .frame(width: 34, height: 34)
+                    .frame(width: DS.Spacing.xl + DS.Spacing.xs / 2, height: DS.Spacing.xl + DS.Spacing.xs / 2)
 
                     // 训练指示点
                     Circle()
                         .fill(hasWorkout ? workoutColor : Color.clear)
-                        .frame(width: 5, height: 5)
+                        .frame(width: DS.Stroke.chartHeavy * 4, height: DS.Stroke.chartHeavy * 4)
                 }
             }
             .buttonStyle(.plain)
@@ -286,33 +286,33 @@ struct TrainingCalendarView: View {
         let manualWorkouts = workoutsForDate(date) ?? []
         let hkWorkouts = hkWorkoutsForDate(date)
 
-        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+        VStack(alignment: .leading, spacing: DS.Spacing.m) {
             HStack {
                 Text(dayDetailTitle(date))
                     .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .foregroundStyle(DS.Color.ink)
                 Spacer()
                 if let summary = summaryForDate(date), let score = summary.dailyScore {
                     HStack(spacing: 4) {
-                        Image(systemName: "heart.fill").font(.system(size: 11)).foregroundStyle(PulseTheme.statusColor(for: score))
+                        Image(systemName: "heart.fill").font(DS.Typography.caption).foregroundStyle(PulseTheme.statusColor(for: score))
                         Text(String(localized: "Recovery \(score)")).font(PulseTheme.captionFont).foregroundStyle(PulseTheme.statusColor(for: score))
                     }
-                    .padding(.horizontal, 10).padding(.vertical, 5)
+                    .padding(.horizontal, DS.Spacing.s).padding(.vertical, DS.Spacing.m)
                     .background(Capsule().fill(PulseTheme.statusColor(for: score).opacity(0.15)))
                 }
             }
 
             // HK 训练（Apple Watch 同步）
             ForEach(Array(hkWorkouts.enumerated()), id: \.offset) { _, hk in
-                HStack(spacing: PulseTheme.spacingS) {
-                    Circle().fill(WorkoutActivityHelper.pulseColor(for: hk.activityType)).frame(width: 8, height: 8)
+                HStack(spacing: DS.Spacing.s) {
+                    Circle().fill(WorkoutActivityHelper.pulseColor(for: hk.activityType)).frame(width: DS.Spacing.s, height: DS.Spacing.s)
                     VStack(alignment: .leading, spacing: 2) {
                         HStack {
                             Text(hk.activityName)
-                                .font(.system(size: 15, weight: .medium, design: .rounded))
-                                .foregroundStyle(PulseTheme.textPrimary)
+                                .font(DS.Typography.body.weight(.medium))
+                                .foregroundStyle(DS.Color.ink)
                             Text("· Apple Watch")
-                                .font(.system(size: 11)).foregroundStyle(PulseTheme.textTertiary)
+                                .font(DS.Typography.caption).foregroundStyle(DS.Color.inkDim)
                         }
                         HStack(spacing: 8) {
                             Label("\(hk.durationMinutes) \(String(localized: "min"))", systemImage: "clock")
@@ -320,14 +320,14 @@ struct TrainingCalendarView: View {
                                 Label("\(Int(cal)) kcal", systemImage: "flame.fill")
                             }
                         }
-                        .font(.system(size: 12)).foregroundStyle(PulseTheme.textSecondary)
+                        .font(DS.Typography.caption).foregroundStyle(DS.Color.inkMid)
                     }
                 }
             }
 
             // 手动记录
             if !manualWorkouts.isEmpty {
-                if !hkWorkouts.isEmpty { Divider().background(PulseTheme.border) }
+                if !hkWorkouts.isEmpty { Divider().background(DS.Color.line) }
                 selectedDayDetail(date: date, workouts: manualWorkouts)
                     .background(Color.clear)
             }
@@ -337,27 +337,27 @@ struct TrainingCalendarView: View {
 
     @ViewBuilder
     private func selectedDayDetail(date: Date, workouts: [WorkoutRecord]) -> some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+        VStack(alignment: .leading, spacing: DS.Spacing.m) {
             // 日期标题
             HStack {
                 Text(dayDetailTitle(date))
                     .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .foregroundStyle(DS.Color.ink)
 
                 Spacer()
 
                 // 恢复评分（如果有）
                 if let summary = summaryForDate(date), let score = summary.dailyScore {
-                    HStack(spacing: PulseTheme.spacingXS) {
+                    HStack(spacing: DS.Spacing.xs) {
                         Image(systemName: "heart.fill")
-                            .font(.system(size: 12))
+                            .font(DS.Typography.caption)
                             .foregroundStyle(PulseTheme.statusColor(for: score))
                         Text("Recovery \(score)")
                             .font(PulseTheme.captionFont)
                             .foregroundStyle(PulseTheme.statusColor(for: score))
                     }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
+                    .padding(.horizontal, DS.Spacing.s)
+                    .padding(.vertical, DS.Spacing.m)
                     .background(
                         Capsule()
                             .fill(PulseTheme.statusColor(for: score).opacity(0.15))
@@ -367,20 +367,20 @@ struct TrainingCalendarView: View {
 
             // 每个训练记录
             ForEach(workouts, id: \.id) { workout in
-                VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                VStack(alignment: .leading, spacing: DS.Spacing.s) {
                     // 训练类型 + 时长
-                    HStack(spacing: PulseTheme.spacingS) {
+                    HStack(spacing: DS.Spacing.s) {
                         Circle()
                             .fill(categoryColor(for: workout.category))
-                            .frame(width: 8, height: 8)
+                            .frame(width: DS.Spacing.s, height: DS.Spacing.s)
 
                         Text(categoryLabel(for: workout.category))
-                            .font(.system(size: 15, weight: .medium, design: .rounded))
-                            .foregroundStyle(PulseTheme.textPrimary)
+                            .font(DS.Typography.body.weight(.medium))
+                            .foregroundStyle(DS.Color.ink)
 
                         Text("\(workout.durationMinutes) min")
                             .font(PulseTheme.captionFont)
-                            .foregroundStyle(PulseTheme.textSecondary)
+                            .foregroundStyle(DS.Color.inkMid)
 
                         Spacer()
 
@@ -388,38 +388,38 @@ struct TrainingCalendarView: View {
                         if let cal = workout.caloriesBurned, cal > 0 {
                             HStack(spacing: 3) {
                                 Image(systemName: "flame.fill")
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(PulseTheme.statusModerate)
+                                    .font(DS.Typography.caption)
+                                    .foregroundStyle(DS.Color.warn)
                                 Text("\(Int(cal)) kcal")
                                     .font(PulseTheme.captionFont)
-                                    .foregroundStyle(PulseTheme.textSecondary)
+                                    .foregroundStyle(DS.Color.inkMid)
                             }
                         }
                     }
 
                     // 动作列表
                     if !workout.exercises.isEmpty {
-                        VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
+                        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                             ForEach(workout.exercises) { exercise in
                                 exerciseRow(exercise)
                             }
                         }
-                        .padding(.leading, PulseTheme.spacingM)
+                        .padding(.leading, DS.Spacing.m)
                     }
 
                     // 备注
                     if let notes = workout.notes, !notes.isEmpty {
                         Text(notes)
                             .font(PulseTheme.captionFont)
-                            .foregroundStyle(PulseTheme.textTertiary)
-                            .padding(.leading, PulseTheme.spacingM)
+                            .foregroundStyle(DS.Color.inkDim)
+                            .padding(.leading, DS.Spacing.m)
                     }
                 }
 
                 // 多条训练之间的分隔线
                 if workout.id != workouts.last?.id {
                     Divider()
-                        .background(PulseTheme.border)
+                        .background(DS.Color.line)
                 }
             }
         }
@@ -428,10 +428,10 @@ struct TrainingCalendarView: View {
 
     /// 单个动作行
     private func exerciseRow(_ exercise: ExerciseEntry) -> some View {
-        HStack(spacing: PulseTheme.spacingS) {
+        HStack(spacing: DS.Spacing.s) {
             Text(exercise.name)
-                .font(.system(size: 13, weight: .regular, design: .rounded))
-                .foregroundStyle(PulseTheme.textSecondary)
+                .font(DS.Typography.bodyS)
+                .foregroundStyle(DS.Color.inkMid)
 
             Spacer()
 
@@ -445,13 +445,13 @@ struct TrainingCalendarView: View {
                     "\(repRange.min() ?? 0)-\(repRange.max() ?? 0)"
 
                 Text("\(totalSets) sets x \(repText) reps")
-                    .font(.system(size: 12, weight: .regular, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkDim)
 
                 if maxWeight > 0 {
                     Text("\(Int(maxWeight)) kg")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.accent)
+                        .font(DS.Typography.caption.weight(.medium))
+                        .foregroundStyle(DS.Color.accent)
                 }
             }
         }
@@ -482,12 +482,12 @@ struct TrainingCalendarView: View {
             .mapValues(\.count)
         let topCategory = categoryCounts.max(by: { $0.value < $1.value })
 
-        return VStack(spacing: PulseTheme.spacingM) {
+        return VStack(spacing: DS.Spacing.m) {
             // 标题
             HStack {
                 Text(String(localized: "Monthly Overview"))
                     .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .foregroundStyle(DS.Color.ink)
                 Spacer()
             }
 
@@ -497,12 +497,12 @@ struct TrainingCalendarView: View {
                     value: "\(trainingDays)",
                     label: String(localized: "Training Days"),
                     icon: "calendar",
-                    color: PulseTheme.accent
+                    color: DS.Color.accent
                 )
 
                 // 分隔线
                 Rectangle()
-                    .fill(PulseTheme.border)
+                    .fill(DS.Color.line)
                     .frame(width: 0.5, height: 40)
 
                 // 最常练部位
@@ -510,12 +510,12 @@ struct TrainingCalendarView: View {
                     value: topCategory.map { categoryLabel(for: $0.key) } ?? "—",
                     label: String(localized: "Top Muscle"),
                     icon: "figure.strengthtraining.traditional",
-                    color: topCategory.map { categoryColor(for: $0.key) } ?? PulseTheme.textTertiary
+                    color: topCategory.map { categoryColor(for: $0.key) } ?? DS.Color.inkDim
                 )
 
                 // 分隔线
                 Rectangle()
-                    .fill(PulseTheme.border)
+                    .fill(DS.Color.line)
                     .frame(width: 0.5, height: 40)
 
                 // 总训练时长
@@ -523,7 +523,7 @@ struct TrainingCalendarView: View {
                     value: totalMinutes >= 60 ? "\(totalMinutes / 60)h\(totalMinutes % 60)m" : "\(totalMinutes)m",
                     label: String(localized: "Total Duration"),
                     icon: "clock.fill",
-                    color: PulseTheme.statusModerate
+                    color: DS.Color.warn
                 )
             }
         }
@@ -532,18 +532,18 @@ struct TrainingCalendarView: View {
 
     /// 统计项
     private func statItem(value: String, label: String, icon: String, color: Color) -> some View {
-        VStack(spacing: PulseTheme.spacingS) {
+        VStack(spacing: DS.Spacing.s) {
             Image(systemName: icon)
-                .font(.system(size: 16))
+                .font(DS.Typography.body)
                 .foregroundStyle(color)
 
             Text(value)
-                .font(.system(size: 18, weight: .semibold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyL.weight(.semibold))
+                .foregroundStyle(DS.Color.ink)
 
             Text(label)
-                .font(.system(size: 11, weight: .regular, design: .rounded))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.caption)
+                .foregroundStyle(DS.Color.inkDim)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
@@ -555,35 +555,35 @@ struct TrainingCalendarView: View {
     private var categoryLegend: some View {
         let legends: [(String, String, Color)] = [
             (String(localized: "Push (Chest/Shoulders)"), "chest",   PulseTheme.trendBlue),
-            (String(localized: "Pull (Back)"),   "back",    PulseTheme.statusGood),
-            (String(localized: "Legs"),        "legs",    PulseTheme.statusModerate),
-            (String(localized: "Arms"),      "arms",    PulseTheme.statusWarning),
+            (String(localized: "Pull (Back)"),   "back",    DS.Color.good),
+            (String(localized: "Legs"),        "legs",    DS.Color.warn),
+            (String(localized: "Arms"),      "arms",    DS.Color.warn),
             (String(localized: "Cardio"),      "cardio",  PulseTheme.activityAccent),
         ]
 
-        return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+        return VStack(alignment: .leading, spacing: DS.Spacing.s) {
             HStack {
                 Text(String(localized: "Legend"))
                     .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
                 Spacer()
             }
 
             // 用两行展示图例，更紧凑
-            HStack(spacing: PulseTheme.spacingM) {
+            HStack(spacing: DS.Spacing.m) {
                 ForEach(legends, id: \.0) { legend in
                     HStack(spacing: 5) {
                         Circle()
                             .fill(legend.2)
-                            .frame(width: 8, height: 8)
+                            .frame(width: DS.Spacing.s, height: DS.Spacing.s)
                         Text(legend.0)
-                            .font(.system(size: 12, weight: .regular, design: .rounded))
-                            .foregroundStyle(PulseTheme.textSecondary)
+                            .font(DS.Typography.caption)
+                            .foregroundStyle(DS.Color.inkMid)
                     }
                 }
             }
         }
-        .padding(.horizontal, PulseTheme.spacingXS)
+        .padding(.horizontal, DS.Spacing.xs)
     }
 
     // MARK: - 日历数据模型

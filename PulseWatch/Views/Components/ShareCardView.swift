@@ -85,7 +85,7 @@ struct ShareCardView: View {
 
             // Subtle bottom accent glow
             RadialGradient(
-                colors: [PulseTheme.accent.opacity(0.08), Color.clear],
+                colors: [DS.Color.accent.opacity(0.08), Color.clear],
                 center: .bottom,
                 startRadius: 10,
                 endRadius: 200
@@ -93,7 +93,7 @@ struct ShareCardView: View {
 
             // Noise texture simulation — subtle grain
             Rectangle()
-                .fill(PulseTheme.highlight)
+                .fill(DS.Color.chipBg)
         }
     }
 
@@ -129,7 +129,7 @@ struct ShareCardView: View {
 
             if ratio == .story { Spacer().frame(height: 24) }
         }
-        .padding(.horizontal, 28)
+        .padding(.horizontal, DS.Spacing.m)
         .padding(.vertical, ratio == .square ? 24 : 0)
     }
 
@@ -137,8 +137,8 @@ struct ShareCardView: View {
 
     private var dateLabel: some View {
         Text(formattedDate)
-            .font(.system(size: 14, weight: .medium, design: .rounded))
-            .foregroundStyle(PulseTheme.textTertiary)
+            .font(DS.Typography.bodyS.weight(.medium))
+            .foregroundStyle(DS.Color.inkDim)
     }
 
     // MARK: - Workout Header
@@ -164,7 +164,7 @@ struct ShareCardView: View {
 
             Text(workoutName)
                 .font(.system(size: ratio == .story ? 26 : 20, weight: .bold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .foregroundStyle(DS.Color.ink)
         }
     }
 
@@ -176,7 +176,7 @@ struct ShareCardView: View {
             metricPill(
                 icon: "clock.fill",
                 value: formatDuration(durationMinutes),
-                color: PulseTheme.accent
+                color: DS.Color.accent
             )
 
             metricDivider
@@ -196,18 +196,18 @@ struct ShareCardView: View {
                 metricPill(
                     icon: "location.fill",
                     value: String(format: "%.1f km", dist / 1000),
-                    color: PulseTheme.statusGood
+                    color: DS.Color.good
                 )
             }
         }
-        .padding(.vertical, 14)
-        .padding(.horizontal, 16)
+        .padding(.vertical, DS.Spacing.card)
+        .padding(.horizontal, DS.Spacing.m)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(PulseTheme.highlight)
+                .fill(DS.Color.chipBg)
                 .overlay(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
+                        .stroke(DS.Color.chipBg, lineWidth: 0.5)
                 )
         )
     }
@@ -215,19 +215,19 @@ struct ShareCardView: View {
     private func metricPill(icon: String, value: String, color: Color) -> some View {
         VStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 13, weight: .medium))
+                .font(DS.Typography.bodyS.weight(.medium))
                 .foregroundStyle(color)
 
             Text(value)
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyS.weight(.semibold))
+                .foregroundStyle(DS.Color.ink)
         }
         .frame(maxWidth: .infinity)
     }
 
     private var metricDivider: some View {
         Rectangle()
-            .fill(PulseTheme.highlight)
+            .fill(DS.Color.chipBg)
             .frame(width: 0.5, height: 32)
     }
 
@@ -236,14 +236,14 @@ struct ShareCardView: View {
     private var hrZonesCard: some View {
         VStack(alignment: .leading, spacing: ratio == .story ? 10 : 7) {
             Text(String(localized: "Heart Rate Zones"))
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(PulseTheme.textTertiary)
-                .padding(.bottom, 2)
+                .font(DS.Typography.bodyS.weight(.semibold))
+                .foregroundStyle(DS.Color.inkDim)
+                .padding(.bottom, DS.Spacing.m)
 
             ForEach(heartRateZones) { zone in
                 HStack(spacing: 8) {
                     Text(zone.name)
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .font(DS.Typography.caption.weight(.medium))
                         .foregroundStyle(zone.pulseColor)
                         .frame(width: 52, alignment: .leading)
 
@@ -267,19 +267,19 @@ struct ShareCardView: View {
                     .frame(height: ratio == .story ? 10 : 8)
 
                     Text("\(Int(zone.percentage * 100))%")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.caption.weight(.medium))
+                        .foregroundStyle(DS.Color.inkDim)
                         .frame(width: 32, alignment: .trailing)
                 }
             }
         }
-        .padding(16)
+        .padding(DS.Spacing.m)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(PulseTheme.highlight)
+                .fill(DS.Color.chipBg)
                 .overlay(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(PulseTheme.highlight, lineWidth: 0.5)
+                        .stroke(DS.Color.chipBg, lineWidth: 0.5)
                 )
         )
     }
@@ -291,22 +291,22 @@ struct ShareCardView: View {
             if let avg = averageHeartRate {
                 HStack(spacing: 6) {
                     Image(systemName: "heart.fill")
-                        .font(.system(size: 12))
+                        .font(DS.Typography.caption)
                         .foregroundStyle(PulseTheme.activityAccent.opacity(0.8))
                     Text(String(localized: "Avg") + " \(avg) bpm")
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .font(DS.Typography.bodyS.weight(.medium))
+                        .foregroundStyle(DS.Color.inkMid)
                 }
             }
 
             if let max = maxHeartRate {
                 HStack(spacing: 6) {
                     Image(systemName: "heart.fill")
-                        .font(.system(size: 12))
+                        .font(DS.Typography.caption)
                         .foregroundStyle(PulseTheme.activityAccent)
                     Text(String(localized: "Max") + " \(max) bpm")
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .font(DS.Typography.bodyS.weight(.medium))
+                        .foregroundStyle(DS.Color.inkMid)
                 }
             }
         }
@@ -318,12 +318,12 @@ struct ShareCardView: View {
         HStack(spacing: 8) {
             // Pulse Watch icon
             Image(systemName: "heart.circle.fill")
-                .font(.system(size: 18, weight: .medium))
-                .foregroundStyle(PulseTheme.accent.opacity(0.6))
+                .font(DS.Typography.bodyL.weight(.medium))
+                .foregroundStyle(DS.Color.accent.opacity(0.6))
 
             Text("Tracked with Pulse Watch")
-                .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.bodyS.weight(.medium))
+                .foregroundStyle(DS.Color.inkDim)
         }
     }
 
@@ -377,7 +377,7 @@ struct ShareHRZone: Identifiable {
         if lc.contains("cardio") || lc.contains("心肺") { return PulseTheme.zoneCardio }
         if lc.contains("anaerob") || lc.contains("无氧") { return PulseTheme.zonePeak }
         if lc.contains("peak") || lc.contains("峰")  { return PulseTheme.zoneMax }
-        return PulseTheme.accent
+        return DS.Color.accent
     }
 }
 

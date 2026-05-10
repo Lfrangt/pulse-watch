@@ -10,21 +10,21 @@ struct GoalProgressCard: View {
 
     var body: some View {
         if activeGoals.isEmpty { EmptyView() } else {
-            VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+            VStack(alignment: .leading, spacing: DS.Spacing.m) {
                 // 标题
-                HStack(spacing: PulseTheme.spacingS) {
+                HStack(spacing: DS.Spacing.s) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(PulseTheme.accentTeal.opacity(0.12))
-                            .frame(width: 24, height: 24)
+                            .fill(DS.Color.accent.opacity(0.12))
+                            .frame(width: DS.Spacing.l + DS.Spacing.xs, height: DS.Spacing.l + DS.Spacing.xs)
                         Image(systemName: "target")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(PulseTheme.accentTeal)
+                            .font(DS.Typography.caption.weight(.medium))
+                            .foregroundStyle(DS.Color.accent)
                     }
 
                     Text(String(localized: "今日目标"))
                         .font(PulseTheme.headlineFont)
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .foregroundStyle(DS.Color.ink)
                         .accessibilityAddTraits(.isHeader)
 
                     Spacer()
@@ -45,47 +45,47 @@ struct GoalProgressCard: View {
         let pct = goal.targetValue > 0 ? min(progress / goal.targetValue, 1.0) : 0
         let completed = pct >= 1.0
 
-        return HStack(spacing: PulseTheme.spacingM) {
+        return HStack(spacing: DS.Spacing.m) {
             // 进度环
             ZStack {
                 Circle()
                     .stroke(PulseTheme.surface2, lineWidth: 4)
-                    .frame(width: 36, height: 36)
+                    .frame(width: DS.Spacing.xl + DS.Spacing.xs, height: DS.Spacing.xl + DS.Spacing.xs)
                 Circle()
                     .trim(from: 0, to: pct)
                     .stroke(
-                        completed ? PulseTheme.accentTeal : PulseTheme.accent.opacity(0.7),
+                        completed ? DS.Color.accent : DS.Color.accent.opacity(0.7),
                         style: StrokeStyle(lineWidth: 4, lineCap: .round)
                     )
-                    .frame(width: 36, height: 36)
+                    .frame(width: DS.Spacing.xl + DS.Spacing.xs, height: DS.Spacing.xl + DS.Spacing.xs)
                     .rotationEffect(.degrees(-90))
 
                 if completed {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(PulseTheme.accentTeal)
+                        .font(DS.Typography.caption.weight(.bold))
+                        .foregroundStyle(DS.Color.accent)
                 } else {
                     Image(systemName: metric?.icon ?? "target")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .font(DS.Typography.caption.weight(.medium))
+                        .foregroundStyle(DS.Color.inkMid)
                 }
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(metric?.label ?? goal.metricType)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.bodyS.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
 
                 Text("\(formatValue(progress, metric: metric)) / \(formatValue(goal.targetValue, metric: metric)) \(metric?.unit ?? "")")
-                    .font(.system(size: 11, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.caption)
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
             Spacer()
 
             Text(String(format: "%.0f%%", pct * 100))
-                .font(.system(size: 14, weight: .bold, design: .rounded))
-                .foregroundStyle(completed ? PulseTheme.accentTeal : PulseTheme.textSecondary)
+                .font(DS.Typography.bodyS.weight(.bold))
+                .foregroundStyle(completed ? DS.Color.accent : DS.Color.inkMid)
         }
     }
 

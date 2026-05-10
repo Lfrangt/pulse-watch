@@ -10,6 +10,7 @@ struct WorkoutTrackingView: View {
 
     @State private var manager = WorkoutSessionManager.shared
     @State private var appeared = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var initialType: WorkoutSessionManager.WorkoutType = .strength
     var onClose: () -> Void = {}
@@ -25,7 +26,7 @@ struct WorkoutTrackingView: View {
                 summaryScreen
             }
         }
-        .containerBackground(PulseTheme.background, for: .navigation)
+        .containerBackground(DS.Color.bg, for: .navigation)
         .onAppear {
             if manager.state == .idle {
                 manager.startWorkout(type: initialType)
@@ -42,11 +43,11 @@ struct WorkoutTrackingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Choose")
-                    .font(.system(size: 8, weight: .semibold))
+                    .font(DS.Typography.watchLabel.weight(.semibold))
                     .tracking(0.8)
                     .textCase(.uppercase)
-                    .foregroundStyle(PulseTheme.textTertiary)
-                    .padding(.bottom, 4)
+                    .foregroundStyle(DS.Color.inkDim)
+                    .padding(.bottom, DS.Spacing.xs)
 
                 ForEach(WorkoutSessionManager.WorkoutType.allCases, id: \.label) { type in
                     Button {
@@ -54,32 +55,32 @@ struct WorkoutTrackingView: View {
                     } label: {
                         HStack(spacing: 10) {
                             Image(systemName: type.icon)
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundStyle(PulseTheme.textSecondary)
+                                .font(DS.Typography.bodyS.weight(.medium))
+                                .foregroundStyle(DS.Color.inkMid)
                                 .frame(width: 18)
                             Text(type.label)
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(PulseTheme.textPrimary)
+                                .font(DS.Typography.caption.weight(.medium))
+                                .foregroundStyle(DS.Color.ink)
                             Spacer()
                             Image(systemName: "arrow.right")
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundStyle(PulseTheme.textTertiary)
+                                .font(DS.Typography.mono.weight(.medium))
+                                .foregroundStyle(DS.Color.inkDim)
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 10)
+                        .padding(.horizontal, DS.Spacing.m)
+                        .padding(.vertical, DS.Spacing.s)
                         .background(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(PulseTheme.cardBackground)
+                                .fill(DS.Color.bgElev)
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
+                                .stroke(DS.Color.line, lineWidth: DS.Stroke.hairline)
                         )
                     }
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 4)
+            .padding(.horizontal, DS.Spacing.xs)
         }
     }
 
@@ -91,65 +92,65 @@ struct WorkoutTrackingView: View {
 
                 // Eyebrow row: TYPE · SET / TIMER
                 liveTopStrip
-                    .padding(.top, 2)
+                    .padding(.top, DS.Spacing.m)
 
                 // Hero HR + zone label
                 liveHero
                     .frame(maxWidth: .infinity)
-                    .padding(.top, 6)
+                    .padding(.top, DS.Spacing.xs)
 
                 // 5-tick zone bar
                 zoneTicks
-                    .padding(.top, 10)
-                    .padding(.horizontal, 2)
+                    .padding(.top, DS.Spacing.s)
+                    .padding(.horizontal, DS.Spacing.m)
 
                 Spacer(minLength: 14)
 
                 // Hairline + ELAPSED / KCAL
                 liveBottomStats
-                    .padding(.top, 10)
+                    .padding(.top, DS.Spacing.s)
                     .overlay(alignment: .top) {
                         Rectangle()
-                            .fill(PulseTheme.border)
-                            .frame(height: PulseTheme.hairline)
+                            .fill(DS.Color.line)
+                            .frame(height: DS.Stroke.hairline)
                     }
 
                 // Controls (pause / stop)
                 controlButtons
-                    .padding(.top, 10)
+                    .padding(.top, DS.Spacing.s)
             }
-            .padding(.horizontal, 4)
+            .padding(.horizontal, DS.Spacing.xs)
         }
     }
 
     private var liveTopStrip: some View {
         HStack {
             Text(currentTypeLabel)
-                .font(.system(size: 9, weight: .semibold))
+                .font(DS.Typography.monoS.weight(.semibold))
                 .tracking(1.4)
                 .textCase(.uppercase)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .foregroundStyle(DS.Color.inkDim)
             Spacer()
             Text(stateLabel)
-                .font(.system(size: 9, weight: .regular, design: .monospaced))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.monoS)
+                .foregroundStyle(DS.Color.inkDim)
         }
     }
 
     private var liveHero: some View {
         VStack(spacing: 2) {
             Text(manager.heartRate > 0 ? "\(Int(manager.heartRate))" : "--")
-                .font(.system(size: 52, weight: .bold, design: .rounded))
+                .font(DS.Typography.watchScore)
                 .monospacedDigit()
                 .kerning(-1.4)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .foregroundStyle(DS.Color.ink)
                 .contentTransition(.numericText())
-                .animation(.easeOut(duration: 0.25), value: Int(manager.heartRate))
+                .animation(reduceMotion ? nil : .easeOut(duration: 0.25), value: Int(manager.heartRate))
 
             Text("BPM · \(manager.currentZone.label.uppercased())")
-                .font(.system(size: 9, weight: .medium))
+                .font(DS.Typography.monoS.weight(.medium))
                 .tracking(1.0)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .foregroundStyle(DS.Color.inkDim)
         }
     }
 
@@ -158,7 +159,7 @@ struct WorkoutTrackingView: View {
             ForEach(WorkoutSessionManager.HeartRateZone.allCases, id: \.rawValue) { zone in
                 let isActive = zone == manager.currentZone
                 RoundedRectangle(cornerRadius: 2, style: .continuous)
-                    .fill(isActive ? PulseTheme.textPrimary : PulseTheme.border)
+                    .fill(isActive ? DS.Color.ink : DS.Color.line)
                     .frame(height: 4)
             }
         }
@@ -175,13 +176,13 @@ struct WorkoutTrackingView: View {
     private func statBlock(label: String, value: String, alignment: HorizontalAlignment) -> some View {
         VStack(alignment: alignment, spacing: 2) {
             Text(label)
-                .font(.system(size: 8, weight: .semibold))
+                .font(DS.Typography.watchLabel.weight(.semibold))
                 .tracking(1.0)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .foregroundStyle(DS.Color.inkDim)
             Text(value)
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .font(DS.Typography.body.weight(.semibold))
                 .monospacedDigit()
-                .foregroundStyle(PulseTheme.textPrimary)
+                .foregroundStyle(DS.Color.ink)
         }
     }
 
@@ -193,17 +194,17 @@ struct WorkoutTrackingView: View {
                 manager.togglePause()
             } label: {
                 Image(systemName: manager.state == .paused ? "play.fill" : "pause.fill")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.bodyS.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, DS.Spacing.s)
                     .background(
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(PulseTheme.cardBackground)
+                            .fill(DS.Color.bgElev)
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .stroke(PulseTheme.border, lineWidth: PulseTheme.hairline)
+                            .stroke(DS.Color.line, lineWidth: DS.Stroke.hairline)
                     )
             }
             .buttonStyle(.plain)
@@ -212,13 +213,13 @@ struct WorkoutTrackingView: View {
                 manager.endWorkout()
             } label: {
                 Image(systemName: "stop.fill")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(PulseTheme.background)
+                    .font(DS.Typography.bodyS.weight(.semibold))
+                    .foregroundStyle(DS.Color.bg)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, DS.Spacing.s)
                     .background(
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(PulseTheme.textPrimary)
+                            .fill(DS.Color.ink)
                     )
             }
             .buttonStyle(.plain)
@@ -233,35 +234,35 @@ struct WorkoutTrackingView: View {
 
                 // Eyebrow + title
                 Text("Session complete")
-                    .font(.system(size: 9, weight: .semibold))
+                    .font(DS.Typography.monoS.weight(.semibold))
                     .tracking(2.0)
                     .textCase(.uppercase)
-                    .foregroundStyle(PulseTheme.textTertiary)
-                    .padding(.top, 2)
+                    .foregroundStyle(DS.Color.inkDim)
+                    .padding(.top, DS.Spacing.m)
 
                 Text(currentTypeLabel)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
-                    .padding(.top, 4)
+                    .font(DS.Typography.bodyL.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
+                    .padding(.top, DS.Spacing.xs)
 
                 // 2x2 grid hemmed by hairline rules top + bottom
                 summaryGrid
-                    .padding(.top, 12)
+                    .padding(.top, DS.Spacing.m)
                     .overlay(alignment: .top) {
                         Rectangle()
-                            .fill(PulseTheme.border)
-                            .frame(height: PulseTheme.hairline)
+                            .fill(DS.Color.line)
+                            .frame(height: DS.Stroke.hairline)
                     }
                     .overlay(alignment: .bottom) {
                         Rectangle()
-                            .fill(PulseTheme.border)
-                            .frame(height: PulseTheme.hairline)
+                            .fill(DS.Color.line)
+                            .frame(height: DS.Stroke.hairline)
                     }
-                    .padding(.bottom, 12)
+                    .padding(.bottom, DS.Spacing.m)
 
                 // Zone distribution
                 zoneDistribution
-                    .padding(.top, 4)
+                    .padding(.top, DS.Spacing.xs)
 
                 Spacer(minLength: 14)
 
@@ -271,19 +272,19 @@ struct WorkoutTrackingView: View {
                     onClose()
                 } label: {
                     Text("Done")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(PulseTheme.background)
+                        .font(DS.Typography.bodyS.weight(.semibold))
+                        .foregroundStyle(DS.Color.bg)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 11)
+                        .padding(.vertical, DS.Spacing.m)
                         .background(
                             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .fill(PulseTheme.textPrimary)
+                                .fill(DS.Color.ink)
                         )
                 }
                 .buttonStyle(.plain)
-                .padding(.top, 14)
+                .padding(.top, DS.Spacing.card)
             }
-            .padding(.horizontal, 4)
+            .padding(.horizontal, DS.Spacing.xs)
         }
     }
 
@@ -302,18 +303,18 @@ struct WorkoutTrackingView: View {
             ForEach(items, id: \.0) { label, value in
                 VStack(alignment: .leading, spacing: 3) {
                     Text(label)
-                        .font(.system(size: 8, weight: .semibold))
+                        .font(DS.Typography.watchLabel.weight(.semibold))
                         .tracking(1.0)
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .foregroundStyle(DS.Color.inkDim)
                     Text(value)
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .font(DS.Typography.bodyL.weight(.semibold))
                         .monospacedDigit()
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .foregroundStyle(DS.Color.ink)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .padding(.vertical, 10)
+        .padding(.vertical, DS.Spacing.s)
     }
 
     private var zoneDistribution: some View {
@@ -321,10 +322,10 @@ struct WorkoutTrackingView: View {
 
         return VStack(alignment: .leading, spacing: 8) {
             Text("Zone time")
-                .font(.system(size: 8, weight: .semibold))
+                .font(DS.Typography.watchLabel.weight(.semibold))
                 .tracking(1.0)
                 .textCase(.uppercase)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .foregroundStyle(DS.Color.inkDim)
 
             ForEach(WorkoutSessionManager.HeartRateZone.allCases, id: \.rawValue) { zone in
                 let seconds = manager.zoneSeconds[zone] ?? 0
@@ -332,25 +333,25 @@ struct WorkoutTrackingView: View {
 
                 HStack(spacing: 8) {
                     Text("Z\(zone.rawValue)")
-                        .font(.system(size: 9, weight: .medium, design: .monospaced))
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .font(DS.Typography.monoS.weight(.medium))
+                        .foregroundStyle(DS.Color.inkMid)
                         .frame(width: 16, alignment: .leading)
 
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
                             RoundedRectangle(cornerRadius: 1)
-                                .fill(PulseTheme.border)
+                                .fill(DS.Color.line)
                                 .frame(height: 3)
                             RoundedRectangle(cornerRadius: 1)
-                                .fill(PulseTheme.textPrimary)
+                                .fill(DS.Color.ink)
                                 .frame(width: max(geo.size.width * pct, pct > 0 ? 2 : 0), height: 3)
                         }
                     }
                     .frame(height: 3)
 
                     Text(formatZoneTime(seconds))
-                        .font(.system(size: 9, weight: .regular, design: .monospaced))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.monoS)
+                        .foregroundStyle(DS.Color.inkDim)
                         .frame(width: 30, alignment: .trailing)
                 }
             }

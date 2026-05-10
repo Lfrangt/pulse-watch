@@ -18,38 +18,38 @@ struct GymArrivalView: View {
                 ZStack {
                     // Pulsing ring
                     Circle()
-                        .stroke(PulseTheme.accent.opacity(0.3), lineWidth: 2)
-                        .frame(width: 56, height: 56)
+                        .stroke(DS.Color.accent.opacity(0.3), lineWidth: 2)
+                        .frame(width: DS.Spacing.xl + DS.Spacing.l + DS.Spacing.xs, height: DS.Spacing.xl + DS.Spacing.l + DS.Spacing.xs)
                         .scaleEffect(pulseScale)
                         .opacity(2.0 - Double(pulseScale))
 
                     // Icon
                     ZStack {
                         Circle()
-                            .fill(PulseTheme.accent.opacity(0.15))
-                            .frame(width: 48, height: 48)
+                            .fill(DS.Color.accent.opacity(0.15))
+                            .frame(width: DS.Spacing.xxl + DS.Spacing.s, height: DS.Spacing.xxl + DS.Spacing.s)
 
                         Image(systemName: "dumbbell.fill")
-                            .font(.system(size: 22))
-                            .foregroundStyle(PulseTheme.accent)
+                            .font(DS.Typography.title2)
+                            .foregroundStyle(DS.Color.accent)
                     }
                     .scaleEffect(appeared ? 1.0 : 0.5)
                 }
 
                 Text("At the Gym?")
-                    .font(.system(size: 17, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.bodyL.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
 
                 if let plan = trainingPlan {
                     VStack(spacing: 4) {
                         Text("Suggested: \(localizedGroup(plan.targetMuscleGroup))")
-                            .font(.system(size: 13, weight: .medium, design: .rounded))
-                            .foregroundStyle(PulseTheme.textSecondary)
+                            .font(DS.Typography.bodyS.weight(.medium))
+                            .foregroundStyle(DS.Color.inkMid)
 
                         if !plan.reason.isEmpty {
                             Text(plan.reason)
-                                .font(.system(size: 11, design: .rounded))
-                                .foregroundStyle(PulseTheme.textTertiary)
+                                .font(DS.Typography.caption)
+                                .foregroundStyle(DS.Color.inkDim)
                         }
                     }
                 }
@@ -57,28 +57,28 @@ struct GymArrivalView: View {
                 // Start button
                 Button(action: onStartWorkout) {
                     Label("Start Workout", systemImage: "play.fill")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(PulseTheme.background)
+                        .font(DS.Typography.bodyS.weight(.semibold))
+                        .foregroundStyle(DS.Color.bg)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 11)
+                        .padding(.vertical, DS.Spacing.m)
                         .background(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(PulseTheme.accent)
-                                .shadow(color: PulseTheme.accent.opacity(0.3), radius: 8, y: 3)
+                                .fill(DS.Color.accent)
+                                
                         )
                 }
                 .buttonStyle(.plain)
 
                 // Dismiss
                 Button("Skip", action: onDismiss)
-                    .font(.system(size: 13, design: .rounded))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.bodyS)
+                    .foregroundStyle(DS.Color.inkDim)
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, DS.Spacing.s)
         }
         .containerBackground(
             LinearGradient(
-                colors: [PulseTheme.background, PulseTheme.surface],
+                colors: [DS.Color.bg, DS.Color.bgElev],
                 startPoint: .top,
                 endPoint: .bottom
             ),

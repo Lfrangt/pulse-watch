@@ -53,32 +53,32 @@ struct WatchHomeView: View {
 
                 // Top mono strip: DAY DD ······ HH:MM
                 topStrip
-                    .padding(.top, 4)
+                    .padding(.top, DS.Spacing.xs)
 
                 // Hero: READINESS eyebrow + big metric + status caption
                 hero
                     .frame(maxWidth: .infinity)
-                    .padding(.top, 10)
+                    .padding(.top, DS.Spacing.s)
 
                 Spacer(minLength: 14)
 
                 // Hairline divider + 3-col bottom triplet
                 bottomTriplet
-                    .padding(.top, 10)
+                    .padding(.top, DS.Spacing.s)
                     .overlay(alignment: .top) {
                         Rectangle()
-                            .fill(PulseTheme.border)
-                            .frame(height: PulseTheme.hairline)
+                            .fill(DS.Color.line)
+                            .frame(height: DS.Stroke.hairline)
                     }
 
                 // Quick action row (Plan / Train) — same hairline-row aesthetic
                 actionRow
-                    .padding(.top, 10)
+                    .padding(.top, DS.Spacing.s)
                     .opacity(appeared ? 1 : 0)
             }
-            .padding(.horizontal, 4)
+            .padding(.horizontal, DS.Spacing.xs)
         }
-        .containerBackground(PulseTheme.background, for: .navigation)
+        .containerBackground(DS.Color.bg, for: .navigation)
         .sheet(isPresented: $showGymArrival) {
             GymArrivalView(
                 trainingPlan: buildPendingPlan(),
@@ -131,13 +131,13 @@ struct WatchHomeView: View {
     private var topStrip: some View {
         HStack {
             Text(weekdayDay())
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.mono.weight(.medium))
+                .foregroundStyle(DS.Color.inkDim)
                 .tracking(0.5)
             Spacer()
             Text(timeShort())
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.mono.weight(.medium))
+                .foregroundStyle(DS.Color.inkDim)
         }
     }
 
@@ -147,27 +147,27 @@ struct WatchHomeView: View {
         VStack(spacing: 4) {
             // Eyebrow — 9pt for watch, ALL CAPS, fg-3
             Text("Readiness")
-                .font(.system(size: 9, weight: .semibold))
+                .font(DS.Typography.monoS.weight(.semibold))
                 .tracking(2.0)
                 .textCase(.uppercase)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .foregroundStyle(DS.Color.inkDim)
 
             // Big metric — 44pt, bold rounded, tabular-nums, status color
             Text("\(score)")
-                .font(.system(size: 44, weight: .bold, design: .rounded))
+                .font(DS.Typography.watchScore)
                 .monospacedDigit()
                 .kerning(-1.2)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .foregroundStyle(DS.Color.ink)
                 .contentTransition(.numericText())
 
             // Status mini-caption (mono)
             if let delta = deltaText {
                 Text(delta)
-                    .font(.system(size: 10, weight: .regular, design: .monospaced))
+                    .font(DS.Typography.mono)
                     .foregroundStyle(statusColor)
             } else {
                 Text(headline)
-                    .font(.system(size: 10, weight: .regular, design: .monospaced))
+                    .font(DS.Typography.mono)
                     .foregroundStyle(statusColor)
             }
         }
@@ -186,13 +186,13 @@ struct WatchHomeView: View {
     private func metricCell(label: String, value: String) -> some View {
         VStack(spacing: 3) {
             Text(label)
-                .font(.system(size: 8, weight: .semibold))
+                .font(DS.Typography.watchLabel.weight(.semibold))
                 .tracking(0.7)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .foregroundStyle(DS.Color.inkDim)
             Text(value)
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .font(DS.Typography.body.weight(.semibold))
                 .monospacedDigit()
-                .foregroundStyle(PulseTheme.textPrimary)
+                .foregroundStyle(DS.Color.ink)
         }
         .frame(maxWidth: .infinity)
     }
@@ -221,20 +221,20 @@ struct WatchHomeView: View {
     private func actionPill(label: String, systemImage: String, inverted: Bool = false) -> some View {
         HStack(spacing: 4) {
             Image(systemName: systemImage)
-                .font(.system(size: 10, weight: .medium))
+                .font(DS.Typography.mono.weight(.medium))
             Text(label)
-                .font(.system(size: 11, weight: .medium))
+                .font(DS.Typography.caption.weight(.medium))
         }
-        .foregroundStyle(inverted ? PulseTheme.background : PulseTheme.textPrimary)
+        .foregroundStyle(inverted ? DS.Color.bg : DS.Color.ink)
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 6)
+        .padding(.vertical, DS.Spacing.xs)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(inverted ? PulseTheme.textPrimary : PulseTheme.cardBackground)
+                .fill(inverted ? DS.Color.ink : DS.Color.bgElev)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(inverted ? Color.clear : PulseTheme.border, lineWidth: PulseTheme.hairline)
+                .stroke(inverted ? Color.clear : DS.Color.line, lineWidth: DS.Stroke.hairline)
         )
     }
 

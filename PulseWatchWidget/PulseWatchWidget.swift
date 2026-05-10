@@ -198,91 +198,43 @@ struct PulseWidgetProvider: TimelineProvider {
     }
 }
 
-// MARK: - Clinical tokens (parallel to PulseTheme — widget target can't import the main module)
+// MARK: - Widget tokens — thin shim over DS.Color so widget code can stay
+// terse while every value resolves to the v2 Clinical design system.
+// Widget target now includes Shared/Theme/DS.swift, so DS.Color is reachable.
 
 enum WidgetColors {
-    // Surfaces — light + dark dynamic
-    static let background       = dyn(light: 0xF7F6F2, dark: 0x000000)
-    static let surface          = dyn(light: 0xFFFFFF, dark: 0x0E0E0E)
-    static let cardBackground   = dyn(light: 0xFFFFFF, dark: 0x0E0E0E)
-    static let border           = dyn(light: 0xE8E5DC, dark: 0x1F1F1F)
-    static let borderStrong     = dyn(light: 0xD4CFC0, dark: 0x2A2A2A)
-    static let chart3           = dyn(light: 0xD4CFC0, dark: 0x2A2A2A)
+    static let background       = DS.Color.bg
+    static let surface          = DS.Color.bgElev
+    static let cardBackground   = DS.Color.bgElev
+    static let border           = DS.Color.line
+    static let borderStrong     = DS.Color.line
+    static let chart3           = DS.Color.lineSoft
 
-    // Foreground
-    static let textPrimary      = dynA(light: (0x17161A, 1.00), dark: (0xF5F5F0, 1.00))
-    static let textSecondary    = dynA(light: (0x52504C, 1.00), dark: (0xF5F5F0, 0.60))
-    static let textTertiary     = dynA(light: (0x8A867E, 1.00), dark: (0xF5F5F0, 0.40))
-    static let textQuaternary   = dynA(light: (0xB7B2A6, 1.00), dark: (0xF5F5F0, 0.20))
+    static let textPrimary      = DS.Color.ink
+    static let textSecondary    = DS.Color.inkMid
+    static let textTertiary     = DS.Color.inkDim
+    static let textQuaternary   = DS.Color.inkDim
 
-    // Accent (medical teal) + status
-    static let accent           = dyn(light: 0x0A7E8C, dark: 0x4FD9E6)
-    static let accentSoft       = dynA(light: (0x0A7E8C, 0.10), dark: (0x4FD9E6, 0.14))
-    static let statusGood       = dyn(light: 0x2F9E5C, dark: 0x6BD393)
-    static let statusWarning    = dyn(light: 0xC28A2C, dark: 0xE8B24F)
-    static let statusPoor       = dyn(light: 0xC43E28, dark: 0xF07A5F)
-    static let sleepViolet      = dyn(light: 0x6B5FC2, dark: 0xA898F5)
+    static let accent           = DS.Color.accent
+    static let accentSoft       = DS.Color.accent.opacity(0.12)
+    static let statusGood       = DS.Color.good
+    static let statusWarning    = DS.Color.warn
+    static let statusPoor       = DS.Color.bad
+    static let sleepViolet      = DS.Color.accent
 
-    // Legacy aliases used elsewhere
-    static let statusModerate   = sleepViolet
-    static let sleepPurple      = sleepViolet
+    // Legacy aliases preserved for compile but unified to clinical mono accent.
+    static let statusModerate   = DS.Color.warn
+    static let sleepPurple      = DS.Color.accent
 
     static func statusColor(for score: Int) -> Color {
         switch score {
-        case 0..<40:  return statusPoor
-        case 40..<70: return sleepViolet
-        default:      return statusGood
+        case 0..<40:  return DS.Color.bad
+        case 40..<70: return DS.Color.warn
+        default:      return DS.Color.good
         }
     }
 
-    // MARK: - Dynamic helpers
-
-    private static func dyn(light: UInt32, dark: UInt32) -> Color {
-        #if canImport(UIKit)
-        return Color(UIColor { trait in
-            UIColor(rgb: trait.userInterfaceStyle == .dark ? dark : light)
-        })
-        #else
-        return Color(rgb: dark)
-        #endif
-    }
-
-    private static func dynA(light: (UInt32, Double), dark: (UInt32, Double)) -> Color {
-        #if canImport(UIKit)
-        return Color(UIColor { trait in
-            let (hex, alpha) = trait.userInterfaceStyle == .dark ? dark : light
-            return UIColor(rgb: hex, alpha: alpha)
-        })
-        #else
-        return Color(rgb: dark.0).opacity(dark.1)
-        #endif
-    }
 }
-
-private extension Color {
-    init(rgb: UInt32, alpha: Double = 1.0) {
-        self.init(.sRGB,
-                  red: Double((rgb >> 16) & 0xFF) / 255,
-                  green: Double((rgb >> 8) & 0xFF) / 255,
-                  blue: Double(rgb & 0xFF) / 255,
-                  opacity: alpha)
-    }
-}
-
-#if canImport(UIKit)
-import UIKit
-private extension UIColor {
-    convenience init(rgb: UInt32, alpha: CGFloat = 1.0) {
-        self.init(red: CGFloat((rgb >> 16) & 0xFF) / 255,
-                  green: CGFloat((rgb >> 8) & 0xFF) / 255,
-                  blue: CGFloat(rgb & 0xFF) / 255,
-                  alpha: alpha)
-    }
-    convenience init(rgb: UInt32, alpha: Double) {
-        self.init(rgb: rgb, alpha: CGFloat(alpha))
-    }
-}
-#endif
 
 // MARK: - Eyebrow modifier (mirror of pulseEyebrow on iPhone)
 
@@ -340,13 +292,13 @@ struct PulseLockScreenCircular: View {
             } currentValueLabel: {
                 VStack(spacing: -1) {
                     Text(data.heartRate > 0 ? "\(data.heartRate)" : "--")
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .font(DS.Typography.body.weight(.semibold))
                         .monospacedDigit()
                     HStack(spacing: 1) {
                         Image(systemName: "heart.fill")
-                            .font(.system(size: 6))
+                            .font(DS.Typography.monoS)
                         Image(systemName: data.heartRateTrend.systemImage)
-                            .font(.system(size: 6, weight: .bold))
+                            .font(DS.Typography.monoS.weight(.bold))
                     }
                 }
             }
@@ -365,7 +317,7 @@ struct PulseLockScreenRectangular: View {
                 Text("")
             } currentValueLabel: {
                 Text("\(data.score)")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(DS.Typography.bodyS.weight(.semibold))
                     .monospacedDigit()
             }
             .gaugeStyle(.accessoryCircular)
@@ -374,25 +326,25 @@ struct PulseLockScreenRectangular: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 3) {
                     Image(systemName: "heart.fill")
-                        .font(.system(size: 8))
+                        .font(DS.Typography.watchVital)
                     Text(data.heartRate > 0 ? "\(data.heartRate) bpm" : "-- bpm")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .font(DS.Typography.caption.weight(.medium))
                         .monospacedDigit()
                     Text(data.heartRateTrend.arrow)
-                        .font(.system(size: 9, weight: .bold))
+                        .font(DS.Typography.monoS.weight(.bold))
                 }
                 HStack(spacing: 3) {
                     Image(systemName: "waveform.path.ecg")
-                        .font(.system(size: 8))
+                        .font(DS.Typography.watchVital)
                     Text(data.hrv > 0 ? "HRV \(data.hrv)ms" : "HRV --")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .font(DS.Typography.caption.weight(.medium))
                         .monospacedDigit()
                 }
                 HStack(spacing: 3) {
                     Image(systemName: "moon.fill")
-                        .font(.system(size: 8))
+                        .font(DS.Typography.watchVital)
                     Text(data.sleepHours > 0 ? formatSleepCompact(data.sleepHours) : "--")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .font(DS.Typography.caption.weight(.medium))
                         .monospacedDigit()
                 }
             }
@@ -447,31 +399,31 @@ struct PulseWidgetSmall: View {
             // Section eyebrow
             Text("Readiness")
                 .widgetEyebrow(size: 9)
-                .padding(.bottom, 2)
+                .padding(.bottom, DS.Spacing.m)
 
             // Hero metric
             Text("\(data.score)")
-                .font(.system(size: 54, weight: .bold, design: .rounded))
+                .font(DS.Typography.widgetSScore)
                 .monospacedDigit()
                 .kerning(-1.4)
                 .foregroundStyle(WidgetColors.textPrimary)
-                .padding(.bottom, 4)
+                .padding(.bottom, DS.Spacing.xs)
 
             // Delta vs avg (status color)
             Text(deltaLine)
-                .font(.system(size: 11, weight: .regular))
+                .font(DS.Typography.caption)
                 .foregroundStyle(statusColor)
 
             Spacer(minLength: 0)
 
             // Bottom mono line
             Text(footer)
-                .font(.system(size: 10, weight: .regular, design: .monospaced))
+                .font(DS.Typography.mono)
                 .foregroundStyle(WidgetColors.textQuaternary)
                 .lineLimit(1)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
+        .padding(.horizontal, DS.Spacing.card)
+        .padding(.vertical, DS.Spacing.m)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .widgetURL(URL(string: "pulse://dashboard"))
     }
@@ -514,7 +466,7 @@ struct PulseWidgetMedium: View {
                 }
                 Spacer()
                 Text(timeShortString(data.lastUpdated))
-                    .font(.system(size: 11, weight: .regular, design: .monospaced))
+                    .font(DS.Typography.mono)
                     .foregroundStyle(WidgetColors.textQuaternary)
             }
 
@@ -522,15 +474,15 @@ struct PulseWidgetMedium: View {
             HStack(alignment: .bottom, spacing: 16) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("\(data.score)")
-                        .font(.system(size: 58, weight: .bold, design: .rounded))
+                        .font(DS.Typography.widgetSScore)
                         .monospacedDigit()
                         .kerning(-2)
                         .foregroundStyle(WidgetColors.textPrimary)
                     Text(deltaLine)
-                        .font(.system(size: 11, weight: .regular))
+                        .font(DS.Typography.caption)
                         .foregroundStyle(statusColor)
                 }
-                .padding(.top, 4)
+                .padding(.top, DS.Spacing.xs)
 
                 // 7-day mini-bars + day labels (latest day filled solid, others muted)
                 if !data.dailyScores.isEmpty {
@@ -539,15 +491,15 @@ struct PulseWidgetMedium: View {
                             .frame(height: 52)
                         WidgetWeekLabels(scores: data.dailyScores)
                     }
-                    .padding(.bottom, 4)
+                    .padding(.bottom, DS.Spacing.xs)
                 }
             }
-            .padding(.top, 10)
+            .padding(.top, DS.Spacing.s)
 
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 14)
+        .padding(.horizontal, DS.Spacing.l)
+        .padding(.vertical, DS.Spacing.card)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .widgetURL(URL(string: "pulse://dashboard"))
     }
@@ -579,7 +531,7 @@ struct PulseWidgetLarge: View {
                 }
                 Spacer()
                 Text(timeShortString(data.lastUpdated))
-                    .font(.system(size: 11, weight: .regular, design: .monospaced))
+                    .font(DS.Typography.mono)
                     .foregroundStyle(WidgetColors.textQuaternary)
             }
 
@@ -589,12 +541,12 @@ struct PulseWidgetLarge: View {
                     Text("Readiness")
                         .widgetEyebrow(size: 10)
                     Text("\(data.score)")
-                        .font(.system(size: 64, weight: .bold, design: .rounded))
+                        .font(DS.Typography.widgetLScore)
                         .monospacedDigit()
                         .kerning(-2)
                         .foregroundStyle(WidgetColors.textPrimary)
                     Text(deltaLine)
-                        .font(.system(size: 11, weight: .regular))
+                        .font(DS.Typography.caption)
                         .foregroundStyle(statusColor)
                 }
 
@@ -630,14 +582,14 @@ struct PulseWidgetLarge: View {
                 Text("Insight")
                     .widgetEyebrow(size: 9)
                 Text(insightText)
-                    .font(.system(size: 13, weight: .regular))
+                    .font(DS.Typography.bodyS)
                     .foregroundStyle(WidgetColors.textPrimary)
                     .lineLimit(2)
             }
 
             Spacer(minLength: 0)
         }
-        .padding(18)
+        .padding(DS.Spacing.l)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .widgetURL(URL(string: "pulse://dashboard"))
     }
@@ -683,18 +635,18 @@ private struct LargeVital: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(label)
-                .font(.system(size: 9, weight: .semibold))
+                .font(DS.Typography.monoS.weight(.semibold))
                 .tracking(0.9)
                 .textCase(.uppercase)
                 .foregroundStyle(WidgetColors.textTertiary)
             HStack(alignment: .firstTextBaseline, spacing: 3) {
                 Text(value)
-                    .font(.system(size: 22, weight: .semibold, design: .rounded))
+                    .font(DS.Typography.title2.weight(.semibold))
                     .monospacedDigit()
                     .foregroundStyle(WidgetColors.textPrimary)
                 if !unit.isEmpty {
                     Text(unit)
-                        .font(.system(size: 10, weight: .regular, design: .monospaced))
+                        .font(DS.Typography.mono)
                         .foregroundStyle(WidgetColors.textTertiary)
                 }
             }
@@ -753,7 +705,7 @@ struct WidgetWeekLabels: View {
         HStack(spacing: 0) {
             ForEach(Array(scores.enumerated()), id: \.offset) { i, day in
                 Text(letterFor(day.date))
-                    .font(.system(size: 9, weight: .medium, design: .monospaced))
+                    .font(DS.Typography.monoS.weight(.medium))
                     .foregroundStyle(i == count - 1 ? WidgetColors.textPrimary : WidgetColors.textQuaternary)
                     .frame(maxWidth: .infinity)
             }

@@ -25,21 +25,21 @@ struct SummaryView: View {
 
                 // Eyebrow + hero score
                 eyebrowHeader
-                    .padding(.top, 2)
+                    .padding(.top, DS.Spacing.m)
 
                 hero
-                    .padding(.top, 8)
+                    .padding(.top, DS.Spacing.s)
 
                 // 2x2 metric grid in hairline rule
                 metricsGrid
-                    .padding(.top, 14)
+                    .padding(.top, DS.Spacing.card)
                     .overlay(alignment: .top) {
-                        Rectangle().fill(PulseTheme.border).frame(height: PulseTheme.hairline)
+                        Rectangle().fill(DS.Color.line).frame(height: DS.Stroke.hairline)
                     }
                     .overlay(alignment: .bottom) {
-                        Rectangle().fill(PulseTheme.border).frame(height: PulseTheme.hairline)
+                        Rectangle().fill(DS.Color.line).frame(height: DS.Stroke.hairline)
                     }
-                    .padding(.bottom, 12)
+                    .padding(.bottom, DS.Spacing.m)
 
                 Spacer(minLength: 12)
 
@@ -48,22 +48,22 @@ struct SummaryView: View {
                     WatchHomeView()
                 } label: {
                     Text("View Trends")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(PulseTheme.background)
+                        .font(DS.Typography.bodyS.weight(.semibold))
+                        .foregroundStyle(DS.Color.bg)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 11)
+                        .padding(.vertical, DS.Spacing.m)
                         .background(
                             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .fill(PulseTheme.textPrimary)
+                                .fill(DS.Color.ink)
                         )
                 }
                 .buttonStyle(.plain)
-                .padding(.top, 6)
+                .padding(.top, DS.Spacing.xs)
                 .opacity(appeared ? 1 : 0)
             }
-            .padding(.horizontal, 4)
+            .padding(.horizontal, DS.Spacing.xs)
         }
-        .containerBackground(PulseTheme.background, for: .navigation)
+        .containerBackground(DS.Color.bg, for: .navigation)
         .navigationTitle("Summary")
         .onAppear {
             loadData()
@@ -77,29 +77,29 @@ struct SummaryView: View {
 
     private var eyebrowHeader: some View {
         Text("Today")
-            .font(.system(size: 9, weight: .semibold))
+            .font(DS.Typography.monoS.weight(.semibold))
             .tracking(2.0)
             .textCase(.uppercase)
-            .foregroundStyle(PulseTheme.textTertiary)
+            .foregroundStyle(DS.Color.inkDim)
     }
 
     private var hero: some View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
             Text("\(score)")
-                .font(.system(size: 38, weight: .bold, design: .rounded))
+                .font(DS.Typography.watchScore)
                 .monospacedDigit()
                 .kerning(-1.2)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .foregroundStyle(DS.Color.ink)
                 .contentTransition(.numericText())
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Readiness")
-                    .font(.system(size: 9, weight: .semibold))
+                    .font(DS.Typography.monoS.weight(.semibold))
                     .tracking(1.4)
                     .textCase(.uppercase)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
                 Text(headline)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(DS.Typography.caption.weight(.medium))
                     .foregroundStyle(statusColor)
             }
             Spacer()
@@ -123,19 +123,19 @@ struct SummaryView: View {
             ForEach(items, id: \.0) { label, value in
                 VStack(alignment: .leading, spacing: 3) {
                     Text(label)
-                        .font(.system(size: 8, weight: .semibold))
+                        .font(DS.Typography.watchLabel.weight(.semibold))
                         .tracking(1.0)
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .foregroundStyle(DS.Color.inkDim)
                     Text(value)
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .font(DS.Typography.bodyL.weight(.semibold))
                         .monospacedDigit()
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .foregroundStyle(DS.Color.ink)
                         .contentTransition(.numericText())
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .padding(.vertical, 10)
+        .padding(.vertical, DS.Spacing.s)
     }
 
     // MARK: - Data load

@@ -114,6 +114,121 @@ Same protocol. Same gates. Outdoor-readability check on Watch sim required.
 - Final `check-design-rules.sh` full scan → 0.
 - Bump app version, update CHANGELOG.
 
+**Gate.** v1.0 ships to ASC. Submit for review.
+
+---
+
+## Phase 6 — v1.1 Google Health integration · post-v1.0-ship
+
+**Trigger.** Google launched the Fitbit Air on 2026-05-07 ($100 screenless
+band, 24/7 HR/HRV/SpO₂/sleep) and opened the Google Health API as the
+unified successor to the Fitbit Web API. Open OAuth 2.0, REST, supports
+third-party iOS apps. Legacy Fitbit Web API turns down 2026-09. Google
+recommends launching integrations after 2026-05-31.
+
+**Headline.** Pulse v1.1 reads from BOTH HealthKit (Apple Watch / iPhone)
+AND Google Health (Fitbit Air / Pixel Watch). Single unified score, single
+unified AI Coach. Beats Google's own Health Coach by being multi-source,
+LLM-agnostic (BYOK), and keyless to the Health Premium subscription.
+
+### 6a · OAuth + token plumbing (4-6 h)
+
+- Add `Shared/Services/GoogleHealthAuth.swift`:
+  - In-app Safari `ASWebAuthenticationSession` to Google OAuth endpoint
+  - Scopes: `https://www.googleapis.com/auth/health.heart_rate.read`,
+    `health.sleep.read`, `health.oxygen_saturation.read`,
+    `health.activity.read` (subject to Restricted scope review).
+  - Refresh token in Keychain via existing `SecureStorage` helper.
+  - Auto-refresh on 401.
+- Settings panel new row: "Connect Google Health" with status chip.
+
+### 6b · Reconciled Stream client (8-12 h)
+
+- Add `Shared/Services/GoogleHealthClient.swift`:
+  - REST GET against `https://health.googleapis.com/v1/...`
+  - Use **Reconciled Stream** endpoint so data is already de-duplicated
+    across Fitbit Air + Pixel Watch + 3rd party.
+  - Map response → existing `DailySummary` fields:
+    HR / HRV / SpO₂ / sleep stages → identical column names as
+    HealthKit fills.
+  - Background refresh same cadence as HealthKitManager (15-min
+    BGTask).
+
+### 6c · Dual-source ScoreEngine (4-6 h)
+
+- `ScoreEngine.generateBrief(...)` adds optional Google data params.
+- Merge logic: prefer most recent reading per metric; if tie, prefer
+  HealthKit (continuous Watch wear has higher density).
+- Confidence footer expands: "Apple Watch · Fitbit Air · data complete"
+  when both connected, "Apple Watch only · partial" when one absent.
+- ScoreEngine signatures unchanged for existing callers — add an
+  overload, never break existing call sites.
+
+### 6d · AI Coach upgrade — dual source context (12-16 h)
+
+Reuse existing DeepSeek / OpenClawBridge BYOK pipe; do NOT add a Gemini
+dependency (would require Google Health Premium subscription, defeating
+the unification value prop).
+
+- New `CoachView` (replaces existing CoachModeView at S06 routing):
+  - Conversation flow with quick-prompt chips:
+    "Why am I tired today?" / "Should I train hard?" /
+    "Compare my Apple Watch and Fitbit Air readings"
+  - Each turn loads:
+    - Last 7 days HealthKit summary
+    - Last 7 days Google Health summary (if connected)
+    - Active brief / strain / health-age numbers
+  - LLM gets dual-source context and answers with cited values
+    ("Your Apple Watch HRV was 58 ms, Fitbit Air read 62 ms — likely
+    sensor placement; both still in your normal band").
+- Streaming response via existing OpenClawBridge SSE channel.
+
+### 6e · Settings + privacy (2-3 h)
+
+- New "Connect Google Health" row group in Settings.
+- Privacy policy update: add Google Health section explaining
+  scope + on-device storage + no Pulse-server upload.
+- App Store metadata update: dual-source positioning.
+
+### 6f · Privacy review submission (2-4 h)
+
+Google Health scopes are all Restricted. Submit OAuth client for
+security review with: privacy policy URL, demo video, scope
+justification ("compute readiness across multiple wearables").
+Estimated review turnaround: 1–3 weeks per Google docs.
+
+### Anti-patterns
+
+- Don't add Gemini for the AI layer — that locks users to Google
+  Health Premium, undoing the unification.
+- Don't sync Google Health data to Pulse's server — keep it on-device
+  per existing privacy posture.
+- Don't replace HealthKitManager with Google Health — they're peers.
+- Don't change DailySummary schema — append-only optional columns
+  if anything new is needed.
+
+### Gate
+
+- iOS PulseWatch builds clean
+- OAuth round-trip tested with a real Google account on a real Fitbit
+  Air (or Pixel Watch) for at least 24h
+- ScoreEngine produces sensible dual-source brief for the test account
+- AI Coach answers a dual-source question correctly with cited
+  numbers
+- Submit to ASC as v1.1
+
+### Time map
+
+| Sub-task | Effort |
+|----------|--------|
+| 6a OAuth   | 4-6 h |
+| 6b Client  | 8-12 h |
+| 6c Engine  | 4-6 h |
+| 6d Coach   | 12-16 h |
+| 6e Settings/privacy | 2-3 h |
+| 6f Review submission | 2-4 h |
+| **Total**  | **32-47 h** |
+
 ---
 
 ## Time map (realistic)

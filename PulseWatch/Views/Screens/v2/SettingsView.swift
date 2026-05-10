@@ -220,7 +220,7 @@ struct SettingsView: View {
                     }
                 }
             } message: {
-                Text(String(localized: "Pulse will send your daily recovery score, sleep, resting heart rate, and HRV to api.deepseek.com over HTTPS to generate personalized training advice. You can disable this anytime from Settings."))
+                Text(String(localized: "Pulse will send a summary of your health data (recovery score, sleep, resting heart rate, HRV, blood oxygen, steps, calories, and recent workout history) to api.deepseek.com over HTTPS every ~30 minutes to generate personalized training advice. You can disable this anytime from Settings."))
             }
             .alert(String(localized: "Connection Failed"), isPresented: $aiCoachActivationFailed) {
                 Button(String(localized: "OK"), role: .cancel) {}

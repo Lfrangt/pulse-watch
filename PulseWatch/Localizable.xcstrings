@@ -5017,13 +5017,13 @@
         }
       }
     },
-    "Pulse will send your daily recovery score, sleep, resting heart rate, and HRV to api.deepseek.com over HTTPS to generate personalized training advice. You can disable this anytime from Settings.": {
+    "Pulse will send a summary of your health data (recovery score, sleep, resting heart rate, HRV, blood oxygen, steps, calories, and recent workout history) to api.deepseek.com over HTTPS every ~30 minutes to generate personalized training advice. You can disable this anytime from Settings.": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pulse 将通过 HTTPS 发送你的每日恢复分、睡眠、静息心率和 HRV 到 api.deepseek.com，生成个性化训练建议。可在设置中随时关闭。"
+            "value": "Pulse 将通过 HTTPS 大约每 30 分钟向 api.deepseek.com 发送你的健康数据摘要（恢复分、睡眠、静息心率、HRV、血氧、步数、卡路里、近期训练记录），用于生成个性化训练建议。可在设置中随时关闭。"
           }
         }
       }

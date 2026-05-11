@@ -23,9 +23,9 @@ struct WorkoutShareScreen: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                PulseTheme.background.ignoresSafeArea()
+                DS.Color.bg.ignoresSafeArea()
 
-                VStack(spacing: PulseTheme.spacingL) {
+                VStack(spacing: DS.Spacing.l) {
                     // Ratio picker
                     ratioPicker
 
@@ -40,8 +40,8 @@ struct WorkoutShareScreen: View {
 
                     // Share button
                     shareButton
-                        .padding(.horizontal, PulseTheme.spacingL)
-                        .padding(.bottom, PulseTheme.spacingM)
+                        .padding(.horizontal, DS.Spacing.l)
+                        .padding(.bottom, DS.Spacing.m)
                 }
             }
             .navigationTitle(String(localized: "Share Workout"))
@@ -52,8 +52,8 @@ struct WorkoutShareScreen: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(PulseTheme.textSecondary)
+                            .font(DS.Typography.bodyS.weight(.medium))
+                            .foregroundStyle(DS.Color.inkMid)
                     }
                 }
             }
@@ -69,7 +69,7 @@ struct WorkoutShareScreen: View {
     // MARK: - Ratio Picker
 
     private var ratioPicker: some View {
-        HStack(spacing: PulseTheme.spacingS) {
+        HStack(spacing: DS.Spacing.s) {
             ForEach(ShareCardView.CardRatio.allCases) { r in
                 Button {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -78,16 +78,16 @@ struct WorkoutShareScreen: View {
                 } label: {
                     VStack(spacing: 4) {
                         Text(r.rawValue)
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .font(DS.Typography.bodyS.weight(.semibold))
                         Text(r.label)
-                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .font(DS.Typography.caption.weight(.medium))
                     }
-                    .foregroundStyle(selectedRatio == r ? PulseTheme.textPrimary : PulseTheme.textTertiary)
+                    .foregroundStyle(selectedRatio == r ? DS.Color.ink : DS.Color.inkDim)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, DS.Spacing.s)
                     .background(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(selectedRatio == r ? Color.white.opacity(0.08) : Color.clear)
+                            .fill(selectedRatio == r ? DS.Color.chipBg : Color.clear)
                     )
                 }
                 .buttonStyle(.plain)
@@ -95,8 +95,8 @@ struct WorkoutShareScreen: View {
                 .accessibilityAddTraits(selectedRatio == r ? .isSelected : [])
             }
         }
-        .padding(.horizontal, PulseTheme.spacingL)
-        .padding(.top, PulseTheme.spacingS)
+        .padding(.horizontal, DS.Spacing.l)
+        .padding(.top, DS.Spacing.s)
     }
 
     // MARK: - Card Preview
@@ -119,7 +119,7 @@ struct WorkoutShareScreen: View {
 
     private var cardPreview: some View {
         card
-            .shadow(color: .black.opacity(0.5), radius: 20, y: 10)
+            
     }
 
     // MARK: - Share Button
@@ -131,14 +131,14 @@ struct WorkoutShareScreen: View {
             HStack(spacing: 8) {
                 if isRendering {
                     ProgressView()
-                        .tint(PulseTheme.background)
+                        .tint(DS.Color.bg)
                         .scaleEffect(0.8)
                 } else {
                     Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 16, weight: .medium))
+                        .font(DS.Typography.body.weight(.medium))
                 }
                 Text(String(localized: "Share"))
-                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    .font(DS.Typography.bodyL.weight(.semibold))
             }
         }
         .buttonStyle(PulseButtonStyle())

@@ -173,20 +173,28 @@ final class HealthKitService {
             logger.info("增量采集 \(type.identifier): \(results.addedSamples.count) 条新数据")
 
             // 转换并写入 SwiftData
+            var affectedDates: Set<Date> = []
             let records = results.addedSamples.map { sample in
                 let metricType = self.metricType(for: type)
                 let value = self.extractValue(from: sample, type: type)
                 let source = sample.sourceRevision.source.name
+                let sampleDate = Calendar.current.startOfDay(for: sample.startDate)
+                affectedDates.insert(sampleDate)
                 return HealthRecord(
                     metricType: metricType,
                     value: value,
                     timestamp: sample.startDate,
-                    source: source
+                    source: source,
+                    sampleUUID: sample.uuid.uuidString
                 )
             }
 
             await saveRecords(records)
-            await updateDailySummary(for: Date())
+
+            // 更新所有受影响日期的 DailySummary（而非仅更新今天）
+            for date in affectedDates {
+                await updateDailySummary(for: date)
+            }
 
             // 心率异常检测：静息心率数据到达时触发
             #if os(iOS)
@@ -209,7 +217,7 @@ final class HealthKitService {
         }
     }
 
-    /// 睡眠数据的增量查询
+    /// 睡眠数据的增量查询 — 按阶段分别记录（深睡/REM/核心/总睡眠）
     @MainActor
     private func performSleepAnchoredQuery(for type: HKCategoryType) async {
         let anchor = anchors[type.identifier]
@@ -229,27 +237,72 @@ final class HealthKitService {
 
             logger.info("增量采集 sleep: \(results.addedSamples.count) 条新数据")
 
-            let records = results.addedSamples.compactMap { sample -> HealthRecord? in
+            var records: [HealthRecord] = []
+            var affectedDates: Set<Date> = []
+
+            for sample in results.addedSamples {
                 let sleepValue = HKCategoryValueSleepAnalysis(rawValue: sample.value)
 
                 // 只记录实际睡眠阶段，忽略 inBed/awake
                 guard sleepValue == .asleepCore || sleepValue == .asleepDeep ||
                       sleepValue == .asleepREM || sleepValue == .asleepUnspecified else {
-                    return nil
+                    continue
                 }
 
                 let durationMinutes = sample.endDate.timeIntervalSince(sample.startDate) / 60
                 let source = sample.sourceRevision.source.name
-                return HealthRecord(
+                let baseUUID = sample.uuid.uuidString
+
+                // 总睡眠记录
+                records.append(HealthRecord(
                     metricType: .sleepAnalysis,
                     value: durationMinutes,
                     timestamp: sample.startDate,
-                    source: source
-                )
+                    source: source,
+                    sampleUUID: "\(baseUUID)-sleep"
+                ))
+
+                // 按阶段记录（使用 HKSample UUID + 阶段后缀保证唯一性）
+                switch sleepValue {
+                case .asleepDeep:
+                    records.append(HealthRecord(
+                        metricType: .sleepDeep,
+                        value: durationMinutes,
+                        timestamp: sample.startDate,
+                        source: source,
+                        sampleUUID: "\(baseUUID)-deep"
+                    ))
+                case .asleepREM:
+                    records.append(HealthRecord(
+                        metricType: .sleepREM,
+                        value: durationMinutes,
+                        timestamp: sample.startDate,
+                        source: source,
+                        sampleUUID: "\(baseUUID)-rem"
+                    ))
+                case .asleepCore:
+                    records.append(HealthRecord(
+                        metricType: .sleepCore,
+                        value: durationMinutes,
+                        timestamp: sample.startDate,
+                        source: source,
+                        sampleUUID: "\(baseUUID)-core"
+                    ))
+                default:
+                    break // asleepUnspecified — 只计入总睡眠
+                }
+
+                // 睡眠归属到醒来日期（凌晨的睡眠归今天）
+                let attributionDate = Calendar.current.startOfDay(for: sample.endDate)
+                affectedDates.insert(attributionDate)
             }
 
             await saveRecords(records)
-            await updateDailySummary(for: Date())
+
+            // 更新所有受影响日期的 DailySummary
+            for date in affectedDates {
+                await updateDailySummary(for: date)
+            }
 
             // 数据更新后推送到 OpenClaw (iPhone) 或同步到 iPhone (Watch)
             #if os(iOS)
@@ -283,7 +336,9 @@ final class HealthKitService {
         }
     }
 
-    /// 更新当天的 DailySummary（聚合 HealthRecord）
+    /// 更新指定日期的 DailySummary
+    /// 对累计型指标（步数、卡路里、运动分钟）直接从 HealthKit 查询去重后的统计值，
+    /// 避免 iPhone + Apple Watch 重复样本导致双倍计数
     @MainActor
     func updateDailySummary(for date: Date) async {
         guard let container = modelContainer else { return }
@@ -291,7 +346,7 @@ final class HealthKitService {
         let context = container.mainContext
         let dateString = DailySummary.dateFormatter.string(from: date)
         let startOfDay = Calendar.current.startOfDay(for: date)
-        let endOfDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
+        let endOfDay = Calendar.current.safeDate(byAdding: .day, value: 1, to: startOfDay)
 
         // 查找或创建当天的 DailySummary
         let predicate = #Predicate<DailySummary> { $0.dateString == dateString }
@@ -305,7 +360,7 @@ final class HealthKitService {
             context.insert(summary)
         }
 
-        // 从 HealthRecord 聚合数据
+        // 从 HealthRecord 聚合非累计型数据（心率、HRV 等取均值/极值即可）
         let recordPredicate = #Predicate<HealthRecord> {
             $0.timestamp >= startOfDay && $0.timestamp < endOfDay
         }
@@ -313,18 +368,13 @@ final class HealthKitService {
 
         guard let records = try? context.fetch(recordDescriptor) else { return }
 
-        // 按类型分组聚合
+        // 按类型分组
         let hrRecords = records.filter { $0.metricType == HealthMetricType.heartRate.rawValue }
         let hrvRecords = records.filter { $0.metricType == HealthMetricType.heartRateVariability.rawValue }
         let restingHRRecords = records.filter { $0.metricType == HealthMetricType.restingHeartRate.rawValue }
         let spo2Records = records.filter { $0.metricType == HealthMetricType.bloodOxygen.rawValue }
-        let stepRecords = records.filter { $0.metricType == HealthMetricType.stepCount.rawValue }
-        let activeCalRecords = records.filter { $0.metricType == HealthMetricType.activeCalories.rawValue }
-        let restingCalRecords = records.filter { $0.metricType == HealthMetricType.restingCalories.rawValue }
-        let exerciseTimeRecords = records.filter { $0.metricType == HealthMetricType.exerciseTime.rawValue }
-        let sleepRecords = records.filter { $0.metricType == HealthMetricType.sleepAnalysis.rawValue }
 
-        // 心率聚合
+        // 心率聚合（均值/极值，不存在重复计数问题）
         if !hrRecords.isEmpty {
             let values = hrRecords.map(\.value)
             summary.averageHeartRate = values.reduce(0, +) / Double(values.count)
@@ -350,30 +400,58 @@ final class HealthKitService {
             summary.minBloodOxygen = values.min()
         }
 
-        // 步数（累加）
-        if !stepRecords.isEmpty {
-            summary.totalSteps = Int(stepRecords.map(\.value).reduce(0, +))
+        // ---- 累计型指标：从 HealthKit 直接查询去重后的统计值 ----
+        let hkPredicate = HKQuery.predicateForSamples(withStart: startOfDay, end: endOfDay)
+
+        // 步数（HealthKit 自动去重 iPhone + Watch 重叠样本）
+        if let steps = await fetchStatisticsSum(type: HKQuantityType(.stepCount), predicate: hkPredicate, unit: .count()) {
+            summary.totalSteps = Int(steps)
         }
 
-        // 卡路里
-        if !activeCalRecords.isEmpty {
-            summary.activeCalories = activeCalRecords.map(\.value).reduce(0, +)
-        }
-        if !restingCalRecords.isEmpty {
-            summary.restingCalories = restingCalRecords.map(\.value).reduce(0, +)
-        }
-        // 运动分钟（Apple Watch appleExerciseTime，真实值）
-        if !exerciseTimeRecords.isEmpty {
-            summary.exerciseMinutes = exerciseTimeRecords.map(\.value).reduce(0, +)
+        // 活跃卡路里
+        if let activeCal = await fetchStatisticsSum(type: HKQuantityType(.activeEnergyBurned), predicate: hkPredicate, unit: .kilocalorie()) {
+            summary.activeCalories = activeCal
         }
 
-        // 睡眠（总分钟数）
+        // 静息卡路里
+        if let restingCal = await fetchStatisticsSum(type: HKQuantityType(.basalEnergyBurned), predicate: hkPredicate, unit: .kilocalorie()) {
+            summary.restingCalories = restingCal
+        }
+
+        // 运动分钟（Apple Watch appleExerciseTime）
+        if let exerciseMin = await fetchStatisticsSum(type: HKQuantityType(.appleExerciseTime), predicate: hkPredicate, unit: .minute()) {
+            summary.exerciseMinutes = exerciseMin
+        }
+
+        // ---- 睡眠：按阶段聚合 ----
+        let sleepRecords = records.filter { $0.metricType == HealthMetricType.sleepAnalysis.rawValue }
+        let deepRecords = records.filter { $0.metricType == HealthMetricType.sleepDeep.rawValue }
+        let remRecords = records.filter { $0.metricType == HealthMetricType.sleepREM.rawValue }
+        let coreRecords = records.filter { $0.metricType == HealthMetricType.sleepCore.rawValue }
+
         if !sleepRecords.isEmpty {
             summary.sleepDurationMinutes = Int(sleepRecords.map(\.value).reduce(0, +))
         }
+        if !deepRecords.isEmpty {
+            summary.deepSleepMinutes = Int(deepRecords.map(\.value).reduce(0, +))
+        }
+        if !remRecords.isEmpty {
+            summary.remSleepMinutes = Int(remRecords.map(\.value).reduce(0, +))
+        }
+        if !coreRecords.isEmpty {
+            summary.coreSleepMinutes = Int(coreRecords.map(\.value).reduce(0, +))
+        }
 
-        // 计算每日评分
+        // ��算每日评分
         summary.dailyScore = calculateScore(from: summary)
+
+        // 计算压力���分
+        summary.stressScore = HealthKitManager.calculateStressScore(
+            hrv: summary.averageHRV,
+            restingHR: summary.restingHeartRate,
+            sleepMinutes: summary.sleepDurationMinutes
+        )
+
         summary.lastUpdated = .now
 
         do {
@@ -381,6 +459,21 @@ final class HealthKitService {
             logger.info("DailySummary 已更新: \(dateString), 评分: \(summary.dailyScore ?? 0)")
         } catch {
             logger.error("DailySummary 保存失败: \(error.localizedDescription)")
+        }
+    }
+
+    /// 从 HealthKit 查询指定类型的去重累计值（HKStatisticsQuery 自动处理多源去重）
+    private func fetchStatisticsSum(type: HKQuantityType, predicate: NSPredicate, unit: HKUnit) async -> Double? {
+        let descriptor = HKStatisticsQueryDescriptor(
+            predicate: .quantitySample(type: type, predicate: predicate),
+            options: .cumulativeSum
+        )
+        do {
+            let result = try await descriptor.result(for: store)
+            return result?.sumQuantity()?.doubleValue(for: unit)
+        } catch {
+            logger.error("Statistics Query 失败 [\(type.identifier)]: \(error.localizedDescription)")
+            return nil
         }
     }
 
@@ -474,38 +567,14 @@ final class HealthKitService {
         }
     }
 
-    /// 基于 DailySummary 计算评分
+    /// 基于 DailySummary 计算评分 — delegates to ScoreEngine for consistency
     private func calculateScore(from summary: DailySummary) -> Int {
-        var score = 50
-
-        if let hrv = summary.averageHRV {
-            if hrv > 60 { score += 15 }
-            else if hrv > 40 { score += 5 }
-            else { score -= 10 }
-        }
-
-        if let rhr = summary.restingHeartRate {
-            if rhr < 60 { score += 10 }
-            else if rhr < 70 { score += 5 }
-            else if rhr > 80 { score -= 10 }
-        }
-
-        if let sleep = summary.sleepDurationMinutes {
-            if sleep > 420 { score += 15 }
-            else if sleep > 360 { score += 5 }
-            else if sleep < 300 { score -= 15 }
-        }
-
-        if let spo2 = summary.averageBloodOxygen {
-            if spo2 >= 96 { score += 5 }
-            else if spo2 < 92 { score -= 15 }
-        }
-
-        if let steps = summary.totalSteps, steps > 8000 {
-            score += 5
-        }
-
-        return max(0, min(100, score))
+        ScoreEngine.calculateScore(
+            hrv: summary.averageHRV,
+            restingHR: summary.restingHeartRate,
+            bloodOxygen: summary.averageBloodOxygen,
+            sleepMinutes: summary.sleepDurationMinutes ?? 0
+        )
     }
 
     // MARK: - 锚点持久化

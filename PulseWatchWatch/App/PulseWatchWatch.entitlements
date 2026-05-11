@@ -8,7 +8,7 @@
 	<array/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.abundra.pulse.shared</string>
+		<string>group.com.hallidai.pulse.shared</string>
 	</array>
 </dict>
 </plist>

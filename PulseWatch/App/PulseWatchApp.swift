@@ -25,7 +25,27 @@ struct PulseWatchApp: App {
         do {
             return try ModelContainer(for: schema, configurations: [config])
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            // If migration fails, delete the store and recreate — losing data is better than crashing
+            // This can happen after a schema change in an app update
+            let storeURL = config.url
+            try? FileManager.default.removeItem(at: storeURL)
+            // Also remove the .sqlite-shm and .sqlite-wal files
+            let shmURL = storeURL.deletingPathExtension().appendingPathExtension("sqlite-shm")
+            let walURL = storeURL.deletingPathExtension().appendingPathExtension("sqlite-wal")
+            try? FileManager.default.removeItem(at: shmURL)
+            try? FileManager.default.removeItem(at: walURL)
+
+            do {
+                return try ModelContainer(for: schema, configurations: [config])
+            } catch {
+                // Last resort: in-memory store to avoid crash
+                let memConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+                do {
+                    return try ModelContainer(for: schema, configurations: [memConfig])
+                } catch {
+                    fatalError("Pulse Watch: Failed to create even in-memory ModelContainer: \(error)")
+                }
+            }
         }
     }()
 
@@ -84,7 +104,18 @@ struct PulseWatchApp: App {
             await HealthKitService.shared.performInitialFetch()
             // 训练历史同步 — 每次启动时增量同步
             await WorkoutHistoryService.shared.syncWorkouts()
+            // 数据采集完成后立即推送到 OpenClaw（确保 Agent 有最新数据）
+            await MainActor.run {
+                OpenClawBridge.shared.checkAndPushIfNeeded()
+            }
         }
+
+        #if os(iOS)
+        // Google Health — refresh on launch if already connected
+        Task { @MainActor in
+            await GoogleHealthService.shared.refresh()
+        }
+        #endif
     }
 
     var body: some Scene {
@@ -132,6 +163,11 @@ struct PulseWatchApp: App {
                 Task {
                     await OpenClawBridge.shared.checkAndProcessPendingIfNeeded()
                 }
+
+                // 回到前台时推送最新健康数据到 OpenClaw
+                Task { @MainActor in
+                    OpenClawBridge.shared.checkAndPushIfNeeded()
+                }
             }
         }
     }
@@ -159,18 +195,17 @@ struct MainTabView: View {
 
     @State private var selectedTab = 0
     init() {
-        // 自定义 TabBar 外观
+        // v2 Clinical TabBar — DS-tokenised: bg surface + line hairline + accent selection.
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(PulseTheme.background)
-        appearance.shadowColor = .clear
-        // Remove iOS 18 tab selection background pill
+        appearance.backgroundColor = UIColor(DS.Color.bg)
+        appearance.shadowColor = UIColor(DS.Color.line)
         let itemAppearance = UITabBarItemAppearance()
-        itemAppearance.normal.iconColor = UIColor(PulseTheme.textTertiary)
-        itemAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(PulseTheme.textTertiary)]
-        itemAppearance.selected.iconColor = UIColor(PulseTheme.accent)
-        itemAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(PulseTheme.accent)]
-        appearance.selectionIndicatorTintColor = UIColor.white.withAlphaComponent(0.1)
+        itemAppearance.normal.iconColor = UIColor(DS.Color.inkDim)
+        itemAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(DS.Color.inkDim)]
+        itemAppearance.selected.iconColor = UIColor(DS.Color.accent)
+        itemAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(DS.Color.accent)]
+        appearance.selectionIndicatorTintColor = .clear
         appearance.stackedLayoutAppearance = itemAppearance
         appearance.inlineLayoutAppearance = itemAppearance
         appearance.compactInlineLayoutAppearance = itemAppearance
@@ -180,7 +215,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            DashboardView()
+            TodayView()
                 .tabItem {
                     Label(String(localized: "Today"), systemImage: "heart.text.clipboard")
                         .accessibilityLabel(String(localized: "Today"))
@@ -188,7 +223,7 @@ struct MainTabView: View {
                 }
                 .tag(0)
 
-            WorkoutView()
+            TrainingView()
                 .tabItem {
                     Label(String(localized: "Exercise"), systemImage: "figure.run")
                         .accessibilityLabel(String(localized: "Exercise"))
@@ -196,7 +231,7 @@ struct MainTabView: View {
                 }
                 .tag(1)
 
-            HistoryView()
+            TrendsView()
                 .tabItem {
                     Label(String(localized: "Trends"), systemImage: "chart.xyaxis.line")
                         .accessibilityLabel(String(localized: "Trends"))
@@ -212,7 +247,7 @@ struct MainTabView: View {
                 }
                 .tag(3)
         }
-        .tint(PulseTheme.accent)
+        .tint(DS.Color.accent)
         .onChange(of: selectedTab) { _, newTab in
             let tabNames = ["Today", "Exercise", "Trends", "Settings"]
             let name = newTab < tabNames.count ? tabNames[newTab] : "unknown"

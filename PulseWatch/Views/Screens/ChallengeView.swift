@@ -10,7 +10,7 @@ struct ChallengeView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: PulseTheme.spacingM) {
+            VStack(spacing: DS.Spacing.m) {
                 headerCard
                     .staggered(index: 0)
 
@@ -44,10 +44,10 @@ struct ChallengeView: View {
 
                 Spacer(minLength: 40)
             }
-            .padding(.horizontal, PulseTheme.spacingM)
-            .padding(.top, PulseTheme.spacingS)
+            .padding(.horizontal, DS.Spacing.m)
+            .padding(.top, DS.Spacing.s)
         }
-        .background(PulseTheme.background)
+        .background(DS.Color.bg)
         .navigationTitle(String(localized: "训练挑战"))
         .navigationBarTitleDisplayMode(.large)
         .toolbarColorScheme(.dark, for: .navigationBar)
@@ -66,23 +66,23 @@ struct ChallengeView: View {
     // MARK: - Header
 
     private var headerCard: some View {
-        HStack(spacing: PulseTheme.spacingM) {
+        HStack(spacing: DS.Spacing.m) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(PulseTheme.activityCoral.opacity(0.12))
-                    .frame(width: 36, height: 36)
+                    .frame(width: DS.Spacing.xl + DS.Spacing.xs, height: DS.Spacing.xl + DS.Spacing.xs)
                 Image(systemName: "flame.fill")
-                    .font(.system(size: 16, weight: .medium))
+                    .font(DS.Typography.body.weight(.medium))
                     .foregroundStyle(PulseTheme.activityCoral)
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(String(localized: "训练挑战"))
                     .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .foregroundStyle(DS.Color.ink)
                     .accessibilityAddTraits(.isHeader)
                 Text(String(localized: "设定挑战，每天打卡，养成习惯"))
                     .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
             }
             Spacer()
         }
@@ -90,27 +90,27 @@ struct ChallengeView: View {
     }
 
     private var emptyCard: some View {
-        VStack(spacing: PulseTheme.spacingM) {
+        VStack(spacing: DS.Spacing.m) {
             Image(systemName: "trophy")
-                .font(.system(size: 36))
-                .foregroundStyle(PulseTheme.textTertiary.opacity(0.5))
+                .font(DS.Typography.title1)
+                .foregroundStyle(DS.Color.inkDim.opacity(0.5))
             Text(String(localized: "还没有挑战"))
                 .font(PulseTheme.bodyFont)
-                .foregroundStyle(PulseTheme.textSecondary)
+                .foregroundStyle(DS.Color.inkMid)
             Text(String(localized: "创建一个训练挑战，坚持打卡"))
                 .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .foregroundStyle(DS.Color.inkDim)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, PulseTheme.spacingXL)
+        .padding(.vertical, DS.Spacing.xl)
         .pulseCard()
     }
 
     private func sectionLabel(_ text: String) -> some View {
         HStack {
             Text(text)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.bodyS.weight(.semibold))
+                .foregroundStyle(DS.Color.inkDim)
             Spacer()
         }
     }
@@ -118,24 +118,24 @@ struct ChallengeView: View {
     // MARK: - Challenge Card
 
     private func challengeCard(_ challenge: TrainingChallenge) -> some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+        VStack(alignment: .leading, spacing: DS.Spacing.m) {
             // 顶部信息
             HStack {
                 let type = ChallengeType(rawValue: challenge.challengeType)
                 Image(systemName: type?.icon ?? "star.fill")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(DS.Typography.bodyS.weight(.medium))
                     .foregroundStyle(PulseTheme.activityCoral)
 
                 Text(challenge.name)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.body.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
 
                 Spacer()
 
                 if challenge.isActive && !challenge.isExpired {
                     Text(String(localized: "剩余 \(challenge.daysRemaining) 天"))
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.caption.weight(.medium))
+                        .foregroundStyle(DS.Color.inkDim)
                 }
             }
 
@@ -147,7 +147,7 @@ struct ChallengeView: View {
                             .fill(PulseTheme.surface2)
                             .frame(height: 8)
                         RoundedRectangle(cornerRadius: 4, style: .continuous)
-                            .fill(PulseTheme.accentTeal)
+                            .fill(DS.Color.accent)
                             .frame(width: geo.size.width * challenge.progressPercent, height: 8)
                     }
                 }
@@ -155,12 +155,12 @@ struct ChallengeView: View {
 
                 HStack {
                     Text("\(challenge.completedCount) / \(challenge.durationDays) " + String(localized: "天"))
-                        .font(.system(size: 11, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.caption)
+                        .foregroundStyle(DS.Color.inkDim)
                     Spacer()
                     Text(String(format: "%.0f%%", challenge.progressPercent * 100))
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .foregroundStyle(PulseTheme.accentTeal)
+                        .font(DS.Typography.caption.weight(.bold))
+                        .foregroundStyle(DS.Color.accent)
                 }
             }
 
@@ -177,16 +177,16 @@ struct ChallengeView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: todayDone ? "checkmark.circle.fill" : "circle")
-                            .font(.system(size: 14))
+                            .font(DS.Typography.bodyS)
                         Text(todayDone ? String(localized: "今日已打卡") : String(localized: "今日打卡"))
-                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                            .font(DS.Typography.bodyS.weight(.medium))
                     }
-                    .foregroundStyle(todayDone ? PulseTheme.accentTeal : PulseTheme.textPrimary)
+                    .foregroundStyle(todayDone ? DS.Color.accent : DS.Color.ink)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, DS.Spacing.s)
                     .background(
-                        RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                            .fill(todayDone ? PulseTheme.accentTeal.opacity(0.1) : PulseTheme.surface2)
+                        RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                            .fill(todayDone ? DS.Color.accent.opacity(0.1) : PulseTheme.surface2)
                     )
                 }
                 .disabled(todayDone)
@@ -213,7 +213,7 @@ struct ChallengeView: View {
 
                 RoundedRectangle(cornerRadius: 3, style: .continuous)
                     .fill(
-                        done ? PulseTheme.accentTeal :
+                        done ? DS.Color.accent :
                         isFuture ? PulseTheme.surface2.opacity(0.5) :
                         PulseTheme.surface2
                     )
@@ -221,7 +221,7 @@ struct ChallengeView: View {
                     .overlay {
                         if cal.isDate(date, inSameDayAs: today) {
                             RoundedRectangle(cornerRadius: 3, style: .continuous)
-                                .stroke(PulseTheme.accent, lineWidth: 1)
+                                .stroke(DS.Color.accent, lineWidth: 1)
                         }
                     }
             }
@@ -234,17 +234,17 @@ struct ChallengeView: View {
         Button {
             showCreate = true
         } label: {
-            HStack(spacing: PulseTheme.spacingS) {
+            HStack(spacing: DS.Spacing.s) {
                 Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 16))
+                    .font(DS.Typography.body)
                 Text(String(localized: "创建挑战"))
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .font(DS.Typography.body.weight(.medium))
             }
             .foregroundStyle(PulseTheme.activityCoral)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
+            .padding(.vertical, DS.Spacing.card)
             .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+                RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
                     .stroke(PulseTheme.activityCoral.opacity(0.3), lineWidth: 1)
                     .fill(PulseTheme.activityCoral.opacity(0.05))
             )
@@ -266,29 +266,29 @@ struct CreateChallengeSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: PulseTheme.spacingL) {
+            VStack(spacing: DS.Spacing.l) {
                 // 名称
                 VStack(alignment: .leading, spacing: 6) {
                     Text(String(localized: "挑战名称"))
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.bodyS.weight(.medium))
+                        .foregroundStyle(DS.Color.inkDim)
                     TextField(String(localized: "例如：30天俯卧撑"), text: $name)
                         .textFieldStyle(.plain)
                         .font(PulseTheme.bodyFont)
-                        .foregroundStyle(PulseTheme.textPrimary)
-                        .padding(12)
+                        .foregroundStyle(DS.Color.ink)
+                        .padding(DS.Spacing.m)
                         .background(
-                            RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                            RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
                                 .fill(PulseTheme.surface2)
                         )
                 }
                 .pulseCard()
 
                 // 类型选择
-                VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
+                VStack(alignment: .leading, spacing: DS.Spacing.s) {
                     Text(String(localized: "挑战类型"))
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.bodyS.weight(.medium))
+                        .foregroundStyle(DS.Color.inkDim)
 
                     ForEach(ChallengeType.allCases, id: \.rawValue) { type in
                         Button {
@@ -296,46 +296,46 @@ struct CreateChallengeSheet: View {
                             targetPerDay = type.defaultTarget
                             if name.isEmpty { name = type.label }
                         } label: {
-                            HStack(spacing: PulseTheme.spacingM) {
+                            HStack(spacing: DS.Spacing.m) {
                                 Image(systemName: type.icon)
-                                    .font(.system(size: 14))
-                                    .foregroundStyle(selectedType == type ? PulseTheme.activityCoral : PulseTheme.textTertiary)
+                                    .font(DS.Typography.bodyS)
+                                    .foregroundStyle(selectedType == type ? PulseTheme.activityCoral : DS.Color.inkDim)
                                     .frame(width: 24)
                                 Text(type.label)
                                     .font(PulseTheme.bodyFont)
-                                    .foregroundStyle(selectedType == type ? PulseTheme.textPrimary : PulseTheme.textSecondary)
+                                    .foregroundStyle(selectedType == type ? DS.Color.ink : DS.Color.inkMid)
                                 Spacer()
                                 if selectedType == type {
                                     Image(systemName: "checkmark.circle.fill")
                                         .foregroundStyle(PulseTheme.activityCoral)
                                 }
                             }
-                            .padding(.vertical, 8)
+                            .padding(.vertical, DS.Spacing.s)
                         }
                     }
                 }
                 .pulseCard()
 
                 // 参数
-                HStack(spacing: PulseTheme.spacingM) {
+                HStack(spacing: DS.Spacing.m) {
                     VStack(spacing: 4) {
                         Text(String(localized: "每日目标"))
-                            .font(.system(size: 11, weight: .medium, design: .rounded))
-                            .foregroundStyle(PulseTheme.textTertiary)
+                            .font(DS.Typography.caption.weight(.medium))
+                            .foregroundStyle(DS.Color.inkDim)
                         Stepper("\(targetPerDay)", value: $targetPerDay, in: 1...1000, step: selectedType == .steps ? 1000 : 10)
-                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .foregroundStyle(PulseTheme.textPrimary)
+                            .font(DS.Typography.body.weight(.semibold))
+                            .foregroundStyle(DS.Color.ink)
                     }
                     .frame(maxWidth: .infinity)
                     .pulseCard()
 
                     VStack(spacing: 4) {
                         Text(String(localized: "天数"))
-                            .font(.system(size: 11, weight: .medium, design: .rounded))
-                            .foregroundStyle(PulseTheme.textTertiary)
+                            .font(DS.Typography.caption.weight(.medium))
+                            .foregroundStyle(DS.Color.inkDim)
                         Stepper("\(durationDays)", value: $durationDays, in: 7...90, step: 7)
-                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .foregroundStyle(PulseTheme.textPrimary)
+                            .font(DS.Typography.body.weight(.semibold))
+                            .foregroundStyle(DS.Color.ink)
                     }
                     .frame(maxWidth: .infinity)
                     .pulseCard()
@@ -352,15 +352,15 @@ struct CreateChallengeSheet: View {
                 }
                 .buttonStyle(PulseButtonStyle())
             }
-            .padding(PulseTheme.spacingM)
-            .background(PulseTheme.background)
+            .padding(DS.Spacing.m)
+            .background(DS.Color.bg)
             .navigationTitle(String(localized: "新挑战"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "取消")) { dismiss() }
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .foregroundStyle(DS.Color.inkMid)
                 }
             }
         }

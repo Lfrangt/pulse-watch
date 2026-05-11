@@ -29,6 +29,20 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "B0C7EF8CD448B100106F8E41"
+               BuildableName = "PulseWatchTests.xctest"
+               BlueprintName = "PulseWatchTests"
+               ReferencedContainer = "container:PulseWatch.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "C7A692FC4F1F8935DE767F22"
                BuildableName = "PulseWatchUITests.xctest"
                BlueprintName = "PulseWatchUITests"
@@ -53,6 +67,17 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "B0C7EF8CD448B100106F8E41"
+               BuildableName = "PulseWatchTests.xctest"
+               BlueprintName = "PulseWatchTests"
+               ReferencedContainer = "container:PulseWatch.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
          <TestableReference
             skipped = "NO"
             parallelizable = "NO">

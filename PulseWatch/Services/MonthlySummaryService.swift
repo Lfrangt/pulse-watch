@@ -116,8 +116,8 @@ final class MonthlySummaryService {
         let now = Date()
 
         // 本月
-        let thisMonthStart = cal.date(from: cal.dateComponents([.year, .month], from: now))!
-        let lastMonthStart = cal.date(byAdding: .month, value: -1, to: thisMonthStart)!
+        let thisMonthStart = cal.safeDate(from: cal.dateComponents([.year, .month], from: now))
+        let lastMonthStart = cal.safeDate(byAdding: .month, value: -1, to: thisMonthStart)
 
         let allSummaries: [DailySummary]
         let allWorkouts: [WorkoutHistoryEntry]
@@ -141,7 +141,7 @@ final class MonthlySummaryService {
         }
 
         // 用上个月数据（月初时报告上月）
-        let prevMonthStart = cal.date(byAdding: .month, value: -1, to: lastMonthStart)!
+        let prevMonthStart = cal.safeDate(byAdding: .month, value: -1, to: lastMonthStart)
 
         let thisSummaries = allSummaries.filter { $0.date >= lastMonthStart && $0.date < thisMonthStart }
         let prevSummaries = allSummaries.filter { $0.date >= prevMonthStart && $0.date < lastMonthStart }

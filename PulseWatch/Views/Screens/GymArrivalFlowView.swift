@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Combine
 
 /// 健身房到达 → 选部位 → AI 训练计划 → 开始计时 → 完成记录
 /// 4 步完整智能健身启动流程
@@ -19,7 +20,6 @@ struct GymArrivalFlowView: View {
     @State private var generatedPlan: GeneratedPlan?
     @State private var timerRunning = false
     @State private var elapsedSeconds: Int = 0
-    @State private var timer: Timer?
     @State private var showStrengthPrompt = false
 
     // External context
@@ -44,7 +44,7 @@ struct GymArrivalFlowView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                PulseTheme.background.ignoresSafeArea()
+                DS.Color.bg.ignoresSafeArea()
 
                 switch step {
                 case .welcome:     welcomeStep
@@ -58,64 +58,68 @@ struct GymArrivalFlowView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 22))
-                            .foregroundStyle(PulseTheme.textTertiary)
+                            .font(DS.Typography.title2)
+                            .foregroundStyle(DS.Color.inkDim)
                     }
                 }
             }
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+                guard timerRunning else { return }
+                elapsedSeconds += 1
+            }
         }
     }
 
     // MARK: - Step 1: Welcome
 
     private var welcomeStep: some View {
-        VStack(spacing: PulseTheme.spacingXL) {
+        VStack(spacing: DS.Spacing.xl) {
             Spacer()
 
             Image(systemName: "dumbbell.fill")
-                .font(.system(size: 60))
-                .foregroundStyle(PulseTheme.accent)
+                .font(DS.Typography.display3)
+                .foregroundStyle(DS.Color.accent)
 
-            VStack(spacing: PulseTheme.spacingS) {
+            VStack(spacing: DS.Spacing.s) {
                 Text("You're at the Gym 💪")
-                    .font(.system(size: 28, weight: .bold))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.title1.weight(.bold))
+                    .foregroundStyle(DS.Color.ink)
                 Text("Ready to start training?")
                     .font(PulseTheme.bodyFont)
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .foregroundStyle(DS.Color.inkMid)
             }
 
             // Readiness badge
-            HStack(spacing: PulseTheme.spacingM) {
+            HStack(spacing: DS.Spacing.m) {
                 readinessBadge(label: "Readiness", score: readinessScore)
                 readinessBadge(label: "Strain", score: strainScore)
             }
-            .padding(.horizontal, PulseTheme.spacingL)
+            .padding(.horizontal, DS.Spacing.l)
 
             Spacer()
 
-            VStack(spacing: PulseTheme.spacingM) {
+            VStack(spacing: DS.Spacing.m) {
                 Button {
                     withAnimation { step = .selectMuscle }
                 } label: {
                     Text("Start Training")
                         .font(PulseTheme.bodyFont.weight(.semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DS.Color.ink)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(PulseTheme.accent))
+                        .padding(.vertical, DS.Spacing.m)
+                        .background(RoundedRectangle(cornerRadius: DS.Radius.inner).fill(DS.Color.accent))
                 }
                 .buttonStyle(.plain)
 
                 Button { dismiss() } label: {
                     Text("Maybe Later")
                         .font(PulseTheme.bodyFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .foregroundStyle(DS.Color.inkDim)
                 }
             }
-            .padding(.horizontal, PulseTheme.spacingL)
-            .padding(.bottom, 40)
+            .padding(.horizontal, DS.Spacing.l)
+            .padding(.bottom, DS.Spacing.xxl)
         }
     }
 
@@ -123,30 +127,30 @@ struct GymArrivalFlowView: View {
         let color = PulseTheme.statusColor(for: score)
         return VStack(spacing: 4) {
             Text("\(score)")
-                .font(.system(size: 24, weight: .bold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.title1.weight(.bold))
+                .foregroundStyle(DS.Color.ink)
             Text(label)
                 .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .foregroundStyle(DS.Color.inkDim)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, PulseTheme.spacingM)
+        .padding(.vertical, DS.Spacing.m)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
+            RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
                 .fill(color.opacity(0.08))
-                .overlay(RoundedRectangle(cornerRadius: PulseTheme.radiusM).stroke(color.opacity(0.2), lineWidth: 1))
+                .overlay(RoundedRectangle(cornerRadius: DS.Radius.inner).stroke(color.opacity(0.2), lineWidth: 1))
         )
     }
 
     // MARK: - Step 2: Select Muscle Groups
 
     private var selectMuscleStep: some View {
-        VStack(spacing: PulseTheme.spacingL) {
+        VStack(spacing: DS.Spacing.l) {
             Spacer().frame(height: 40)
 
             Text("What are you training today?")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.title1.weight(.bold))
+                .foregroundStyle(DS.Color.ink)
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 4), spacing: 12) {
                 ForEach(MuscleGroup.allCases) { group in
@@ -157,26 +161,26 @@ struct GymArrivalFlowView: View {
                     } label: {
                         VStack(spacing: 6) {
                             Text(group.emoji)
-                                .font(.system(size: 28))
+                                .font(DS.Typography.title1)
                             Text(group.label)
-                                .font(.system(size: 12, weight: selected ? .semibold : .regular))
-                                .foregroundStyle(selected ? group.color : PulseTheme.textTertiary)
+                                .font(DS.Typography.caption)
+                                .foregroundStyle(selected ? group.color : DS.Color.inkDim)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
+                        .padding(.vertical, DS.Spacing.card)
                         .background(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(selected ? group.color.opacity(0.15) : PulseTheme.cardBackground)
+                                .fill(selected ? group.color.opacity(0.15) : DS.Color.bgElev)
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .stroke(selected ? group.color.opacity(0.5) : PulseTheme.border.opacity(0.3), lineWidth: 1)
+                                .stroke(selected ? group.color.opacity(0.5) : DS.Color.line.opacity(0.3), lineWidth: 1)
                         )
                     }
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, PulseTheme.spacingM)
+            .padding(.horizontal, DS.Spacing.m)
 
             Spacer()
 
@@ -186,16 +190,16 @@ struct GymArrivalFlowView: View {
             } label: {
                 Text(String(format: String(localized: "Continue (%d selected)"), selectedGroups.count))
                     .font(PulseTheme.bodyFont.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(DS.Color.ink)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM)
-                        .fill(selectedGroups.isEmpty ? PulseTheme.textTertiary : PulseTheme.accent))
+                    .padding(.vertical, DS.Spacing.m)
+                    .background(RoundedRectangle(cornerRadius: DS.Radius.inner)
+                        .fill(selectedGroups.isEmpty ? DS.Color.inkDim : DS.Color.accent))
             }
             .buttonStyle(.plain)
             .disabled(selectedGroups.isEmpty)
-            .padding(.horizontal, PulseTheme.spacingL)
-            .padding(.bottom, 40)
+            .padding(.horizontal, DS.Spacing.l)
+            .padding(.bottom, DS.Spacing.xxl)
         }
     }
 
@@ -203,47 +207,48 @@ struct GymArrivalFlowView: View {
 
     private var planStep: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: PulseTheme.spacingL) {
+            VStack(alignment: .leading, spacing: DS.Spacing.l) {
                 // Header
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Your Training Plan")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .font(DS.Typography.title1.weight(.bold))
+                        .foregroundStyle(DS.Color.ink)
                     if let plan = generatedPlan {
                         HStack(spacing: 8) {
                             Text(plan.intensity.rawValue)
                                 .font(PulseTheme.captionFont.weight(.medium))
                                 .foregroundStyle(intensityColor(plan.intensity))
                             Text("·")
-                                .foregroundStyle(PulseTheme.textTertiary)
+                                .foregroundStyle(DS.Color.inkDim)
                             Text(String(format: String(localized: "~%d min"), plan.estimatedMinutes))
                                 .font(PulseTheme.captionFont)
-                                .foregroundStyle(PulseTheme.textTertiary)
+                                .foregroundStyle(DS.Color.inkDim)
                         }
                         Text(plan.reason)
                             .font(PulseTheme.captionFont)
-                            .foregroundStyle(PulseTheme.textSecondary)
+                            .foregroundStyle(DS.Color.inkMid)
                     }
                 }
-                .padding(.horizontal, PulseTheme.spacingM)
-                .padding(.top, 20)
+                .padding(.horizontal, DS.Spacing.m)
+                .padding(.top, DS.Spacing.l)
 
                 // Exercises
                 if let plan = generatedPlan {
-                    VStack(spacing: PulseTheme.spacingS) {
+                    VStack(spacing: DS.Spacing.s) {
                         ForEach(plan.exercises.indices, id: \.self) { i in
                             exerciseRow(plan.exercises[i], index: i + 1)
                         }
                     }
-                    .padding(.horizontal, PulseTheme.spacingM)
+                    .padding(.horizontal, DS.Spacing.m)
                 }
 
                 Spacer(minLength: 40)
 
                 // Buttons
-                VStack(spacing: PulseTheme.spacingM) {
+                VStack(spacing: DS.Spacing.m) {
                     Button {
-                        startTimer()
+                        elapsedSeconds = 0
+                        timerRunning = true
                         withAnimation { step = .training }
                     } label: {
                         HStack {
@@ -251,79 +256,79 @@ struct GymArrivalFlowView: View {
                             Text("Start Timer")
                         }
                         .font(PulseTheme.bodyFont.weight(.semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DS.Color.ink)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(PulseTheme.accent))
+                        .padding(.vertical, DS.Spacing.m)
+                        .background(RoundedRectangle(cornerRadius: DS.Radius.inner).fill(DS.Color.accent))
                     }
                     .buttonStyle(.plain)
 
                     Button { dismiss() } label: {
                         Text("Save Plan & Close")
                             .font(PulseTheme.bodyFont)
-                            .foregroundStyle(PulseTheme.accent)
+                            .foregroundStyle(DS.Color.accent)
                     }
                 }
-                .padding(.horizontal, PulseTheme.spacingL)
-                .padding(.bottom, 40)
+                .padding(.horizontal, DS.Spacing.l)
+                .padding(.bottom, DS.Spacing.xxl)
             }
         }
     }
 
     private func exerciseRow(_ exercise: SuggestedExercise, index: Int) -> some View {
-        HStack(spacing: PulseTheme.spacingM) {
+        HStack(spacing: DS.Spacing.m) {
             Text("\(index)")
-                .font(.system(size: 14, weight: .bold, design: .rounded))
-                .foregroundStyle(PulseTheme.accent)
-                .frame(width: 28, height: 28)
-                .background(Circle().fill(PulseTheme.accent.opacity(0.12)))
+                .font(DS.Typography.bodyS.weight(.bold))
+                .foregroundStyle(DS.Color.accent)
+                .frame(width: DS.Spacing.xl - DS.Spacing.xs, height: DS.Spacing.xl - DS.Spacing.xs)
+                .background(Circle().fill(DS.Color.accent.opacity(0.12)))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(exercise.name)
                     .font(PulseTheme.bodyFont.weight(.medium))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .foregroundStyle(DS.Color.ink)
                 HStack(spacing: 8) {
                     Text("\(exercise.sets) × \(exercise.reps)")
                         .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .foregroundStyle(DS.Color.inkMid)
                     if let w = exercise.suggestedWeight {
                         Text(String(format: "%.0f kg", w))
                             .font(PulseTheme.captionFont.weight(.medium))
-                            .foregroundStyle(PulseTheme.accent)
+                            .foregroundStyle(DS.Color.accent)
                     }
                 }
             }
             Spacer()
         }
-        .padding(PulseTheme.spacingM)
-        .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(PulseTheme.cardBackground))
+        .padding(DS.Spacing.m)
+        .background(RoundedRectangle(cornerRadius: DS.Radius.inner).fill(DS.Color.bgElev))
     }
 
     // MARK: - Step 4: Training Timer
 
     private var trainingStep: some View {
-        VStack(spacing: PulseTheme.spacingXL) {
+        VStack(spacing: DS.Spacing.xl) {
             Spacer()
 
             // Timer display
             VStack(spacing: 8) {
                 Text(formatTime(elapsedSeconds))
-                    .font(.system(size: 64, weight: .bold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.display3)
+                    .foregroundStyle(DS.Color.ink)
                     .monospacedDigit()
                 Text("Training in progress")
                     .font(PulseTheme.bodyFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
             // Selected groups reminder
             HStack(spacing: 8) {
                 ForEach(Array(selectedGroups).prefix(4)) { g in
                     Text(g.emoji + " " + g.label)
-                        .font(.system(size: 11, weight: .medium))
+                        .font(DS.Typography.caption.weight(.medium))
                         .foregroundStyle(g.color)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, DS.Spacing.s)
+                        .padding(.vertical, DS.Spacing.xs)
                         .background(Capsule().fill(g.color.opacity(0.12)))
                 }
             }
@@ -332,7 +337,7 @@ struct GymArrivalFlowView: View {
 
             // End button
             Button {
-                stopTimer()
+                timerRunning = false
                 withAnimation { step = .complete }
             } label: {
                 HStack {
@@ -340,34 +345,34 @@ struct GymArrivalFlowView: View {
                     Text("End Workout")
                 }
                 .font(PulseTheme.bodyFont.weight(.semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(DS.Color.ink)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(PulseTheme.activityAccent))
+                .padding(.vertical, DS.Spacing.m)
+                .background(RoundedRectangle(cornerRadius: DS.Radius.inner).fill(PulseTheme.activityAccent))
             }
             .buttonStyle(.plain)
-            .padding(.horizontal, PulseTheme.spacingL)
-            .padding(.bottom, 40)
+            .padding(.horizontal, DS.Spacing.l)
+            .padding(.bottom, DS.Spacing.xxl)
         }
     }
 
     // MARK: - Step 5: Complete
 
     private var completeStep: some View {
-        VStack(spacing: PulseTheme.spacingXL) {
+        VStack(spacing: DS.Spacing.xl) {
             Spacer()
 
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 60))
-                .foregroundStyle(PulseTheme.statusGood)
+                .font(DS.Typography.display3)
+                .foregroundStyle(DS.Color.good)
 
-            VStack(spacing: PulseTheme.spacingS) {
+            VStack(spacing: DS.Spacing.s) {
                 Text("Workout Complete! 🎉")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.title1.weight(.bold))
+                    .foregroundStyle(DS.Color.ink)
                 Text(formatTime(elapsedSeconds))
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundStyle(PulseTheme.accent)
+                    .font(DS.Typography.title1.weight(.bold))
+                    .foregroundStyle(DS.Color.accent)
             }
 
             // Strength prompt (if relevant muscles)
@@ -376,10 +381,10 @@ struct GymArrivalFlowView: View {
                 VStack(spacing: 8) {
                     Text("Did you hit any PRs today?")
                         .font(PulseTheme.bodyFont)
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .foregroundStyle(DS.Color.inkMid)
                     Text("Record your lifts in Strength tracking")
                         .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .foregroundStyle(DS.Color.inkDim)
                 }
             }
 
@@ -391,14 +396,14 @@ struct GymArrivalFlowView: View {
             } label: {
                 Text("Done")
                     .font(PulseTheme.bodyFont.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(DS.Color.ink)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(RoundedRectangle(cornerRadius: PulseTheme.radiusM).fill(PulseTheme.accent))
+                    .padding(.vertical, DS.Spacing.m)
+                    .background(RoundedRectangle(cornerRadius: DS.Radius.inner).fill(DS.Color.accent))
             }
             .buttonStyle(.plain)
-            .padding(.horizontal, PulseTheme.spacingL)
-            .padding(.bottom, 40)
+            .padding(.horizontal, DS.Spacing.l)
+            .padding(.bottom, DS.Spacing.xxl)
         }
     }
 
@@ -432,9 +437,8 @@ struct GymArrivalFlowView: View {
                 }
             }
         }
-        let reason = reasons.isEmpty
-            ? String(format: String(localized: "Readiness %d — %@ intensity recommended"), readinessScore, intensity.rawValue)
-            : reasons.first!
+        let reason = reasons.first
+            ?? String(format: String(localized: "Readiness %d — %@ intensity recommended"), readinessScore, intensity.rawValue)
 
         generatedPlan = GeneratedPlan(
             intensity: intensity,
@@ -489,21 +493,7 @@ struct GymArrivalFlowView: View {
         }
     }
 
-    // MARK: - Timer
-
-    private func startTimer() {
-        elapsedSeconds = 0
-        timerRunning = true
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            elapsedSeconds += 1
-        }
-    }
-
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-        timerRunning = false
-    }
+    // MARK: - Timer (declarative via .onReceive in body)
 
     private func formatTime(_ seconds: Int) -> String {
         let m = seconds / 60
@@ -531,8 +521,8 @@ struct GymArrivalFlowView: View {
     private func intensityColor(_ intensity: TrainingPlan.Intensity) -> Color {
         switch intensity {
         case .heavy:    return PulseTheme.activityAccent
-        case .moderate: return PulseTheme.statusModerate
-        case .light:    return PulseTheme.statusGood
+        case .moderate: return DS.Color.warn
+        case .light:    return DS.Color.good
         }
     }
 }

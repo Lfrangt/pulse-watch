@@ -66,7 +66,7 @@ No subscription traps. Pay once, own it forever. Every future update included.
 Pulse is what happens when you combine Apple Watch sensors with real AI — not a chatbot, not a template generator, but an agent that understands your body.
 
 ## Keywords (100 chars max)
-recovery,score,HRV,fitness,AI,coach,workout,planner,sleep,tracker,WHOOP,alternative,training,health
+recovery,score,HRV,fitness,AI,coach,workout,planner,sleep,tracker,heart rate,training,health
 
 ## What's New (v1.0.0)
 🎉 Hello, world! Pulse v1.0 is here.
@@ -80,7 +80,7 @@ recovery,score,HRV,fitness,AI,coach,workout,planner,sleep,tracker,WHOOP,alternat
 
 ## Category
 Primary: Health & Fitness
-Secondary: Medical
+Secondary: Lifestyle
 
 ## Age Rating
 4+

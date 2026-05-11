@@ -40,7 +40,7 @@ final class HealthDataService {
         guard let container = modelContainer else { return [] }
 
         let context = container.mainContext
-        let startDate = Calendar.current.date(byAdding: .day, value: -days, to: Date())!
+        let startDate = Calendar.current.safeDate(byAdding: .day, value: -days, to: Date())
         let startOfDay = Calendar.current.startOfDay(for: startDate)
 
         let predicate = #Predicate<DailySummary> { $0.date >= startOfDay }
@@ -150,7 +150,7 @@ final class HealthDataService {
         guard let container = modelContainer else { return [] }
 
         let context = container.mainContext
-        let startDate = Calendar.current.date(byAdding: .day, value: -days, to: Date())!
+        let startDate = Calendar.current.safeDate(byAdding: .day, value: -days, to: Date())
 
         let predicate = #Predicate<WorkoutHistoryEntry> { $0.startDate >= startDate }
         var descriptor = FetchDescriptor<WorkoutHistoryEntry>(predicate: predicate)

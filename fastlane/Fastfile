@@ -4,7 +4,7 @@ platform :ios do
   # ─── Shared ────────────────────────────────────────────────
   before_all do
     # Regenerate Xcode project from project.yml (XcodeGen)
-    if which("xcodegen")
+    if system("which xcodegen > /dev/null 2>&1")
       sh("cd .. && xcodegen generate")
       UI.success("✅ Xcode project regenerated via XcodeGen")
     else
@@ -16,16 +16,23 @@ platform :ios do
   # Create an API key at https://appstoreconnect.apple.com/access/api
   # Set env vars: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_CONTENT (or ASC_KEY_FILEPATH)
   private_lane :load_asc_api_key do
-    if ENV["ASC_KEY_ID"] && ENV["ASC_ISSUER_ID"] && (ENV["ASC_KEY_CONTENT"] || ENV["ASC_KEY_FILEPATH"])
-      app_store_connect_api_key(
+    if ENV["ASC_KEY_ID"] && ENV["ASC_ISSUER_ID"]
+      key_opts = {
         key_id: ENV["ASC_KEY_ID"],
         issuer_id: ENV["ASC_ISSUER_ID"],
-        key_content: ENV["ASC_KEY_CONTENT"],
-        key_filepath: ENV["ASC_KEY_FILEPATH"],
-        is_key_content_base64: ENV["ASC_KEY_BASE64"] == "true",
         duration: 1200,
         in_house: false
-      )
+      }
+      if ENV["ASC_KEY_CONTENT"] && !ENV["ASC_KEY_CONTENT"].empty?
+        key_opts[:key_content] = ENV["ASC_KEY_CONTENT"]
+        key_opts[:is_key_content_base64] = (ENV["ASC_KEY_BASE64"] == "true")
+      elsif ENV["ASC_KEY_FILEPATH"] && !ENV["ASC_KEY_FILEPATH"].empty?
+        key_opts[:key_filepath] = ENV["ASC_KEY_FILEPATH"]
+      else
+        UI.important("⚠️  No ASC key content or filepath provided")
+        next nil
+      end
+      app_store_connect_api_key(key_opts)
     else
       UI.important("⚠️  ASC API Key not configured — will fall back to Apple ID auth")
       nil
@@ -49,11 +56,11 @@ platform :ios do
       clean: true,
       output_directory: "./build/fastlane",
       output_name: "PulseWatch.ipa",
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath '#{File.expand_path(ENV["ASC_KEY_FILEPATH"], File.dirname(__FILE__) + "/..")}' -authenticationKeyID '#{ENV["ASC_KEY_ID"]}' -authenticationKeyIssuerID '#{ENV["ASC_ISSUER_ID"]}'",
       export_options: {
-        provisioningProfiles: {
-          "com.abundra.pulse" => "match AppStore com.abundra.pulse"
-        }
-      }.merge(api_key ? {} : {})
+        signingStyle: "automatic",
+        teamID: "AV25N53237"
+      }
     )
 
     if api_key

@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import SwiftUI
 
 /// 持久化的训练记录 — 从 HealthKit HKWorkout 同步到本地 SwiftData
 /// 解决训练完成后数据消失的痛点，支持离线查看历史
@@ -97,6 +98,10 @@ final class WorkoutHistoryEntry {
     var activityColor: String {
         WorkoutActivityHelper.colorHex(for: activityType)
     }
+
+    var pulseActivityColor: Color {
+        WorkoutActivityHelper.pulseColor(for: activityType)
+    }
 }
 
 // MARK: - 心率区间条目
@@ -106,6 +111,16 @@ struct HRZoneEntry: Codable, Identifiable {
     let name: String
     let percentage: Double  // 0.0 ~ 1.0
     let colorHex: String
+
+    var pulseColor: Color {
+        let lc = name.lowercased()
+        if lc.contains("warm") || lc.contains("热身") { return PulseTheme.zoneRest }
+        if lc.contains("fat") || lc.contains("燃")   { return PulseTheme.zoneFatBurn }
+        if lc.contains("cardio") || lc.contains("心肺") { return PulseTheme.zoneCardio }
+        if lc.contains("anaerob") || lc.contains("无氧") { return PulseTheme.zonePeak }
+        if lc.contains("peak") || lc.contains("峰")  { return PulseTheme.zoneMax }
+        return PulseTheme.accent
+    }
 }
 
 // MARK: - 运动类型辅助
@@ -168,6 +183,16 @@ enum WorkoutActivityHelper {
         case 52, 24, 50, 72:    return "7FB069"  // 步行/瑜伽/恢复 — 绿色
         case 20, 58:            return "D4A056"  // 力量训练 — 琥珀色
         default:                return "D4B478"  // 默认 accent
+        }
+    }
+
+    static func pulseColor(for rawValue: Int) -> Color {
+        switch UInt(rawValue) {
+        case 37, 63:            return PulseTheme.activityCoral  // 跑步/HIIT
+        case 13, 46, 35:        return PulseTheme.accent         // 骑行/游泳/划船
+        case 52, 24, 50, 72:    return PulseTheme.statusGood     // 步行/瑜伽/恢复
+        case 20, 58:            return PulseTheme.statusWarning  // 力量训练
+        default:                return PulseTheme.accent
         }
     }
 }

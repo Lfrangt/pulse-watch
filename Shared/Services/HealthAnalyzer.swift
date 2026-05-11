@@ -341,7 +341,7 @@ final class HealthAnalyzer {
                             metric: .hrv,
                             severity: .high,
                             message: String(localized: "HRV significantly low"),
-                            detail: "Current \(Int(currentHRV))ms, >2σ below baseline \(Int(mean))ms",
+                            detail: String(localized: "Current \(Int(currentHRV))ms, >2σ below baseline \(Int(mean))ms"),
                             currentValue: currentHRV,
                             baselineValue: mean,
                             zScore: zScore

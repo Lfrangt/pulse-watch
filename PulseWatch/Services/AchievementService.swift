@@ -123,9 +123,9 @@ final class AchievementService {
         let now = Date()
         var consecutiveWeeks = 0
         for weekOffset in 0..<4 {
-            let weekStart = cal.date(byAdding: .weekOfYear, value: -weekOffset, to: now)!
-            let weekStartDay = cal.startOfDay(for: cal.date(from: cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: weekStart))!)
-            let weekEnd = cal.date(byAdding: .weekOfYear, value: 1, to: weekStartDay)!
+            let weekStart = cal.safeDate(byAdding: .weekOfYear, value: -weekOffset, to: now)
+            let weekStartDay = cal.startOfDay(for: cal.safeDate(from: cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: weekStart)))
+            let weekEnd = cal.safeDate(byAdding: .weekOfYear, value: 1, to: weekStartDay)
             let weekPRs = records.filter { $0.isPersonalRecord && $0.date >= weekStartDay && $0.date < weekEnd }
             if weekPRs.isEmpty { break }
             consecutiveWeeks += 1

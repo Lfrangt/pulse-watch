@@ -1,5 +1,6 @@
 import Foundation
 import WatchConnectivity
+import os
 #if os(watchOS)
 import WidgetKit
 #endif
@@ -9,6 +10,8 @@ import WidgetKit
 final class WatchConnectivityManager: NSObject {
 
     static let shared = WatchConnectivityManager()
+
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "WatchConnectivityManager")
 
     // MARK: - Received State (consumed by Watch UI)
 
@@ -86,7 +89,7 @@ final class WatchConnectivityManager: NSObject {
         if session.isReachable {
             // Real-time delivery if Watch is active
             session.sendMessage(payload, replyHandler: nil) { error in
-                print("WC sendMessage error: \(error.localizedDescription)")
+                self.logger.error("WC sendMessage error: \(error.localizedDescription, privacy: .public)")
                 // Fall back to queued transfer
                 session.transferUserInfo(payload)
             }
@@ -136,9 +139,7 @@ final class WatchConnectivityManager: NSObject {
 
         if session.isReachable {
             session.sendMessage(payload, replyHandler: nil) { error in
-                #if DEBUG
-                print("WC sendWorkoutCompleted error: \(error.localizedDescription)")
-                #endif
+                self.logger.error("WC sendWorkoutCompleted error: \(error.localizedDescription, privacy: .public)")
                 session.transferUserInfo(payload)
             }
         } else {
@@ -173,7 +174,7 @@ final class WatchConnectivityManager: NSObject {
 
         if session.isReachable {
             session.sendMessage(payload, replyHandler: nil) { error in
-                print("WC sendHealthSnapshot error: \(error.localizedDescription)")
+                self.logger.error("WC sendHealthSnapshot error: \(error.localizedDescription, privacy: .public)")
                 session.transferUserInfo(payload)
             }
         } else {
@@ -212,7 +213,7 @@ final class WatchConnectivityManager: NSObject {
 
     #if os(watchOS)
     private func updateComplicationData() {
-        let defaults = UserDefaults(suiteName: "group.com.abundra.pulse.shared")
+        let defaults = UserDefaults(suiteName: "group.com.hallidai.pulse.shared")
         if let score = receivedScore {
             defaults?.set(score, forKey: "pulse.score")
         }
@@ -270,7 +271,7 @@ extension WatchConnectivityManager: WCSessionDelegate {
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         if let error {
-            print("WC activation error: \(error.localizedDescription)")
+            logger.error("WC activation error: \(error.localizedDescription, privacy: .public)")
             return
         }
 

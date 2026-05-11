@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - Shared Data Key
 
 enum PulseSharedData {
-    static let suiteName = "group.com.abundra.pulse"
+    static let suiteName = "group.com.hallidai.pulse.shared"
     static let scoreKey = "pulse.score"
     static let headlineKey = "pulse.headline"
     static let heartRateKey = "pulse.heartRate"
@@ -71,7 +71,7 @@ struct PulseComplicationCircular: View {
 
             Gauge(value: Double(entry.score), in: 0...100) {
                 Text("P")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .font(DS.Typography.mono.weight(.bold))
             } currentValueLabel: {
                 Text(entry.score > 0 ? "\(entry.score)" : "--")
                     .font(.system(size: entry.score > 0 ? 16 : 12, weight: .bold, design: .rounded))
@@ -85,17 +85,17 @@ struct PulseComplicationCircular: View {
 
     private var scoreColor: Color {
         switch entry.score {
-        case 0..<40: return Color(hex: "C75C5C")
-        case 40..<70: return Color(hex: "D4A056")
-        default: return Color(hex: "7FB069")
+        case 0..<40: return DS.Color.bad
+        case 40..<70: return DS.Color.warn
+        default: return DS.Color.good
         }
     }
 
     private var gaugeGradient: Gradient {
         switch entry.score {
-        case 0..<40: return Gradient(colors: [Color(hex: "C75C5C"), Color(hex: "A04040")])
-        case 40..<70: return Gradient(colors: [Color(hex: "D4A056"), Color(hex: "B88A40")])
-        default: return Gradient(colors: [Color(hex: "7FB069"), Color(hex: "5A9044")])
+        case 0..<40: return Gradient(colors: [DS.Color.bad, DS.Color.bad.opacity(0.7)])
+        case 40..<70: return Gradient(colors: [DS.Color.warn, DS.Color.warn.opacity(0.7)])
+        default: return Gradient(colors: [DS.Color.good, DS.Color.good.opacity(0.7)])
         }
     }
 }
@@ -112,7 +112,7 @@ struct PulseComplicationRectangular: View {
                 EmptyView()
             } currentValueLabel: {
                 Text("\(entry.score)")
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .font(DS.Typography.caption.weight(.bold))
             }
             .gaugeStyle(.accessoryCircular)
             .tint(gaugeColor)
@@ -121,7 +121,7 @@ struct PulseComplicationRectangular: View {
             // 右侧：文字摘要
             VStack(alignment: .leading, spacing: 2) {
                 Text("Pulse · \(entry.headline)")
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .font(DS.Typography.caption.weight(.semibold))
                     .widgetAccentable()
                     .lineLimit(1)
 
@@ -129,19 +129,19 @@ struct PulseComplicationRectangular: View {
                     // 心率
                     HStack(spacing: 2) {
                         Image(systemName: "heart.fill")
-                            .font(.system(size: 8))
-                            .foregroundStyle(Color(hex: "C75C5C"))
+                            .font(DS.Typography.watchVital)
+                            .foregroundStyle(DS.Color.accent)
                         Text(entry.heartRate > 0 ? "\(entry.heartRate)" : "--")
-                            .font(.system(size: 10, design: .rounded))
+                            .font(DS.Typography.mono)
                     }
 
                     // 步数
                     HStack(spacing: 2) {
                         Image(systemName: "figure.walk")
-                            .font(.system(size: 8))
-                            .foregroundStyle(Color(hex: "7FB069"))
+                            .font(DS.Typography.watchVital)
+                            .foregroundStyle(DS.Color.good)
                         Text(formatSteps(entry.steps))
-                            .font(.system(size: 10, design: .rounded))
+                            .font(DS.Typography.mono)
                     }
                 }
                 .foregroundStyle(.secondary)
@@ -152,9 +152,9 @@ struct PulseComplicationRectangular: View {
 
     private var gaugeColor: Color {
         switch entry.score {
-        case 0..<40: return Color(hex: "C75C5C")
-        case 40..<70: return Color(hex: "D4A056")
-        default: return Color(hex: "7FB069")
+        case 0..<40: return DS.Color.bad
+        case 40..<70: return DS.Color.warn
+        default: return DS.Color.good
         }
     }
 
@@ -184,7 +184,7 @@ struct PulseComplicationCorner: View {
     var body: some View {
         ZStack {
             Text("\(entry.score)")
-                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .font(DS.Typography.bodyL.weight(.bold))
                 .foregroundStyle(scoreColor)
                 .widgetLabel {
                     Gauge(value: Double(entry.score), in: 0...100) {
@@ -199,9 +199,9 @@ struct PulseComplicationCorner: View {
 
     private var scoreColor: Color {
         switch entry.score {
-        case 0..<40: return Color(hex: "C75C5C")
-        case 40..<70: return Color(hex: "D4A056")
-        default: return Color(hex: "7FB069")
+        case 0..<40: return DS.Color.bad
+        case 40..<70: return DS.Color.warn
+        default: return DS.Color.good
         }
     }
 }

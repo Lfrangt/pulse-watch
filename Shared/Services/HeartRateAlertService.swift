@@ -195,7 +195,7 @@ final class HeartRateAlertService {
         guard let container = modelContainer else { return [] }
 
         let context = container.mainContext
-        let startDate = Calendar.current.date(byAdding: .day, value: -days, to: Date())!
+        let startDate = Calendar.current.safeDate(byAdding: .day, value: -days, to: Date())
 
         let predicate = #Predicate<HeartRateAlertEvent> { $0.timestamp >= startDate }
         var descriptor = FetchDescriptor<HeartRateAlertEvent>(predicate: predicate)

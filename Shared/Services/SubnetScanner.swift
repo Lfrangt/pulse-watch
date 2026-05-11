@@ -26,7 +26,8 @@ final class SubnetScanner {
 
     /// Scan the local /24 subnet for a host listening on `port`.
     /// Returns the first responding gateway URL (e.g. "http://192.168.1.42:18789"), or nil.
-    func findGateway(port: UInt16 = SubnetScanner.defaultPort) async -> String? {
+    /// `scheme` preserves the original protocol from the saved config (default "http").
+    func findGateway(port: UInt16 = SubnetScanner.defaultPort, scheme: String = "http") async -> String? {
         #if os(watchOS)
         return nil
         #else
@@ -51,7 +52,7 @@ final class SubnetScanner {
             for _ in 0..<concurrency {
                 guard let ip = iterator.next() else { break }
                 launched += 1
-                group.addTask { await self.probe(host: ip, port: port) }
+                group.addTask { await self.probe(host: ip, port: port, scheme: scheme) }
             }
 
             // Process results, launching replacements as slots free up
@@ -64,7 +65,7 @@ final class SubnetScanner {
                 // Launch next candidate if available
                 if let ip = iterator.next() {
                     launched += 1
-                    group.addTask { await self.probe(host: ip, port: port) }
+                    group.addTask { await self.probe(host: ip, port: port, scheme: scheme) }
                 }
             }
 
@@ -78,7 +79,7 @@ final class SubnetScanner {
 
     #if !os(watchOS)
     /// Attempt a TCP connection to host:port. Returns gateway URL on success, nil on failure.
-    private func probe(host: String, port: UInt16) async -> String? {
+    private func probe(host: String, port: UInt16, scheme: String = "http") async -> String? {
         await withCheckedContinuation { continuation in
             let endpoint = NWEndpoint.hostPort(
                 host: NWEndpoint.Host(host),
@@ -100,7 +101,7 @@ final class SubnetScanner {
             connection.stateUpdateHandler = { state in
                 switch state {
                 case .ready:
-                    resume("http://\(host):\(port)")
+                    resume("\(scheme)://\(host):\(port)")
                 case .failed, .cancelled:
                     resume(nil)
                 case .waiting:

@@ -1,4 +1,4 @@
 app_identifier("com.abundra.pulse")
 apple_id(ENV["APPLE_ID"])
 itc_team_id(ENV["ITC_TEAM_ID"])
-team_id("WRH82M8L9U")
+team_id("AV25N53237")

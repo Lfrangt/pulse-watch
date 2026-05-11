@@ -41,10 +41,10 @@ final class TriScoreService {
     func compute(modelContext: ModelContext) -> TriScore? {
         let cal = Calendar.current
         let today = cal.startOfDay(for: .now)
-        let yesterday = cal.date(byAdding: .day, value: -1, to: today)!
+        let yesterday = cal.safeDate(byAdding: .day, value: -1, to: today)
 
         // 获取近7天数据作为基线
-        let weekAgo = cal.date(byAdding: .day, value: -7, to: today)!
+        let weekAgo = cal.safeDate(byAdding: .day, value: -7, to: today)
         let summaries: [DailySummary]
         let todayWorkouts: [WorkoutHistoryEntry]
 

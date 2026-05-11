@@ -13,7 +13,7 @@ struct WorkoutHistoryDetailView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: PulseTheme.spacingM) {
+            VStack(spacing: DS.Spacing.m) {
                 // 运动类型头部
                 headerCard
                     .staggered(index: 0)
@@ -48,10 +48,10 @@ struct WorkoutHistoryDetailView: View {
 
                 Spacer(minLength: 60)
             }
-            .padding(.horizontal, PulseTheme.spacingM)
-            .padding(.top, PulseTheme.spacingS)
+            .padding(.horizontal, DS.Spacing.m)
+            .padding(.top, DS.Spacing.s)
         }
-        .background(PulseTheme.background)
+        .background(DS.Color.bg)
         .onAppear { selectedMuscleGroups = Set(entry.muscleGroupTags) }
         .navigationTitle(entry.activityName)
         .navigationBarTitleDisplayMode(.inline)
@@ -61,8 +61,8 @@ struct WorkoutHistoryDetailView: View {
                     showShareScreen = true
                 } label: {
                     Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(PulseTheme.accent)
+                        .font(DS.Typography.body.weight(.medium))
+                        .foregroundStyle(DS.Color.accent)
                 }
             }
         }
@@ -89,17 +89,17 @@ struct WorkoutHistoryDetailView: View {
     // MARK: - 头部卡片
 
     private var headerCard: some View {
-        let color = Color(hex: entry.activityColor)
+        let color = entry.pulseActivityColor
 
-        return VStack(spacing: PulseTheme.spacingM) {
+        return VStack(spacing: DS.Spacing.m) {
             // 大图标
             ZStack {
                 Circle()
                     .fill(color.opacity(0.12))
-                    .frame(width: 80, height: 80)
+                    .frame(width: DS.Spacing.xxl * 2, height: DS.Spacing.xxl * 2)
 
                 Image(systemName: entry.activityIcon)
-                    .font(.system(size: 32, weight: .medium))
+                    .font(DS.Typography.title1.weight(.medium))
                     .foregroundStyle(color)
                     .accessibilityHidden(true)
             }
@@ -109,8 +109,8 @@ struct WorkoutHistoryDetailView: View {
                 Text(entry.sourceName == "OpenClaw" && !(entry.notes ?? "").isEmpty
                      ? (entry.notes ?? entry.activityName)
                      : entry.activityName)
-                    .font(.system(size: 24, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.title1.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
                     .minimumScaleFactor(0.7)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
@@ -118,25 +118,25 @@ struct WorkoutHistoryDetailView: View {
                 if entry.sourceName == "OpenClaw" {
                     HStack(spacing: 5) {
                         Image(systemName: "cpu.fill")
-                            .font(.system(size: 10))
-                        Text("由 OpenClaw AI 记录")
-                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .font(DS.Typography.mono)
+                        Text(String(localized: "Recorded by OpenClaw AI"))
+                            .font(DS.Typography.caption.weight(.medium))
                     }
-                    .foregroundStyle(PulseTheme.accentTeal)
-                    .padding(.horizontal, 10).padding(.vertical, 4)
-                    .background(Capsule().fill(PulseTheme.accentTeal.opacity(0.12)))
+                    .foregroundStyle(DS.Color.accent)
+                    .padding(.horizontal, DS.Spacing.s).padding(.vertical, DS.Spacing.xs)
+                    .background(Capsule().fill(DS.Color.accent.opacity(0.12)))
                 }
             }
 
             // 日期时间
             Text(formatFullDate(entry.startDate))
                 .font(PulseTheme.bodyFont)
-                .foregroundStyle(PulseTheme.textSecondary)
+                .foregroundStyle(DS.Color.inkMid)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, PulseTheme.spacingXL)
+        .padding(.vertical, DS.Spacing.xl)
         .pulseCard()
         .accessibilityElement(children: .combine)
     }
@@ -145,18 +145,18 @@ struct WorkoutHistoryDetailView: View {
 
     private var metricsGrid: some View {
         let columns = [
-            GridItem(.flexible(), spacing: PulseTheme.spacingS),
-            GridItem(.flexible(), spacing: PulseTheme.spacingS),
+            GridItem(.flexible(), spacing: DS.Spacing.s),
+            GridItem(.flexible(), spacing: DS.Spacing.s),
         ]
 
-        return LazyVGrid(columns: columns, spacing: PulseTheme.spacingS) {
+        return LazyVGrid(columns: columns, spacing: DS.Spacing.s) {
             // 时长
             metricTile(
                 icon: "clock.fill",
                 label: String(localized: "Duration"),
                 value: formatDuration(entry.durationMinutes),
                 unit: "",
-                color: PulseTheme.accent
+                color: DS.Color.accent
             )
 
             // 卡路里
@@ -166,7 +166,7 @@ struct WorkoutHistoryDetailView: View {
                     label: String(localized: "Calories"),
                     value: "\(Int(cal))",
                     unit: "kcal",
-                    color: PulseTheme.statusModerate
+                    color: DS.Color.warn
                 )
             }
 
@@ -178,7 +178,7 @@ struct WorkoutHistoryDetailView: View {
                     label: String(localized: "Distance"),
                     value: String(format: "%.2f", km),
                     unit: "km",
-                    color: PulseTheme.statusGood
+                    color: DS.Color.good
                 )
             }
 
@@ -189,52 +189,52 @@ struct WorkoutHistoryDetailView: View {
                     label: String(localized: "Avg Heart Rate"),
                     value: "\(Int(avgHR))",
                     unit: "bpm",
-                    color: PulseTheme.statusPoor
+                    color: DS.Color.bad
                 )
             }
         }
     }
 
     private func metricTile(icon: String, label: String, value: String, unit: String, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
-            HStack(spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.s) {
+            HStack(spacing: DS.Spacing.s) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .fill(color.opacity(0.12))
-                        .frame(width: 28, height: 28)
+                        .frame(width: DS.Spacing.xl - DS.Spacing.xs, height: DS.Spacing.xl - DS.Spacing.xs)
 
                     Image(systemName: icon)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(DS.Typography.caption.weight(.medium))
                         .foregroundStyle(color)
                 }
 
                 Text(label)
                     .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
             }
 
             HStack(alignment: .firstTextBaseline, spacing: 3) {
                 Text(value)
-                    .font(.system(size: 24, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.title1.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
 
                 if !unit.isEmpty {
                     Text(unit)
                         .font(PulseTheme.metricLabelFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .foregroundStyle(DS.Color.inkDim)
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(PulseTheme.spacingM)
+        .padding(DS.Spacing.m)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(PulseTheme.cardBackground)
-                .shadow(color: PulseTheme.cardShadow.opacity(0.3), radius: 8, y: 4)
+            RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                .fill(DS.Color.bgElev)
+                
         )
         .overlay(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                .stroke(DS.Color.line.opacity(0.5), lineWidth: 0.5)
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
@@ -244,48 +244,48 @@ struct WorkoutHistoryDetailView: View {
     // MARK: - 心率区间分布
 
     private var heartRateZonesCard: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
-            HStack(spacing: PulseTheme.spacingS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.m) {
+            HStack(spacing: DS.Spacing.s) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .fill(PulseTheme.statusPoor.opacity(0.12))
-                        .frame(width: 24, height: 24)
+                        .fill(DS.Color.bad.opacity(0.12))
+                        .frame(width: DS.Spacing.l + DS.Spacing.xs, height: DS.Spacing.l + DS.Spacing.xs)
 
                     Image(systemName: "heart.text.clipboard")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(PulseTheme.statusPoor)
+                        .font(DS.Typography.caption.weight(.medium))
+                        .foregroundStyle(DS.Color.bad)
                 }
                 .accessibilityHidden(true)
 
                 Text("Heart Rate Zones")
                     .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .foregroundStyle(DS.Color.ink)
                     .accessibilityAddTraits(.isHeader)
             }
 
             ForEach(entry.heartRateZones) { zone in
-                HStack(spacing: PulseTheme.spacingS) {
+                HStack(spacing: DS.Spacing.s) {
                     Text(zone.name)
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: zone.colorHex))
+                        .font(DS.Typography.bodyS.weight(.medium))
+                        .foregroundStyle(zone.pulseColor)
                         .frame(width: 60, alignment: .leading)
 
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
                             RoundedRectangle(cornerRadius: 4, style: .continuous)
-                                .fill(Color(hex: zone.colorHex).opacity(0.15))
+                                .fill(zone.pulseColor.opacity(0.15))
                                 .frame(maxWidth: .infinity)
 
                             RoundedRectangle(cornerRadius: 4, style: .continuous)
-                                .fill(Color(hex: zone.colorHex))
+                                .fill(zone.pulseColor)
                                 .frame(width: max(4, geo.size.width * zone.percentage))
                         }
                     }
                     .frame(height: 12)
 
                     Text("\(Int(zone.percentage * 100))%")
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .font(DS.Typography.bodyS.weight(.medium))
+                        .foregroundStyle(DS.Color.inkDim)
                         .frame(width: 40, alignment: .trailing)
                 }
                 .accessibilityElement(children: .ignore)
@@ -301,33 +301,33 @@ struct WorkoutHistoryDetailView: View {
     private var heartRateSummaryCard: some View {
         HStack(spacing: 0) {
             if let avgHR = entry.averageHeartRate {
-                VStack(spacing: PulseTheme.spacingXS) {
+                VStack(spacing: DS.Spacing.xs) {
                     Text("\(Int(avgHR))")
-                        .font(.system(size: 28, weight: .semibold, design: .rounded))
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .font(DS.Typography.title1.weight(.semibold))
+                        .foregroundStyle(DS.Color.ink)
 
                     Text(String(localized: "Average") + " bpm")
                         .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .foregroundStyle(DS.Color.inkMid)
                 }
                 .frame(maxWidth: .infinity)
             }
 
             if entry.averageHeartRate != nil && entry.maxHeartRate != nil {
                 Rectangle()
-                    .fill(PulseTheme.border.opacity(0.5))
+                    .fill(DS.Color.line.opacity(0.5))
                     .frame(width: 0.5, height: 44)
             }
 
             if let maxHR = entry.maxHeartRate {
-                VStack(spacing: PulseTheme.spacingXS) {
+                VStack(spacing: DS.Spacing.xs) {
                     Text("\(Int(maxHR))")
-                        .font(.system(size: 28, weight: .semibold, design: .rounded))
-                        .foregroundStyle(PulseTheme.statusPoor)
+                        .font(DS.Typography.title1.weight(.semibold))
+                        .foregroundStyle(DS.Color.bad)
 
                     Text(String(localized: "Max") + " bpm")
                         .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .foregroundStyle(DS.Color.inkMid)
                 }
                 .frame(maxWidth: .infinity)
             }
@@ -338,19 +338,19 @@ struct WorkoutHistoryDetailView: View {
     // MARK: - 肌群标签选择器
 
     private var muscleGroupCard: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+        VStack(alignment: .leading, spacing: DS.Spacing.m) {
             HStack {
                 Image(systemName: "figure.strengthtraining.traditional")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(PulseTheme.accent)
+                    .font(DS.Typography.bodyS.weight(.medium))
+                    .foregroundStyle(DS.Color.accent)
                 Text("Muscle Groups")
                     .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .foregroundStyle(DS.Color.ink)
                 Spacer()
                 if !selectedMuscleGroups.isEmpty {
                     Text(String(format: String(localized: "%d selected"), selectedMuscleGroups.count))
                         .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textTertiary)
+                        .foregroundStyle(DS.Color.inkDim)
                 }
             }
 
@@ -369,15 +369,15 @@ struct WorkoutHistoryDetailView: View {
                     } label: {
                         VStack(spacing: 4) {
                             Text(group.emoji)
-                                .font(.system(size: 18))
+                                .font(DS.Typography.bodyL)
                             Text(group.label)
-                                .font(.system(size: 11, weight: selected ? .semibold : .regular))
-                                .foregroundStyle(selected ? group.color : PulseTheme.textTertiary)
+                                .font(DS.Typography.caption)
+                                .foregroundStyle(selected ? group.color : DS.Color.inkDim)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.7)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
+                        .padding(.vertical, DS.Spacing.s)
                         .background(
                             RoundedRectangle(cornerRadius: 10, style: .continuous)
                                 .fill(selected ? group.color.opacity(0.15) : PulseTheme.surface)
@@ -399,15 +399,15 @@ struct WorkoutHistoryDetailView: View {
     // MARK: - 数据来源
 
     private var sourceCard: some View {
-        HStack(spacing: PulseTheme.spacingS) {
+        HStack(spacing: DS.Spacing.s) {
             Image(systemName: "applewatch")
-                .font(.system(size: 14))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.bodyS)
+                .foregroundStyle(DS.Color.inkDim)
                 .accessibilityHidden(true)
 
             Text(String(localized: "Source:") + " \(entry.sourceName)")
                 .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .foregroundStyle(DS.Color.inkDim)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
 
@@ -415,13 +415,13 @@ struct WorkoutHistoryDetailView: View {
 
             Text(String(localized: "Synced:") + " \(formatShortDate(entry.syncedAt))")
                 .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .foregroundStyle(DS.Color.inkDim)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
         }
-        .padding(PulseTheme.spacingM)
+        .padding(DS.Spacing.m)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+            RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
                 .fill(PulseTheme.surface)
         )
         .accessibilityElement(children: .combine)
@@ -433,21 +433,21 @@ struct WorkoutHistoryDetailView: View {
         Button {
             showDeleteConfirm = true
         } label: {
-            HStack(spacing: PulseTheme.spacingS) {
+            HStack(spacing: DS.Spacing.s) {
                 Image(systemName: "trash")
-                    .font(.system(size: 14))
+                    .font(DS.Typography.bodyS)
                 Text("Delete Record")
                     .font(PulseTheme.bodyFont.weight(.medium))
             }
-            .foregroundStyle(PulseTheme.statusPoor)
+            .foregroundStyle(DS.Color.bad)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
+            .padding(.vertical, DS.Spacing.card)
             .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .fill(PulseTheme.statusPoor.opacity(0.08))
+                RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                    .fill(DS.Color.bad.opacity(0.08))
                     .overlay(
-                        RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                            .stroke(PulseTheme.statusPoor.opacity(0.2), lineWidth: 0.5)
+                        RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                            .stroke(DS.Color.bad.opacity(0.2), lineWidth: 0.5)
                     )
             )
         }
@@ -470,7 +470,8 @@ struct WorkoutHistoryDetailView: View {
     private func formatFullDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale.current
-        formatter.dateFormat = "yyyy年M月d日 EEEE HH:mm"
+        formatter.dateStyle = .full
+        formatter.timeStyle = .short
         return formatter.string(from: date)
     }
 

@@ -43,14 +43,14 @@ enum MuscleGroup: String, CaseIterable, Codable, Identifiable {
 
     var color: Color {
         switch self {
-        case .chest:     return Color(hex: "C75C5C")
-        case .back:      return Color(hex: "5C7BC7")
-        case .legs:      return Color(hex: "7FC75C")
-        case .shoulders: return Color(hex: "C7A05C")
-        case .arms:      return Color(hex: "C75C9E")
-        case .core:      return Color(hex: "5CC7C1")
-        case .fullBody:  return Color(hex: "8B5CC7")
-        case .cardio:    return Color(hex: "C7735C")
+        case .chest:     return PulseTheme.activityCoral
+        case .back:      return PulseTheme.trendBlue
+        case .legs:      return PulseTheme.statusGood
+        case .shoulders: return PulseTheme.statusWarning
+        case .arms:      return PulseTheme.statusModerate
+        case .core:      return PulseTheme.accent
+        case .fullBody:  return PulseTheme.chartPurple
+        case .cardio:    return PulseTheme.activityCoral
         }
     }
 }

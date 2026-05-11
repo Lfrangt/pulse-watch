@@ -1,1 +1,1 @@
-powerlifting,strength tracker,squat bench deadlift,HRV,recovery,workout log,health score,no subscription,apple watch,readiness score
+health score,HRV,recovery,apple watch,readiness score,workout log,powerlifting,strength tracker

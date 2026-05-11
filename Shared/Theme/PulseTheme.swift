@@ -1,210 +1,228 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
-// MARK: - Pulse Design System
-// ui2.0: Biometric Minimalism — deep charcoal + electric teal/violet/coral
-// Stitch AI generated, 2026-03-19
+// MARK: - Pulse Design System v2 — DS shim
+//
+// Phase 5 collapses the v1 PulseTheme namespace into a thin forwarding layer
+// over DS.Color / DS.Spacing / DS.Radius / DS.Typography / DS.Motion. Every
+// `PulseTheme.X` reference in legacy services / models / KEEP-MIGRATE
+// components (which R11 forbids touching) now resolves to the v2 Clinical
+// design tokens.
+//
+// New code MUST use DS.* directly. PulseTheme.X is preserved only so the
+// untouched service / model layer compiles.
 
 enum PulseTheme {
 
-    // MARK: - Colors
-    // Biometric Minimalism — cold precision, data-forward
+    // MARK: - Surfaces
+    static let background       = DS.Color.bg
+    static let surface          = DS.Color.bgElev
+    static let surface2         = DS.Color.bgElev
+    static let cardBackground   = DS.Color.bgElev
+    static let cardElevated     = DS.Color.bgElev
+    static let border           = DS.Color.line
+    static let borderStrong     = DS.Color.line
+    static let divider          = DS.Color.lineSoft
+    static let highlight        = DS.Color.chipBg
+    static let warmHighlight    = DS.Color.chipBg
+    static let scrim            = Color.black.opacity(0.6)
 
-    /// Deep black background
-    static let background = Color(hex: "0A0A0A")
+    // MARK: - Foreground
+    static let textPrimary      = DS.Color.ink
+    static let textSecondary    = DS.Color.inkMid
+    static let textTertiary     = DS.Color.inkDim
+    static let textQuaternary   = DS.Color.inkDim
 
-    /// Elevated surface
-    static let surface = Color(hex: "1A1A1A")
+    // MARK: - Accent (single mono accent per v2 Clinical)
+    static let accent           = DS.Color.accent
+    static let accentTeal       = DS.Color.accent
+    static let accentSoft       = DS.Color.accent.opacity(0.12)
+    static let accentStrong     = DS.Color.accent
 
-    /// Secondary surface
-    static let surface2 = Color(hex: "242424")
+    // MARK: - Status
+    static let statusGood       = DS.Color.good
+    static let statusWarning    = DS.Color.warn
+    static let statusPoor       = DS.Color.bad
+    static let statusModerate   = DS.Color.warn
 
-    /// Card background
-    static let cardBackground = Color(hex: "1A1A1A")
+    // MARK: - Legacy multi-color aliases — all retired to single accent.
+    static let sleepViolet      = DS.Color.accent
+    static let activityCoral    = DS.Color.accent
+    static let positiveGreen    = DS.Color.good
+    static let sleepAccent      = DS.Color.accent
+    static let activityAccent   = DS.Color.accent
+    static let trendBlue        = DS.Color.accent
+    static let hrvBlue          = DS.Color.accent
+    static let chartPurple      = DS.Color.accent
 
-    /// Elevated card (active/pressed)
-    static let cardElevated = Color(hex: "242424")
+    // MARK: - HR Zones (Z1 → Z5) — clinical neutral progression.
+    static let zoneRest         = DS.Color.lineSoft
+    static let zoneFatBurn      = DS.Color.inkDim
+    static let zoneCardio       = DS.Color.accent
+    static let zonePeak         = DS.Color.warn
+    static let zoneMax          = DS.Color.bad
+    static let zoneColors: [Color] = [zoneRest, zoneFatBurn, zoneCardio, zonePeak, zoneMax]
 
-    /// Subtle cool border
-    static let border = Color(hex: "3A494A")
+    // MARK: - Muscle status
+    static let muscleHealthy    = DS.Color.good
+    static let muscleFatigued   = DS.Color.bad
 
-    /// Primary text — pure white
-    static let textPrimary = Color(hex: "FFFFFF")
+    // MARK: - Typography (forward to DS.Typography)
+    static let displayFont: Font     = DS.Typography.display3
+    static let titleFont: Font       = DS.Typography.title1
+    static let title2Font: Font      = DS.Typography.title2
+    static let headlineFont: Font    = DS.Typography.bodyL
+    static let bodyFont: Font        = DS.Typography.body
+    static let bodyStrongFont: Font  = DS.Typography.body.weight(.medium)
+    static let calloutFont: Font     = DS.Typography.bodyS
+    static let footnoteFont: Font    = DS.Typography.caption
+    static let captionFont: Font     = DS.Typography.caption
+    static let eyebrowFont: Font     = DS.Typography.mono
 
-    /// Secondary text — neutral gray
-    static let textSecondary = Color(hex: "A0A0A0")
+    static let metricXLFont: Font    = DS.Typography.display2
+    static let metricLFont: Font     = DS.Typography.display3
+    static let metricMFont: Font     = DS.Typography.title1
+    static let metricSFont: Font     = DS.Typography.title2
 
-    /// Tertiary text — dim
-    static let textTertiary = Color(hex: "849495")
+    static let unitFont: Font        = DS.Typography.monoL
+    static let monoFont: Font        = DS.Typography.mono
 
-    // MARK: - Accent Colors
+    static let scoreFont: Font       = DS.Typography.display3
+    static let metricFont: Font      = DS.Typography.title1
+    static let metricLabelFont: Font = DS.Typography.mono
 
-    /// TriScore primary / accent — electric teal
-    static let accentTeal = Color(hex: "00F5FF")
+    static let captionTracking: CGFloat = DS.Tracking.mono
+    static let eyebrowTracking: CGFloat = DS.Tracking.mono
 
-    /// Sleep / HRV accent — soft violet
-    static let sleepViolet = Color(hex: "BF94FF")
+    // MARK: - Spacing (mapped onto DS.Spacing)
+    static let spacingXS: CGFloat  = DS.Spacing.xs
+    static let spacingS:  CGFloat  = DS.Spacing.s
+    static let spacingM:  CGFloat  = DS.Spacing.m
+    static let spacingL:  CGFloat  = DS.Spacing.l
+    static let spacingXL: CGFloat  = DS.Spacing.xl
+    static let spacing2XL: CGFloat = DS.Spacing.xxl
 
-    /// Activity / steps accent — coral red
-    static let activityCoral = Color(hex: "FF6B6B")
+    // MARK: - Radius
+    static let radiusXS: CGFloat = DS.Radius.chip
+    static let radiusS:  CGFloat = DS.Radius.chip
+    static let radiusM:  CGFloat = DS.Radius.inner
+    static let radiusL:  CGFloat = DS.Radius.card
+    static let radiusXL: CGFloat = DS.Radius.card
 
-    // MARK: - Status Colors
+    // MARK: - Stroke
+    static let hairline: CGFloat = DS.Stroke.hairline
 
-    /// Good / recovered — electric teal
-    static let statusGood = Color(hex: "00F5FF")
+    // MARK: - Shadows — R7 forbids shadows. Tokens kept clear for backward compat.
+    static let cardShadow: Color = .clear
+    static let popShadow:  Color = .clear
+    static let glowShadow: Color = .clear
 
-    /// Warning / moderate — gold
-    static let statusWarning = Color(hex: "FFD700")
+    // MARK: - Animation (forward to DS.Motion)
+    static let animationFast:      Animation = DS.Motion.tabSwitch
+    static let animationNormal:    Animation = DS.Motion.scoreChange
+    static let animationSlow:      Animation = DS.Motion.scoreChange
+    static let animationBreathing: Animation = .easeInOut(duration: 4).repeatForever(autoreverses: true)
 
-    /// Moderate / okay — soft violet
-    static let statusModerate = Color(hex: "BF94FF")
-
-    /// Poor / needs rest — coral red
-    static let statusPoor = Color(hex: "FF6B6B")
-
-    /// Legacy aliases
-    static let accent = accentTeal
-    static let sleepAccent = sleepViolet
-    static let activityAccent = activityCoral
-
-    /// Subtle highlight for active states
-    static let warmHighlight = Color(hex: "1A2A2A")
-
-    // MARK: - Semantic Colors
-
-    /// Trend / chart blue
-    static let trendBlue = Color(hex: "5B8DEF")
-
-    /// HRV chart blue
-    static let hrvBlue = Color(hex: "5C7BC7")
-
-    /// Chart purple
-    static let chartPurple = Color(hex: "4B3D8F")
-
-    // MARK: - Gradients
-
-    /// Hero section gradient (teal atmospheric)
+    // MARK: - Gradients (legacy compat — flattened to flat surfaces per v2 Clinical)
     static let heroGradient = LinearGradient(
-        stops: [
-            .init(color: Color(hex: "0A1628"), location: 0),
-            .init(color: Color(hex: "0F2A3D"), location: 0.25),
-            .init(color: Color(hex: "134E5E"), location: 0.45),
-            .init(color: Color(hex: "0D3B4A"), location: 0.65),
-            .init(color: Color(hex: "0A1A24"), location: 0.85),
-            .init(color: Color.black, location: 1.0),
-        ],
-        startPoint: .top,
-        endPoint: .bottom
+        colors: [DS.Color.bg, DS.Color.bg],
+        startPoint: .top, endPoint: .bottom
     )
 
     static func statusGradient(for score: Int) -> LinearGradient {
         let color = statusColor(for: score)
         return LinearGradient(
-            colors: [color.opacity(0.15), color.opacity(0.03)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
+            colors: [color.opacity(0.06), color.opacity(0)],
+            startPoint: .topLeading, endPoint: .bottomTrailing
         )
     }
 
-    /// Ambient background gradient — subtle warmth radiating from top
     static func ambientGradient(for score: Int) -> RadialGradient {
-        let color = statusColor(for: score)
-        return RadialGradient(
-            colors: [color.opacity(0.08), Color.clear],
-            center: .top,
-            startRadius: 50,
-            endRadius: 400
-        )
+        RadialGradient(colors: [.clear, .clear], center: .top, startRadius: 0, endRadius: 1)
     }
-
-    // MARK: - Typography
-
-    static let titleFont: Font = .system(size: 28, weight: .semibold, design: .rounded)
-    static let headlineFont: Font = .system(size: 18, weight: .medium, design: .rounded)
-    static let bodyFont: Font = .system(size: 15, weight: .regular, design: .rounded)
-    static let captionFont: Font = .system(size: 13, weight: .regular, design: .rounded)
-    static let scoreFont: Font = .system(size: 48, weight: .bold, design: .rounded)
-    static let metricFont: Font = .system(size: 22, weight: .semibold, design: .rounded)
-    static let metricLabelFont: Font = .system(size: 12, weight: .medium, design: .rounded)
-
-    // MARK: - Spacing
-
-    static let spacingXS: CGFloat = 4
-    static let spacingS: CGFloat = 8
-    static let spacingM: CGFloat = 16
-    static let spacingL: CGFloat = 24
-    static let spacingXL: CGFloat = 32
-
-    // MARK: - Corner Radius
-
-    static let radiusS: CGFloat = 10
-    static let radiusM: CGFloat = 16
-    static let radiusL: CGFloat = 22
-
-    // MARK: - Shadows
-
-    static let cardShadow: Color = .black.opacity(0.35)
-    static let glowShadow: Color = accent.opacity(0.15)
 
     // MARK: - Helpers
-
     static func statusColor(for score: Int) -> Color {
         switch score {
-        case 0..<40: return statusPoor
-        case 40..<70: return statusModerate
-        default: return statusGood
+        case 0..<40:  return DS.Color.bad
+        case 40..<70: return DS.Color.warn
+        default:      return DS.Color.good
         }
     }
 
     static func statusLabel(for score: Int) -> String {
         switch score {
-        case 0..<30: return String(localized: "Rest")
+        case 0..<30:  return String(localized: "Rest")
         case 30..<50: return String(localized: "Average")
         case 50..<70: return String(localized: "Fair")
         case 70..<85: return String(localized: "Good")
-        default: return String(localized: "Peak")
+        default:      return String(localized: "Peak")
         }
     }
 }
 
-// MARK: - Card Style Modifier
+// MARK: - Card modifier (mirror of DS.Card primitive — forwarded for legacy callers)
 
 struct PulseCardStyle: ViewModifier {
-    var padding: CGFloat = PulseTheme.spacingL
+    var padding: CGFloat = DS.Spacing.l
 
     func body(content: Content) -> some View {
         content
             .padding(padding)
-            .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .fill(PulseTheme.cardBackground)
-                    .shadow(color: PulseTheme.cardShadow, radius: 16, y: 6)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous))
+            .background(DS.Color.bgElev)
+            .clipShape(RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusL, style: .continuous)
-                    .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                    .stroke(DS.Color.line, lineWidth: DS.Stroke.hairline)
             )
     }
 }
 
 extension View {
-    func pulseCard(padding: CGFloat = PulseTheme.spacingL) -> some View {
+    /// Legacy `.pulseCard()` — forwards to DS-tokenised PulseCardStyle.
+    func pulseCard(padding: CGFloat = DS.Spacing.l) -> some View {
         modifier(PulseCardStyle(padding: padding))
+    }
+
+    /// Legacy `.pulseEyebrow()` — small mono uppercase + tracking + inkMid.
+    func pulseEyebrow() -> some View {
+        self.font(DS.Typography.mono)
+            .tracking(DS.Tracking.mono)
+            .textCase(.uppercase)
+            .foregroundStyle(DS.Color.inkDim)
+    }
+
+    /// Legacy `.pulseHairline()` — overlay rounded rect with line stroke.
+    func pulseHairline(radius: CGFloat = DS.Radius.card) -> some View {
+        self.overlay(
+            RoundedRectangle(cornerRadius: radius, style: .continuous)
+                .stroke(DS.Color.line, lineWidth: DS.Stroke.hairline)
+        )
     }
 }
 
-// MARK: - Staggered Appearance
+// MARK: - Staggered entrance (legacy decoration — opacity + offset, no harm under
+// reduce motion since the move is small).
 
 struct StaggeredAppear: ViewModifier {
     let index: Int
     @State private var appeared = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
         content
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 20)
             .onAppear {
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(Double(index) * 0.08)) {
+                let anim = DS.Motion.respecting(
+                    .easeOut(duration: 0.35).delay(Double(index) * 0.08),
+                    reduce: reduceMotion
+                )
+                if let anim {
+                    withAnimation(anim) { appeared = true }
+                } else {
                     appeared = true
                 }
             }
@@ -217,26 +235,53 @@ extension View {
     }
 }
 
-// MARK: - Tactile Button Style
+// MARK: - Noise (legacy no-op — clinical has no grain)
+
+struct NoiseTexture: ViewModifier {
+    var opacity: Double = 0
+    func body(content: Content) -> some View { content }
+}
+
+extension View {
+    func noiseTexture(opacity: Double = 0) -> some View {
+        modifier(NoiseTexture(opacity: opacity))
+    }
+}
+
+// MARK: - Button styles (legacy — both forward to clinical DS surfaces)
 
 struct PulseButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(PulseTheme.bodyFont.weight(.medium))
-            .foregroundStyle(PulseTheme.background)
+            .font(DS.Typography.body.weight(.medium))
+            .foregroundStyle(DS.Color.bg)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
+            .padding(.vertical, DS.Spacing.card)
             .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                    .fill(PulseTheme.accent)
-                    .shadow(color: PulseTheme.accent.opacity(0.3), radius: configuration.isPressed ? 4 : 8, y: configuration.isPressed ? 2 : 4)
+                RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                    .fill(DS.Color.ink)
             )
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: configuration.isPressed)
+            .opacity(configuration.isPressed ? 0.88 : 1)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
     }
 }
 
-// MARK: - Color Extension
+struct PulseSecondaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(DS.Typography.body.weight(.medium))
+            .foregroundStyle(DS.Color.accent)
+            .padding(.horizontal, DS.Spacing.l)
+            .padding(.vertical, DS.Spacing.s)
+            .background(DS.Color.accent.opacity(0.12))
+            .clipShape(RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous))
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+    }
+}
+
+// MARK: - Color hex helpers (preserved — used by legacy services / models that
+// build colors from hex strings or UInt32 RGB. Kept distinct from DS.swift's
+// single-arg rgb initialiser by the alpha parameter.)
 
 extension Color {
     init(hex: String) {
@@ -252,12 +297,33 @@ extension Color {
         default:
             (a, r, g, b) = (255, 0, 0, 0)
         }
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
-        )
+        self.init(.sRGB,
+                  red: Double(r) / 255,
+                  green: Double(g) / 255,
+                  blue: Double(b) / 255,
+                  opacity: Double(a) / 255)
+    }
+
+    init(rgb: UInt32, alpha: Double = 1.0) {
+        self.init(.sRGB,
+                  red: Double((rgb >> 16) & 0xFF) / 255,
+                  green: Double((rgb >> 8) & 0xFF) / 255,
+                  blue: Double(rgb & 0xFF) / 255,
+                  opacity: alpha)
     }
 }
+
+#if canImport(UIKit)
+extension UIColor {
+    convenience init(rgb: UInt32, alpha: CGFloat = 1.0) {
+        self.init(red: CGFloat((rgb >> 16) & 0xFF) / 255,
+                  green: CGFloat((rgb >> 8) & 0xFF) / 255,
+                  blue: CGFloat(rgb & 0xFF) / 255,
+                  alpha: alpha)
+    }
+
+    convenience init(rgb: UInt32, alpha: Double) {
+        self.init(rgb: rgb, alpha: CGFloat(alpha))
+    }
+}
+#endif

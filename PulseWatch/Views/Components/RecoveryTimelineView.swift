@@ -74,7 +74,7 @@ enum TimelineEventBuilder {
                 icon: "moon.fill",
                 title: String(localized: "Asleep"),
                 detail: "\(sleepHours)h\(sleepMins)m\(deepDetail)",
-                impact: insight.sleepScore >= 70 ? "恢复 +\(min(20, insight.sleepScore / 5))" : "恢复一般",
+                impact: insight.sleepScore >= 70 ? String(localized: "Recovery +\(min(20, insight.sleepScore / 5))") : String(localized: "Fair recovery"),
                 impactPositive: insight.sleepScore >= 50,
                 color: sleepColor
             ))
@@ -83,10 +83,10 @@ enum TimelineEventBuilder {
             let rhrText: String
             let rhrGood: Bool
             if let rhr = hk.latestRestingHR {
-                rhrText = "静息心率 \(Int(rhr))bpm"
+                rhrText = String(localized: "Resting HR \(Int(rhr))bpm")
                 rhrGood = rhr < 70
             } else {
-                rhrText = "静息心率 --"
+                rhrText = String(localized: "Resting HR --")
                 rhrGood = true
             }
 
@@ -95,9 +95,9 @@ enum TimelineEventBuilder {
                 icon: "sunrise.fill",
                 title: String(localized: "Awake"),
                 detail: rhrText,
-                impact: rhrGood ? "恢复良好" : "恢复较弱",
+                impact: rhrGood ? String(localized: "Good recovery") : String(localized: "Weak recovery"),
                 impactPositive: rhrGood,
-                color: rhrGood ? PulseTheme.statusGood : PulseTheme.statusModerate
+                color: rhrGood ? DS.Color.good : DS.Color.warn
             ))
         } else {
             // 无睡眠数据 — 只显示一个占位，不显示假的醒来时间
@@ -106,7 +106,7 @@ enum TimelineEventBuilder {
                 icon: "moon.fill",
                 title: String(localized: "Sleep"),
                 detail: String(localized: "No sleep data"),
-                impact: "等待同步",
+                impact: String(localized: "Awaiting sync"),
                 impactPositive: true,
                 color: sleepColor
             ))
@@ -135,9 +135,9 @@ enum TimelineEventBuilder {
                 icon: "figure.walk",
                 title: String(localized: "Daily Activity"),
                 detail: "\(stepsText) · \(activeCal) +\(Int(calories))kcal",
-                impact: steps >= 8000 ? "继续加油" : "继续加油",
+                impact: steps >= 8000 ? String(localized: "Keep it up") : String(localized: "Keep moving"),
                 impactPositive: steps >= 5000,
-                color: PulseTheme.accent
+                color: DS.Color.accent
             ))
         }
 
@@ -160,9 +160,9 @@ enum TimelineEventBuilder {
             icon: "heart.text.clipboard",
             title: String(localized: "Current Status"),
             detail: "\(hrvText) · \(adviceText)",
-            impact: currentGood ? "适合训练" : "建议休息",
+            impact: currentGood ? String(localized: "Ready to train") : String(localized: "Rest recommended"),
             impactPositive: currentGood,
-            color: PulseTheme.accent,
+            color: DS.Color.accent,
             isCurrent: true
         ))
 
@@ -183,7 +183,7 @@ struct RecoveryTimelineView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingM) {
+        VStack(alignment: .leading, spacing: DS.Spacing.m) {
             // ── 标题区 ──
             sectionHeader
 
@@ -200,20 +200,20 @@ struct RecoveryTimelineView: View {
     // MARK: - 标题
 
     private var sectionHeader: some View {
-        HStack(spacing: PulseTheme.spacingS) {
+        HStack(spacing: DS.Spacing.s) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(PulseTheme.accent.opacity(0.12))
-                    .frame(width: 32, height: 32)
+                    .fill(DS.Color.accent.opacity(0.12))
+                    .frame(width: DS.Spacing.xl, height: DS.Spacing.xl)
 
                 Image(systemName: "clock.arrow.circlepath")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(PulseTheme.accent)
+                    .font(DS.Typography.bodyS.weight(.medium))
+                    .foregroundStyle(DS.Color.accent)
             }
 
             Text("Body Timeline")
                 .font(PulseTheme.headlineFont)
-                .foregroundStyle(PulseTheme.textPrimary)
+                .foregroundStyle(DS.Color.ink)
                 .accessibilityAddTraits(.isHeader)
 
             Spacer()
@@ -221,7 +221,7 @@ struct RecoveryTimelineView: View {
             // 时间范围标签
             Text("Past 24h")
                 .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textTertiary)
+                .foregroundStyle(DS.Color.inkDim)
         }
     }
 
@@ -230,17 +230,17 @@ struct RecoveryTimelineView: View {
     private var emptyState: some View {
         HStack {
             Spacer()
-            VStack(spacing: PulseTheme.spacingS) {
+            VStack(spacing: DS.Spacing.s) {
                 Image(systemName: "clock.badge.questionmark")
-                    .font(.system(size: 28, weight: .light))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .font(DS.Typography.title1.weight(.light))
+                    .foregroundStyle(DS.Color.inkDim)
                     .accessibilityHidden(true)
 
                 Text("No timeline data yet")
                     .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
             }
-            .padding(.vertical, PulseTheme.spacingXL)
+            .padding(.vertical, DS.Spacing.xl)
             Spacer()
         }
         .accessibilityElement(children: .combine)
@@ -280,7 +280,7 @@ struct TimelineNodeView: View {
     private let leadingWidth: CGFloat = 40
 
     var body: some View {
-        HStack(alignment: .top, spacing: PulseTheme.spacingM) {
+        HStack(alignment: .top, spacing: DS.Spacing.m) {
             // ── 左侧：垂直线 + 节点圆 ──
             timelineTrack
                 .frame(width: leadingWidth)
@@ -288,7 +288,7 @@ struct TimelineNodeView: View {
             // ── 右侧：事件内容 ──
             eventContent
         }
-        .padding(.vertical, PulseTheme.spacingXS)
+        .padding(.vertical, DS.Spacing.xs)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(formattedTime), \(event.title)")
         .accessibilityValue("\(event.detail). \(event.impact)")
@@ -315,7 +315,7 @@ struct TimelineNodeView: View {
                 // 垂直连接线 — 上半段（非第一个节点时显示）
                 if !isFirst {
                     Rectangle()
-                        .fill(PulseTheme.border)
+                        .fill(DS.Color.line)
                         .frame(width: lineWidth)
                         .frame(height: geo.size.height / 2)
                         .position(x: centerX, y: geo.size.height / 4)
@@ -324,7 +324,7 @@ struct TimelineNodeView: View {
                 // 垂直连接线 — 下半段（非最后一个节点时显示）
                 if !isLast {
                     Rectangle()
-                        .fill(PulseTheme.border)
+                        .fill(DS.Color.line)
                         .frame(width: lineWidth)
                         .frame(height: geo.size.height / 2)
                         .position(x: centerX, y: geo.size.height * 3 / 4)
@@ -356,7 +356,7 @@ struct TimelineNodeView: View {
                     Circle()
                         .fill(
                             RadialGradient(
-                                colors: [.white.opacity(0.3), .clear],
+                                colors: [DS.Color.inkDim, .clear],
                                 center: .topLeading,
                                 startRadius: 0,
                                 endRadius: nodeSize / 2
@@ -373,45 +373,45 @@ struct TimelineNodeView: View {
     // MARK: - 右侧事件内容
 
     private var eventContent: some View {
-        VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
+        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
             // 时间标签
             Text(formattedTime)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.caption.weight(.medium))
+                .foregroundStyle(DS.Color.inkDim)
 
             // 事件标题 + 图标
-            HStack(spacing: PulseTheme.spacingXS + 2) {
+            HStack(spacing: DS.Spacing.xs + 2) {
                 Image(systemName: event.icon)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(DS.Typography.caption.weight(.medium))
                     .foregroundStyle(event.color)
 
                 Text(event.title)
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.body.weight(.medium))
+                    .foregroundStyle(DS.Color.ink)
             }
 
             // 详情描述
             Text(event.detail)
                 .font(PulseTheme.captionFont)
-                .foregroundStyle(PulseTheme.textSecondary)
+                .foregroundStyle(DS.Color.inkMid)
                 .fixedSize(horizontal: false, vertical: true)
 
             // 影响标签（彩色胶囊）
             impactCapsule
         }
-        .padding(.vertical, PulseTheme.spacingXS)
+        .padding(.vertical, DS.Spacing.xs)
     }
 
     // MARK: - 影响胶囊标签
 
     private var impactCapsule: some View {
-        let capsuleColor = event.impactPositive ? PulseTheme.statusGood : PulseTheme.statusModerate
+        let capsuleColor = event.impactPositive ? DS.Color.good : DS.Color.warn
 
         return Text(event.impact)
-            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .font(DS.Typography.caption.weight(.semibold))
             .foregroundStyle(capsuleColor)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
+            .padding(.horizontal, DS.Spacing.s)
+            .padding(.vertical, DS.Spacing.xs)
             .background(
                 Capsule()
                     .fill(capsuleColor.opacity(0.12))
@@ -479,13 +479,13 @@ struct RecoveryTimelineSection: View {
 
 #Preview {
     ScrollView {
-        VStack(spacing: PulseTheme.spacingM) {
+        VStack(spacing: DS.Spacing.m) {
             // 使用模拟数据预览
             RecoveryTimelineView(events: previewEvents)
         }
         .padding()
     }
-    .background(PulseTheme.background)
+    .background(DS.Color.bg)
     .preferredColorScheme(.dark)
 }
 
@@ -494,12 +494,10 @@ private var previewEvents: [TimelineEvent] {
     let calendar = Calendar.current
     let now = Date()
 
-    let bedtime = calendar.date(bySettingHour: 23, minute: 30, second: 0, of:
-        calendar.date(byAdding: .day, value: -1, to: now)!
-    )!
-
-    let wakeTime = calendar.date(bySettingHour: 7, minute: 5, second: 0, of: now)!
-    let activityTime = calendar.date(bySettingHour: 14, minute: 0, second: 0, of: now)!
+    let yesterday = calendar.safeDate(byAdding: .day, value: -1, to: now)
+    let bedtime = calendar.date(bySettingHour: 23, minute: 30, second: 0, of: yesterday) ?? yesterday
+    let wakeTime = calendar.date(bySettingHour: 7, minute: 5, second: 0, of: now) ?? now
+    let activityTime = calendar.date(bySettingHour: 14, minute: 0, second: 0, of: now) ?? now
 
     return [
         TimelineEvent(
@@ -507,7 +505,7 @@ private var previewEvents: [TimelineEvent] {
             icon: "moon.fill",
             title: String(localized: "Asleep"),
             detail: String(localized: "Total 7h35m · Deep ~2.1h"),
-            impact: "恢复 +15",
+            impact: String(localized: "Recovery +15"),
             impactPositive: true,
             color: PulseTheme.sleepAccent
         ),
@@ -515,28 +513,28 @@ private var previewEvents: [TimelineEvent] {
             time: wakeTime,
             icon: "sunrise.fill",
             title: String(localized: "Awake"),
-            detail: String(localized: "静息心率 62bpm"),
-            impact: "恢复良好",
+            detail: String(localized: "Resting HR 62bpm"),
+            impact: String(localized: "Good recovery"),
             impactPositive: true,
-            color: PulseTheme.statusGood
+            color: DS.Color.good
         ),
         TimelineEvent(
             time: activityTime,
             icon: "figure.walk",
             title: String(localized: "Daily Activity"),
             detail: String(localized: "3.0k steps · Active calories +120kcal"),
-            impact: "继续加油",
+            impact: String(localized: "Keep it up"),
             impactPositive: true,
-            color: PulseTheme.accent
+            color: DS.Color.accent
         ),
         TimelineEvent(
             time: now,
             icon: "heart.text.clipboard",
             title: String(localized: "Current Status"),
             detail: String(localized: "HRV 48ms ↑ · Moderate"),
-            impact: "适合训练",
+            impact: String(localized: "Ready to train"),
             impactPositive: true,
-            color: PulseTheme.accent,
+            color: DS.Color.accent,
             isCurrent: true
         ),
     ]

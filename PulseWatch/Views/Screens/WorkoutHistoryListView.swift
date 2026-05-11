@@ -23,8 +23,8 @@ struct WorkoutHistoryListView: View {
                     workoutList
                 }
             }
-            .background(PulseTheme.background)
-            .navigationTitle("Workout History")
+            .background(DS.Color.bg)
+            .navigationTitle(String(localized: "Workout History"))
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
@@ -33,8 +33,8 @@ struct WorkoutHistoryListView: View {
                         showAddWorkout = true
                     } label: {
                         Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 18))
-                            .foregroundStyle(PulseTheme.accent)
+                            .font(DS.Typography.bodyL)
+                            .foregroundStyle(DS.Color.accent)
                     }
                     .accessibilityLabel(String(localized: "Add Workout"))
                 }
@@ -71,7 +71,7 @@ struct WorkoutHistoryListView: View {
 
     private var workoutList: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            LazyVStack(spacing: PulseTheme.spacingS) {
+            LazyVStack(spacing: DS.Spacing.s) {
                 // 统计概览
                 summaryHeader
                     .staggered(index: 0)
@@ -107,16 +107,16 @@ struct WorkoutHistoryListView: View {
                     } header: {
                         Text(section.key)
                             .font(PulseTheme.captionFont)
-                            .foregroundStyle(PulseTheme.textTertiary)
+                            .foregroundStyle(DS.Color.inkDim)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.top, sectionIndex == 0 ? 0 : PulseTheme.spacingS)
-                            .padding(.leading, PulseTheme.spacingXS)
+                            .padding(.top, sectionIndex == 0 ? 0 : DS.Spacing.s)
+                            .padding(.leading, DS.Spacing.xs)
                     }
                 }
 
                 Spacer(minLength: 60)
             }
-            .padding(.horizontal, PulseTheme.spacingM)
+            .padding(.horizontal, DS.Spacing.m)
         }
     }
 
@@ -132,47 +132,47 @@ struct WorkoutHistoryListView: View {
                 value: "\(totalWorkouts)",
                 label: String(localized: "Workouts"),
                 icon: "figure.mixed.cardio",
-                color: PulseTheme.accent
+                color: DS.Color.accent
             )
 
             Rectangle()
-                .fill(PulseTheme.border.opacity(0.5))
+                .fill(DS.Color.line.opacity(0.5))
                 .frame(width: 0.5, height: 40)
 
             summaryItem(
                 value: formatDuration(totalMinutes),
                 label: String(localized: "Total Time"),
                 icon: "clock.fill",
-                color: PulseTheme.statusModerate
+                color: DS.Color.warn
             )
 
             Rectangle()
-                .fill(PulseTheme.border.opacity(0.5))
+                .fill(DS.Color.line.opacity(0.5))
                 .frame(width: 0.5, height: 40)
 
             summaryItem(
                 value: totalCalories >= 1000 ? String(format: "%.1fk", totalCalories / 1000) : "\(Int(totalCalories))",
                 label: String(localized: "Calories"),
                 icon: "flame.fill",
-                color: PulseTheme.statusPoor
+                color: DS.Color.bad
             )
         }
         .pulseCard()
     }
 
     private func summaryItem(value: String, label: String, icon: String, color: Color) -> some View {
-        VStack(spacing: PulseTheme.spacingXS) {
+        VStack(spacing: DS.Spacing.xs) {
             Image(systemName: icon)
-                .font(.system(size: 14))
+                .font(DS.Typography.bodyS)
                 .foregroundStyle(color)
 
             Text(value)
-                .font(.system(size: 20, weight: .semibold, design: .rounded))
-                .foregroundStyle(PulseTheme.textPrimary)
+                .font(DS.Typography.bodyL.weight(.semibold))
+                .foregroundStyle(DS.Color.ink)
 
             Text(label)
-                .font(.system(size: 11, weight: .regular, design: .rounded))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.caption)
+                .foregroundStyle(DS.Color.inkDim)
         }
         .frame(maxWidth: .infinity)
     }
@@ -180,34 +180,34 @@ struct WorkoutHistoryListView: View {
     // MARK: - 训练行
 
     private func workoutRow(_ entry: WorkoutHistoryEntry) -> some View {
-        let color = Color(hex: entry.activityColor)
+        let color = entry.pulseActivityColor
 
-        return HStack(spacing: PulseTheme.spacingM) {
+        return HStack(spacing: DS.Spacing.m) {
             // 运动类型 icon
             ZStack(alignment: .bottomTrailing) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .fill(color.opacity(0.12))
-                        .frame(width: 40, height: 40)
+                        .frame(width: DS.Spacing.xxl, height: DS.Spacing.xxl)
 
                     Image(systemName: entry.activityIcon)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(DS.Typography.body.weight(.medium))
                         .foregroundStyle(color)
                 }
 
                 // OpenClaw AI 写入标识
                 if entry.sourceName == "OpenClaw" {
                     Image(systemName: "cpu.fill")
-                        .font(.system(size: 11))
-                        .foregroundStyle(PulseTheme.accentTeal)
-                        .background(Circle().fill(PulseTheme.cardBackground).frame(width: 15, height: 15))
+                        .font(DS.Typography.caption)
+                        .foregroundStyle(DS.Color.accent)
+                        .background(Circle().fill(DS.Color.bgElev).frame(width: DS.Spacing.card, height: DS.Spacing.card))
                         .offset(x: 3, y: 3)
                 } else if entry.isManual {
                     // 手动添加标识
                     Image(systemName: "pencil.circle.fill")
-                        .font(.system(size: 12))
-                        .foregroundStyle(PulseTheme.accent)
-                        .background(Circle().fill(PulseTheme.cardBackground).frame(width: 14, height: 14))
+                        .font(DS.Typography.caption)
+                        .foregroundStyle(DS.Color.accent)
+                        .background(Circle().fill(DS.Color.bgElev).frame(width: DS.Spacing.card, height: DS.Spacing.card))
                         .offset(x: 3, y: 3)
                 }
             }
@@ -220,20 +220,20 @@ struct WorkoutHistoryListView: View {
                          ? (entry.notes ?? entry.activityName)
                          : entry.activityName)
                         .font(PulseTheme.bodyFont.weight(.medium))
-                        .foregroundStyle(PulseTheme.textPrimary)
+                        .foregroundStyle(DS.Color.ink)
                         .lineLimit(1)
                     if entry.sourceName == "OpenClaw" {
                         Text("AI")
-                            .font(.system(size: 9, weight: .bold, design: .rounded))
-                            .foregroundStyle(PulseTheme.accentTeal)
-                            .padding(.horizontal, 5).padding(.vertical, 2)
-                            .background(Capsule().fill(PulseTheme.accentTeal.opacity(0.13)))
+                            .font(DS.Typography.monoS.weight(.bold))
+                            .foregroundStyle(DS.Color.accent)
+                            .padding(.horizontal, DS.Spacing.m).padding(.vertical, DS.Spacing.m)
+                            .background(Capsule().fill(DS.Color.accent.opacity(0.13)))
                     }
                 }
 
                 Text(formatRelativeDate(entry.startDate))
                     .font(PulseTheme.captionFont)
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
 
                 // 肌群 badge 行
                 let tags = entry.muscleGroupTags
@@ -241,16 +241,16 @@ struct WorkoutHistoryListView: View {
                     HStack(spacing: 4) {
                         ForEach(tags.prefix(3)) { group in
                             Text(group.label)
-                                .font(.system(size: 10, weight: .medium))
+                                .font(DS.Typography.mono.weight(.medium))
                                 .foregroundStyle(group.color)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
+                                .padding(.horizontal, DS.Spacing.xs)
+                                .padding(.vertical, DS.Spacing.m)
                                 .background(Capsule().fill(group.color.opacity(0.12)))
                         }
                         if tags.count > 3 {
                             Text("+\(tags.count - 3)")
-                                .font(.system(size: 10))
-                                .foregroundStyle(PulseTheme.textTertiary)
+                                .font(DS.Typography.mono)
+                                .foregroundStyle(DS.Color.inkDim)
                         }
                     }
                 }
@@ -265,37 +265,37 @@ struct WorkoutHistoryListView: View {
                 if strain > 0 {
                     let level = StrainScoreService.StrainLevel(score: strain)
                     Text("\(strain)")
-                        .font(.system(size: 13, weight: .bold, design: .rounded))
-                        .foregroundStyle(Color(hex: level.color))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Capsule().fill(Color(hex: level.color).opacity(0.15)))
+                        .font(DS.Typography.bodyS.weight(.bold))
+                        .foregroundStyle(level.pulseColor)
+                        .padding(.horizontal, DS.Spacing.xs)
+                        .padding(.vertical, DS.Spacing.m)
+                        .background(Capsule().fill(level.pulseColor.opacity(0.15)))
                 }
 
                 Text(formatDuration(entry.durationMinutes))
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .font(DS.Typography.body.weight(.semibold))
+                    .foregroundStyle(DS.Color.ink)
 
                 if let cal = entry.totalCalories {
                     Text("\(Int(cal)) kcal")
                         .font(PulseTheme.captionFont)
-                        .foregroundStyle(PulseTheme.textSecondary)
+                        .foregroundStyle(DS.Color.inkMid)
                 }
             }
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.caption.weight(.medium))
+                .foregroundStyle(DS.Color.inkDim)
         }
-        .padding(PulseTheme.spacingM)
+        .padding(DS.Spacing.m)
         .background(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .fill(PulseTheme.cardBackground)
-                .shadow(color: PulseTheme.cardShadow.opacity(0.3), radius: 8, y: 4)
+            RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                .fill(DS.Color.bgElev)
+                
         )
         .overlay(
-            RoundedRectangle(cornerRadius: PulseTheme.radiusM, style: .continuous)
-                .stroke(PulseTheme.border.opacity(0.5), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous)
+                .stroke(DS.Color.line.opacity(0.5), lineWidth: 0.5)
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(entry.activityName), \(formatRelativeDate(entry.startDate))")
@@ -306,41 +306,41 @@ struct WorkoutHistoryListView: View {
     // MARK: - 空状态
 
     private var emptyState: some View {
-        VStack(spacing: PulseTheme.spacingL) {
+        VStack(spacing: DS.Spacing.l) {
             Spacer()
 
             ZStack {
                 Circle()
-                    .fill(PulseTheme.accent.opacity(0.08))
-                    .frame(width: 100, height: 100)
+                    .fill(DS.Color.accent.opacity(0.08))
+                    .frame(width: DS.Spacing.xxl * 2 + DS.Spacing.l, height: DS.Spacing.xxl * 2 + DS.Spacing.l)
 
                 Image(systemName: "figure.run")
-                    .font(.system(size: 40, weight: .light))
-                    .foregroundStyle(PulseTheme.accent)
+                    .font(DS.Typography.title1.weight(.light))
+                    .foregroundStyle(DS.Color.accent)
             }
 
-            VStack(spacing: PulseTheme.spacingS) {
+            VStack(spacing: DS.Spacing.s) {
                 Text(String(localized: "Complete Your First Workout"))
                     .font(PulseTheme.headlineFont)
-                    .foregroundStyle(PulseTheme.textPrimary)
+                    .foregroundStyle(DS.Color.ink)
 
                 Text(String(localized: "Start a workout on Apple Watch and your history will appear here"))
                     .font(PulseTheme.bodyFont)
-                    .foregroundStyle(PulseTheme.textSecondary)
+                    .foregroundStyle(DS.Color.inkMid)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
             }
             
             // 支持的训练类型提示
-            VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
+            VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                 Text(String(localized: "Supported workout types:"))
                     .font(PulseTheme.captionFont.weight(.medium))
-                    .foregroundStyle(PulseTheme.textTertiary)
+                    .foregroundStyle(DS.Color.inkDim)
                 
                 LazyVGrid(columns: [
                     GridItem(.flexible()),
                     GridItem(.flexible())
-                ], spacing: PulseTheme.spacingXS) {
+                ], spacing: DS.Spacing.xs) {
                     workoutTypeItem(icon: "dumbbell.fill", name: String(localized: "Strength Training"))
                     workoutTypeItem(icon: "figure.run", name: String(localized: "Running"))
                     workoutTypeItem(icon: "figure.walk", name: String(localized: "Walking"))
@@ -349,32 +349,32 @@ struct WorkoutHistoryListView: View {
                     workoutTypeItem(icon: "heart.fill", name: String(localized: "Other"))
                 }
             }
-            .padding(PulseTheme.spacingM)
+            .padding(DS.Spacing.m)
             .background(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
+                RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
                     .fill(PulseTheme.surface)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: PulseTheme.radiusS, style: .continuous)
-                    .stroke(PulseTheme.border.opacity(0.3), lineWidth: 0.5)
+                RoundedRectangle(cornerRadius: DS.Radius.chip, style: .continuous)
+                    .stroke(DS.Color.line.opacity(0.3), lineWidth: 0.5)
             )
 
             Spacer()
             Spacer()
         }
-        .padding(.horizontal, PulseTheme.spacingL)
+        .padding(.horizontal, DS.Spacing.l)
     }
     
     private func workoutTypeItem(icon: String, name: String) -> some View {
-        HStack(spacing: PulseTheme.spacingXS) {
+        HStack(spacing: DS.Spacing.xs) {
             Image(systemName: icon)
-                .font(.system(size: 10))
-                .foregroundStyle(PulseTheme.accent)
+                .font(DS.Typography.mono)
+                .foregroundStyle(DS.Color.accent)
                 .frame(width: 16)
             
             Text(name)
-                .font(.system(size: 10))
-                .foregroundStyle(PulseTheme.textTertiary)
+                .font(DS.Typography.mono)
+                .foregroundStyle(DS.Color.inkDim)
             
             Spacer()
         }

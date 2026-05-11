@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import os
 
 /// Coordinates the gym geofence flow on iPhone:
 /// arrive at gym → generate training plan → send to Watch via WatchConnectivity
@@ -7,6 +8,8 @@ import Combine
 final class GymCoordinator {
 
     static let shared = GymCoordinator()
+
+    private let logger = Logger(subsystem: "com.abundra.pulse", category: "GymCoordinator")
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -30,9 +33,7 @@ final class GymCoordinator {
             .receive(on: DispatchQueue.main)
             .sink { notification in
                 if let category = notification.userInfo?["category"] as? String {
-                    #if DEBUG
-                    print("[GymCoordinator] Workout started from watch: \(category)")
-                    #endif
+                    self.logger.debug("Workout started from watch: \(category, privacy: .public)")
                 }
             }
             .store(in: &cancellables)

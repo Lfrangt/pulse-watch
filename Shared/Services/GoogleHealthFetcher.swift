@@ -2,7 +2,9 @@
 //  GoogleHealthFetcher.swift
 //  Pulse
 //
-//  v1.0 Phase 6b — Google Fit REST API data fetching layer.
+//  v1.1 Phase 6b — Google Health API v4 data fetching layer.
+//  API: https://health.googleapis.com/v4 (NOT the legacy Google Fit API)
+//  Docs: https://developers.google.com/health
 //
 //  iOS-only: mirrors the GoogleHealthAuth.swift os(iOS) guard.
 //  All network calls use URLSession — no third-party dependencies.
@@ -15,7 +17,7 @@ import os
 
 // MARK: - GoogleHealthSnapshot
 
-/// A point-in-time snapshot of health metrics fetched from the Google Fit REST API.
+/// A point-in-time snapshot of health metrics fetched from the Google Health API v4.
 struct GoogleHealthSnapshot {
     let fetchedAt: Date
     let heartRate: Double?        // bpm average
@@ -51,29 +53,41 @@ enum GoogleHealthFetchError: LocalizedError {
         case .notConnected:
             return String(localized: "Google Health not connected")
         case .httpError(let code, let body):
-            return String(format: String(localized: "Google Fit API error %d: %@"), code, body)
+            return String(format: String(localized: "Google Health API error %d: %@"), code, body)
         case .decodingFailed(let detail):
-            return String(format: String(localized: "Google Fit response decoding failed: %@"), detail)
+            return String(format: String(localized: "Google Health response decoding failed: %@"), detail)
         }
     }
 }
 
 // MARK: - GoogleHealthFetcher
 
-/// Fetches today's health aggregates from the Google Fit REST API.
+/// Fetches today's health data from the Google Health API v4.
+/// API base: https://health.googleapis.com/v4 — NOT the legacy Google Fit API.
 /// Uses `GoogleHealthAuth.shared.currentAccessToken()` for bearer auth.
 final class GoogleHealthFetcher {
 
     static let shared = GoogleHealthFetcher()
 
     private let logger = Logger(subsystem: "com.abundra.pulse", category: "GoogleHealthFetcher")
-    private let aggregateURL = URL(string: "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate")!
+
+    // Google Health API v4 base URL (developers.google.com/health/reference/rest)
+    private let apiBase = "https://health.googleapis.com/v4/users/me/dataTypes"
+
+    // Data type names for Google Health API v4
+    private enum DataType: String {
+        case heartRate        = "heart_rate"
+        case stepCount        = "step_count"
+        case caloriesExpended = "active_calories"
+        case sleep            = "sleep"
+        case oxygenSaturation = "oxygen_saturation"
+    }
 
     private init() {}
 
     // MARK: - Public
 
-    /// Fetches today's (midnight → now) health snapshot from Google Fit.
+    /// Fetches today's (midnight → now) health snapshot from the Google Health API.
     /// Throws `GoogleHealthFetchError.notConnected` if the user has not authorised.
     func fetchTodaySnapshot() async throws -> GoogleHealthSnapshot {
         let accessToken: String
@@ -83,150 +97,121 @@ final class GoogleHealthFetcher {
             throw GoogleHealthFetchError.notConnected
         }
 
-        let (startMillis, endMillis) = todayMillisRange()
-        let body = buildRequestBody(startMillis: startMillis, endMillis: endMillis)
+        let (startTime, endTime) = todayISO8601Range()
 
-        var request = URLRequest(url: aggregateURL)
+        // Fetch each data type in parallel via rollUp endpoint
+        async let hrData     = fetchRollUp(.heartRate,        start: startTime, end: endTime, token: accessToken)
+        async let stepsData  = fetchRollUp(.stepCount,        start: startTime, end: endTime, token: accessToken)
+        async let calData    = fetchRollUp(.caloriesExpended, start: startTime, end: endTime, token: accessToken)
+        async let sleepData  = fetchRollUp(.sleep,            start: startTime, end: endTime, token: accessToken)
+        async let spo2Data   = fetchRollUp(.oxygenSaturation, start: startTime, end: endTime, token: accessToken)
+
+        let (hr, steps, cal, sleep, spo2) = try await (hrData, stepsData, calData, sleepData, spo2Data)
+
+        return GoogleHealthSnapshot(
+            fetchedAt: Date(),
+            heartRate: extractNumeric(hr, key: "average"),
+            restingHeartRate: extractNumeric(hr, key: "minimum"),
+            sleepMinutes: extractSleepMinutes(sleep),
+            bloodOxygen: extractNumeric(spo2, key: "average"),
+            steps: extractInt(steps, key: "sum"),
+            activeCalories: extractNumeric(cal, key: "sum")
+        )
+    }
+
+    // MARK: - Per-type rollUp fetch
+
+    /// POST /v4/users/me/dataTypes/{type}/dataPoints:rollUp
+    /// Returns the raw JSON dict or nil on soft errors (data not available).
+    private func fetchRollUp(
+        _ type: DataType,
+        start: String,
+        end: String,
+        token: String
+    ) async throws -> [String: Any]? {
+        let urlString = "\(apiBase)/\(type.rawValue)/dataPoints:rollUp"
+        guard let url = URL(string: urlString) else { return nil }
+
+        let body: [String: Any] = [
+            "startTime": start,
+            "endTime": end,
+            "period": "daily",
+        ]
+
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let http = response as? HTTPURLResponse else {
             throw GoogleHealthFetchError.httpError(0, "invalid response")
         }
+
+        // 404 = data type not present for this user → return nil (not an error)
+        if http.statusCode == 404 { return nil }
+
         guard (200..<300).contains(http.statusCode) else {
             let bodyText = String(data: data, encoding: .utf8) ?? "<no body>"
-            logger.error("Google Fit aggregate request failed: HTTP \(http.statusCode): \(bodyText)")
+            logger.error("Google Health \(type.rawValue) rollUp failed: HTTP \(http.statusCode): \(bodyText)")
             throw GoogleHealthFetchError.httpError(http.statusCode, bodyText)
         }
 
-        return try parseSnapshot(from: data)
-    }
-
-    // MARK: - Request builder
-
-    private func buildRequestBody(startMillis: Int64, endMillis: Int64) -> [String: Any] {
-        [
-            "aggregateBy": [
-                ["dataTypeName": "com.google.heart_rate.bpm"],
-                ["dataTypeName": "com.google.heart_rate.summary"],
-                ["dataTypeName": "com.google.step_count.delta"],
-                ["dataTypeName": "com.google.calories.expended"],
-                ["dataTypeName": "com.google.sleep.segment"],
-                ["dataTypeName": "com.google.oxygen_saturation"],
-            ],
-            "bucketByTime": ["durationMillis": 86_400_000],
-            "startTimeMillis": startMillis,
-            "endTimeMillis": endMillis,
-        ]
+        return (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
     }
 
     // MARK: - Time helpers
 
-    private func todayMillisRange() -> (Int64, Int64) {
+    private func todayISO8601Range() -> (String, String) {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
         let now = Date()
         let midnight = Calendar.current.startOfDay(for: now)
-        let startMillis = Int64(midnight.timeIntervalSince1970 * 1000)
-        let endMillis   = Int64(now.timeIntervalSince1970 * 1000)
-        return (startMillis, endMillis)
+        return (formatter.string(from: midnight), formatter.string(from: now))
     }
 
-    // MARK: - Response parser
+    // MARK: - Response parsers
 
-    /// Google Fit aggregate response shape:
-    /// { "bucket": [ { "dataset": [ { "dataSourceId": "...", "point": [ { "value": [...] } ] } ] } ] }
-    private func parseSnapshot(from data: Data) throws -> GoogleHealthSnapshot {
-        guard
-            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-            let buckets = json["bucket"] as? [[String: Any]]
-        else {
-            let preview = String(data: data.prefix(200), encoding: .utf8) ?? "<binary>"
-            throw GoogleHealthFetchError.decodingFailed("unexpected root structure: \(preview)")
+    /// Extract a numeric value from the rollUp response.
+    /// Google Health API v4 rollUp response shape (expected):
+    /// { "dataPoints": [ { "value": { "average": 72.4, "minimum": 58, "maximum": 110, "sum": 1234 } } ] }
+    private func extractNumeric(_ json: [String: Any]?, key: String) -> Double? {
+        guard let json,
+              let points = json["dataPoints"] as? [[String: Any]],
+              let first = points.first,
+              let value = first["value"] as? [String: Any],
+              let num = value[key] as? Double
+        else { return nil }
+        return num
+    }
+
+    private func extractInt(_ json: [String: Any]?, key: String) -> Int? {
+        guard let num = extractNumeric(json, key: key) else { return nil }
+        return Int(num)
+    }
+
+    /// Sleep rollUp returns duration in seconds or minutes depending on API version.
+    /// Parse "durationSeconds" or fall back to "durationMinutes".
+    private func extractSleepMinutes(_ json: [String: Any]?) -> Int? {
+        guard let json,
+              let points = json["dataPoints"] as? [[String: Any]],
+              let first = points.first,
+              let value = first["value"] as? [String: Any]
+        else { return nil }
+
+        if let secs = value["durationSeconds"] as? Double {
+            return Int(secs / 60)
         }
-
-        // Collect all datasets across all buckets (today = single bucket, but be defensive)
-        var allDatasets: [[String: Any]] = []
-        for bucket in buckets {
-            if let datasets = bucket["dataset"] as? [[String: Any]] {
-                allDatasets.append(contentsOf: datasets)
-            }
+        if let mins = value["durationMinutes"] as? Double {
+            return Int(mins)
         }
-
-        var heartRateValues: [Double] = []
-        var heartRateMinValues: [Double] = []  // from heart_rate.summary min field
-        var stepSum: Int = 0
-        var caloriesSum: Double = 0
-        var sleepMinutes: Int = 0
-        var oxygenValues: [Double] = []
-
-        for dataset in allDatasets {
-            guard
-                let dataSourceId = dataset["dataSourceId"] as? String,
-                let points = dataset["point"] as? [[String: Any]]
-            else { continue }
-
-            for point in points {
-                guard let values = point["value"] as? [[String: Any]] else { continue }
-
-                if dataSourceId.contains("heart_rate.bpm") {
-                    // fpVal = average bpm
-                    if let fpVal = values.first?["fpVal"] as? Double {
-                        heartRateValues.append(fpVal)
-                    }
-                } else if dataSourceId.contains("heart_rate.summary") {
-                    // heart_rate.summary: [average, max, min] — index 2 = min
-                    if values.count >= 3, let minVal = values[2]["fpVal"] as? Double {
-                        heartRateMinValues.append(minVal)
-                    }
-                } else if dataSourceId.contains("step_count.delta") {
-                    if let intVal = values.first?["intVal"] as? Int {
-                        stepSum += intVal
-                    }
-                } else if dataSourceId.contains("calories.expended") {
-                    if let fpVal = values.first?["fpVal"] as? Double {
-                        caloriesSum += fpVal
-                    }
-                } else if dataSourceId.contains("sleep.segment") {
-                    // Each point spans startTimeNanos → endTimeNanos — convert to minutes
-                    if let startNanos = point["startTimeNanos"] as? String,
-                       let endNanos = point["endTimeNanos"] as? String,
-                       let start = Double(startNanos),
-                       let end = Double(endNanos) {
-                        let durationSeconds = (end - start) / 1_000_000_000
-                        sleepMinutes += Int(durationSeconds / 60)
-                    }
-                } else if dataSourceId.contains("oxygen_saturation") {
-                    if let fpVal = values.first?["fpVal"] as? Double {
-                        oxygenValues.append(fpVal)
-                    }
-                }
-            }
+        // Fallback: use sum in seconds if API returns aggregate in seconds
+        if let sum = value["sum"] as? Double {
+            return Int(sum / 60)
         }
-
-        let avgHeartRate: Double? = heartRateValues.isEmpty
-            ? nil
-            : heartRateValues.reduce(0, +) / Double(heartRateValues.count)
-
-        let minHeartRate: Double? = heartRateMinValues.isEmpty
-            ? nil
-            : heartRateMinValues.min()
-
-        let avgOxygen: Double? = oxygenValues.isEmpty
-            ? nil
-            : oxygenValues.reduce(0, +) / Double(oxygenValues.count)
-
-        return GoogleHealthSnapshot(
-            fetchedAt: Date(),
-            heartRate: avgHeartRate,
-            restingHeartRate: minHeartRate,
-            sleepMinutes: sleepMinutes > 0 ? sleepMinutes : nil,
-            bloodOxygen: avgOxygen,
-            steps: stepSum > 0 ? stepSum : nil,
-            activeCalories: caloriesSum > 0 ? caloriesSum : nil
-        )
+        return nil
     }
 }
 

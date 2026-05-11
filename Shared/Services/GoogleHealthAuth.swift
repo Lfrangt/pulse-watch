@@ -37,11 +37,13 @@ final class GoogleHealthAuth: NSObject, ObservableObject {
 
     private let redirectURI = "pulse-health://google-health/callback"
 
+    // Google Health API v4 restricted scopes (developers.google.com/health)
+    // "activity_and_fitness" covers steps, activity, calories, exercise.
+    // "health_metrics_and_measurements" covers heart rate, SpO2, sleep.
+    // Both require privacy review approval before production use.
     private let scopes: [String] = [
-        "https://www.googleapis.com/auth/health.heart_rate.read",
-        "https://www.googleapis.com/auth/health.sleep.read",
-        "https://www.googleapis.com/auth/health.oxygen_saturation.read",
-        "https://www.googleapis.com/auth/health.activity.read",
+        "https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly",
+        "https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.readonly",
     ]
 
     private let authEndpoint = URL(string: "https://accounts.google.com/o/oauth2/v2/auth")!

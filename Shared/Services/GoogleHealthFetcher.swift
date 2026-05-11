@@ -81,7 +81,7 @@ final class GoogleHealthFetcher {
         case steps            = "steps"
         case totalCalories    = "total-calories"
         case sleep            = "sleep"
-        case oxygenSaturation = "oxygen-saturation"
+        case oxygenSaturation = "daily-oxygen-saturation"
     }
 
     private init() {}
@@ -169,12 +169,25 @@ final class GoogleHealthFetcher {
 
     // MARK: - Time helpers
 
+    // Google Health API v4 rollUp max range per request (codelab: developers.google.com/health)
+    private static let maxRangeDays = 14
+
     private func todayISO8601Range() -> (String, String) {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime]
         let now = Date()
         let midnight = Calendar.current.startOfDay(for: now)
         return (formatter.string(from: midnight), formatter.string(from: now))
+    }
+
+    /// Returns an ISO 8601 range clamped to ≤14 days before `end`.
+    /// Use this for any historical multi-day fetch to stay within API limits.
+    func clampedRange(start: Date, end: Date) -> (String, String) {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        let maxStart = end.addingTimeInterval(-Double(Self.maxRangeDays) * 86_400)
+        let clamped = start < maxStart ? maxStart : start
+        return (formatter.string(from: clamped), formatter.string(from: end))
     }
 
     // MARK: - Response parsers

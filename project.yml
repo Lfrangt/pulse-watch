@@ -41,7 +41,7 @@ targets:
         NSLocalNetworkUsageDescription: "Pulse scans your local network to discover and connect to your OpenClaw AI coach gateway."
         NSLocationWhenInUseUsageDescription: "Pulse uses your location to save your frequent places for smart reminders."
         TELEMETRYDECK_APP_ID: "$(TELEMETRYDECK_APP_ID)"
-        GoogleHealthOAuthClientID: ""
+        GoogleHealthOAuthClientID: "318054848235-qlb055fci5o78jsnojfhkcb6ap592uel.apps.googleusercontent.com"
         ITSAppUsesNonExemptEncryption: false
         LSRequiresIPhoneOS: true
         UILaunchScreen:

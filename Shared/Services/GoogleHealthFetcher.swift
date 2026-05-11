@@ -74,13 +74,14 @@ final class GoogleHealthFetcher {
     // Google Health API v4 base URL (developers.google.com/health/reference/rest)
     private let apiBase = "https://health.googleapis.com/v4/users/me/dataTypes"
 
-    // Data type names for Google Health API v4
+    // Data type names — kebab-case as required by Google Health API v4
+    // Source: developers.google.com/health/data-types
     private enum DataType: String {
-        case heartRate        = "heart_rate"
-        case stepCount        = "step_count"
-        case caloriesExpended = "active_calories"
+        case heartRate        = "heart-rate"
+        case steps            = "steps"
+        case totalCalories    = "total-calories"
         case sleep            = "sleep"
-        case oxygenSaturation = "oxygen_saturation"
+        case oxygenSaturation = "oxygen-saturation"
     }
 
     private init() {}
@@ -101,8 +102,8 @@ final class GoogleHealthFetcher {
 
         // Fetch each data type in parallel via rollUp endpoint
         async let hrData     = fetchRollUp(.heartRate,        start: startTime, end: endTime, token: accessToken)
-        async let stepsData  = fetchRollUp(.stepCount,        start: startTime, end: endTime, token: accessToken)
-        async let calData    = fetchRollUp(.caloriesExpended, start: startTime, end: endTime, token: accessToken)
+        async let stepsData  = fetchRollUp(.steps,            start: startTime, end: endTime, token: accessToken)
+        async let calData    = fetchRollUp(.totalCalories,    start: startTime, end: endTime, token: accessToken)
         async let sleepData  = fetchRollUp(.sleep,            start: startTime, end: endTime, token: accessToken)
         async let spo2Data   = fetchRollUp(.oxygenSaturation, start: startTime, end: endTime, token: accessToken)
 
@@ -110,12 +111,12 @@ final class GoogleHealthFetcher {
 
         return GoogleHealthSnapshot(
             fetchedAt: Date(),
-            heartRate: extractNumeric(hr, key: "average"),
-            restingHeartRate: extractNumeric(hr, key: "minimum"),
+            heartRate: extractNumeric(hr, keys: ["bpmAverage", "average"]),
+            restingHeartRate: extractNumeric(hr, keys: ["bpmMinimum", "minimum"]),
             sleepMinutes: extractSleepMinutes(sleep),
-            bloodOxygen: extractNumeric(spo2, key: "average"),
-            steps: extractInt(steps, key: "sum"),
-            activeCalories: extractNumeric(cal, key: "sum")
+            bloodOxygen: extractNumeric(spo2, keys: ["percentageAverage", "average"]),
+            steps: extractInt(steps, keys: ["steps", "value", "sum"]),
+            activeCalories: extractNumeric(cal, keys: ["kcal", "value", "sum"])
         )
     }
 
@@ -132,10 +133,14 @@ final class GoogleHealthFetcher {
         let urlString = "\(apiBase)/\(type.rawValue)/dataPoints:rollUp"
         guard let url = URL(string: urlString) else { return nil }
 
+        // Request body: range (RFC 3339 timestamps) + windowSize (Duration "Ns")
+        // Source: developers.google.com/health/reference/rest/v4/users.dataTypes.dataPoints/rollUp
         let body: [String: Any] = [
-            "startTime": start,
-            "endTime": end,
-            "period": "daily",
+            "range": [
+                "startTime": start,
+                "endTime": end,
+            ],
+            "windowSize": "86400s",  // 24 hours — one bucket per day
         ]
 
         var request = URLRequest(url: url)
@@ -174,43 +179,49 @@ final class GoogleHealthFetcher {
 
     // MARK: - Response parsers
 
-    /// Extract a numeric value from the rollUp response.
-    /// Google Health API v4 rollUp response shape (expected):
-    /// { "dataPoints": [ { "value": { "average": 72.4, "minimum": 58, "maximum": 110, "sum": 1234 } } ] }
-    private func extractNumeric(_ json: [String: Any]?, key: String) -> Double? {
+    /// Google Health API v4 rollUp response shape:
+    /// { "rollupDataPoints": [ { "startTime": ..., "endTime": ..., "value": { ... } } ] }
+    /// Tries each key in `keys` in order, returns first non-nil Double found.
+    private func extractNumeric(_ json: [String: Any]?, keys: [String]) -> Double? {
         guard let json,
-              let points = json["dataPoints"] as? [[String: Any]],
-              let first = points.first,
-              let value = first["value"] as? [String: Any],
-              let num = value[key] as? Double
-        else { return nil }
-        return num
-    }
-
-    private func extractInt(_ json: [String: Any]?, key: String) -> Int? {
-        guard let num = extractNumeric(json, key: key) else { return nil }
-        return Int(num)
-    }
-
-    /// Sleep rollUp returns duration in seconds or minutes depending on API version.
-    /// Parse "durationSeconds" or fall back to "durationMinutes".
-    private func extractSleepMinutes(_ json: [String: Any]?) -> Int? {
-        guard let json,
-              let points = json["dataPoints"] as? [[String: Any]],
+              let points = json["rollupDataPoints"] as? [[String: Any]],
               let first = points.first,
               let value = first["value"] as? [String: Any]
         else { return nil }
 
-        if let secs = value["durationSeconds"] as? Double {
-            return Int(secs / 60)
+        for key in keys {
+            if let num = value[key] as? Double { return num }
+            if let num = value[key] as? Int { return Double(num) }
         }
-        if let mins = value["durationMinutes"] as? Double {
-            return Int(mins)
+        return nil
+    }
+
+    private func extractInt(_ json: [String: Any]?, keys: [String]) -> Int? {
+        guard let num = extractNumeric(json, keys: keys) else { return nil }
+        return Int(num)
+    }
+
+    /// Sleep rollUp: try duration keys in seconds/minutes, then sum.
+    private func extractSleepMinutes(_ json: [String: Any]?) -> Int? {
+        guard let json,
+              let points = json["rollupDataPoints"] as? [[String: Any]],
+              let first = points.first,
+              let value = first["value"] as? [String: Any]
+        else { return nil }
+
+        let secondsKeys = ["durationSeconds", "totalSleepSeconds", "seconds"]
+        let minutesKeys = ["durationMinutes", "totalSleepMinutes", "minutes"]
+
+        for key in secondsKeys {
+            if let secs = value[key] as? Double { return Int(secs / 60) }
+            if let secs = value[key] as? Int { return secs / 60 }
         }
-        // Fallback: use sum in seconds if API returns aggregate in seconds
-        if let sum = value["sum"] as? Double {
-            return Int(sum / 60)
+        for key in minutesKeys {
+            if let mins = value[key] as? Double { return Int(mins) }
+            if let mins = value[key] as? Int { return mins }
         }
+        // Last resort: sum field (may be in seconds)
+        if let sum = value["sum"] as? Double, sum > 60 { return Int(sum / 60) }
         return nil
     }
 }

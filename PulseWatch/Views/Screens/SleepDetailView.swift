@@ -194,10 +194,10 @@ struct SleepDetailView: View {
 
     private var summaryStatsRow: some View {
         HStack(spacing: PulseTheme.spacingS) {
-            statPill(icon: "moon.fill", value: formatDuration(totalMinutes), label: String(localized: "总睡眠"), color: PulseTheme.textSecondary)
-            statPill(icon: "powersleep", value: formatDuration(deepMinutes), label: String(localized: "深睡"), color: deepColor)
+            statPill(icon: "moon.fill", value: formatDuration(totalMinutes), label: String(localized: "Total Sleep"), color: PulseTheme.textSecondary)
+            statPill(icon: "powersleep", value: formatDuration(deepMinutes), label: String(localized: "Deep"), color: deepColor)
             statPill(icon: "brain.head.profile", value: formatDuration(remMinutes), label: "REM", color: remColor)
-            statPill(icon: "sleep", value: formatDuration(coreMinutes), label: String(localized: "浅睡"), color: coreColor)
+            statPill(icon: "sleep", value: formatDuration(coreMinutes), label: String(localized: "Core"), color: coreColor)
         }
     }
 
@@ -249,7 +249,7 @@ struct SleepDetailView: View {
                 }
             }
 
-            Text(String(localized: "睡眠评分"))
+            Text(String(localized: "Sleep Score"))
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textSecondary)
 
@@ -265,11 +265,11 @@ struct SleepDetailView: View {
     private var sleepInsight: String {
         let deepPct = totalMinutes > 0 ? Int(Double(deepMinutes) / Double(totalMinutes) * 100) : 0
         if deepPct >= 20 {
-            return String(localized: "深睡比例优秀，恢复充分")
+            return String(localized: "Excellent deep sleep ratio — well recovered")
         } else if deepPct >= 13 {
-            return String(localized: "深睡占比 \(deepPct)%，处于健康范围")
+            return String(localized: "Deep sleep at \(deepPct)% — within healthy range")
         } else {
-            return String(localized: "深睡偏少，建议改善睡前习惯")
+            return String(localized: "Low deep sleep — consider improving bedtime habits")
         }
     }
 
@@ -346,17 +346,17 @@ struct SleepDetailView: View {
     }
 
     private var sleepLatencyInsight: String {
-        String(localized: "入睡用时约 12 分钟，快于平均水平")
+        String(localized: "Fell asleep in about 12 minutes — faster than average")
     }
 
     private var deepSleepInsight: String {
         let pct = totalMinutes > 0 ? Int(Double(deepMinutes) / Double(totalMinutes) * 100) : 0
-        return String(localized: "深睡占比 \(pct)%，处于健康范围")
+        return String(localized: "Deep sleep at \(pct)% — within healthy range")
     }
 
     private var weeklyTrendInsight: String {
         let hours = String(format: "%.1f", Double(totalMinutes) / 60)
-        return String(localized: "本周平均睡眠 \(hours)h，保持稳定")
+        return String(localized: "Weekly avg sleep \(hours)h — staying consistent")
     }
 
     // MARK: - Helpers

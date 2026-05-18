@@ -154,13 +154,13 @@ final class HealthAgeService {
             totalImpact += impact
             let advice: String
             if rhr < 50 {
-                advice = String(localized: "静息心率极低，通常见于耐力运动员")
+                advice = String(localized: "Very low resting HR — typical of endurance athletes")
             } else if rhr < 60 {
-                advice = String(localized: "静息心率优秀（Framingham 低风险区间）")
+                advice = String(localized: "Excellent resting HR (Framingham low-risk range)")
             } else if rhr < 75 {
-                advice = String(localized: "静息心率正常，心血管健康")
+                advice = String(localized: "Normal resting HR — cardiovascular health is good")
             } else {
-                advice = String(localized: "静息心率偏高，有氧训练可有效降低")
+                advice = String(localized: "Resting HR is elevated — cardio training can help lower it")
             }
             metrics.append(MetricScore(metric: .restingHR, value: rhr, ageImpact: impact, advice: advice))
         }
@@ -175,11 +175,11 @@ final class HealthAgeService {
             totalImpact += impact
             let advice: String
             if hrv >= baseline * 1.3 {
-                advice = String(localized: "HRV 远超年龄基准，自主神经功能出色")
+                advice = String(localized: "HRV well above age baseline — excellent autonomic function")
             } else if hrv >= baseline * 0.9 {
-                advice = String(localized: "HRV 在年龄正常范围内（Shaffer 2017 标准）")
+                advice = String(localized: "HRV within normal range for your age (Shaffer 2017)")
             } else {
-                advice = String(localized: "HRV 低于年龄基准，建议改善睡眠和减少压力")
+                advice = String(localized: "HRV below age baseline — improve sleep and reduce stress")
             }
             metrics.append(MetricScore(metric: .hrv, value: hrv, ageImpact: impact, advice: advice))
         }
@@ -194,11 +194,11 @@ final class HealthAgeService {
             totalImpact += impact
             let advice: String
             switch hours {
-            case ..<6.0:    advice = String(localized: "严重睡眠不足，死亡率风险显著升高（CDC 2016）")
-            case 6.0..<7.0: advice = String(localized: "睡眠略不足，建议延长至 7-8 小时")
-            case 7.0..<8.5: advice = String(localized: "睡眠时长在最优区间（Walker 2017 推荐）")
-            case 8.5..<9.5: advice = String(localized: "睡眠偏多，注意睡眠效率和质量")
-            default:        advice = String(localized: "睡眠过多，建议排查潜在健康问题")
+            case ..<6.0:    advice = String(localized: "Severe sleep deficit — significantly higher mortality risk (CDC 2016)")
+            case 6.0..<7.0: advice = String(localized: "Slightly short on sleep — aim for 7-8 hours")
+            case 7.0..<8.5: advice = String(localized: "Sleep duration in optimal range (Walker 2017)")
+            case 8.5..<9.5: advice = String(localized: "Sleeping a bit long — check sleep efficiency and quality")
+            default:        advice = String(localized: "Excessive sleep — consider checking for underlying health issues")
             }
             metrics.append(MetricScore(metric: .sleep, value: hours, ageImpact: impact, advice: advice))
         }
@@ -214,10 +214,10 @@ final class HealthAgeService {
             totalImpact += impact
             let advice: String
             switch steps {
-            case ..<4000:   advice = String(localized: "长期久坐（<4000步），心血管和代谢风险显著上升（JAMA 2022）")
-            case 4000..<6000: advice = String(localized: "步数偏低，建议每天步行至少 8000 步")
-            case 6000..<8000: advice = String(localized: "接近推荐阈值，继续保持")
-            default:        advice = String(localized: "步数达标（≥8000步），久坐风险低")
+            case ..<4000:   advice = String(localized: "Sedentary (<4000 steps) — cardiovascular and metabolic risk significantly elevated (JAMA 2022)")
+            case 4000..<6000: advice = String(localized: "Step count is low — aim for at least 8000 steps per day")
+            case 6000..<8000: advice = String(localized: "Approaching recommended threshold — keep it up")
+            default:        advice = String(localized: "Step count on target (8000+) — low sedentary risk")
             }
             metrics.append(MetricScore(metric: .steps, value: steps, ageImpact: impact, advice: advice))
         }
@@ -231,11 +231,11 @@ final class HealthAgeService {
         totalImpact += activeImpact
         let activeAdvice: String
         if avgActiveMin >= whoDaily {
-            activeAdvice = String(localized: "活动量达到 WHO 2020 推荐标准（≥150 min/week）")
+            activeAdvice = String(localized: "Activity meets WHO 2020 guidelines (150+ min/week)")
         } else if avgActiveMin >= 10 {
-            activeAdvice = String(localized: "活动量略不足，WHO 建议每天至少 21 分钟中等强度运动")
+            activeAdvice = String(localized: "Activity slightly below target — WHO recommends 21+ min/day of moderate exercise")
         } else {
-            activeAdvice = String(localized: "活动量严重不足，增加日常运动可显著降低慢病风险")
+            activeAdvice = String(localized: "Activity severely insufficient — increasing daily exercise can significantly reduce chronic disease risk")
         }
         metrics.append(MetricScore(metric: .activeMinutes, value: avgActiveMin, ageImpact: activeImpact, advice: activeAdvice))
 

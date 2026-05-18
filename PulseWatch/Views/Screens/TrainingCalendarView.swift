@@ -24,7 +24,7 @@ struct TrainingCalendarView: View {
     // MARK: - 常量
 
     private let calendar = Calendar.current
-    private let weekdayHeaders = ["一", "二", "三", "四", "五", "六", "日"]
+    private let weekdayHeaders = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
     // MARK: - 训练分类颜色
 
@@ -51,10 +51,10 @@ struct TrainingCalendarView: View {
         switch category.lowercased() {
         case "chest":      return String(localized: "Chest")
         case "back":       return String(localized: "Back")
-        case "legs":       return "腿部"
+        case "legs":       return String(localized: "Legs")
         case "shoulders":  return String(localized: "Shoulders")
-        case "arms":       return "手臂"
-        case "cardio":     return "有氧"
+        case "arms":       return String(localized: "Arms")
+        case "cardio":     return String(localized: "Cardio")
         default:           return category
         }
     }
@@ -97,7 +97,7 @@ struct TrainingCalendarView: View {
                 .padding(.top, PulseTheme.spacingS)
             }
             .background(PulseTheme.background)
-            .navigationTitle("训练日历")
+            .navigationTitle("Training Calendar")
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
         }
@@ -149,8 +149,8 @@ struct TrainingCalendarView: View {
     /// 当前月份的标题字符串，例如 "2026年3月"
     private var monthYearString: String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "yyyy MMM"
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateFormat = "MMM yyyy"
         return formatter.string(from: currentMonth)
     }
 
@@ -282,7 +282,7 @@ struct TrainingCalendarView: View {
                 if let summary = summaryForDate(date), let score = summary.dailyScore {
                     HStack(spacing: 4) {
                         Image(systemName: "heart.fill").font(.system(size: 11)).foregroundStyle(PulseTheme.statusColor(for: score))
-                        Text("恢复 \(score)").font(PulseTheme.captionFont).foregroundStyle(PulseTheme.statusColor(for: score))
+                        Text("Recovery \(score)").font(PulseTheme.captionFont).foregroundStyle(PulseTheme.statusColor(for: score))
                     }
                     .padding(.horizontal, 10).padding(.vertical, 5)
                     .background(Capsule().fill(PulseTheme.statusColor(for: score).opacity(0.15)))
@@ -302,7 +302,7 @@ struct TrainingCalendarView: View {
                                 .font(.system(size: 11)).foregroundStyle(PulseTheme.textTertiary)
                         }
                         HStack(spacing: 8) {
-                            Label("\(hk.durationMinutes) 分钟", systemImage: "clock")
+                            Label("\(hk.durationMinutes) min", systemImage: "clock")
                             if let cal = hk.totalCalories, cal > 0 {
                                 Label("\(Int(cal)) kcal", systemImage: "flame.fill")
                             }
@@ -447,7 +447,7 @@ struct TrainingCalendarView: View {
     /// 日期详情标题，例如 "3月14日 周六"
     private func dayDetailTitle(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.locale = Locale(identifier: "en_US")
         formatter.dateFormat = "MMM d, EEEE"
         return formatter.string(from: date)
     }
@@ -472,7 +472,7 @@ struct TrainingCalendarView: View {
         return VStack(spacing: PulseTheme.spacingM) {
             // 标题
             HStack {
-                Text("本月概览")
+                Text("Monthly Overview")
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
                 Spacer()
@@ -482,7 +482,7 @@ struct TrainingCalendarView: View {
                 // 训练天数
                 statItem(
                     value: "\(trainingDays)",
-                    label: "训练天数",
+                    label: "Training Days",
                     icon: "calendar",
                     color: PulseTheme.accent
                 )
@@ -495,7 +495,7 @@ struct TrainingCalendarView: View {
                 // 最常练部位
                 statItem(
                     value: topCategory != nil ? categoryLabel(for: topCategory!.key) : "—",
-                    label: "最常练部位",
+                    label: "Top Muscle",
                     icon: "figure.strengthtraining.traditional",
                     color: topCategory != nil ? categoryColor(for: topCategory!.key) : PulseTheme.textTertiary
                 )
@@ -508,7 +508,7 @@ struct TrainingCalendarView: View {
                 // 总训练时长
                 statItem(
                     value: totalMinutes >= 60 ? "\(totalMinutes / 60)h\(totalMinutes % 60)m" : "\(totalMinutes)m",
-                    label: "总训练时长",
+                    label: "Total Duration",
                     icon: "clock.fill",
                     color: PulseTheme.statusModerate
                 )
@@ -541,16 +541,16 @@ struct TrainingCalendarView: View {
 
     private var categoryLegend: some View {
         let legends: [(String, String, Color)] = [
-            ("推（胸/肩）", "chest",   Color(hex: "5B8DEF")),
-            ("拉（背部）",   "back",    PulseTheme.statusGood),
-            ("腿部",        "legs",    PulseTheme.statusModerate),
-            ("手臂",      "arms",    Color(hex: "C9A96E")),
-            ("有氧",      "cardio",  PulseTheme.activityAccent),
+            ("Push (Chest/Shoulders)", "chest",   Color(hex: "5B8DEF")),
+            ("Pull (Back)",            "back",    PulseTheme.statusGood),
+            ("Legs",                   "legs",    PulseTheme.statusModerate),
+            ("Arms",                   "arms",    Color(hex: "C9A96E")),
+            ("Cardio",                 "cardio",  PulseTheme.activityAccent),
         ]
 
         return VStack(alignment: .leading, spacing: PulseTheme.spacingS) {
             HStack {
-                Text("图例")
+                Text("Legend")
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
                 Spacer()

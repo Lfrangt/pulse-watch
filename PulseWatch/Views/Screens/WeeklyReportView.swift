@@ -83,9 +83,8 @@ struct WeeklyReportView: View {
         }
 
         let fmt = DateFormatter()
-        fmt.locale = Locale(identifier: "zh_CN")
-        fmt.dateStyle = .medium
         fmt.locale = Locale.current
+        fmt.dateStyle = .medium
 
         return "\(fmt.string(from: monday)) - \(fmt.string(from: sunday))"
     }
@@ -574,7 +573,7 @@ struct WeeklyReportView: View {
         let now = Date()
         let weekday = cal.component(.weekday, from: now)
         let daysSinceMonday = (weekday + 5) % 7
-        let labels = [String(localized: "Mon"), String(localized: "Tue"), String(localized: "Wed"), String(localized: "Thu"), String(localized: "Fri"), String(localized: "Sat"), String(localized: "Sun")]
+        let labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
         guard let monday = cal.date(byAdding: .day, value: -daysSinceMonday, to: cal.startOfDay(for: now)) else {
             return []
@@ -641,7 +640,7 @@ struct WeeklyReportView: View {
         let scores = summaries.compactMap(\.dailyScore)
 
         guard !scores.isEmpty else {
-            return [String(localized: "Insufficient data — keep wearing your device")]
+            return ["Insufficient data — keep wearing your device"]
         }
 
         // 最佳/最差日分析
@@ -649,7 +648,7 @@ struct WeeklyReportView: View {
            let worstDay = summaries.filter({ $0.dailyScore != nil }).min(by: { ($0.dailyScore ?? 0) < ($1.dailyScore ?? 0) }) {
 
             let fmt = DateFormatter()
-            fmt.locale = Locale(identifier: "zh_CN")
+            fmt.locale = Locale.current
             fmt.dateFormat = "EEEE"
 
             let bestLabel = fmt.string(from: bestDay.date)
@@ -682,11 +681,11 @@ struct WeeklyReportView: View {
         if let lastAvg {
             let diff = avgScore - lastAvg
             if diff > 5 {
-                insights.append(String(localized: "Overall improvement — keep up the rhythm"))
+                insights.append("Overall improvement — keep up the rhythm")
             } else if diff < -5 {
-                insights.append(String(localized: "Slight decline this week — adjust rest and training"))
+                insights.append("Slight decline this week — adjust rest and training")
             } else {
-                insights.append(String(localized: "Stable — your body is adapting well"))
+                insights.append("Stable — your body is adapting well")
             }
         }
 
@@ -699,7 +698,7 @@ struct WeeklyReportView: View {
             }
         }
 
-        return insights.isEmpty ? [String(localized: "Building data — more detailed analysis next week")] : insights
+        return insights.isEmpty ? ["Building data — more detailed analysis next week"] : insights
     }
 
     // MARK: - 下周建议生成
@@ -710,18 +709,18 @@ struct WeeklyReportView: View {
         let scores = summaries.compactMap(\.dailyScore)
 
         guard !scores.isEmpty else {
-            return [String(localized: "Keep wearing your device to build a baseline")]
+            return ["Keep wearing your device to build a baseline"]
         }
 
         let avgScore = scores.reduce(0, +) / scores.count
 
         // 基于评分趋势建议
         if avgScore >= 75 {
-            advice.append(String(localized: "Excellent — push harder or try something new"))
+            advice.append("Excellent — push harder or try something new")
         } else if avgScore >= 55 {
-            advice.append(String(localized: "Maintain your pace, focus on recovery and nutrition"))
+            advice.append("Maintain your pace, focus on recovery and nutrition")
         } else {
-            advice.append(String(localized: "Reduce intensity, prioritize sleep quality"))
+            advice.append("Reduce intensity, prioritize sleep quality")
         }
 
         // 睡眠建议
@@ -729,7 +728,7 @@ struct WeeklyReportView: View {
         if sleeps.count >= 3 {
             let avg = Double(sleeps.reduce(0, +)) / Double(sleeps.count) / 60.0
             if avg < 7 {
-                advice.append(String(localized: "Goal: ≥ 7 hours nightly, try a consistent bedtime"))
+                advice.append("Goal: ≥ 7 hours nightly, try a consistent bedtime")
             }
         }
 
@@ -741,11 +740,11 @@ struct WeeklyReportView: View {
             } / Double(hrvValues.count)
 
             if trend < -2 {
-                advice.append(String(localized: "HRV trending down — manage stress and recovery"))
+                advice.append("HRV trending down — manage stress and recovery")
             }
         }
 
-        return advice.isEmpty ? [String(localized: "Keep up the good habits")] : advice
+        return advice.isEmpty ? ["Keep up the good habits"] : advice
     }
 
     // MARK: - 空占位

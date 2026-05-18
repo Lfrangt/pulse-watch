@@ -53,7 +53,7 @@ struct WeeklyTrendChartsView: View {
                         .foregroundStyle(PulseTheme.accent)
                 }
 
-                Text(String(localized: "7日趋势"))
+                Text(String(localized: "7-Day Trends"))
                     .font(PulseTheme.headlineFont)
                     .foregroundStyle(PulseTheme.textPrimary)
                     .accessibilityAddTraits(.isHeader)
@@ -93,12 +93,12 @@ struct WeeklyTrendChartsView: View {
             placeholderChartSilhouette
             
             VStack(spacing: PulseTheme.spacingS) {
-                Text(String(localized: "Start wearing Apple Watch to collect data"))
+                Text("Start wearing Apple Watch to collect data")
                     .font(PulseTheme.bodyFont)
                     .foregroundStyle(PulseTheme.textSecondary)
                     .multilineTextAlignment(.center)
                 
-                Text(String(localized: "Trends will appear here once you have a few days of health data"))
+                Text("Trends will appear here once you have a few days of health data")
                     .font(PulseTheme.captionFont)
                     .foregroundStyle(PulseTheme.textTertiary)
                     .multilineTextAlignment(.center)
@@ -169,7 +169,7 @@ struct WeeklyTrendChartsView: View {
         return VStack(alignment: .leading, spacing: PulseTheme.spacingXS) {
             chartHeader(
                 icon: "heart.fill",
-                title: String(localized: "静息心率"),
+                title: String(localized: "Resting Heart Rate"),
                 color: PulseTheme.activityAccent,
                 summary: hrData.isEmpty ? nil : restingHRSummary(hrData)
             )
@@ -224,7 +224,7 @@ struct WeeklyTrendChartsView: View {
                 }
                 .frame(height: 120)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(String(localized: "Resting Heart Rate trend chart"))
+                .accessibilityLabel("Resting Heart Rate trend chart")
                 .accessibilityValue(hrData.isEmpty ? String(localized: "No data") : restingHRSummary(hrData))
             }
         }
@@ -298,7 +298,7 @@ struct WeeklyTrendChartsView: View {
                 }
                 .frame(height: 120)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(String(localized: "HRV trend chart"))
+                .accessibilityLabel("HRV trend chart")
                 .accessibilityValue(hrvData.isEmpty ? String(localized: "No data") : hrvSummary(hrvData))
             }
         }
@@ -374,7 +374,7 @@ struct WeeklyTrendChartsView: View {
                 }
                 .frame(height: 120)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(String(localized: "Sleep trend chart"))
+                .accessibilityLabel("Sleep trend chart")
                 .accessibilityValue(sleepData.isEmpty ? String(localized: "No data") : sleepSummary(sleepData))
             }
         }
@@ -408,13 +408,13 @@ struct WeeklyTrendChartsView: View {
     private var miniEmptyPlaceholder: some View {
         HStack {
             Spacer()
-            Text(String(localized: "Insufficient data"))
+            Text("Insufficient data")
                 .font(PulseTheme.captionFont)
                 .foregroundStyle(PulseTheme.textTertiary)
             Spacer()
         }
         .frame(height: 60)
-        .accessibilityLabel(String(localized: "Insufficient data to display chart"))
+        .accessibilityLabel("Insufficient data to display chart")
     }
 
     // MARK: - Summary 计算

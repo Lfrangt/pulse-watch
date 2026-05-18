@@ -34,7 +34,7 @@ struct HealthAgeDetailView: View {
             .padding(.top, PulseTheme.spacingM)
         }
         .background(PulseTheme.background.ignoresSafeArea())
-        .navigationTitle("生理年龄")
+        .navigationTitle("Health Age")
         .navigationBarTitleDisplayMode(.large)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .preferredColorScheme(.dark)
@@ -49,7 +49,7 @@ struct HealthAgeDetailView: View {
                 Text("\(Int(result.healthAge.rounded()))")
                     .font(.system(size: 72, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                Text("岁")
+                Text("yrs")
                     .font(.system(size: 28, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.6))
                     .offset(y: -8)
@@ -60,9 +60,9 @@ struct HealthAgeDetailView: View {
                 HStack(spacing: 6) {
                     Image(systemName: isYounger ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
                         .font(.system(size: 16))
-                    Text(String(format: "比实际年龄%@ %d 岁",
-                                isYounger ? "年轻" : "偏老",
-                                Int(abs(diff).rounded())))
+                    Text(String(format: "%d years %@ than actual age",
+                                Int(abs(diff).rounded()),
+                                isYounger ? "younger" : "older"))
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
                 }
                 .foregroundStyle(accentColor)
@@ -73,13 +73,13 @@ struct HealthAgeDetailView: View {
 
             // Actual age row
             HStack(spacing: 4) {
-                Text("实际年龄：")
+                Text("Actual age:")
                     .foregroundStyle(.white.opacity(0.4))
-                Text("\(result.chronologicalAge) 岁")
+                Text("\(result.chronologicalAge) yrs")
                     .foregroundStyle(.white.opacity(0.7))
                 Text("·")
                     .foregroundStyle(.white.opacity(0.2))
-                Text("基于 \(result.daysOfData) 天数据")
+                Text("Based on \(result.daysOfData) days of data")
                     .foregroundStyle(.white.opacity(0.4))
             }
             .font(.system(size: 13, design: .rounded))
@@ -106,7 +106,7 @@ struct HealthAgeDetailView: View {
 
     private var metricsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("指标详情")
+            Text("Metric Details")
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .tracking(1.2)
                 .foregroundStyle(PulseTheme.textTertiary)
@@ -123,9 +123,9 @@ struct HealthAgeDetailView: View {
         let isGood = m.ageImpact < -0.3
         let isBad  = m.ageImpact > 0.3
         let rowColor: Color = isGood ? PulseTheme.accentTeal : (isBad ? PulseTheme.activityCoral : PulseTheme.textSecondary)
-        let impactText = abs(m.ageImpact) < 0.3 ? "无影响" :
-            (m.ageImpact < 0 ? String(format: "年轻 %.1f 年", abs(m.ageImpact))
-                             : String(format: "偏老 %.1f 年", m.ageImpact))
+        let impactText = abs(m.ageImpact) < 0.3 ? "No impact" :
+            (m.ageImpact < 0 ? String(format: "%.1f yrs younger", abs(m.ageImpact))
+                             : String(format: "%.1f yrs older", m.ageImpact))
 
         return VStack(spacing: 0) {
             HStack(spacing: 12) {
@@ -190,20 +190,20 @@ struct HealthAgeDetailView: View {
 
     private var whatAffectsCard: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("什么影响生理年龄？")
+            Text("What Affects Health Age?")
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .tracking(1.2)
                 .foregroundStyle(PulseTheme.textTertiary)
 
             VStack(alignment: .leading, spacing: 10) {
                 tipRow(icon: "heart.fill", color: PulseTheme.activityCoral,
-                       text: "静息心率越低、HRV 越高，心血管健康越好")
+                       text: "Lower resting HR and higher HRV indicate better cardiovascular health")
                 tipRow(icon: "moon.fill", color: PulseTheme.sleepViolet,
-                       text: "每晚 7-9 小时睡眠有助于细胞修复和代谢")
+                       text: "7-9 hours of sleep per night supports cell repair and metabolism")
                 tipRow(icon: "figure.run", color: PulseTheme.accentTeal,
-                       text: "每天 8000 步以上可显著降低全因死亡率")
+                       text: "8,000+ daily steps significantly reduces all-cause mortality")
                 tipRow(icon: "info.circle", color: .white.opacity(0.4),
-                       text: "数据基于人口均值估算，仅供参考，非医疗诊断")
+                       text: "Based on population averages — for reference only, not medical diagnosis")
             }
         }
         .padding(PulseTheme.spacingM)
@@ -235,11 +235,11 @@ struct HealthAgeDetailView: View {
 
     private func localizedMetricLabel(_ metric: HealthAgeService.MetricScore.Metric) -> String {
         switch metric {
-        case .restingHR:     return "静息心率"
-        case .hrv:           return "心率变异性 HRV"
-        case .sleep:         return "睡眠时长"
-        case .steps:         return "日均步数"
-        case .activeMinutes: return "活跃分钟"
+        case .restingHR:     return "Resting Heart Rate"
+        case .hrv:           return "Heart Rate Variability"
+        case .sleep:         return "Sleep Duration"
+        case .steps:         return "Daily Steps"
+        case .activeMinutes: return "Active Minutes"
         }
     }
 
@@ -248,8 +248,8 @@ struct HealthAgeDetailView: View {
         case .restingHR:     return String(format: "%.0f bpm", m.value)
         case .hrv:           return String(format: "%.0f ms", m.value)
         case .sleep:         return String(format: "%.1fh", m.value)
-        case .steps:         return String(format: "%.0f 步", m.value)
-        case .activeMinutes: return String(format: "%.0f 分钟", m.value)
+        case .steps:         return String(format: "%.0f steps", m.value)
+        case .activeMinutes: return String(format: "%.0f min", m.value)
         }
     }
 }
